@@ -1,0 +1,146 @@
+name: Configure SozoRock Foundation parent domain
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/configure-parent-domain.yml
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+concurrency:
+  group: sozorock-foundation-parent-domain-dns
+  cancel-in-progress: false
+
+jobs:
+  configure-parent-domain:
+    if: github.repository == 'drolu-cmyk/sozorock-foundation' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    env:
+      AWS_REGION: us-east-1
+      AWS_ROLE_TO_ASSUME: ${{ vars.AWS_ROLE_TO_ASSUME || 'arn:aws:iam::791860731989:role/GitHubActionsSozorockAiLabDeployRole' }}
+      ZONE_NAME: sozorockfoundation.org.
+      WWW_NAME: www.sozorockfoundation.org.
+      CNAME_TARGET: custom-domains.chatgpt.site.
+      OPENAI_NAME: _openai-site-verification.www.sozorockfoundation.org.
+      OPENAI_VALUE: openai-site-verification=uRWqqC2NjJmoTR2EyEqF9JyNpVBzzmx61U0re5JhBjk
+      CLOUDFLARE_NAME: _cf-custom-hostname.www.sozorockfoundation.org.
+      CLOUDFLARE_VALUE: a3a592c6-be9a-4592-90d6-dd20c2e1af6d
+    steps:
+      - name: Configure AWS credentials with GitHub OIDC
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: ${{ env.AWS_ROLE_TO_ASSUME }}
+          role-session-name: SozoRockFoundation-${{ github.run_id }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Validate zone and update only the authorized records
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          zone_json="$(aws route53 list-hosted-zones-by-name --dns-name "$ZONE_NAME" --output json)"
+          mapfile -t zone_ids < <(
+            jq -r --arg name "$ZONE_NAME"               '.HostedZones[] | select(.Name == $name and .Config.PrivateZone == false) | .Id'               <<<"$zone_json"
+          )
+
+          if [[ ${#zone_ids[@]} -ne 1 ]]; then
+            echo "Expected exactly one public hosted zone named $ZONE_NAME; found ${#zone_ids[@]}." >&2
+            exit 1
+          fi
+
+          zone_id="${zone_ids[0]#/hostedzone/}"
+          actual_zone_name="$(aws route53 get-hosted-zone --id "$zone_id" --query 'HostedZone.Name' --output text)"
+          if [[ "$actual_zone_name" != "$ZONE_NAME" ]]; then
+            echo "Hosted-zone safety check failed: expected $ZONE_NAME, got $actual_zone_name." >&2
+            exit 1
+          fi
+
+          current_records="$(aws route53 list-resource-record-sets --hosted-zone-id "$zone_id" --output json)"
+          existing_www="$(
+            jq -c --arg name "$WWW_NAME"               '[.ResourceRecordSets[] | select(.Name == $name)]'               <<<"$current_records"
+          )"
+
+          unexpected_www_types="$(
+            jq -r '.[] | select(.Type != "CNAME") | .Type' <<<"$existing_www"
+          )"
+          if [[ -n "$unexpected_www_types" ]]; then
+            echo "Refusing to replace unexpected record type(s) at $WWW_NAME: $unexpected_www_types" >&2
+            exit 1
+          fi
+
+          advanced_www_records="$(
+            jq -r '.[] | select(has("SetIdentifier") or has("AliasTarget") or has("TrafficPolicyInstanceId")) | .Type'               <<<"$existing_www"
+          )"
+          if [[ -n "$advanced_www_records" ]]; then
+            echo "Refusing to replace an advanced-routing record at $WWW_NAME." >&2
+            exit 1
+          fi
+
+          change_batch="$(
+            jq -n               --arg www_name "$WWW_NAME"               --arg cname_target "$CNAME_TARGET"               --arg openai_name "$OPENAI_NAME"               --arg openai_value "\"$OPENAI_VALUE\""               --arg cloudflare_name "$CLOUDFLARE_NAME"               --arg cloudflare_value "\"$CLOUDFLARE_VALUE\""               '{
+                Comment: "Attach the SozoRock Foundation parent domain to the published ChatGPT Site",
+                Changes: [
+                  {
+                    Action: "UPSERT",
+                    ResourceRecordSet: {
+                      Name: $www_name,
+                      Type: "CNAME",
+                      TTL: 300,
+                      ResourceRecords: [{Value: $cname_target}]
+                    }
+                  },
+                  {
+                    Action: "UPSERT",
+                    ResourceRecordSet: {
+                      Name: $openai_name,
+                      Type: "TXT",
+                      TTL: 300,
+                      ResourceRecords: [{Value: $openai_value}]
+                    }
+                  },
+                  {
+                    Action: "UPSERT",
+                    ResourceRecordSet: {
+                      Name: $cloudflare_name,
+                      Type: "TXT",
+                      TTL: 300,
+                      ResourceRecords: [{Value: $cloudflare_value}]
+                    }
+                  }
+                ]
+              }'
+          )"
+
+          change_id="$(
+            aws route53 change-resource-record-sets               --hosted-zone-id "$zone_id"               --change-batch "$change_batch"               --query 'ChangeInfo.Id'               --output text
+          )"
+          aws route53 wait resource-record-sets-changed --id "$change_id"
+
+          updated_records="$(aws route53 list-resource-record-sets --hosted-zone-id "$zone_id" --output json)"
+          actual_cname="$(
+            jq -r --arg name "$WWW_NAME"               '.ResourceRecordSets[] | select(.Name == $name and .Type == "CNAME") | .ResourceRecords[0].Value'               <<<"$updated_records"
+          )"
+          actual_openai="$(
+            jq -r --arg name "$OPENAI_NAME"               '.ResourceRecordSets[] | select(.Name == $name and .Type == "TXT") | .ResourceRecords[0].Value'               <<<"$updated_records"
+          )"
+          actual_cloudflare="$(
+            jq -r --arg name "$CLOUDFLARE_NAME"               '.ResourceRecordSets[] | select(.Name == $name and .Type == "TXT") | .ResourceRecords[0].Value'               <<<"$updated_records"
+          )"
+
+          [[ "$actual_cname" == "$CNAME_TARGET" ]]
+          [[ "$actual_openai" == "\"$OPENAI_VALUE\"" ]]
+          [[ "$actual_cloudflare" == "\"$CLOUDFLARE_VALUE\"" ]]
+
+          {
+            echo "## Parent-domain DNS cutover completed"
+            echo
+            echo "- www CNAME now targets custom-domains.chatgpt.site"
+            echo "- OpenAI site-verification TXT record is present"
+            echo "- Cloudflare custom-hostname TXT record is present"
+            echo "- Apex, mail, nameserver, and unrelated subdomain records were not changed"
+          } >> "$GITHUB_STEP_SUMMARY"
