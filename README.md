@@ -18,3 +18,10 @@ The production DNS workflow is intentionally limited to these records:
 | TXT | `_cf-custom-hostname.www` | `a3a592c6-be9a-4592-90d6-dd20c2e1af6d` |
 
 The workflow does not change the apex domain, MX records, nameservers, email records, or other subdomains.
+
+
+## AWS authorization
+
+The workflow uses the dedicated `GitHubActionsSozorockFoundationDnsRole`. Its least-privilege CloudFormation definition is stored at `infra/cloudformation/github-actions-dns-role.yml`.
+
+The role trusts only the `main` branch of this repository and may change only the three parent-domain records listed above. Creating the role is the one-time AWS bootstrap required before the workflow can complete.
