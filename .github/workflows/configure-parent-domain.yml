@@ -22,7 +22,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       AWS_REGION: us-east-1
-      AWS_ROLE_TO_ASSUME: ${{ vars.AWS_ROLE_TO_ASSUME || 'arn:aws:iam::791860731989:role/GitHubActionsSozorockAiLabDeployRole' }}
+      AWS_ROLE_TO_ASSUME: ${{ vars.AWS_ROLE_TO_ASSUME || 'arn:aws:iam::791860731989:role/GitHubActionsSozorockFoundationDnsRole' }}
       ZONE_NAME: sozorockfoundation.org.
       WWW_NAME: www.sozorockfoundation.org.
       CNAME_TARGET: custom-domains.chatgpt.site.
@@ -37,6 +37,7 @@ jobs:
           role-to-assume: ${{ env.AWS_ROLE_TO_ASSUME }}
           role-session-name: SozoRockFoundation-${{ github.run_id }}
           aws-region: ${{ env.AWS_REGION }}
+          retry-max-attempts: 3
 
       - name: Validate zone and update only the authorized records
         shell: bash
