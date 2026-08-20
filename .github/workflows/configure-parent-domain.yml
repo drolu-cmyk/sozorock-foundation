@@ -1,5 +1,5 @@
 name: Configure SozoRock Foundation parent domain
-# Release retry: approved ChatGPT Sites deployment -> www.sozorockfoundation.org after OIDC role repair (2026-08-20)
+# OIDC diagnostic + guarded release: approved ChatGPT Sites deployment -> www.sozorockfoundation.org (2026-08-20)
 
 on:
   push:
@@ -38,6 +38,30 @@ jobs:
         with:
           ref: main
           fetch-depth: 0
+
+      - name: Record safe GitHub OIDC claims
+        id: oidc
+        shell: bash
+        run: |
+          set -euo pipefail
+          response="$(curl -fsS -H "Authorization: bearer ${ACTIONS_ID_TOKEN_REQUEST_TOKEN}" "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=sts.amazonaws.com")"
+          jwt="$(jq -r '.value' <<<"$response")"
+          payload="$(cut -d. -f2 <<<"$jwt" | tr '_-' '/+')"
+          case $((${#payload} % 4)) in
+            2) payload="${payload}==" ;;
+            3) payload="${payload}=" ;;
+          esac
+          claims="$(printf '%s' "$payload" | base64 -d)"
+          sub="$(jq -r '.sub' <<<"$claims")"
+          aud="$(jq -r 'if (.aud | type) == "array" then (.aud | join(",")) else .aud end' <<<"$claims")"
+          iss="$(jq -r '.iss' <<<"$claims")"
+          test "$aud" = "sts.amazonaws.com"
+          test "$iss" = "https://token.actions.githubusercontent.com"
+          {
+            echo "sub=$sub"
+            echo "aud=$aud"
+            echo "iss=$iss"
+          } >> "$GITHUB_OUTPUT"
 
       - name: Configure AWS credentials with GitHub OIDC
         id: aws
@@ -121,6 +145,9 @@ jobs:
         if: always()
         shell: bash
         env:
+          OIDC_SUB: ${{ steps.oidc.outputs.sub }}
+          OIDC_AUD: ${{ steps.oidc.outputs.aud }}
+          OIDC_ISS: ${{ steps.oidc.outputs.iss }}
           AWS_OUTCOME: ${{ steps.aws.outcome }}
           DNS_OUTCOME: ${{ steps.dns.outcome }}
           ROUTE53_CHANGE_ID: ${{ steps.dns.outputs.route53_change_id }}
@@ -139,13 +166,16 @@ jobs:
             --arg status "$status" \
             --arg completed_at "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
             --arg workflow_run_id "$GITHUB_RUN_ID" \
+            --arg oidc_sub "$OIDC_SUB" \
+            --arg oidc_aud "$OIDC_AUD" \
+            --arg oidc_iss "$OIDC_ISS" \
             --arg aws_outcome "$AWS_OUTCOME" \
             --arg dns_outcome "$DNS_OUTCOME" \
             --arg route53_change_id "$ROUTE53_CHANGE_ID" \
             --arg www_cname "$WWW_CNAME" \
             --arg openai_verification "$OPENAI_VERIFICATION" \
             --arg cloudflare_verification "$CLOUDFLARE_VERIFICATION" \
-            '{status:$status, completed_at:$completed_at, workflow_run_id:$workflow_run_id, aws_outcome:$aws_outcome, dns_outcome:$dns_outcome, route53_change_id:$route53_change_id, www_cname:$www_cname, openai_verification:$openai_verification, cloudflare_verification:$cloudflare_verification, scope:"www only; apex, mail, nameservers, and unrelated subdomains unchanged"}' \
+            '{status:$status, completed_at:$completed_at, workflow_run_id:$workflow_run_id, oidc_sub:$oidc_sub, oidc_aud:$oidc_aud, oidc_iss:$oidc_iss, aws_outcome:$aws_outcome, dns_outcome:$dns_outcome, route53_change_id:$route53_change_id, www_cname:$www_cname, openai_verification:$openai_verification, cloudflare_verification:$cloudflare_verification, scope:"www only; apex, mail, nameservers, and unrelated subdomains unchanged"}' \
             > deployments/www-cutover.json
 
           git config user.name 'github-actions[bot]'
