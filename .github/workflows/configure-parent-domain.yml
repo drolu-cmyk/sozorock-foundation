@@ -1,4 +1,5 @@
 name: Configure SozoRock Foundation parent domain
+# Release trigger: approved ChatGPT Sites deployment -> www.sozorockfoundation.org (2026-08-20)
 
 on:
   push:
