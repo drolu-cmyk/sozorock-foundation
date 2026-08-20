@@ -47,7 +47,7 @@ jobs:
           role-to-assume: ${{ env.AWS_ROLE_TO_ASSUME }}
           role-session-name: SozoRockFoundation-${{ github.run_id }}
           aws-region: ${{ env.AWS_REGION }}
-          retry-max-attempts: 3
+          retry-max-attempts: 10
 
       - name: Validate zone and update only authorized records
         id: dns
