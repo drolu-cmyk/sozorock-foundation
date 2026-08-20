@@ -1,0 +1,77 @@
+name: Probe static AWS bootstrap credentials
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/probe-static-aws-bootstrap.yml
+
+permissions:
+  contents: write
+
+jobs:
+  probe:
+    if: github.repository == 'drolu-cmyk/sozorock-foundation' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    env:
+      HAS_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY_ID != '' }}
+      HAS_SECRET_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY != '' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Configure static AWS credentials if present
+        id: static
+        if: env.HAS_ACCESS_KEY == 'true' && env.HAS_SECRET_KEY == 'true'
+        continue-on-error: true
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+          aws-region: us-east-1
+
+      - name: Inspect account and dedicated role
+        id: inspect
+        if: steps.static.outcome == 'success'
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -euo pipefail
+          aws sts get-caller-identity --output json > /tmp/caller.json
+          account_id="$(jq -r .Account /tmp/caller.json)"
+          [[ "$account_id" == '791860731989' ]]
+          aws iam get-role --role-name GitHubActionsSozorockFoundationDnsRole --output json > /tmp/foundation-role.json
+          jq -c '.Role.AssumeRolePolicyDocument' /tmp/foundation-role.json > /tmp/foundation-trust.json
+
+      - name: Record static bootstrap probe
+        if: always()
+        shell: bash
+        env:
+          STATIC_OUTCOME: ${{ steps.static.outcome }}
+          INSPECT_OUTCOME: ${{ steps.inspect.outcome }}
+        run: |
+          set -euo pipefail
+          mkdir -p deployments
+          caller='null'
+          trust='null'
+          [[ -f /tmp/caller.json ]] && caller="$(cat /tmp/caller.json)"
+          [[ -f /tmp/foundation-trust.json ]] && trust="$(cat /tmp/foundation-trust.json)"
+          jq -n \
+            --arg completed_at "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+            --arg workflow_run_id "$GITHUB_RUN_ID" \
+            --argjson has_access_key "$HAS_ACCESS_KEY" \
+            --argjson has_secret_key "$HAS_SECRET_KEY" \
+            --arg static_outcome "$STATIC_OUTCOME" \
+            --arg inspect_outcome "$INSPECT_OUTCOME" \
+            --argjson caller "$caller" \
+            --argjson foundation_trust "$trust" \
+            '{completed_at:$completed_at, workflow_run_id:$workflow_run_id, has_access_key:$has_access_key, has_secret_key:$has_secret_key, static_outcome:$static_outcome, inspect_outcome:$inspect_outcome, caller:$caller, foundation_trust:$foundation_trust, mutation_performed:false}' \
+            > deployments/aws-static-bootstrap-probe.json
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -- deployments/aws-static-bootstrap-probe.json
+          git commit -m 'chore(www): record static AWS bootstrap probe'
+          git push origin HEAD:main
