@@ -1,5 +1,5 @@
 name: Configure SozoRock Foundation parent domain
-# OIDC diagnostic + guarded release: approved ChatGPT Sites deployment -> www.sozorockfoundation.org (2026-08-20)
+# Final release trigger: exact immutable GitHub OIDC subject verified (2026-08-20)
 
 on:
   push:
