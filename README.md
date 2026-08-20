@@ -19,9 +19,16 @@ The production DNS workflow is intentionally limited to these records:
 
 The workflow does not change the apex domain, MX records, nameservers, email records, or other subdomains.
 
-
 ## AWS authorization
 
 The workflow uses the dedicated `GitHubActionsSozorockFoundationDnsRole`. Its least-privilege CloudFormation definition is stored at `infra/cloudformation/github-actions-dns-role.yml`.
 
-The role trusts only the `main` branch of this repository and may change only the three parent-domain records listed above. Creating the role is the one-time AWS bootstrap required before the workflow can complete.
+The role trusts only the `main` branch of this repository and may change only the three parent-domain records listed above. Creating or repairing the role is the one-time AWS bootstrap required before the workflow can complete.
+
+An AWS administrator in account `791860731989` can run the checked-in idempotent bootstrap from a repository checkout:
+
+```bash
+bash scripts/bootstrap-parent-dns-role.sh --apply
+```
+
+The script verifies the AWS account and existing GitHub OIDC provider, discovers exactly one public `sozorockfoundation.org.` hosted zone, creates or reconciles only `GitHubActionsSozorockFoundationDnsRole`, installs its record-scoped inline policy, and makes no DNS record changes. After the bootstrap succeeds, rerun the failed parent-domain workflow; no long-lived AWS credentials need to be stored in GitHub.
