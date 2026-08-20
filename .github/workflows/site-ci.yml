@@ -1,0 +1,30 @@
+name: Parent site CI
+
+on:
+  pull_request:
+    paths:
+      - 'site/**'
+      - 'scripts/**'
+      - 'package.json'
+      - '.github/workflows/site-ci.yml'
+  push:
+    branches:
+      - main
+    paths:
+      - 'site/**'
+      - 'scripts/**'
+      - 'package.json'
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm run build
+      - run: npm test
