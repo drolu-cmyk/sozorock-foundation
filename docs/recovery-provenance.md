@@ -10,6 +10,6 @@ This repository copy is therefore a forensic reconstruction of the approved impl
 - the last recoverable earlier HTML/CSS/JS prototype used only as a structural scaffold;
 - the approved redesign brief and publication records.
 
-Where an original production media asset could not be recovered safely, the repository uses a deterministic first-party fallback rather than a website screenshot, generated hero image, invented partner image, or third-party stock art. Such fallbacks are isolated in `site/assets` and can be replaced independently when the original media file is recovered.
+The SozoRock Health In Focus image was recovered exactly from the approved Health site repository as `hero-community-desktop-v2.webp`. Recovery verified the source file size as 73,222 bytes and its Git blob SHA as `d1f56687d982e40209d1e01e97fb0f5d9cb0ce68` before committing it to `site/assets/health-community.webp`.
 
 The parent-site source is intentionally separated from all subdomain products and publication-access backend behavior.
