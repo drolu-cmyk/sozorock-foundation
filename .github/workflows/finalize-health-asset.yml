@@ -1,0 +1,47 @@
+name: Finalize approved Health asset
+
+on:
+  push:
+    branches:
+      - parent-site-migration
+    paths:
+      - .github/workflows/finalize-health-asset.yml
+
+permissions:
+  contents: write
+
+jobs:
+  finalize:
+    if: github.repository == 'drolu-cmyk/sozorock-foundation'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: parent-site-migration
+          fetch-depth: 0
+
+      - name: Wire verified asset and remove recovery scaffolding
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('site/pages.mjs')
+          text = p.read_text()
+          old = '<img src="/assets/health-field.svg" alt="Editorial illustration of access, navigation, handoff and care">'
+          new = '<img src="/assets/health-community.webp" alt="A Black man and a White woman use a tablet together in a community library.">'
+          if old not in text:
+              raise SystemExit('Expected Health fallback reference not found')
+          p.write_text(text.replace(old, new, 1))
+          PY
+
+          rm -f site/assets/health-field.svg
+          rm -f .github/workflows/recover-health-asset.yml
+          rm -f .github/workflows/finalize-health-asset.yml
+
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -- site/pages.mjs
+          git rm --ignore-unmatch -- site/assets/health-field.svg .github/workflows/recover-health-asset.yml .github/workflows/finalize-health-asset.yml
+          git commit -m 'fix(site): use approved SozoRock Health feature image'
+          git push origin HEAD:parent-site-migration
