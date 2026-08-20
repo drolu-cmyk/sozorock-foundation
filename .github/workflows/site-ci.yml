@@ -26,5 +26,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+      - name: Validate deployment bootstrap shell
+        run: bash -n scripts/bootstrap-parent-dns-role.sh
       - run: npm run build
       - run: npm test
