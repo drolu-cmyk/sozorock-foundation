@@ -1,0 +1,12 @@
+{
+  "status": "failed",
+  "completed_at": "2026-08-20T23:28:58Z",
+  "workflow_run_id": "32428821552",
+  "aws_outcome": "failure",
+  "dns_outcome": "skipped",
+  "route53_change_id": "",
+  "www_cname": "",
+  "openai_verification": "",
+  "cloudflare_verification": "",
+  "scope": "www only; apex, mail, nameservers, and unrelated subdomains unchanged"
+}
