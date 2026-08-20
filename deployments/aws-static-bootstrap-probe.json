@@ -1,0 +1,11 @@
+{
+  "completed_at": "2026-08-20T23:34:00Z",
+  "workflow_run_id": "32429174076",
+  "has_access_key": false,
+  "has_secret_key": false,
+  "static_outcome": "skipped",
+  "inspect_outcome": "skipped",
+  "caller": null,
+  "foundation_trust": null,
+  "mutation_performed": false
+}
