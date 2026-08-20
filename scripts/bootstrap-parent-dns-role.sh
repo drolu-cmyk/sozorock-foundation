@@ -6,7 +6,7 @@ ROLE_NAME="GitHubActionsSozorockFoundationDnsRole"
 POLICY_NAME="SozoRockFoundationParentDns"
 ZONE_NAME="sozorockfoundation.org."
 OIDC_PROVIDER_ARN="arn:aws:iam::${ACCOUNT_ID}:oidc-provider/token.actions.githubusercontent.com"
-EXPECTED_SUBJECT="repo:drolu-cmyk/sozorock-foundation:ref:refs/heads/main"
+EXPECTED_SUBJECT="repo:drolu-cmyk@271617784/sozorock-foundation@1337104562:ref:refs/heads/main"
 
 if [[ "${1:-}" != "--apply" ]]; then
   echo "Usage: $0 --apply" >&2
