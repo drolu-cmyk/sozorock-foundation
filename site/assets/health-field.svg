@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 720" role="img" aria-labelledby="t d">
+  <title id="t">SozoRock Health editorial field</title>
+  <desc id="d">A restrained first-party editorial illustration showing connected access points leading toward care.</desc>
+  <rect width="1000" height="720" fill="#dfe9f3"/>
+  <rect x="0" y="0" width="1000" height="720" fill="#0b315e" opacity=".09"/>
+  <g stroke="#0b315e" fill="none" stroke-width="5">
+    <path d="M90 570 C250 440 330 500 450 360 S690 170 920 120"/>
+    <path d="M120 610 C250 535 390 580 520 460 S770 280 900 250" opacity=".5"/>
+  </g>
+  <g fill="#fff" stroke="#0b315e" stroke-width="4">
+    <circle cx="120" cy="570" r="34"/>
+    <circle cx="445" cy="365" r="34"/>
+    <circle cx="735" cy="235" r="34"/>
+    <circle cx="920" cy="120" r="34"/>
+  </g>
+  <g fill="#0b315e" font-family="Arial, Helvetica, sans-serif" font-weight="700">
+    <text x="70" y="660" font-size="30">ACCESS</text>
+    <text x="390" y="448" font-size="30">NAVIGATION</text>
+    <text x="675" y="320" font-size="30">HANDOFF</text>
+    <text x="805" y="75" font-size="30">CARE</text>
+  </g>
+</svg>
