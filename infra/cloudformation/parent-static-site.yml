@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: Production static hosting for www.sozorockfoundation.org using private S3, CloudFront, and ACM. DNS cutover is performed separately after the distribution is ready.
+Description: Production static hosting for www.sozorockfoundation.org using private S3, CloudFront, and an existing ACM certificate. DNS cutover is performed separately after the distribution is ready.
 
 Parameters:
   HostedZoneId:
@@ -11,6 +11,9 @@ Parameters:
   BucketName:
     Type: String
     Default: sozorock-foundation-parent-prod-791860731989
+  CertificateArn:
+    Type: String
+    Default: arn:aws:acm:us-east-1:791860731989:certificate/d2b11522-63cb-4c7f-b5a8-c0c25a39a2f7
 
 Resources:
   SiteBucket:
@@ -87,15 +90,6 @@ Resources:
             ModeBlock: true
             Override: true
 
-  Certificate:
-    Type: AWS::CertificateManager::Certificate
-    Properties:
-      DomainName: !Ref DomainName
-      ValidationMethod: DNS
-      DomainValidationOptions:
-        - DomainName: !Ref DomainName
-          HostedZoneId: !Ref HostedZoneId
-
   Distribution:
     Type: AWS::CloudFront::Distribution
     Properties:
@@ -131,7 +125,7 @@ Resources:
             - EventType: viewer-request
               FunctionARN: !GetAtt CleanUrlFunction.FunctionARN
         ViewerCertificate:
-          AcmCertificateArn: !Ref Certificate
+          AcmCertificateArn: !Ref CertificateArn
           SslSupportMethod: sni-only
           MinimumProtocolVersion: TLSv1.2_2021
 
