@@ -1,6 +1,15 @@
 name: Deploy SozoRock Foundation parent site
 
 on:
+  push:
+    branches:
+      - main
+    paths:
+      - site/**
+      - scripts/build.mjs
+      - scripts/qa.mjs
+      - package.json
+      - .github/workflows/deploy-parent-site.yml
   workflow_dispatch:
 
 permissions:
@@ -52,11 +61,14 @@ jobs:
           set -euo pipefail
           bucket="$(aws cloudformation describe-stacks --stack-name "$STACK_NAME" --query 'Stacks[0].Outputs[?OutputKey==`BucketName`].OutputValue' --output text)"
           distribution="$(aws cloudformation describe-stacks --stack-name "$STACK_NAME" --query 'Stacks[0].Outputs[?OutputKey==`DistributionId`].OutputValue' --output text)"
+          distribution_domain="$(aws cloudformation describe-stacks --stack-name "$STACK_NAME" --query 'Stacks[0].Outputs[?OutputKey==`DistributionDomainName`].OutputValue' --output text)"
           test -n "$bucket"
           test -n "$distribution"
+          test -n "$distribution_domain"
           {
             echo "bucket=$bucket"
             echo "distribution=$distribution"
+            echo "distribution_domain=$distribution_domain"
           } >> "$GITHUB_OUTPUT"
 
       - name: Publish built site to private S3 origin
@@ -79,17 +91,18 @@ jobs:
           invalidation="$(aws cloudfront create-invalidation --distribution-id '${{ steps.hosting.outputs.distribution }}' --paths '/*' --query 'Invalidation.Id' --output text)"
           aws cloudfront wait invalidation-completed --distribution-id '${{ steps.hosting.outputs.distribution }}' --id "$invalidation"
 
-      - name: Verify production identity
+      - name: Verify CloudFront deployment before DNS cutover
         shell: bash
         run: |
           set -euo pipefail
+          url="https://${{ steps.hosting.outputs.distribution_domain }}/?deploy=${GITHUB_RUN_ID}"
           for attempt in {1..18}; do
-            page="$(curl -fsSL --max-time 20 'https://www.sozorockfoundation.org/?deploy='"$GITHUB_RUN_ID" || true)"
+            page="$(curl -fsSL --max-time 20 "$url" || true)"
             if grep -Fq 'Access.' <<<"$page" && grep -Fq 'Assurance.' <<<"$page" && grep -Fq 'Intelligence.' <<<"$page"; then
-              echo 'Production identity verified.'
+              echo 'CloudFront deployment identity verified.'
               exit 0
             fi
             sleep 10
           done
-          echo 'Production identity did not verify after CloudFront deployment.' >&2
+          echo 'CloudFront deployment identity did not verify.' >&2
           exit 1
