@@ -1,0 +1,95 @@
+name: Deploy SozoRock Foundation parent site
+
+on:
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+concurrency:
+  group: sozorock-foundation-parent-site-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    if: github.repository == 'drolu-cmyk/sozorock-foundation' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    env:
+      AWS_REGION: us-east-1
+      AWS_ROLE_TO_ASSUME: arn:aws:iam::791860731989:role/GitHubActionsSozorockFoundationSiteDeployRole
+      STACK_NAME: sozorock-foundation-parent-site
+
+    steps:
+      - name: Check out main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Validate and build
+        run: |
+          set -euo pipefail
+          npm test
+          npm run build
+
+      - name: Configure AWS credentials with GitHub OIDC
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: ${{ env.AWS_ROLE_TO_ASSUME }}
+          role-session-name: FoundationSiteDeploy-${{ github.run_id }}
+          aws-region: ${{ env.AWS_REGION }}
+          retry-max-attempts: 10
+
+      - name: Resolve production hosting outputs
+        id: hosting
+        shell: bash
+        run: |
+          set -euo pipefail
+          bucket="$(aws cloudformation describe-stacks --stack-name "$STACK_NAME" --query 'Stacks[0].Outputs[?OutputKey==`BucketName`].OutputValue' --output text)"
+          distribution="$(aws cloudformation describe-stacks --stack-name "$STACK_NAME" --query 'Stacks[0].Outputs[?OutputKey==`DistributionId`].OutputValue' --output text)"
+          test -n "$bucket"
+          test -n "$distribution"
+          {
+            echo "bucket=$bucket"
+            echo "distribution=$distribution"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Publish built site to private S3 origin
+        shell: bash
+        run: |
+          set -euo pipefail
+          aws s3 sync dist/assets/ "s3://${{ steps.hosting.outputs.bucket }}/assets/" \
+            --delete \
+            --cache-control 'public,max-age=31536000,immutable'
+
+          aws s3 sync dist/ "s3://${{ steps.hosting.outputs.bucket }}/" \
+            --delete \
+            --exclude 'assets/*' \
+            --cache-control 'public,max-age=300,must-revalidate'
+
+      - name: Invalidate CloudFront
+        shell: bash
+        run: |
+          set -euo pipefail
+          invalidation="$(aws cloudfront create-invalidation --distribution-id '${{ steps.hosting.outputs.distribution }}' --paths '/*' --query 'Invalidation.Id' --output text)"
+          aws cloudfront wait invalidation-completed --distribution-id '${{ steps.hosting.outputs.distribution }}' --id "$invalidation"
+
+      - name: Verify production identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          for attempt in {1..18}; do
+            page="$(curl -fsSL --max-time 20 'https://www.sozorockfoundation.org/?deploy='"$GITHUB_RUN_ID" || true)"
+            if grep -Fq 'Access.' <<<"$page" && grep -Fq 'Assurance.' <<<"$page" && grep -Fq 'Intelligence.' <<<"$page"; then
+              echo 'Production identity verified.'
+              exit 0
+            fi
+            sleep 10
+          done
+          echo 'Production identity did not verify after CloudFront deployment.' >&2
+          exit 1
