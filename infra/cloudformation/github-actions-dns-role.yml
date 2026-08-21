@@ -24,7 +24,7 @@ Resources:
             Condition:
               StringEquals:
                 token.actions.githubusercontent.com:aud: sts.amazonaws.com
-                token.actions.githubusercontent.com:sub: repo:drolu-cmyk/sozorock-foundation:ref:refs/heads/main
+                token.actions.githubusercontent.com:sub: repo:drolu-cmyk@271617784/sozorock-foundation@1337104562:ref:refs/heads/main
       Policies:
         - PolicyName: SozoRockFoundationParentDns
           PolicyDocument:
