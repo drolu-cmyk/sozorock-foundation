@@ -47,11 +47,11 @@ jobs:
         with:
           node-version: '22'
 
-      - name: Validate and build all parent routes
+      - name: Build and validate all parent routes
         run: |
           set -euo pipefail
-          npm test
           npm run build
+          npm test
 
       - name: Configure AWS credentials with GitHub OIDC
         uses: aws-actions/configure-aws-credentials@v6
