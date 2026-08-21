@@ -65,4 +65,5 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          sed -i 's/<<<"${DOMAIN_JSON:-{}}"/<<<"${DOMAIN_JSON:-}"/' scripts/deploy-parent-regional.sh
           bash scripts/deploy-parent-regional.sh
