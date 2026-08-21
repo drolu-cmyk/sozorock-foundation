@@ -65,5 +65,48 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+
+          # Correct the shell fallback used while polling the API Gateway domain.
           sed -i 's/<<<"${DOMAIN_JSON:-{}}"/<<<"${DOMAIN_JSON:-}"/' scripts/deploy-parent-regional.sh
+
+          # API Gateway can report a Regional custom domain as AVAILABLE before
+          # the newly created API mapping is ready on every serving endpoint.
+          # Keep DNS untouched until the custom-domain request serves the
+          # approved Foundation identity.
+          python3 - <<'PY'
+          from pathlib import Path
+
+          path = Path('scripts/deploy-parent-regional.sh')
+          text = path.read_text()
+          old = '''log "Verify custom-domain target directly before Route 53 cutover"
+          TARGET_IP="$(getent ahostsv4 "$TARGET" | awk 'NR==1{print $1}')"
+          test -n "$TARGET_IP"
+          custom_page="$(curl -fsSL --max-time 30 --resolve "${DOMAIN_NAME}:443:${TARGET_IP}" "https://${DOMAIN_NAME}/?target=${RUN_ID}")"
+          grep -Fq 'Access.' <<<"$custom_page"
+          grep -Fq 'Assurance.' <<<"$custom_page"
+          grep -Fq 'Intelligence.' <<<"$custom_page"
+          '''
+          new = '''log "Wait for custom-domain API mapping before Route 53 cutover"
+          CUSTOM_DOMAIN_READY=0
+          for _ in $(seq 1 90); do
+            TARGET_IP="$(getent ahostsv4 "$TARGET" | awk 'NR==1{print $1}' || true)"
+            if [ -n "$TARGET_IP" ]; then
+              custom_page="$(curl -fsSL --max-time 20 --resolve "${DOMAIN_NAME}:443:${TARGET_IP}" "https://${DOMAIN_NAME}/?target=${RUN_ID}" || true)"
+              if grep -Fq 'Access.' <<<"$custom_page" && grep -Fq 'Assurance.' <<<"$custom_page" && grep -Fq 'Intelligence.' <<<"$custom_page"; then
+                CUSTOM_DOMAIN_READY=1
+                break
+              fi
+            fi
+            sleep 5
+          done
+          if [ "$CUSTOM_DOMAIN_READY" != "1" ]; then
+            echo "API Gateway custom-domain mapping did not become ready; www remains unchanged." >&2
+            exit 1
+          fi
+          '''
+          if old not in text:
+              raise SystemExit('Expected custom-domain verification block not found')
+          path.write_text(text.replace(old, new))
+          PY
+
           bash scripts/deploy-parent-regional.sh
