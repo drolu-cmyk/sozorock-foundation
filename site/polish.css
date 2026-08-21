@@ -1,0 +1,86 @@
+/* Production polish for the approved Foundation parent experience. */
+
+.focus-frame{
+  position:relative;
+  min-height:468px;
+  overflow:hidden;
+}
+
+/* The HTML hidden state must win over the base grid declaration so only one
+   controlled feature is rendered at a time. */
+.focus-slide[hidden]{
+  display:none!important;
+}
+
+.focus-slide{
+  min-height:468px;
+  width:100%;
+  align-items:stretch;
+}
+
+.focus-slide.is-active{
+  display:grid;
+  animation:focus-reveal .32s ease-out both;
+}
+
+.focus-copy{
+  min-height:468px;
+  padding:56px 58px;
+}
+
+.focus-media{
+  height:468px;
+  min-height:468px;
+}
+
+.paper-media{
+  padding:30px;
+}
+
+.paper-media img{
+  display:block;
+  width:auto;
+  height:auto;
+  max-width:82%;
+  max-height:408px;
+  object-fit:contain;
+}
+
+.health-media img{
+  display:block;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  object-position:center;
+}
+
+.ai-panel{
+  height:468px;
+  min-height:468px;
+}
+
+.focus-tabs{
+  align-items:stretch;
+}
+
+.focus-tabs button{
+  min-height:82px;
+}
+
+@keyframes focus-reveal{
+  from{opacity:.2;transform:translateY(6px)}
+  to{opacity:1;transform:translateY(0)}
+}
+
+@media(max-width:900px){
+  .focus-frame{min-height:0}
+  .focus-slide{min-height:0}
+  .focus-copy{min-height:0;padding:42px 30px}
+  .focus-media,.ai-panel{height:auto;min-height:360px}
+  .paper-media img{max-width:88%;max-height:320px}
+  .focus-tabs button{min-height:auto}
+}
+
+@media(prefers-reduced-motion:reduce){
+  .focus-slide.is-active{animation:none}
+}
