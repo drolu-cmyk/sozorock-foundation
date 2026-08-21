@@ -1,0 +1,219 @@
+name: Deploy SozoRock Foundation parent site
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - site/**
+      - scripts/build.mjs
+      - scripts/qa.mjs
+      - package.json
+      - infra/cloudformation/parent-static-site.yml
+      - .github/workflows/deploy-parent-site.yml
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+concurrency:
+  group: sozorock-foundation-parent-site-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    if: github.repository == 'drolu-cmyk/sozorock-foundation' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    env:
+      AWS_REGION: us-east-1
+      AWS_ROLE_TO_ASSUME: arn:aws:iam::791860731989:role/GitHubActionsSozorockFoundationSiteDeployRole
+      STACK_NAME: sozorock-foundation-parent-regional
+      DOMAIN_NAME: www.sozorockfoundation.org
+      WWW_NAME: www.sozorockfoundation.org.
+      HOSTED_ZONE_ID: Z07905293AANZWGYZ84F3
+      BUCKET_NAME: sozorock-foundation-parent-prod-791860731989
+      CERTIFICATE_ARN: arn:aws:acm:us-east-1:791860731989:certificate/d2b11522-63cb-4c7f-b5a8-c0c25a39a2f7
+      LAMBDA_ROLE_ARN: arn:aws:iam::791860731989:role/SozoRockFoundationParentLambdaRole
+
+    steps:
+      - name: Check out main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Validate and build all parent routes
+        run: |
+          set -euo pipefail
+          npm test
+          npm run build
+
+      - name: Configure AWS credentials with GitHub OIDC
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: ${{ env.AWS_ROLE_TO_ASSUME }}
+          role-session-name: FoundationSiteDeploy-${{ github.run_id }}
+          aws-region: ${{ env.AWS_REGION }}
+          retry-max-attempts: 10
+
+      - name: Provision regional production hosting
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(aws sts get-caller-identity --query Account --output text)" = '791860731989'
+          aws cloudformation deploy \
+            --stack-name "$STACK_NAME" \
+            --template-file infra/cloudformation/parent-static-site.yml \
+            --parameter-overrides \
+              DomainName="$DOMAIN_NAME" \
+              BucketName="$BUCKET_NAME" \
+              CertificateArn="$CERTIFICATE_ARN" \
+              LambdaRoleArn="$LAMBDA_ROLE_ARN" \
+            --no-fail-on-empty-changeset
+
+      - name: Resolve production hosting outputs
+        id: hosting
+        shell: bash
+        run: |
+          set -euo pipefail
+          bucket="$(aws cloudformation describe-stacks --stack-name "$STACK_NAME" --query 'Stacks[0].Outputs[?OutputKey==`BucketName`].OutputValue' --output text)"
+          api_id="$(aws cloudformation describe-stacks --stack-name "$STACK_NAME" --query 'Stacks[0].Outputs[?OutputKey==`ApiId`].OutputValue' --output text)"
+          api_endpoint="$(aws cloudformation describe-stacks --stack-name "$STACK_NAME" --query 'Stacks[0].Outputs[?OutputKey==`ApiEndpoint`].OutputValue' --output text)"
+          test "$bucket" = "$BUCKET_NAME"
+          test -n "$api_id"
+          test -n "$api_endpoint"
+          {
+            echo "bucket=$bucket"
+            echo "api_id=$api_id"
+            echo "api_endpoint=$api_endpoint"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Publish built site to private S3
+        shell: bash
+        run: |
+          set -euo pipefail
+          aws s3 sync dist/assets/ "s3://${{ steps.hosting.outputs.bucket }}/assets/" \
+            --delete \
+            --cache-control 'public,max-age=31536000,immutable'
+
+          aws s3 sync dist/ "s3://${{ steps.hosting.outputs.bucket }}/" \
+            --delete \
+            --exclude 'assets/*' \
+            --cache-control 'public,max-age=300,must-revalidate'
+
+      - name: Verify new AWS target before touching www
+        shell: bash
+        run: |
+          set -euo pipefail
+          url="${{ steps.hosting.outputs.api_endpoint }}/?deploy=${GITHUB_RUN_ID}"
+          for attempt in {1..30}; do
+            page="$(curl -fsSL --max-time 20 "$url" || true)"
+            if grep -Fq 'Access.' <<<"$page" && grep -Fq 'Assurance.' <<<"$page" && grep -Fq 'Intelligence.' <<<"$page"; then
+              echo 'Regional production target identity verified.'
+              exit 0
+            fi
+            sleep 10
+          done
+          echo 'Regional production target did not verify; www remains unchanged.' >&2
+          exit 1
+
+      - name: Resolve API Gateway custom-domain target
+        id: domain
+        shell: bash
+        run: |
+          set -euo pipefail
+          for attempt in {1..60}; do
+            status="$(aws apigatewayv2 get-domain-name --domain-name "$DOMAIN_NAME" --query 'DomainNameConfigurations[0].DomainNameStatus' --output text 2>/dev/null || true)"
+            if [ "$status" = 'AVAILABLE' ]; then
+              break
+            fi
+            if [ "$status" = 'FAILED' ]; then
+              echo 'API Gateway custom domain failed; www remains unchanged.' >&2
+              exit 1
+            fi
+            sleep 10
+          done
+          target="$(aws apigatewayv2 get-domain-name --domain-name "$DOMAIN_NAME" --query 'DomainNameConfigurations[0].ApiGatewayDomainName' --output text)"
+          target_zone="$(aws apigatewayv2 get-domain-name --domain-name "$DOMAIN_NAME" --query 'DomainNameConfigurations[0].HostedZoneId' --output text)"
+          test -n "$target"
+          test "$target" != 'None'
+          test -n "$target_zone"
+          test "$target_zone" != 'None'
+          {
+            echo "target=$target"
+            echo "target_zone=$target_zone"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Atomically replace only the www routing record
+        id: dns
+        shell: bash
+        env:
+          TARGET: ${{ steps.domain.outputs.target }}
+          TARGET_ZONE: ${{ steps.domain.outputs.target_zone }}
+        run: |
+          set -euo pipefail
+          records="$(aws route53 list-resource-record-sets --hosted-zone-id "$HOSTED_ZONE_ID" --output json)"
+          current_cname="$(jq -c --arg name "$WWW_NAME" '.ResourceRecordSets[] | select(.Name==$name and .Type=="CNAME")' <<<"$records")"
+          current_a="$(jq -r --arg name "$WWW_NAME" '.ResourceRecordSets[] | select(.Name==$name and .Type=="A") | .AliasTarget.DNSName // empty' <<<"$records")"
+
+          if [ -n "$current_a" ] && [ "$current_a" != "$TARGET." ]; then
+            echo "Unexpected existing www A alias: $current_a" >&2
+            exit 1
+          fi
+
+          if [ -n "$current_cname" ]; then
+            old_value="$(jq -r '.ResourceRecords[0].Value' <<<"$current_cname")"
+            test "$old_value" = 'custom-domains.chatgpt.site.'
+            jq -n \
+              --argjson cname "$current_cname" \
+              --arg name "$WWW_NAME" \
+              --arg target "$TARGET." \
+              --arg zone "$TARGET_ZONE" \
+              '{Comment:"Move Foundation www from ChatGPT Sites to regional AWS hosting",Changes:[
+                {Action:"DELETE",ResourceRecordSet:$cname},
+                {Action:"CREATE",ResourceRecordSet:{Name:$name,Type:"A",AliasTarget:{HostedZoneId:$zone,DNSName:$target,EvaluateTargetHealth:false}}}
+              ]}' >/tmp/www-cutover.json
+            change_id="$(aws route53 change-resource-record-sets --hosted-zone-id "$HOSTED_ZONE_ID" --change-batch file:///tmp/www-cutover.json --query 'ChangeInfo.Id' --output text)"
+            aws route53 wait resource-record-sets-changed --id "$change_id"
+            echo "change_id=$change_id" >> "$GITHUB_OUTPUT"
+          elif [ "$current_a" = "$TARGET." ]; then
+            echo 'www already points to the regional AWS target.'
+          else
+            echo 'Expected www CNAME or target A alias was not found; refusing ambiguous DNS mutation.' >&2
+            exit 1
+          fi
+
+      - name: Verify Route 53 and live HTTPS
+        shell: bash
+        env:
+          TARGET: ${{ steps.domain.outputs.target }}
+        run: |
+          set -euo pipefail
+          final="$(aws route53 list-resource-record-sets --hosted-zone-id "$HOSTED_ZONE_ID" --output json)"
+          final_a="$(jq -r --arg name "$WWW_NAME" '.ResourceRecordSets[] | select(.Name==$name and .Type=="A") | .AliasTarget.DNSName // empty' <<<"$final")"
+          final_cname="$(jq -r --arg name "$WWW_NAME" '.ResourceRecordSets[] | select(.Name==$name and .Type=="CNAME") | .ResourceRecords[0].Value // empty' <<<"$final")"
+          test "$final_a" = "$TARGET."
+          test -z "$final_cname"
+
+          target_ip="$(getent ahostsv4 "$TARGET" | awk 'NR==1{print $1}')"
+          test -n "$target_ip"
+          page="$(curl -fsSL --max-time 30 --resolve "${DOMAIN_NAME}:443:${target_ip}" "https://${DOMAIN_NAME}/?verify=${GITHUB_RUN_ID}")"
+          grep -Fq 'Access.' <<<"$page"
+          grep -Fq 'Assurance.' <<<"$page"
+          grep -Fq 'Intelligence.' <<<"$page"
+
+          for attempt in {1..30}; do
+            live="$(curl -fsSL --max-time 20 "https://${DOMAIN_NAME}/?live=${GITHUB_RUN_ID}" || true)"
+            if grep -Fq 'Access.' <<<"$live" && grep -Fq 'Assurance.' <<<"$live" && grep -Fq 'Intelligence.' <<<"$live"; then
+              echo 'www.sozorockfoundation.org is live on repository-driven AWS hosting.'
+              exit 0
+            fi
+            sleep 10
+          done
+          echo 'Direct target verification passed but public DNS/HTTPS verification has not converged yet.' >&2
+          exit 1

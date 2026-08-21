@@ -1,0 +1,177 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Production parent-site hosting for www.sozorockfoundation.org using private S3, Lambda, and a regional API Gateway custom domain. This architecture intentionally avoids dependence on an externally owned CloudFront alternate-domain association.
+
+Parameters:
+  DomainName:
+    Type: String
+    Default: www.sozorockfoundation.org
+  BucketName:
+    Type: String
+    Default: sozorock-foundation-parent-prod-791860731989
+  CertificateArn:
+    Type: String
+    Default: arn:aws:acm:us-east-1:791860731989:certificate/d2b11522-63cb-4c7f-b5a8-c0c25a39a2f7
+  LambdaRoleArn:
+    Type: String
+    Default: arn:aws:iam::791860731989:role/SozoRockFoundationParentLambdaRole
+
+Resources:
+  SiteBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref BucketName
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      VersioningConfiguration:
+        Status: Enabled
+      OwnershipControls:
+        Rules:
+          - ObjectOwnership: BucketOwnerEnforced
+
+  OriginFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: SozoRockFoundationParentOrigin
+      Runtime: python3.13
+      Handler: index.handler
+      Role: !Ref LambdaRoleArn
+      MemorySize: 256
+      Timeout: 10
+      Environment:
+        Variables:
+          SITE_BUCKET: !Ref SiteBucket
+      Code:
+        ZipFile: |
+          import base64
+          import boto3
+          import mimetypes
+          import os
+          import urllib.parse
+          from botocore.exceptions import ClientError
+
+          s3 = boto3.client('s3')
+          bucket = os.environ['SITE_BUCKET']
+
+          SECURITY_HEADERS = {
+              'x-content-type-options': 'nosniff',
+              'x-frame-options': 'DENY',
+              'referrer-policy': 'strict-origin-when-cross-origin',
+              'strict-transport-security': 'max-age=31536000',
+              'content-security-policy': "frame-ancestors 'none'"
+          }
+
+          def resolve_key(raw_path):
+              path = urllib.parse.unquote(raw_path or '/')
+              path = path.split('?', 1)[0]
+              if path == '/':
+                  return 'index.html'
+              key = path.lstrip('/')
+              if key.endswith('/'):
+                  return key + 'index.html'
+              leaf = key.rsplit('/', 1)[-1]
+              if '.' not in leaf:
+                  return key + '/index.html'
+              return key
+
+          def handler(event, context):
+              key = resolve_key(event.get('rawPath') or event.get('path') or '/')
+              try:
+                  obj = s3.get_object(Bucket=bucket, Key=key)
+                  body = obj['Body'].read()
+                  content_type = obj.get('ContentType') or mimetypes.guess_type(key)[0] or 'application/octet-stream'
+                  headers = dict(SECURITY_HEADERS)
+                  headers['content-type'] = content_type
+                  if obj.get('CacheControl'):
+                      headers['cache-control'] = obj['CacheControl']
+                  return {
+                      'statusCode': 200,
+                      'headers': headers,
+                      'body': base64.b64encode(body).decode('ascii'),
+                      'isBase64Encoded': True
+                  }
+              except ClientError as exc:
+                  code = exc.response.get('Error', {}).get('Code', '')
+                  if code in ('NoSuchKey', 'NoSuchBucket', '404'):
+                      return {
+                          'statusCode': 404,
+                          'headers': {**SECURITY_HEADERS, 'content-type': 'text/plain; charset=utf-8'},
+                          'body': 'Not found',
+                          'isBase64Encoded': False
+                      }
+                  raise
+
+  HttpApi:
+    Type: AWS::ApiGatewayV2::Api
+    Properties:
+      Name: SozoRockFoundationParentSite
+      ProtocolType: HTTP
+
+  LambdaIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    Properties:
+      ApiId: !Ref HttpApi
+      IntegrationType: AWS_PROXY
+      IntegrationUri: !GetAtt OriginFunction.Arn
+      PayloadFormatVersion: '2.0'
+
+  DefaultRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref HttpApi
+      RouteKey: '$default'
+      Target: !Join
+        - /
+        - - integrations
+          - !Ref LambdaIntegration
+
+  DefaultStage:
+    Type: AWS::ApiGatewayV2::Stage
+    Properties:
+      ApiId: !Ref HttpApi
+      StageName: '$default'
+      AutoDeploy: true
+
+  InvokePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref OriginFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub 'arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${HttpApi}/*'
+
+  CustomDomain:
+    Type: AWS::ApiGatewayV2::DomainName
+    Properties:
+      DomainName: !Ref DomainName
+      DomainNameConfigurations:
+        - CertificateArn: !Ref CertificateArn
+          EndpointType: REGIONAL
+          SecurityPolicy: TLS_1_2
+
+  DomainMapping:
+    Type: AWS::ApiGatewayV2::ApiMapping
+    DependsOn:
+      - DefaultStage
+    Properties:
+      ApiId: !Ref HttpApi
+      DomainName: !Ref CustomDomain
+      Stage: '$default'
+
+Outputs:
+  BucketName:
+    Value: !Ref SiteBucket
+  ApiId:
+    Value: !Ref HttpApi
+  ApiEndpoint:
+    Value: !GetAtt HttpApi.ApiEndpoint
+  DomainName:
+    Value: !Ref CustomDomain
+  SiteUrl:
+    Value: !Sub 'https://${DomainName}'
