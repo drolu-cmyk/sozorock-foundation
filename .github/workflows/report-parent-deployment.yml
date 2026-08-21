@@ -1,0 +1,34 @@
+name: Report parent website deployment
+
+on:
+  workflow_run:
+    workflows:
+      - Deploy SozoRock Foundation parent site
+    types:
+      - completed
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  report:
+    if: github.repository == 'drolu-cmyk/sozorock-foundation'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Publish deployment receipt
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CONCLUSION: ${{ github.event.workflow_run.conclusion }}
+          RUN_URL: ${{ github.event.workflow_run.html_url }}
+          RUN_ID: ${{ github.event.workflow_run.id }}
+          HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
+          HEAD_BRANCH: ${{ github.event.workflow_run.head_branch }}
+        run: |
+          set -euo pipefail
+          if [ "$CONCLUSION" = 'success' ]; then
+            status='**SUCCESS — production deployment and live HTTPS verification passed.**'
+          else
+            status="**FAILURE — deployment concluded: ${CONCLUSION}. Production must not be treated as complete.**"
+          fi
+          gh issue comment 15 --repo "$GITHUB_REPOSITORY" --body "Parent website deployment receipt\n\n${status}\n\nRun: ${RUN_URL}\nRun ID: \`${RUN_ID}\`\nCommit: \`${HEAD_SHA}\`\nBranch: \`${HEAD_BRANCH}\`"
