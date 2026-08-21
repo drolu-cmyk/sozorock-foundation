@@ -1,10 +1,7 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: Production static hosting for www.sozorockfoundation.org using private S3, CloudFront, and an existing ACM certificate. DNS cutover is performed separately after the distribution is ready.
+Description: Production parent-site hosting for www.sozorockfoundation.org using private S3, Lambda, and a regional API Gateway custom domain. This architecture intentionally avoids dependence on an externally owned CloudFront alternate-domain association.
 
 Parameters:
-  HostedZoneId:
-    Type: String
-    Default: Z07905293AANZWGYZ84F3
   DomainName:
     Type: String
     Default: www.sozorockfoundation.org
@@ -14,6 +11,9 @@ Parameters:
   CertificateArn:
     Type: String
     Default: arn:aws:acm:us-east-1:791860731989:certificate/d2b11522-63cb-4c7f-b5a8-c0c25a39a2f7
+  LambdaRoleArn:
+    Type: String
+    Default: arn:aws:iam::791860731989:role/SozoRockFoundationParentLambdaRole
 
 Resources:
   SiteBucket:
@@ -35,123 +35,143 @@ Resources:
         Rules:
           - ObjectOwnership: BucketOwnerEnforced
 
-  OriginAccessControl:
-    Type: AWS::CloudFront::OriginAccessControl
+  OriginFunction:
+    Type: AWS::Lambda::Function
     Properties:
-      OriginAccessControlConfig:
-        Name: sozorock-foundation-www-oac
-        Description: Private S3 origin access for the SozoRock Foundation parent site
-        OriginAccessControlOriginType: s3
-        SigningBehavior: always
-        SigningProtocol: sigv4
+      FunctionName: SozoRockFoundationParentOrigin
+      Runtime: python3.13
+      Handler: index.handler
+      Role: !Ref LambdaRoleArn
+      MemorySize: 256
+      Timeout: 10
+      Environment:
+        Variables:
+          SITE_BUCKET: !Ref SiteBucket
+      Code:
+        ZipFile: |
+          import base64
+          import boto3
+          import mimetypes
+          import os
+          import urllib.parse
+          from botocore.exceptions import ClientError
 
-  CleanUrlFunction:
-    Type: AWS::CloudFront::Function
-    Properties:
-      Name: sozorock-foundation-clean-urls
-      AutoPublish: true
-      FunctionConfig:
-        Comment: Rewrite clean routes to generated index.html files
-        Runtime: cloudfront-js-2.0
-      FunctionCode: |
-        function handler(event) {
-          var request = event.request;
-          var uri = request.uri;
-          if (uri.endsWith('/')) {
-            request.uri = uri + 'index.html';
-          } else if (!uri.split('/').pop().includes('.')) {
-            request.uri = uri + '/index.html';
+          s3 = boto3.client('s3')
+          bucket = os.environ['SITE_BUCKET']
+
+          SECURITY_HEADERS = {
+              'x-content-type-options': 'nosniff',
+              'x-frame-options': 'DENY',
+              'referrer-policy': 'strict-origin-when-cross-origin',
+              'strict-transport-security': 'max-age=31536000',
+              'content-security-policy': "frame-ancestors 'none'"
           }
-          return request;
-        }
 
-  SecurityHeadersPolicy:
-    Type: AWS::CloudFront::ResponseHeadersPolicy
-    Properties:
-      ResponseHeadersPolicyConfig:
-        Name: sozorock-foundation-security-headers
-        Comment: Security headers for the Foundation parent site
-        SecurityHeadersConfig:
-          ContentTypeOptions:
-            Override: true
-          FrameOptions:
-            FrameOption: DENY
-            Override: true
-          ReferrerPolicy:
-            ReferrerPolicy: strict-origin-when-cross-origin
-            Override: true
-          StrictTransportSecurity:
-            AccessControlMaxAgeSec: 31536000
-            IncludeSubdomains: false
-            Preload: false
-            Override: true
-          XSSProtection:
-            Protection: true
-            ModeBlock: true
-            Override: true
+          def resolve_key(raw_path):
+              path = urllib.parse.unquote(raw_path or '/')
+              path = path.split('?', 1)[0]
+              if path == '/':
+                  return 'index.html'
+              key = path.lstrip('/')
+              if key.endswith('/'):
+                  return key + 'index.html'
+              leaf = key.rsplit('/', 1)[-1]
+              if '.' not in leaf:
+                  return key + '/index.html'
+              return key
 
-  Distribution:
-    Type: AWS::CloudFront::Distribution
-    Properties:
-      DistributionConfig:
-        Enabled: true
-        Comment: The SozoRock Foundation parent website
-        Aliases:
-          - !Ref DomainName
-        DefaultRootObject: index.html
-        HttpVersion: http2and3
-        IPV6Enabled: true
-        PriceClass: PriceClass_100
-        Origins:
-          - Id: site-bucket
-            DomainName: !GetAtt SiteBucket.RegionalDomainName
-            OriginAccessControlId: !GetAtt OriginAccessControl.Id
-            S3OriginConfig:
-              OriginAccessIdentity: ''
-        DefaultCacheBehavior:
-          TargetOriginId: site-bucket
-          ViewerProtocolPolicy: redirect-to-https
-          AllowedMethods:
-            - GET
-            - HEAD
-            - OPTIONS
-          CachedMethods:
-            - GET
-            - HEAD
-          Compress: true
-          CachePolicyId: 658327ea-f89d-4fab-a63d-7e88639e58f6
-          ResponseHeadersPolicyId: !Ref SecurityHeadersPolicy
-          FunctionAssociations:
-            - EventType: viewer-request
-              FunctionARN: !GetAtt CleanUrlFunction.FunctionARN
-        ViewerCertificate:
-          AcmCertificateArn: !Ref CertificateArn
-          SslSupportMethod: sni-only
-          MinimumProtocolVersion: TLSv1.2_2021
+          def handler(event, context):
+              key = resolve_key(event.get('rawPath') or event.get('path') or '/')
+              try:
+                  obj = s3.get_object(Bucket=bucket, Key=key)
+                  body = obj['Body'].read()
+                  content_type = obj.get('ContentType') or mimetypes.guess_type(key)[0] or 'application/octet-stream'
+                  headers = dict(SECURITY_HEADERS)
+                  headers['content-type'] = content_type
+                  if obj.get('CacheControl'):
+                      headers['cache-control'] = obj['CacheControl']
+                  return {
+                      'statusCode': 200,
+                      'headers': headers,
+                      'body': base64.b64encode(body).decode('ascii'),
+                      'isBase64Encoded': True
+                  }
+              except ClientError as exc:
+                  code = exc.response.get('Error', {}).get('Code', '')
+                  if code in ('NoSuchKey', 'NoSuchBucket', '404'):
+                      return {
+                          'statusCode': 404,
+                          'headers': {**SECURITY_HEADERS, 'content-type': 'text/plain; charset=utf-8'},
+                          'body': 'Not found',
+                          'isBase64Encoded': False
+                      }
+                  raise
 
-  SiteBucketPolicy:
-    Type: AWS::S3::BucketPolicy
+  HttpApi:
+    Type: AWS::ApiGatewayV2::Api
     Properties:
-      Bucket: !Ref SiteBucket
-      PolicyDocument:
-        Version: '2012-10-17'
-        Statement:
-          - Sid: AllowCloudFrontRead
-            Effect: Allow
-            Principal:
-              Service: cloudfront.amazonaws.com
-            Action: s3:GetObject
-            Resource: !Sub '${SiteBucket.Arn}/*'
-            Condition:
-              StringEquals:
-                AWS:SourceArn: !Sub 'arn:aws:cloudfront::${AWS::AccountId}:distribution/${Distribution}'
+      Name: SozoRockFoundationParentSite
+      ProtocolType: HTTP
+
+  LambdaIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    Properties:
+      ApiId: !Ref HttpApi
+      IntegrationType: AWS_PROXY
+      IntegrationUri: !GetAtt OriginFunction.Arn
+      PayloadFormatVersion: '2.0'
+
+  DefaultRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref HttpApi
+      RouteKey: '$default'
+      Target: !Join
+        - /
+        - - integrations
+          - !Ref LambdaIntegration
+
+  DefaultStage:
+    Type: AWS::ApiGatewayV2::Stage
+    Properties:
+      ApiId: !Ref HttpApi
+      StageName: '$default'
+      AutoDeploy: true
+
+  InvokePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref OriginFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub 'arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${HttpApi}/*'
+
+  CustomDomain:
+    Type: AWS::ApiGatewayV2::DomainName
+    Properties:
+      DomainName: !Ref DomainName
+      DomainNameConfigurations:
+        - CertificateArn: !Ref CertificateArn
+          EndpointType: REGIONAL
+          SecurityPolicy: TLS_1_2
+
+  DomainMapping:
+    Type: AWS::ApiGatewayV2::ApiMapping
+    DependsOn:
+      - DefaultStage
+    Properties:
+      ApiId: !Ref HttpApi
+      DomainName: !Ref CustomDomain
+      Stage: '$default'
 
 Outputs:
   BucketName:
     Value: !Ref SiteBucket
-  DistributionId:
-    Value: !Ref Distribution
-  DistributionDomainName:
-    Value: !GetAtt Distribution.DomainName
+  ApiId:
+    Value: !Ref HttpApi
+  ApiEndpoint:
+    Value: !GetAtt HttpApi.ApiEndpoint
+  DomainName:
+    Value: !Ref CustomDomain
   SiteUrl:
     Value: !Sub 'https://${DomainName}'
