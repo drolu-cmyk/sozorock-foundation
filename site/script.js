@@ -4,6 +4,7 @@
   const primaryNav = document.querySelector('[data-primary-nav]');
   const menus = [...document.querySelectorAll('[data-menu]')];
   const path = document.body.dataset.path || '/';
+  const mobileMedia = window.matchMedia('(max-width: 900px)');
 
   const closeMenus = (except = null) => menus.forEach(menu => {
     if (menu === except) return;
@@ -13,22 +14,43 @@
     if (panel) panel.hidden = true;
   });
 
-  const currentSection = path.startsWith('/work') ? 'work' : (['/publications','/insights','/events'].some(p => path.startsWith(p)) || path.startsWith('/publication/')) ? 'ideas' : (['/about','/leadership','/standards'].some(p => path.startsWith(p))) ? 'about' : null;
+  const setMobileNav = open => {
+    primaryNav?.classList.toggle('is-open', open);
+    mobileToggle?.classList.toggle('is-open', open);
+    mobileToggle?.setAttribute('aria-expanded', String(open));
+    mobileToggle?.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+    document.body.classList.toggle('nav-open', open);
+    if (!open) closeMenus();
+  };
+
+  const currentSection = path.startsWith('/work') ? 'work' :
+    (['/publications','/insights','/events'].some(p => path.startsWith(p)) || path.startsWith('/publication/')) ? 'ideas' :
+    (['/about','/leadership','/standards'].some(p => path.startsWith(p))) ? 'about' : null;
+
   menus.forEach(menu => {
     const trigger = menu.querySelector('.nav-trigger');
     const panel = menu.querySelector('.mega-panel');
     if (menu.dataset.section === currentSection) trigger?.classList.add('is-current');
     if (!trigger || !panel) return;
+
     const toggle = () => {
       const open = trigger.getAttribute('aria-expanded') === 'true';
       closeMenus(menu);
       trigger.setAttribute('aria-expanded', String(!open));
       panel.hidden = open;
     };
+
     trigger.addEventListener('click', toggle);
     trigger.addEventListener('keydown', event => {
-      if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); toggle(); }
-      if (event.key === 'ArrowDown' && panel.hidden) { event.preventDefault(); toggle(); panel.querySelector('a')?.focus(); }
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        toggle();
+      }
+      if (event.key === 'ArrowDown' && panel.hidden) {
+        event.preventDefault();
+        toggle();
+        panel.querySelector('a')?.focus();
+      }
     });
   });
 
@@ -39,16 +61,28 @@
   document.addEventListener('keydown', event => {
     if (event.key === 'Escape') {
       closeMenus();
-      primaryNav?.classList.remove('is-open');
-      mobileToggle?.setAttribute('aria-expanded', 'false');
+      setMobileNav(false);
+      mobileToggle?.focus();
     }
   });
-  document.addEventListener('click', event => { if (header && !header.contains(event.target)) closeMenus(); });
-  mobileToggle?.addEventListener('click', () => {
-    const next = !primaryNav?.classList.contains('is-open');
-    primaryNav?.classList.toggle('is-open', next);
-    mobileToggle.setAttribute('aria-expanded', String(next));
+
+  document.addEventListener('click', event => {
+    if (header && !header.contains(event.target)) closeMenus();
   });
+
+  mobileToggle?.addEventListener('click', () => {
+    setMobileNav(!primaryNav?.classList.contains('is-open'));
+  });
+
+  primaryNav?.querySelectorAll('a').forEach(link => link.addEventListener('click', () => {
+    if (mobileMedia.matches) setMobileNav(false);
+  }));
+
+  const handleViewport = event => {
+    if (!event.matches) setMobileNav(false);
+  };
+  if (mobileMedia.addEventListener) mobileMedia.addEventListener('change', handleViewport);
+  else mobileMedia.addListener(handleViewport);
 
   const slides = [...document.querySelectorAll('[data-focus-slide]')];
   const tabs = [...document.querySelectorAll('[data-focus-tab]')];
@@ -72,8 +106,17 @@
     });
     if (moveFocus) tabs[current]?.focus();
   };
-  const stop = () => { if (timer) window.clearInterval(timer); timer = null; };
-  const start = () => { stop(); if (paused || reduceMotion || !slides.length) return; timer = window.setInterval(() => render(current + 1), 6500); };
+
+  const stop = () => {
+    if (timer) window.clearInterval(timer);
+    timer = null;
+  };
+  const start = () => {
+    stop();
+    if (paused || reduceMotion || !slides.length) return;
+    timer = window.setInterval(() => render(current + 1), 6500);
+  };
+
   tabs.forEach((tab, i) => {
     tab.addEventListener('click', () => { render(i); start(); });
     tab.addEventListener('keydown', event => {
@@ -83,9 +126,14 @@
       if (event.key === 'End') { event.preventDefault(); render(slides.length - 1, true); start(); }
     });
   });
+
   if (focusToggle) {
     focusToggle.textContent = paused ? 'Play features' : 'Pause features';
-    focusToggle.addEventListener('click', () => { paused = !paused; focusToggle.textContent = paused ? 'Play features' : 'Pause features'; start(); });
+    focusToggle.addEventListener('click', () => {
+      paused = !paused;
+      focusToggle.textContent = paused ? 'Play features' : 'Pause features';
+      start();
+    });
   }
   render(0);
   start();
@@ -94,7 +142,10 @@
   if (reduceMotion || !('IntersectionObserver' in window)) reveals.forEach(el => el.classList.add('is-visible'));
   else {
     const observer = new IntersectionObserver(entries => entries.forEach(entry => {
-      if (entry.isIntersecting) { entry.target.classList.add('is-visible'); observer.unobserve(entry.target); }
+      if (entry.isIntersecting) {
+        entry.target.classList.add('is-visible');
+        observer.unobserve(entry.target);
+      }
     }), { threshold: 0.12 });
     reveals.forEach(el => observer.observe(el));
   }
