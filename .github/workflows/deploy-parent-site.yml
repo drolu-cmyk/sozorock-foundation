@@ -170,3 +170,24 @@ jobs:
           curl -fsSL --max-time 20 "https://${DOMAIN_NAME}/sitemap.xml" | grep -Fq 'https://www.sozorockfoundation.org/publications'
           curl -fsSL --max-time 20 "https://${DOMAIN_NAME}/leadership" | grep -Fq '/assets/leadership/oluwabiyi-adeyemo.png'
           curl -fsSL --max-time 20 "https://${DOMAIN_NAME}/publications" | grep -Fq '/assets/rrg-cover.jpg'
+
+      - name: Publish deployment receipt
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          JOB_STATUS: ${{ job.status }}
+          HEAD_SHA: ${{ github.sha }}
+          HEAD_BRANCH: ${{ github.ref_name }}
+          RUN_ID: ${{ github.run_id }}
+          SERVER_URL: ${{ github.server_url }}
+          REPOSITORY: ${{ github.repository }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ "$JOB_STATUS" = 'success' ]; then
+            status='**SUCCESS — production deployment and live HTTPS verification passed.**'
+          else
+            status="**FAILURE — deployment job concluded: ${JOB_STATUS}. Production must not be treated as complete.**"
+          fi
+          run_url="${SERVER_URL}/${REPOSITORY}/actions/runs/${RUN_ID}"
+          gh issue comment 15 --repo "$REPOSITORY" --body "Parent website deployment receipt\n\n${status}\n\nRun: ${run_url}\nRun ID: \`${RUN_ID}\`\nCommit: \`${HEAD_SHA}\`\nBranch: \`${HEAD_BRANCH}\`"
