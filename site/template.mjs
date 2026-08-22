@@ -3,7 +3,7 @@ import { leadership, publications, externalDestinations } from './content.mjs';
 const esc = (value) => String(value ?? '').replace(/[&<>\"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[ch]));
 const json = value => JSON.stringify(value).replace(/</g, '\\u003c');
 
-const logo = `<a class="brand" href="/" aria-label="The SozoRock Foundation home"><span class="brand-mark"><span class="brand-word">sozorock.</span><span class="brand-reg" aria-hidden="true">®</span></span><span class="brand-unit">FOUNDATION</span></a>`;
+const logo = `<a class="brand" href="/" aria-label="The SozoRock Foundation home"><span class="brand-mark"><span class="brand-word">sozoroc<span class="brand-k">k<span class="brand-reg" aria-hidden="true">®</span></span><span class="brand-dot">.</span></span></span><span class="brand-unit">FOUNDATION</span></a>`;
 
 const megaMenu = ({label, key, heading, allLabel, allHref, items}) => `
 <div class="nav-menu" data-menu data-section="${key}">
