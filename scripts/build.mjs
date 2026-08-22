@@ -9,6 +9,7 @@ await rm(out, { recursive: true, force: true });
 await mkdir(out, { recursive: true });
 await cp(new URL('../site/styles.css', import.meta.url), new URL('./styles.css', out));
 await cp(new URL('../site/polish.css', import.meta.url), new URL('./polish.css', out));
+await cp(new URL('../site/leadership-reference.css', import.meta.url), new URL('./leadership-reference.css', out));
 await cp(new URL('../site/script.js', import.meta.url), new URL('./script.js', out));
 await cp(new URL('../site/assets/', import.meta.url), new URL('./assets/', out), { recursive: true });
 

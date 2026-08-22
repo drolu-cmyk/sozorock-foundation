@@ -1,0 +1,56 @@
+/* Approved leadership/reference fidelity from the Foundation Sites design. */
+body[data-path="/leadership"] .shell{width:min(1240px,calc(100vw - 64px))}
+
+/* Approved compact wordmark treatment. */
+body[data-path="/leadership"] .brand{gap:0}
+body[data-path="/leadership"] .brand-word{font-size:30px;font-weight:800;letter-spacing:-.06em}
+body[data-path="/leadership"] .brand-reg{right:-5px;top:-9px;font-size:8px;font-family:Arial,sans-serif;font-weight:700}
+body[data-path="/leadership"] .brand-unit{margin-left:18px;font-size:11px;letter-spacing:.14em}
+
+/* Leadership hero: approved two-column editorial composition. */
+body[data-path="/leadership"] .inner-hero{height:276px;padding:0;background:#fff;border-bottom:1px solid var(--line)}
+body[data-path="/leadership"] .inner-hero .shell{min-height:276px;display:grid;grid-template-columns:1.42fr .72fr;grid-template-rows:auto auto;grid-template-areas:"kicker lede" "title lede";column-gap:112px;align-content:center}
+body[data-path="/leadership"] .inner-hero .kicker{grid-area:kicker;margin:0 0 14px}
+body[data-path="/leadership"] .inner-hero h1{grid-area:title;font-size:64px;line-height:.98;letter-spacing:-.055em}
+body[data-path="/leadership"] .inner-hero .inner-lede{grid-area:lede;align-self:center;max-width:370px;margin:0;color:var(--ink);font-family:var(--body);font-size:0;line-height:1.35}
+body[data-path="/leadership"] .inner-hero .inner-lede::after{content:"Responsibility for partnerships, global affairs, health education, and strategic initiatives.";font-size:21px;line-height:1.35}
+
+/* Leadership roster: approved two-up image/text rows. */
+body[data-path="/leadership"] .content-section{padding:86px 0 96px}
+body[data-path="/leadership"] .leadership-grid{grid-template-columns:1fr 1fr;gap:48px 40px}
+body[data-path="/leadership"] .person{grid-template-columns:190px 1fr;gap:28px;min-width:0;padding-top:20px;border-top:1px solid var(--navy)}
+body[data-path="/leadership"] .person img{width:190px;height:253px;object-fit:cover;object-position:center top;background:#eaf2f9}
+body[data-path="/leadership"] .person h2{margin:0 0 6px;font-size:28px;line-height:1.02;letter-spacing:-.035em}
+body[data-path="/leadership"] .person-title{margin:0 0 22px;color:var(--cobalt);font-size:14px;font-weight:700;line-height:1.25}
+body[data-path="/leadership"] .person>div>p:last-child{margin:0;color:var(--muted);font-size:15px;line-height:1.5}
+
+@media (min-width:901px) and (max-width:1180px){
+  body[data-path="/leadership"] .shell{width:min(1020px,calc(100vw - 56px))}
+  body[data-path="/leadership"] .inner-hero .shell{grid-template-columns:1.25fr .75fr;column-gap:64px}
+  body[data-path="/leadership"] .leadership-grid{gap:44px 30px}
+  body[data-path="/leadership"] .person{grid-template-columns:150px 1fr;gap:22px}
+  body[data-path="/leadership"] .person img{width:150px;height:200px}
+  body[data-path="/leadership"] .person h2{font-size:24px}
+}
+
+@media(max-width:900px){
+  body[data-path="/leadership"] .shell{width:min(calc(100% - 36px),760px)}
+  body[data-path="/leadership"] .inner-hero{height:auto;padding:54px 0}
+  body[data-path="/leadership"] .inner-hero .shell{min-height:0;display:block}
+  body[data-path="/leadership"] .inner-hero .kicker{margin-bottom:16px}
+  body[data-path="/leadership"] .inner-hero h1{font-size:clamp(46px,8vw,58px)}
+  body[data-path="/leadership"] .inner-hero .inner-lede{max-width:620px;margin-top:22px}
+  body[data-path="/leadership"] .inner-hero .inner-lede::after{font-size:19px}
+  body[data-path="/leadership"] .leadership-grid{grid-template-columns:1fr;gap:46px}
+  body[data-path="/leadership"] .person{grid-template-columns:180px 1fr}
+  body[data-path="/leadership"] .person img{width:180px;height:240px}
+}
+
+@media(max-width:620px){
+  body[data-path="/leadership"] .shell{width:calc(100% - 32px)}
+  body[data-path="/leadership"] .brand-word{font-size:23px}
+  body[data-path="/leadership"] .brand-reg{right:-4px;top:-6px;font-size:7px}
+  body[data-path="/leadership"] .brand-unit{margin-left:14px;font-size:8px}
+  body[data-path="/leadership"] .person{grid-template-columns:1fr;gap:20px}
+  body[data-path="/leadership"] .person img{width:100%;height:min(112vw,460px);max-height:460px}
+}
