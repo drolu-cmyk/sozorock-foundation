@@ -64,31 +64,31 @@ export const publications = [
 
 export const leadership = [
   {
-    name: 'Dr. Oluwabiyi Adeyemo',
-    credentials: 'MBA',
-    title: 'Director of Strategic Initiatives',
-    image: '/assets/leadership/oluwabiyi-adeyemo.png',
-    bio: 'Leads strategy, research, program design, and applied implementation across the Foundation.'
-  },
-  {
     name: 'Nike Oye',
     credentials: 'MBA',
     title: 'Director of Global Health Partnerships',
     image: '/assets/leadership/nike-oye.png',
-    bio: 'Leads health partnerships and cross-sector relationships that connect community needs with institutional capacity.'
+    bio: 'Coordinates strategic alliances with regional and international stakeholders to accelerate innovation in equitable health delivery. Her work focuses on sustaining multilateral partnerships, facilitating technical cooperation, and expanding the Foundation’s reach across emerging and established health ecosystems.'
   },
   {
     name: 'Anthony Abraham',
     credentials: 'MSC',
     title: 'Director of Global Affairs',
     image: '/assets/leadership/anthony-abraham.png',
-    bio: 'Leads global affairs and international relationships across the Foundation’s work.'
+    bio: 'Leads cross-border policy and institutional relations, building collaborative pathways among health entities, academic networks, and development partners. He structures global alignment so locally grounded models can inform work across different health systems.'
   },
   {
     name: 'Jordan Hare',
     credentials: 'BSN, RN',
     title: 'Director of Health Education',
     image: '/assets/leadership/jordan-hare.png',
-    bio: 'Leads health education and community learning that connect people with trusted information and care.'
+    bio: 'Guides education and community strategies that advance literacy, prevention, and trust. Her work includes evidence-based engagement models and Health Access Day as a participatory approach to community learning and workforce mentorship.'
+  },
+  {
+    name: 'Dr. Oluwabiyi Adeyemo',
+    credentials: '',
+    title: 'Director of Strategic Initiatives',
+    image: '/assets/leadership/oluwabiyi-adeyemo.png',
+    bio: 'Designs and leads the Foundation’s strategic architecture across research, policy, technology, and implementation. His work connects the publication portfolio with Health Equity Hubs, Health Access Day, CB-CAP, and applied learning.'
   }
 ];
