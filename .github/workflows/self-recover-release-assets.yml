@@ -26,6 +26,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       TARGET_BRANCH: release/final-responsive-copy-routing
+      DIAGNOSTIC_ISSUE: '30'
     steps:
       - uses: actions/checkout@v4
         with:
@@ -79,29 +80,11 @@ jobs:
             'https://sozorockfoundation.org/m4.png' \
             'https://www.sozorockfoundation.org/m4.png'
 
-          fetch_meta_image() {
-            local out="$1" page="$2" html url
-            echo "Reading cover metadata from $page"
-            html="$(curl -fLsS --retry 2 --connect-timeout 12 --max-time 35 -A 'Mozilla/5.0' "$page")"
-            url="$(printf '%s' "$html" | python3 -c '
-import html,re,sys
-s=sys.stdin.read()
-for p in [r"<meta[^>]+property=[\"\x27]og:image[\"\x27][^>]+content=[\"\x27]([^\"\x27]+)",r"<meta[^>]+content=[\"\x27]([^\"\x27]+)[\"\x27][^>]+property=[\"\x27]og:image[\"\x27]",r"<meta[^>]+name=[\"\x27]twitter:image[\"\x27][^>]+content=[\"\x27]([^\"\x27]+)"]:
- m=re.search(p,s,re.I)
- if m: print(html.unescape(m.group(1))); break
-')"
-            [ -n "$url" ] && fetch_image "$out" "$url"
-          }
-
+          # ISBN-matched publisher-distributed covers served by Readings' image CDN.
           fetch_image site/assets/rrg-cover.jpg \
-            'https://covers.openlibrary.org/b/isbn/9798993647715-L.jpg?default=false' || \
-          fetch_meta_image site/assets/rrg-cover.jpg \
-            'https://bookshop.org/p/books/rethinking-rural-governance-delaware-county-ny-from-compliance-to-systems-intelligence-oluwabiyi-adeyemo/23612574'
-
+            'https://thumbs.readings.com.au/-ei5Iho6pK-ocs4dh7Y_XSpjrtw%3D/0x500/https%3A//readings-v4-production.s3.amazonaws.com/assets/267/26c/c0f/26726cc0f73edc2df927609257afa02bf06312e0/979899364771520251222-2-g7cugq.jpg'
           fetch_image site/assets/rebs-cover.jpg \
-            'https://covers.openlibrary.org/b/isbn/9798993647708-L.jpg?default=false' || \
-          fetch_meta_image site/assets/rebs-cover.jpg \
-            'https://tertulia.com/book/rural-equity-blueprint-series---volume-1-access-day-building-a-framework-for-rural-health-equity-in-new-york-state-oluwabiyi-adeyemo/9798993647708'
+            'https://thumbs.readings.com.au/WNoEajjp7urRl6ZZR_Lo0zL2Eiw%3D/0x500/https%3A//readings-v4-production.s3.amazonaws.com/assets/8b0/e20/58d/8b0e2058d15a6a7274a3df4bc067c28a75c70f1a/979899364770820251222-2-gw927x.jpg'
 
           for f in \
             site/assets/leadership/nike-oye.png \
@@ -134,21 +117,22 @@ for p in [r"<meta[^>]+property=[\"\x27]og:image[\"\x27][^>]+content=[\"\x27]([^\
           echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
 
       - name: Publish recovery diagnosis
-        if: always() && github.event_name == 'issues'
+        if: always()
         env:
           GH_TOKEN: ${{ github.token }}
-          ISSUE_NUMBER: ${{ github.event.issue.number }}
           JOB_STATUS: ${{ job.status }}
           ASSET_SHA: ${{ steps.commit.outputs.sha }}
         shell: bash
         run: |
           set -euo pipefail
           {
-            echo "Release asset recovery: **${JOB_STATUS^^}**"
+            echo "Release asset recovery run ${GITHUB_RUN_ID}: **${JOB_STATUS^^}**"
             echo
-            if [ -n "${ASSET_SHA:-}" ]; then echo "Release branch asset commit: \`${ASSET_SHA}\`"; echo; fi
+            echo "Trigger: \`${GITHUB_EVENT_NAME}\`"
+            if [ -n "${ASSET_SHA:-}" ]; then echo "Release branch asset commit: \`${ASSET_SHA}\`"; fi
+            echo
             echo '```text'
-            if [ -f /tmp/recovery.log ]; then tail -n 80 /tmp/recovery.log; else echo 'No recovery log was produced.'; fi
+            if [ -f /tmp/recovery.log ]; then tail -n 100 /tmp/recovery.log; else echo 'No recovery log was produced.'; fi
             echo '```'
           } >/tmp/recovery-comment.md
-          gh issue comment "$ISSUE_NUMBER" --repo "$GITHUB_REPOSITORY" --body-file /tmp/recovery-comment.md
+          gh issue comment "$DIAGNOSTIC_ISSUE" --repo "$GITHUB_REPOSITORY" --body-file /tmp/recovery-comment.md
