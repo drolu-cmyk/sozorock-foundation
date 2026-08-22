@@ -5,12 +5,20 @@ on:
     branches: [main]
     paths:
       - .github/workflows/self-recover-release-assets.yml
+  issues:
+    types: [opened]
 
 permissions:
   contents: write
+  issues: read
 
 jobs:
   recover:
+    if: >-
+      github.repository == 'drolu-cmyk/sozorock-foundation' &&
+      (github.event_name == 'push' ||
+       (github.event.issue.user.login == 'drolu-cmyk' &&
+        github.event.issue.title == 'recover-release-assets'))
     runs-on: ubuntu-latest
     env:
       TARGET_BRANCH: release/final-responsive-copy-routing
