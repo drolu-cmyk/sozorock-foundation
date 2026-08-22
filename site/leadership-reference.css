@@ -54,3 +54,5 @@ body[data-path="/leadership"] .person>div>p:last-child{margin:0;color:var(--mute
   body[data-path="/leadership"] .person{grid-template-columns:1fr;gap:20px}
   body[data-path="/leadership"] .person img{width:100%;height:min(112vw,460px);max-height:460px}
 }
+
+/* Production redeploy marker: 2026-08-22. */
