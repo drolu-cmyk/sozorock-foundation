@@ -1,0 +1,109 @@
+name: Self-recover approved release visuals
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/self-recover-release-assets.yml
+
+permissions:
+  contents: write
+
+jobs:
+  recover:
+    runs-on: ubuntu-latest
+    env:
+      TARGET_BRANCH: release/final-responsive-copy-routing
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.TARGET_BRANCH }}
+          fetch-depth: 0
+
+      - name: Recover and validate approved visual assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p site/assets/leadership
+
+          valid_image() {
+            local file="$1"
+            [ -s "$file" ] && [ "$(wc -c < "$file")" -gt 2500 ] || return 1
+            case "$(file -b --mime-type "$file")" in image/jpeg|image/png|image/webp) return 0;; *) return 1;; esac
+          }
+
+          fetch_image() {
+            local out="$1"; shift
+            local url tmp="${out}.tmp"
+            rm -f "$out" "$tmp"
+            for url in "$@"; do
+              echo "Trying $url"
+              if curl -fL --retry 3 --connect-timeout 15 --max-time 45 -A 'Mozilla/5.0 (compatible; SozoRockFoundationRecovery/1.0)' "$url" -o "$tmp"; then
+                if valid_image "$tmp"; then mv "$tmp" "$out"; return 0; fi
+              fi
+              rm -f "$tmp"
+            done
+            return 1
+          }
+
+          fetch_image site/assets/leadership/nike-oye.png \
+            'https://sozorockfoundation.org/m1.png' \
+            'https://www.sozorockfoundation.org/m1.png'
+          fetch_image site/assets/leadership/anthony-abraham.png \
+            'https://sozorockfoundation.org/m2.png' \
+            'https://www.sozorockfoundation.org/m2.png'
+          fetch_image site/assets/leadership/jordan-hare.png \
+            'https://sozorockfoundation.org/m3.png' \
+            'https://www.sozorockfoundation.org/m3.png'
+          fetch_image site/assets/leadership/oluwabiyi-adeyemo.png \
+            'https://sozorockfoundation.org/m4.png' \
+            'https://www.sozorockfoundation.org/m4.png'
+
+          fetch_meta_image() {
+            local out="$1" page="$2" html url
+            html="$(curl -fLsS --retry 3 --connect-timeout 15 --max-time 45 -A 'Mozilla/5.0' "$page")"
+            url="$(printf '%s' "$html" | python3 -c '
+import html,re,sys
+s=sys.stdin.read()
+for p in [r"<meta[^>]+property=[\"\x27]og:image[\"\x27][^>]+content=[\"\x27]([^\"\x27]+)",r"<meta[^>]+content=[\"\x27]([^\"\x27]+)[\"\x27][^>]+property=[\"\x27]og:image[\"\x27]",r"<meta[^>]+name=[\"\x27]twitter:image[\"\x27][^>]+content=[\"\x27]([^\"\x27]+)"]:
+ m=re.search(p,s,re.I)
+ if m: print(html.unescape(m.group(1))); break
+')"
+            [ -n "$url" ] && fetch_image "$out" "$url"
+          }
+
+          fetch_image site/assets/rrg-cover.jpg \
+            'https://covers.openlibrary.org/b/isbn/9798993647715-L.jpg?default=false' || \
+          fetch_meta_image site/assets/rrg-cover.jpg \
+            'https://bookshop.org/p/books/rethinking-rural-governance-delaware-county-ny-from-compliance-to-systems-intelligence-oluwabiyi-adeyemo/23612574'
+
+          fetch_image site/assets/rebs-cover.jpg \
+            'https://covers.openlibrary.org/b/isbn/9798993647708-L.jpg?default=false' || \
+          fetch_meta_image site/assets/rebs-cover.jpg \
+            'https://tertulia.com/book/rural-equity-blueprint-series---volume-1-access-day-building-a-framework-for-rural-health-equity-in-new-york-state-oluwabiyi-adeyemo/9798993647708'
+
+          for f in \
+            site/assets/leadership/nike-oye.png \
+            site/assets/leadership/anthony-abraham.png \
+            site/assets/leadership/jordan-hare.png \
+            site/assets/leadership/oluwabiyi-adeyemo.png \
+            site/assets/rrg-cover.jpg \
+            site/assets/rebs-cover.jpg; do
+            valid_image "$f"
+            file "$f"
+            sha256sum "$f"
+          done
+
+      - name: Commit recovered assets to the release branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add site/assets/leadership/ site/assets/rrg-cover.jpg site/assets/rebs-cover.jpg
+          if git diff --cached --quiet; then
+            echo 'Approved visual assets already present.'
+            exit 0
+          fi
+          git commit -m 'fix(assets): restore approved publication covers and leadership portraits'
+          git push origin "HEAD:${TARGET_BRANCH}"
