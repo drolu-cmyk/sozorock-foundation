@@ -7,6 +7,10 @@ on:
       - .github/workflows/self-recover-release-assets.yml
   issues:
     types: [opened]
+  pull_request:
+    branches: [main]
+    paths:
+      - .github/recovery-trigger
 
 permissions:
   contents: write
@@ -16,7 +20,7 @@ jobs:
   recover:
     if: >-
       github.repository == 'drolu-cmyk/sozorock-foundation' &&
-      (github.event_name == 'push' ||
+      (github.event_name == 'push' || github.event_name == 'pull_request' ||
        (github.event.issue.user.login == 'drolu-cmyk' &&
         github.event.issue.title == 'recover-release-assets'))
     runs-on: ubuntu-latest
