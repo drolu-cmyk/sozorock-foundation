@@ -5,6 +5,22 @@ export const routes = [
   '/publication/rrg-v1-2025', '/publication/rebs-v1-2025'
 ];
 
+export const externalDestinations = {
+  health: 'https://health.sozorockfoundation.org/',
+  aiLab: 'https://ai-lab.sozorockfoundation.org/',
+  cbcap: 'https://cbcap.sozorockfoundation.org/'
+};
+
+// Keep the approved parent paths for backwards compatibility, but production
+// serves these two legacy parent routes as permanent redirects to the dedicated
+// product sites. They are intentionally omitted from the parent sitemap.
+export const redirectRoutes = new Map([
+  ['/work/health', externalDestinations.health],
+  ['/work/ai-lab', externalDestinations.aiLab]
+]);
+
+export const indexableRoutes = routes.filter(route => !redirectRoutes.has(route));
+
 export const publications = [
   {
     slug: 'hsa-v1-2026',
@@ -16,8 +32,7 @@ export const publications = [
     isbn: '979-8-9936477-3-9',
     authors: ['Dr. Oluwabiyi Adeyemo'],
     datePublished: '2026-08',
-    cover: '/assets/hsa-cover.webp',
-    coverClass: 'hsa'
+    cover: '/assets/hsa-cover.webp'
   },
   {
     slug: 'rrg-v1-2025',
@@ -30,7 +45,7 @@ export const publications = [
     doi: '10.65473/rrg-v1-2025',
     authors: ['Oluwabiyi Adeyemo'],
     datePublished: '2025-11-20',
-    coverClass: 'rrg'
+    cover: '/assets/rrg-cover.jpg'
   },
   {
     slug: 'rebs-v1-2025',
@@ -43,13 +58,37 @@ export const publications = [
     doi: '10.65473/rebs-v1-2025',
     authors: ['Oluwabiyi Adeyemo', 'Jordan Hare'],
     datePublished: '2025-10',
-    coverClass: 'rebs'
+    cover: '/assets/rebs-cover.jpg'
   }
 ];
 
 export const leadership = [
-  { name: 'Dr. Oluwabiyi Adeyemo', credentials: 'MBA', initials: 'OA', title: 'Director of Strategic Initiatives', bio: 'Leads strategic initiatives, research architecture, program design, and applied implementation across the Foundation.' },
-  { name: 'Nike Oye', credentials: 'MBA', initials: 'NO', title: 'Director of Global Health Partnerships', bio: 'Supports health partnerships and cross-sector relationships that connect community needs with institutional capacity.' },
-  { name: 'Anthony Abraham', credentials: 'MSC', initials: 'AA', title: 'Director of Global Affairs', bio: 'Supports global affairs, public-system relationships, and the Foundation’s international engagement.' },
-  { name: 'Jordan Hare', credentials: 'BSN, RN', initials: 'JH', title: 'Director of Health Education', bio: 'Supports health education, community learning, and practical pathways to trusted information and care.' }
+  {
+    name: 'Dr. Oluwabiyi Adeyemo',
+    credentials: 'MBA',
+    title: 'Director of Strategic Initiatives',
+    image: '/assets/leadership/oluwabiyi-adeyemo.png',
+    bio: 'Leads strategy, research, program design, and applied implementation across the Foundation.'
+  },
+  {
+    name: 'Nike Oye',
+    credentials: 'MBA',
+    title: 'Director of Global Health Partnerships',
+    image: '/assets/leadership/nike-oye.png',
+    bio: 'Leads health partnerships and cross-sector relationships that connect community needs with institutional capacity.'
+  },
+  {
+    name: 'Anthony Abraham',
+    credentials: 'MSC',
+    title: 'Director of Global Affairs',
+    image: '/assets/leadership/anthony-abraham.png',
+    bio: 'Leads global affairs and international relationships across the Foundation’s work.'
+  },
+  {
+    name: 'Jordan Hare',
+    credentials: 'BSN, RN',
+    title: 'Director of Health Education',
+    image: '/assets/leadership/jordan-hare.png',
+    bio: 'Leads health education and community learning that connect people with trusted information and care.'
+  }
 ];

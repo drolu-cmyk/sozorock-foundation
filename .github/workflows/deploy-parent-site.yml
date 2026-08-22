@@ -66,19 +66,48 @@ jobs:
         run: |
           set -euo pipefail
 
-          # Correct the shell fallback used while polling the API Gateway domain.
+          # Keep the established regional deployment path while applying the
+          # production redirect and readiness behavior before the deployment
+          # script packages its Lambda origin.
           sed -i 's/<<<"${DOMAIN_JSON:-{}}"/<<<"${DOMAIN_JSON:-}"/' scripts/deploy-parent-regional.sh
 
-          # API Gateway can report a Regional custom domain as AVAILABLE before
-          # the newly created API mapping is ready on every serving endpoint.
-          # Keep DNS untouched until the custom-domain request serves the
-          # approved Foundation identity.
           python3 - <<'PY'
           from pathlib import Path
 
           path = Path('scripts/deploy-parent-regional.sh')
           text = path.read_text()
-          old = '''log "Verify custom-domain target directly before Route 53 cutover"
+
+          handler_old = '''def handler(event, context):
+              key = resolve_key(event.get('rawPath') or event.get('path') or '/')
+          '''
+          handler_new = '''REDIRECTS = {
+              '/work/health': 'https://health.sozorockfoundation.org/',
+              '/work/health/': 'https://health.sozorockfoundation.org/',
+              '/work/ai-lab': 'https://ai-lab.sozorockfoundation.org/',
+              '/work/ai-lab/': 'https://ai-lab.sozorockfoundation.org/',
+          }
+
+
+          def handler(event, context):
+              raw_path = event.get('rawPath') or event.get('path') or '/'
+              if raw_path in REDIRECTS:
+                  return {
+                      'statusCode': 301,
+                      'headers': {
+                          **SECURITY_HEADERS,
+                          'location': REDIRECTS[raw_path],
+                          'cache-control': 'public,max-age=300',
+                      },
+                      'body': '',
+                      'isBase64Encoded': False,
+                  }
+              key = resolve_key(raw_path)
+          '''
+          if handler_old not in text:
+              raise SystemExit('Expected Lambda handler block not found')
+          text = text.replace(handler_old, handler_new)
+
+          probe_old = '''log "Verify custom-domain target directly before Route 53 cutover"
           TARGET_IP="$(getent ahostsv4 "$TARGET" | awk 'NR==1{print $1}')"
           test -n "$TARGET_IP"
           custom_page="$(curl -fsSL --max-time 30 --resolve "${DOMAIN_NAME}:443:${TARGET_IP}" "https://${DOMAIN_NAME}/?target=${RUN_ID}")"
@@ -86,7 +115,7 @@ jobs:
           grep -Fq 'Assurance.' <<<"$custom_page"
           grep -Fq 'Intelligence.' <<<"$custom_page"
           '''
-          new = '''log "Wait for custom-domain API mapping before Route 53 cutover"
+          probe_new = '''log "Wait for custom-domain API mapping before Route 53 cutover"
           CUSTOM_DOMAIN_READY=0
           for _ in $(seq 1 90); do
             TARGET_IP="$(getent ahostsv4 "$TARGET" | awk 'NR==1{print $1}' || true)"
@@ -104,9 +133,26 @@ jobs:
             exit 1
           fi
           '''
-          if old not in text:
+          if probe_old not in text:
               raise SystemExit('Expected custom-domain verification block not found')
-          path.write_text(text.replace(old, new))
+          text = text.replace(probe_old, probe_new)
+          path.write_text(text)
           PY
 
           bash scripts/deploy-parent-regional.sh
+
+          verify_redirect() {
+            local source="$1" expected="$2" headers status location
+            headers="$(curl -sS --max-time 20 -D - -o /dev/null "https://${DOMAIN_NAME}${source}")"
+            status="$(printf '%s' "$headers" | awk 'toupper($1) ~ /^HTTP\// {code=$2} END{print code}' | tr -d '\r')"
+            location="$(printf '%s' "$headers" | awk 'BEGIN{IGNORECASE=1} /^location:/ {sub(/^[^:]+:[[:space:]]*/,""); gsub(/\r/,""); print; exit}')"
+            test "$status" = '301'
+            test "$location" = "$expected"
+          }
+
+          verify_redirect '/work/health' 'https://health.sozorockfoundation.org/'
+          verify_redirect '/work/ai-lab' 'https://ai-lab.sozorockfoundation.org/'
+
+          curl -fsSL --max-time 20 "https://${DOMAIN_NAME}/sitemap.xml" | grep -Fq 'https://www.sozorockfoundation.org/publications'
+          curl -fsSL --max-time 20 "https://${DOMAIN_NAME}/leadership" | grep -Fq '/assets/leadership/oluwabiyi-adeyemo.png'
+          curl -fsSL --max-time 20 "https://${DOMAIN_NAME}/publications" | grep -Fq '/assets/rrg-cover.jpg'
