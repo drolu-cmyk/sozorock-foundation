@@ -166,7 +166,7 @@ async function handlePublicationAccess(request, env, slug) {
   if (!upstream.ok) {
     return json({ error: typeof body.error === "string" ? body.error : "We could not process this request." }, upstream.status >= 400 && upstream.status < 600 ? upstream.status : 502);
   }
-  return json({ message: typeof body.message === "string" ? body.message : "Check your email for a verification link." });
+  return json({ message: "Check your email for a verification link. It expires in 30 minutes." });
 }
 
 function redirect(url, pathname, status = 308) {

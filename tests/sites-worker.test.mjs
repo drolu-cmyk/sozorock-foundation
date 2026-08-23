@@ -144,7 +144,7 @@ test("forwards a valid access request to the established Health verification ser
   }), {
     UPSTREAM_FETCH: async (url, options) => {
       upstreamCalls.push({ url, options, body: JSON.parse(options.body) });
-      return Response.json({ message: "Check your email for a verification link." });
+      return Response.json({ message: "Your publication is ready to download." });
     },
   });
 
@@ -156,7 +156,7 @@ test("forwards a valid access request to the established Health verification ser
   assert.equal(upstreamCalls[0].options.headers.Referer, "https://health.sozorockfoundation.org/publications/health-systems-assurance-volume-1/access");
   assert.equal(upstreamCalls[0].body.email, "amina@example.org");
   assert.equal(upstreamCalls[0].body.updatesConsent, false);
-  assert.deepEqual(await response.json(), { message: "Check your email for a verification link." });
+  assert.deepEqual(await response.json(), { message: "Check your email for a verification link. It expires in 30 minutes." });
 });
 
 test("rejects invalid access requests before contacting the verification service", async () => {
