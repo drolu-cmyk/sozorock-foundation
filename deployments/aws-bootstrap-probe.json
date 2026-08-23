@@ -1,9 +1,0 @@
-{
-  "completed_at": "2026-08-20T23:32:30Z",
-  "workflow_run_id": "32429069758",
-  "bootstrap_outcome": "failure",
-  "inspect_outcome": "skipped",
-  "caller": null,
-  "foundation_trust": null,
-  "mutation_performed": false
-}

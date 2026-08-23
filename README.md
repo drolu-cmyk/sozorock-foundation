@@ -1,34 +1,57 @@
-# SozoRock Foundation Parent Website
+# The SozoRock Foundation parent site
 
-This private repository is dedicated to the SozoRock Foundation parent website.
+The canonical Sites source for `www.sozorockfoundation.org`. The site is a responsive institutional experience with a Cloudflare Worker entry point for clean-route delivery and verified publication-access requests.
 
-- Current hosted site: https://sozorock-foundation.the-sozorock-4854.chatgpt.site/
-- Canonical production domain: https://www.sozorockfoundation.org
-- Scope: parent website source, documentation, and infrastructure automation only
-- Excluded: SozoRock AI Lab and every other SozoRock project or subdomain
-
-## Domain cutover
-
-The production DNS workflow is intentionally limited to these records:
-
-| Type | Name | Value |
-| --- | --- | --- |
-| CNAME | `www` | `custom-domains.chatgpt.site` |
-| TXT | `_openai-site-verification.www` | `openai-site-verification=uRWqqC2NjJmoTR2EyEqF9JyNpVBzzmx61U0re5JhBjk` |
-| TXT | `_cf-custom-hostname.www` | `a3a592c6-be9a-4592-90d6-dd20c2e1af6d` |
-
-The workflow does not change the apex domain, MX records, nameservers, email records, or other subdomains.
-
-## AWS authorization
-
-The workflow uses the dedicated `GitHubActionsSozorockFoundationDnsRole`. Its least-privilege CloudFormation definition is stored at `infra/cloudformation/github-actions-dns-role.yml`.
-
-The role trusts only the `main` branch of this repository and may change only the three parent-domain records listed above. Creating or repairing the role is the one-time AWS bootstrap required before the workflow can complete.
-
-An AWS administrator in account `791860731989` can run the checked-in idempotent bootstrap from a repository checkout:
+## Run locally
 
 ```bash
-bash scripts/bootstrap-parent-dns-role.sh --apply
+npm install
+npm run dev
 ```
 
-The script verifies the AWS account and existing GitHub OIDC provider, discovers exactly one public `sozorockfoundation.org.` hosted zone, creates or reconciles only `GitHubActionsSozorockFoundationDnsRole`, installs its record-scoped inline policy, and makes no DNS record changes. After the bootstrap succeeds, rerun the failed parent-domain workflow; no long-lived AWS credentials need to be stored in GitHub.
+Production build and verification:
+
+```bash
+npm run build
+node scripts/prepare-sites-build.mjs
+node --test tests/sites-worker.test.mjs
+```
+
+## Architecture and production source
+
+The site uses React and Vite with a lightweight History API router. The Sites worker serves the app shell directly for every permanent route so copied links and browser refreshes retain the requested path. It includes distinct views for Platforms, Publications, Insights, Events, About, Leadership, Partner, Support, Standards, the three platform detail pages, and the three DOI-facing publication routes.
+
+Sites is the only production deployment source for the parent website. This repository does not contain an AWS parent-site deployment workflow or reconstructed AWS clone.
+
+The homepage includes a rotating, pausable initiative feature with keyboard-operable tabs. Motion is intentionally restrained and respects `prefers-reduced-motion`.
+
+## Source-backed content
+
+Content and approved imagery were grounded in the Foundation’s current parent site, supplied files, leadership page, and live platform sites:
+
+- `health.sozorockfoundation.org`
+- `health.sozorockfoundation.org/explore`
+- `ai-lab.sozorockfoundation.org`
+- `cbcap.sozorockfoundation.org`
+
+The visual system uses the parent Foundation’s deep navy and blue palette. It does not use gradients or generated hero artwork.
+
+## Permanent publication routes
+
+These routes remain distinct and unchanged:
+
+- `/publication/hsa-v1-2026`
+- `/publication/rrg-v1-2025`
+- `/publication/rebs-v1-2025`
+
+These records remain public and indexable. Downloadable HSA files are released through a separate verified-access route:
+
+- `/publication/hsa-v1-2026/access`
+
+Direct legacy file URLs redirect to that access route. The current Health verification service sends the verification link from `publications@sozorockfoundation.org`.
+
+## Form behavior
+
+The Partner and Support forms validate locally and prepare an addressed email inquiry; they do not claim to submit to a CRM. The HSA publication-access form posts to the Sites worker, which validates the request and forwards it to the established SozoRock Health verification service. Required delivery consent and optional updates consent are separate.
+
+No DOI is displayed or embedded until a registered DOI is supplied. Adding a DOI later requires only the publication metadata field; the permanent route does not change.
