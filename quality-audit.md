@@ -21,9 +21,9 @@ The implementation does not copy the typography, layouts, language, or imagery o
 3. **Primary navigation — Excellent.** The header is limited to Work, Ideas, About, Partner, and Support. Dropdowns expose the next level without overloading the top bar and work by click, Enter, and Escape.
 4. **Platform discovery — Excellent.** The Platforms overview and three platform pages use short introductions and horizontal editorial rows. They do not rely on repetitive promotional cards.
 5. **Ideas and permanent records — Excellent.** Publications, Insights, and Events are separate destinations. All three DOI-facing publication routes remain intact and each route retains its own scope, access path, and caution language.
-6. **Partner and Support — Excellent.** Engagement options are presented as scannable rows rather than a brochure grid. Forms are clearly frontend prototypes and do not imply network submission.
+6. **Partner and Support — Excellent.** Engagement options are presented as scannable rows rather than a brochure grid. The forms now validate, require privacy consent, use a bot honeypot, and submit through the Foundation's established contact service.
 7. **Leadership — Excellent.** Leadership has its own page with four approved portraits, titles, and profiles. Dr. Oluwabiyi Adeyemo's title remains Director of Strategic Initiatives.
-8. **Standards and legal closure — Excellent.** Standards are a dedicated page. The footer separates Work, Ideas, Foundation, Engage, legal policies, nonprofit status, EIN, and social channels with readable legal text.
+8. **Standards and legal closure — Excellent.** Standards, Privacy, Accessibility, Nondiscrimination, and Terms are dedicated pages. The footer separates Work, Ideas, Foundation, Engage, legal policies, nonprofit status, EIN, and verified social channels with readable legal text.
 
 ## Polish implemented
 
@@ -59,6 +59,6 @@ The implementation does not copy the typography, layouts, language, or imagery o
 - HSA is presented as public-interest evidence synthesis and proposed analytical work, not a validated standard or certification.
 - No gradient, fake metric, invented partner, fake endorsement, generated hero art, or website screenshot is used as parent-site campaign imagery.
 
-## Remaining validation outside prototype scope
+## Remaining operational validation
 
-Formal assistive-technology testing, production analytics, live-form delivery, and testing on a representative physical-device matrix should be completed before a production cutover. These are launch-readiness activities, not blockers for the frontend quality pass.
+Formal assistive-technology testing and testing on a representative physical-device matrix remain appropriate ongoing QA. Production analytics and search-console ownership require the Foundation's analytics and webmaster accounts. A valid contact request was not sent during automated QA because it would generate an external email; the upstream contract, origin forwarding, and failure behavior are covered by tests, and the upstream endpoint's invalid-request behavior was verified live without sending mail.

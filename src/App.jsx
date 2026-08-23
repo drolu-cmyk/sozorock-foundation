@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { HomePage } from "./HomePage";
 import {
   AboutPage,
+  AccessibilityPage,
   AiLabPage,
   EventsPage,
   HealthPage,
@@ -9,6 +10,7 @@ import {
   InstitutePage,
   LeadershipPage,
   NotFoundPage,
+  NondiscriminationPage,
   PartnerPage,
   PlatformsPage,
   PublicationPage,
@@ -16,10 +18,13 @@ import {
   PublicationsPage,
   StandardsPage,
   SupportPage,
+  PrivacyPage,
+  TermsPage,
 } from "./Pages";
 import { Footer, Header } from "./SiteChrome";
 import { publications } from "./siteData";
 import { useCurrentPath } from "./router";
+import { getSeoForPath } from "./seo";
 
 function RouteView({ pathname }) {
   const publication = pathname.startsWith("/publication/") ? publications.find((item) => item.path === pathname) : null;
@@ -39,36 +44,19 @@ function RouteView({ pathname }) {
   if (pathname === "/partner") return <PartnerPage />;
   if (pathname === "/support") return <SupportPage />;
   if (pathname === "/standards") return <StandardsPage />;
+  if (pathname === "/privacy") return <PrivacyPage />;
+  if (pathname === "/accessibility") return <AccessibilityPage />;
+  if (pathname === "/nondiscrimination") return <NondiscriminationPage />;
+  if (pathname === "/terms") return <TermsPage />;
   return <NotFoundPage />;
 }
 
-const titleMap = {
-  "/": "The SozoRock Foundation | Access. Assurance. Intelligence.",
-  "/platforms": "Platforms | The SozoRock Foundation",
-  "/platforms/institute": "SozoRock Global Institute | The SozoRock Foundation",
-  "/platforms/health": "SozoRock Health | The SozoRock Foundation",
-  "/platforms/ai-lab": "SozoRock AI Lab | The SozoRock Foundation",
-  "/publications": "Publications | The SozoRock Foundation",
-  "/insights": "Insights | The SozoRock Foundation",
-  "/events": "Events | The SozoRock Foundation",
-  "/about": "About | The SozoRock Foundation",
-  "/leadership": "Leadership | The SozoRock Foundation",
-  "/partner": "Partner | The SozoRock Foundation",
-  "/support": "Support | The SozoRock Foundation",
-  "/standards": "Standards | The SozoRock Foundation",
-};
-
 export function App() {
   const { pathname } = useCurrentPath();
-  const publication = publications.find((item) => item.path === pathname);
-  const accessPublication = publications.find((item) => item.accessPath === pathname);
-  const publicationTitle = publication?.title;
-  const title = publicationTitle ? `${publicationTitle} | The SozoRock Foundation` : accessPublication ? `Publication access | The SozoRock Foundation` : titleMap[pathname] || "The SozoRock Foundation";
+  const seo = getSeoForPath(pathname);
 
   useEffect(() => {
-    document.title = title;
-    const origin = "https://www.sozorockfoundation.org";
-    const canonicalUrl = `${origin}${pathname}`;
+    document.title = seo.title;
     const setMeta = (name, content, attribute = "name") => {
       let element = document.head.querySelector(`meta[${attribute}="${name}"]`);
       if (!content) {
@@ -89,56 +77,52 @@ export function App() {
       canonical.setAttribute("rel", "canonical");
       document.head.appendChild(canonical);
     }
-    canonical.setAttribute("href", canonicalUrl);
+    canonical.setAttribute("href", seo.canonicalUrl);
 
-    const description = publication?.description || "The SozoRock Foundation builds platforms for better health and public systems through public-interest research, health access, systems intelligence, convening, and applied learning.";
-    setMeta("description", description);
-    setMeta("og:title", title, "property");
-    setMeta("og:description", description, "property");
-    setMeta("og:url", canonicalUrl, "property");
-    setMeta("og:type", publication ? "article" : "website", "property");
-    setMeta("og:image", publication ? `${origin}${publication.cover}` : `${origin}/media/sozorock-logo.png`, "property");
-    setMeta("robots", accessPublication ? "noindex, nofollow" : "index, follow");
+    setMeta("description", seo.description);
+    setMeta("robots", seo.robots);
+    setMeta("og:site_name", "The SozoRock Foundation", "property");
+    setMeta("og:locale", "en_US", "property");
+    setMeta("og:title", seo.title, "property");
+    setMeta("og:description", seo.description, "property");
+    setMeta("og:url", seo.canonicalUrl, "property");
+    setMeta("og:type", seo.ogType, "property");
+    setMeta("og:image", seo.image, "property");
+    setMeta("og:image:secure_url", seo.image, "property");
+    setMeta("og:image:type", "image/png", "property");
+    setMeta("og:image:width", "1200", "property");
+    setMeta("og:image:height", "630", "property");
+    setMeta("og:image:alt", seo.imageAlt, "property");
+    setMeta("twitter:card", "summary_large_image");
+    setMeta("twitter:site", "@srockfoundation");
+    setMeta("twitter:creator", "@srockfoundation");
+    setMeta("twitter:title", seo.title);
+    setMeta("twitter:description", seo.description);
+    setMeta("twitter:image", seo.image);
+    setMeta("twitter:image:alt", seo.imageAlt);
+    setMeta("article:published_time", seo.publication?.dateMachine || seo.publication?.date, "property");
+    setMeta("article:section", seo.publication?.theme, "property");
 
     const citationMeta = {
-      citation_title: publication ? `${publication.title}, ${publication.volume}: ${publication.subtitle || publication.tagline}` : null,
-      citation_author: publication?.author,
-      citation_publication_date: publication?.dateMachine,
-      citation_publisher: publication?.publisher,
-      citation_isbn: publication?.isbn,
-      citation_language: publication?.languageCode,
-      citation_abstract: publication?.description,
-      citation_doi: publication?.doi,
+      citation_title: seo.publication ? `${seo.publication.title}, ${seo.publication.volume}: ${seo.publication.subtitle || seo.publication.tagline}` : null,
+      citation_author: seo.publication?.author,
+      citation_publication_date: seo.publication?.dateMachine,
+      citation_publisher: seo.publication?.publisher || (seo.publication ? "The SozoRock Foundation, Inc." : null),
+      citation_isbn: seo.publication?.isbn,
+      citation_language: seo.publication?.languageCode,
+      citation_abstract: seo.publication?.description,
+      citation_doi: seo.publication?.doi,
     };
     Object.entries(citationMeta).forEach(([name, content]) => setMeta(name, content));
 
-    const schemaId = "publication-schema";
+    const schemaId = "site-schema";
     document.getElementById(schemaId)?.remove();
-    if (publication) {
-      const schema = document.createElement("script");
-      schema.id = schemaId;
-      schema.type = "application/ld+json";
-      schema.textContent = JSON.stringify({
-        "@context": "https://schema.org",
-        "@type": "Report",
-        name: `${publication.title}, ${publication.volume}`,
-        alternateName: publication.subtitle,
-        description: publication.description,
-        author: { "@type": "Person", name: publication.author },
-        publisher: publication.publisher ? { "@type": "Organization", name: publication.publisher } : undefined,
-        datePublished: publication.dateMachine,
-        inLanguage: publication.languageCode,
-        isbn: publication.isbn,
-        url: canonicalUrl,
-        image: `${origin}${publication.cover}`,
-        identifier: [
-          publication.isbn ? { "@type": "PropertyValue", propertyID: "ISBN", value: publication.isbn } : null,
-          publication.doi ? { "@type": "PropertyValue", propertyID: "DOI", value: publication.doi } : null,
-        ].filter(Boolean),
-      });
-      document.head.appendChild(schema);
-    }
-  }, [pathname, publication, accessPublication, title]);
+    const schema = document.createElement("script");
+    schema.id = schemaId;
+    schema.type = "application/ld+json";
+    schema.textContent = JSON.stringify(seo.schema);
+    document.head.appendChild(schema);
+  }, [seo]);
 
   return (
     <div className="site-frame">

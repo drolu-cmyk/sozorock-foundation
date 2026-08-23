@@ -120,12 +120,14 @@ export function Footer() {
         <div className="footer-meta">
           <nav aria-label="Legal and policy links">
             <Link href="/standards">Standards</Link>
-            <Link href="/standards#accessibility">Accessibility</Link>
-            <Link href="/standards#privacy">Privacy</Link>
-            <Link href="/standards#nondiscrimination">Nondiscrimination</Link>
+            <Link href="/privacy">Privacy</Link>
+            <Link href="/accessibility">Accessibility</Link>
+            <Link href="/nondiscrimination">Nondiscrimination</Link>
+            <Link href="/terms">Terms</Link>
           </nav>
           <nav aria-label="Social links">
-            <a href="https://x.com/sozorockfoundation">X</a>
+            <a href="https://x.com/srockfoundation">X</a>
+            <a href="https://www.instagram.com/srockfoundation/">Instagram</a>
             <a href="https://www.youtube.com/@srockfoundation">YouTube</a>
           </nav>
         </div>
