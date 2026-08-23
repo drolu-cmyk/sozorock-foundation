@@ -1,6 +1,11 @@
 name: Finalize SozoRock Foundation Sites DNS
 
 on:
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/finalize-sites-dns.yml
   schedule:
     - cron: "*/5 * * * *"
   workflow_dispatch:
