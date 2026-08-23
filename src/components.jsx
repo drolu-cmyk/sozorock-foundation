@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Link } from "./router";
-import { partnerRoutes } from "./siteData";
 
 export function PageHero({ eyebrow, title, copy, children, compact = false }) {
   return (
@@ -83,18 +82,54 @@ export function PublicationCard({ publication }) {
 }
 
 export function EngagementForm({ kind }) {
-  const [sent, setSent] = useState(false);
+  const [status, setStatus] = useState("idle");
+  const [message, setMessage] = useState("");
   const options = kind === "Support"
-    ? ["Support public-interest publications", "Sponsor applied learning", "Support Health programs", "Provide in-kind support", "Discuss another form of support"]
-    : partnerRoutes.map((route) => route.title);
+    ? ["Fund the work", "Support research and publications", "Partner with us"]
+    : ["Partner with us", "CB-CAP inquiry", "Health Equity Hub partnership", "Health Access Day partnership", "Support research and publications", "Bring the model to a community", "Institutional or public-sector inquiry"];
+  const roles = ["Individual or family", "Community organization", "Licensed provider or health organization", "County, state, or public agency", "University or researcher", "Foundation or funder", "Corporate organization", "Other"];
+
+  const submit = async (event) => {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const data = new FormData(form);
+    const payload = {
+      name: `${String(data.get("firstName") || "").trim()} ${String(data.get("lastName") || "").trim()}`.trim(),
+      email: String(data.get("email") || "").trim(),
+      organization: String(data.get("organization") || "").trim(),
+      inquiryType: String(data.get("interest") || ""),
+      role: String(data.get("role") || ""),
+      stateOrCounty: String(data.get("location") || "").trim(),
+      message: String(data.get("message") || "").trim(),
+      website: String(data.get("website") || ""),
+      consent: data.get("consent") === "yes",
+    };
+    setStatus("sending");
+    setMessage("");
+    try {
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const body = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(body.error || "We could not send this inquiry right now.");
+      setStatus("sent");
+      setMessage(body.message || "Thank you. Your inquiry has been received.");
+      form.reset();
+    } catch (error) {
+      setStatus("error");
+      setMessage(error instanceof Error ? error.message : "We could not send this inquiry right now.");
+    }
+  };
 
   return (
-    <form className="engagement-form" onSubmit={(event) => { event.preventDefault(); setSent(true); }}>
-      {sent ? (
+    <form className="engagement-form" onSubmit={submit} aria-describedby="engagement-note engagement-status">
+      {status === "sent" ? (
         <div className="form-confirmation" role="status">
-          <h2>Next step ready.</h2>
-          <p>Email <a href="mailto:contact@sozorockfoundation.org">contact@sozorockfoundation.org</a> to continue the conversation. Do not include sensitive information.</p>
-          <button className="text-button" type="button" onClick={() => setSent(false)}>Return to the form</button>
+          <h2>Inquiry received.</h2>
+          <p>{message}</p>
+          <button className="text-button" type="button" onClick={() => { setStatus("idle"); setMessage(""); }}>Send another inquiry</button>
         </div>
       ) : (
         <>
@@ -103,11 +138,16 @@ export function EngagementForm({ kind }) {
             <label>Last name<input name="lastName" autoComplete="family-name" required /></label>
           </div>
           <label>Email<input type="email" name="email" autoComplete="email" required /></label>
-          <label>Organization<input name="organization" autoComplete="organization" /></label>
+          <label>Organization or affiliation<input name="organization" autoComplete="organization" required /></label>
+          <label>Organization or role<select name="role" required defaultValue=""><option value="" disabled>Select an option</option>{roles.map((role) => <option key={role}>{role}</option>)}</select></label>
+          <label>City, state, or region<input name="location" autoComplete="address-level1" required /></label>
           <label>Area of interest<select name="interest" required defaultValue=""><option value="" disabled>Select an option</option>{options.map((option) => <option key={option}>{option}</option>)}</select></label>
-          <label>What would you like to discuss?<textarea name="message" rows="5" required /></label>
-          <p className="form-note">Do not submit patient, student, employee, financial, legal, account, or other sensitive information.</p>
-          <button className="button button-primary" type="submit">Prepare {kind.toLowerCase()} inquiry</button>
+          <label>What outcome are you working toward?<textarea name="message" rows="5" minLength="20" maxLength="1200" required /></label>
+          <div className="access-honeypot" aria-hidden="true"><label>Website<input name="website" tabIndex="-1" autoComplete="off" /></label></div>
+          <label className="check-field"><input name="consent" type="checkbox" value="yes" required /><span>I agree that The SozoRock Foundation, Inc. may use this information to respond to my inquiry. I have read the <Link href="/privacy">Privacy Notice</Link>.</span></label>
+          <p className="form-note" id="engagement-note">Do not submit patient, student, employee, financial, legal, account, or other sensitive information.</p>
+          <button className="button button-primary" type="submit" disabled={status === "sending"}>{status === "sending" ? "Sending…" : `Send ${kind.toLowerCase()} inquiry`}</button>
+          <p id="engagement-status" className={`access-status ${status === "error" ? "is-error" : ""}`} role="status" aria-live="polite">{message}</p>
         </>
       )}
     </form>

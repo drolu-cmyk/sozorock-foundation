@@ -410,7 +410,7 @@ export function PublicationAccessPage({ publication }) {
           <div className="access-honeypot" aria-hidden="true"><label>Website<input name="website" tabIndex="-1" autoComplete="off" /></label></div>
           <label className="check-field" htmlFor="access-delivery-consent"><input id="access-delivery-consent" name="deliveryConsent" type="checkbox" value="yes" required aria-invalid={Boolean(errors.deliveryConsent)} aria-describedby={errors.deliveryConsent ? "access-deliveryConsent-error" : undefined} /><span>I agree that The SozoRock Foundation, Inc. may email me the verification and access link for this publication.{errorFor("deliveryConsent")}</span></label>
           <label className="check-field" htmlFor="access-updates-consent"><input id="access-updates-consent" name="updatesConsent" type="checkbox" value="yes" /><span>Optional: Send me future publication updates. This is not required for access.</span></label>
-          <p id="access-privacy" className="access-privacy">We use this information to provide and understand publication access. See our <Link href="/standards#privacy">privacy notice</Link>.</p>
+          <p id="access-privacy" className="access-privacy">We use this information to provide and understand publication access. See our <Link href="/privacy">Privacy Notice</Link>.</p>
           <button type="submit" className="button button-primary access-submit" disabled={status === "sending"}>{status === "sending" ? "Sending verification…" : "Email my verification link"}</button>
           <p id="access-status" className={`access-status ${status === "error" ? "is-error" : ""}`} role="status" aria-live="polite">{message}</p>
         </form>
@@ -502,8 +502,60 @@ export function StandardsPage() {
     <>
       <PageHero eyebrow="About" title="Standards" copy="Independence, corrections, funding, authorship, AI use, citations, copyright, and accessibility." />
       <section className="section"><div className="shell standards-list">{standards.map(([title, copy]) => <article id={title.toLowerCase().replaceAll(" ", "-")} key={title}><h2>{title}</h2><p>{copy}</p></article>)}</div></section>
-      <section className="section soft-section" id="privacy"><div className="shell split-copy"><div><p className="eyebrow">Public trust</p><h2>Privacy and nondiscrimination.</h2></div><div><p id="nondiscrimination">Foundation-wide privacy, accessibility, and nondiscrimination commitments work alongside the safeguards required by each platform.</p><a href="https://health.sozorockfoundation.org/privacy" className="text-link">View the current Health privacy notice</a></div></div></section>
+      <section className="section soft-section"><div className="shell split-copy"><div><p className="eyebrow">Public trust</p><h2>Policies that stand on their own.</h2></div><div><p>Foundation-wide privacy, accessibility, nondiscrimination, and website terms work alongside the safeguards required by each platform.</p><div className="policy-links"><Link href="/privacy" className="text-link">Privacy</Link><Link href="/accessibility" className="text-link">Accessibility</Link><Link href="/nondiscrimination" className="text-link">Nondiscrimination</Link><Link href="/terms" className="text-link">Terms</Link></div></div></div></section>
     </>
+  );
+}
+
+function PolicyPage({ title, summary, children }) {
+  return (
+    <>
+      <PageHero eyebrow="Legal and policy" title={title} copy={summary} compact />
+      <section className="section policy-page"><div className="shell policy-layout"><aside><p className="eyebrow">Last updated</p><p>August 23, 2026</p><p>Questions may be sent to <a href="mailto:contact@sozorockfoundation.org">contact@sozorockfoundation.org</a>.</p></aside><div className="policy-copy">{children}</div></div></section>
+    </>
+  );
+}
+
+export function PrivacyPage() {
+  return (
+    <PolicyPage title="Privacy Notice" summary="How The SozoRock Foundation, Inc. handles information submitted through this website.">
+      <section><h2>Information we receive</h2><p>We receive information you choose to provide through an inquiry or publication-access form, such as your name, email address, organization or affiliation, location, role, interests, and message. Please do not submit medical, emergency, protected health, financial-account, legal, or other sensitive information.</p></section>
+      <section><h2>How we use information</h2><p>We use submitted information to respond to inquiries, provide requested publication access, understand institutional interest, protect the service, and maintain appropriate records. Optional publication-update consent is separate from access and may be withdrawn.</p></section>
+      <section><h2>Service providers and platforms</h2><p>Hosting, security, email delivery, and related service providers may process limited information on our behalf. Publication-access and inquiry submissions use the Foundation&apos;s established SozoRock Health delivery services. Platform-specific services may publish an additional notice.</p><p><a href="https://health.sozorockfoundation.org/privacy" className="text-link">Read the SozoRock Health Privacy Notice</a></p></section>
+      <section><h2>Choices and contact</h2><p>We do not sell personal information or use this website for behavioral advertising. You may ask about, correct, or request deletion of information you submitted by contacting us. We may retain limited records when reasonably necessary for security, legal, or operational obligations.</p></section>
+    </PolicyPage>
+  );
+}
+
+export function AccessibilityPage() {
+  return (
+    <PolicyPage title="Accessibility" summary="Our commitment to an experience that people can perceive, operate, understand, and use.">
+      <section><h2>Our approach</h2><p>We aim to align this website with WCAG 2.2 Level AA practices, including keyboard access, visible focus, meaningful headings, alternative text, readable contrast, responsive layouts, and reduced-motion support.</p></section>
+      <section><h2>Documents and services</h2><p>We work to provide accessible publication records and digital materials. Some third-party or historical documents may have limitations. Contact us to request an accessible format or reasonable accommodation.</p></section>
+      <section><h2>Feedback</h2><p>If you encounter a barrier, tell us the page, document, assistive technology, and issue. We will review the report and respond with an available path forward.</p></section>
+    </PolicyPage>
+  );
+}
+
+export function NondiscriminationPage() {
+  return (
+    <PolicyPage title="Nondiscrimination" summary="Equal access, dignity, and respect across Foundation programs and public-facing services.">
+      <section><h2>Commitment</h2><p>The SozoRock Foundation does not discriminate in access to its programs, services, partnerships, or public resources on the basis of race, color, national origin, ancestry, ethnicity, religion, sex, pregnancy, sexual orientation, gender identity or expression, age, disability, veteran status, or another status protected by applicable law.</p></section>
+      <section><h2>Access and accommodation</h2><p>We seek to provide reasonable accommodations and language-access pathways where practicable. Contact us before an event or activity when an accommodation would support participation.</p></section>
+      <section><h2>Questions or concerns</h2><p>Send a concern with enough information for us to understand and review it. Retaliation for raising a good-faith accessibility or nondiscrimination concern is not acceptable.</p></section>
+    </PolicyPage>
+  );
+}
+
+export function TermsPage() {
+  return (
+    <PolicyPage title="Website Terms" summary="Terms governing use of this website and its public-interest materials.">
+      <section><h2>Informational purpose</h2><p>This website and its publications provide general public-interest information. They are not medical, clinical, legal, tax, investment, or emergency advice and do not create a professional, fiduciary, clinical, or provider relationship.</p></section>
+      <section><h2>Permitted use</h2><p>You may use the website lawfully and may cite or link to public pages. Publication-specific copyright, permissions, licenses, and citation instructions control reuse of publication files. Do not interfere with the service, bypass access controls, misrepresent Foundation affiliation, or use Foundation marks without permission.</p></section>
+      <section><h2>External services</h2><p>Links to external sites and Foundation platforms are provided for context and convenience. Their content, availability, and privacy practices may be governed by separate terms and notices.</p></section>
+      <section><h2>Availability and changes</h2><p>We work to keep information accurate and services available but do not promise uninterrupted operation or that every item is complete or current. We may correct, update, suspend, or remove material while preserving appropriate publication and corrections records.</p></section>
+      <section><h2>Foundation identity</h2><p>© 2026 The SozoRock Foundation, Inc. SozoRock® is a registered trademark of SozoRock Tech Inc., used under license by The SozoRock Foundation.</p></section>
+    </PolicyPage>
   );
 }
 

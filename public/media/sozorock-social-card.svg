@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#f3f1ed"/>
+  <rect width="30" height="630" fill="#154e9b"/>
+  <image href="sozorock-logo.png" x="88" y="76" width="354" height="72"/>
+  <text x="88" y="181" fill="#071f3c" font-family="Liberation Sans, Arial, sans-serif" font-size="24" font-weight="700" letter-spacing="5">FOUNDATION</text>
+  <line x1="88" y1="230" x2="1112" y2="230" stroke="#d8d5cf" stroke-width="2"/>
+  <text x="88" y="346" fill="#071f3c" font-family="Liberation Sans, Arial, sans-serif" font-size="68" font-weight="700" letter-spacing="-3">Access. Assurance.</text>
+  <text x="88" y="430" fill="#071f3c" font-family="Liberation Sans, Arial, sans-serif" font-size="68" font-weight="700" letter-spacing="-3">Intelligence.</text>
+  <text x="88" y="546" fill="#526170" font-family="Liberation Sans, Arial, sans-serif" font-size="26">Health access · Public systems · Responsible applied AI</text>
+</svg>
