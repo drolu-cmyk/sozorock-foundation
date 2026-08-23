@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { access } from "node:fs/promises";
+import { access, readFile } from "node:fs/promises";
 import test from "node:test";
 import worker, { APP_ROUTES, LEGACY_ROUTES } from "../worker/index.js";
 
@@ -213,4 +213,19 @@ test("emits the files required by Sites packaging", async () => {
   await access(new URL("../dist/client/index.html", import.meta.url));
   await access(new URL("../dist/server/index.js", import.meta.url));
   await access(new URL("../dist/.openai/hosting.json", import.meta.url));
+  for (const pathname of APP_ROUTES) {
+    if (pathname === "/") continue;
+    await access(new URL(`../dist/client${pathname}.html`, import.meta.url));
+  }
+});
+
+test("keeps Partner and Support as honest, validated email handoffs", async () => {
+  const source = await readFile(new URL("../src/components.jsx", import.meta.url), "utf8");
+  assert.match(source, /onSubmit=\{\(event\) => \{ event\.preventDefault\(\); setSent\(true\); \}\}/u);
+  assert.match(source, /mailto:contact@sozorockfoundation\.org/u);
+  assert.match(source, /name="firstName"[\s\S]*required/u);
+  assert.match(source, /name="email"[\s\S]*required/u);
+  assert.match(source, /name="interest"[\s\S]*required/u);
+  assert.match(source, /name="message"[\s\S]*required/u);
+  assert.doesNotMatch(source, /open publications/iu);
 });

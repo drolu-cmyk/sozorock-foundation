@@ -85,7 +85,7 @@ export function PublicationCard({ publication }) {
 export function EngagementForm({ kind }) {
   const [sent, setSent] = useState(false);
   const options = kind === "Support"
-    ? ["Support open publications", "Sponsor applied learning", "Support Health programs", "Provide in-kind support", "Discuss another form of support"]
+    ? ["Support public-interest publications", "Sponsor applied learning", "Support Health programs", "Provide in-kind support", "Discuss another form of support"]
     : partnerRoutes.map((route) => route.title);
 
   return (
