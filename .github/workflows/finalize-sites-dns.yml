@@ -1,0 +1,119 @@
+name: Finalize SozoRock Foundation Sites DNS
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/finalize-sites-dns.yml
+  schedule:
+    - cron: "*/5 * * * *"
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: write
+
+concurrency:
+  group: sozorock-foundation-sites-dns-final
+  cancel-in-progress: false
+
+jobs:
+  cutover:
+    if: github.repository == 'drolu-cmyk/sozorock-foundation' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    env:
+      AWS_REGION: us-east-1
+      AWS_ROLE_TO_ASSUME: arn:aws:iam::791860731989:role/GitHubActionsSozorockFoundationDnsRole
+      ZONE_NAME: sozorockfoundation.org.
+      WWW_NAME: www.sozorockfoundation.org.
+      CNAME_TARGET: custom-domains.chatgpt.site.
+      OPENAI_NAME: _openai-site-verification.www.sozorockfoundation.org.
+      OPENAI_VALUE: openai-site-verification=uRWqqC2NjJmoTR2EyEqF9JyNpVBzzmx61U0re5JhBjk
+      CLOUDFLARE_NAME: _cf-custom-hostname.www.sozorockfoundation.org.
+      CLOUDFLARE_VALUE: a3a592c6-be9a-4592-90d6-dd20c2e1af6d
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Stop after the first verified cutover
+        id: gate
+        shell: bash
+        run: |
+          if [[ -f deployments/sites-dns-final.json ]] && jq -e '.status == "success"' deployments/sites-dns-final.json >/dev/null; then
+            echo "needed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "needed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: aws-actions/configure-aws-credentials@v6
+        if: steps.gate.outputs.needed == 'true'
+        with:
+          role-to-assume: ${{ env.AWS_ROLE_TO_ASSUME }}
+          role-session-name: SozoRockSitesFinal-${{ github.run_id }}
+          aws-region: ${{ env.AWS_REGION }}
+          retry-max-attempts: 10
+
+      - name: Upsert and verify only the Sites www records
+        id: dns
+        if: steps.gate.outputs.needed == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          zone_json="$(aws route53 list-hosted-zones-by-name --dns-name "$ZONE_NAME" --output json)"
+          mapfile -t zone_ids < <(jq -r --arg name "$ZONE_NAME" '.HostedZones[] | select(.Name == $name and .Config.PrivateZone == false) | .Id' <<<"$zone_json")
+          [[ ${#zone_ids[@]} -eq 1 ]]
+          zone_id="${zone_ids[0]#/hostedzone/}"
+          existing="$(aws route53 list-resource-record-sets --hosted-zone-id "$zone_id" --output json)"
+          unexpected="$(jq -r --arg name "$WWW_NAME" '.ResourceRecordSets[] | select(.Name == $name and .Type != "CNAME") | .Type' <<<"$existing")"
+          [[ -z "$unexpected" ]]
+          advanced="$(jq -r --arg name "$WWW_NAME" '.ResourceRecordSets[] | select(.Name == $name and (has("SetIdentifier") or has("AliasTarget") or has("TrafficPolicyInstanceId"))) | .Type' <<<"$existing")"
+          [[ -z "$advanced" ]]
+
+          change_batch="$(jq -n \
+            --arg www "$WWW_NAME" --arg target "$CNAME_TARGET" \
+            --arg openai "$OPENAI_NAME" --arg openai_value "\"$OPENAI_VALUE\"" \
+            --arg cloudflare "$CLOUDFLARE_NAME" --arg cloudflare_value "\"$CLOUDFLARE_VALUE\"" \
+            '{Comment:"Make Sites the sole www production source",Changes:[
+              {Action:"UPSERT",ResourceRecordSet:{Name:$www,Type:"CNAME",TTL:60,ResourceRecords:[{Value:$target}]}},
+              {Action:"UPSERT",ResourceRecordSet:{Name:$openai,Type:"TXT",TTL:300,ResourceRecords:[{Value:$openai_value}]}},
+              {Action:"UPSERT",ResourceRecordSet:{Name:$cloudflare,Type:"TXT",TTL:300,ResourceRecords:[{Value:$cloudflare_value}]}}
+            ]}')"
+          change_id="$(aws route53 change-resource-record-sets --hosted-zone-id "$zone_id" --change-batch "$change_batch" --query 'ChangeInfo.Id' --output text)"
+          aws route53 wait resource-record-sets-changed --id "$change_id"
+          actual="$(aws route53 list-resource-record-sets --hosted-zone-id "$zone_id" --output json)"
+          cname="$(jq -r --arg name "$WWW_NAME" '.ResourceRecordSets[] | select(.Name == $name and .Type == "CNAME") | .ResourceRecords[0].Value' <<<"$actual")"
+          openai="$(jq -r --arg name "$OPENAI_NAME" '.ResourceRecordSets[] | select(.Name == $name and .Type == "TXT") | .ResourceRecords[0].Value' <<<"$actual")"
+          cloudflare="$(jq -r --arg name "$CLOUDFLARE_NAME" '.ResourceRecordSets[] | select(.Name == $name and .Type == "TXT") | .ResourceRecords[0].Value' <<<"$actual")"
+          [[ "$cname" == "$CNAME_TARGET" ]]
+          [[ "$openai" == "\"$OPENAI_VALUE\"" ]]
+          [[ "$cloudflare" == "\"$CLOUDFLARE_VALUE\"" ]]
+          {
+            echo "change_id=$change_id"
+            echo "cname=$cname"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Record verified cutover
+        if: steps.gate.outputs.needed == 'true'
+        shell: bash
+        env:
+          CHANGE_ID: ${{ steps.dns.outputs.change_id }}
+          VERIFIED_CNAME: ${{ steps.dns.outputs.cname }}
+        run: |
+          set -euo pipefail
+          mkdir -p deployments
+          jq -n \
+            --arg status success \
+            --arg completed_at "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+            --arg workflow_run_id "$GITHUB_RUN_ID" \
+            --arg route53_change_id "$CHANGE_ID" \
+            --arg www_cname "$VERIFIED_CNAME" \
+            '{status:$status,completed_at:$completed_at,workflow_run_id:$workflow_run_id,route53_change_id:$route53_change_id,www_cname:$www_cname,scope:"www only; apex, mail, nameservers, and subdomains unchanged"}' > deployments/sites-dns-final.json
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add deployments/sites-dns-final.json
+          git commit -m "deploy(www): verify Sites-only DNS cutover"
+          git push origin HEAD:main
