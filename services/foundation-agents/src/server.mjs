@@ -1,34 +1,8 @@
-import { timingSafeEqual } from "node:crypto";
 import http from "node:http";
+import { authorizedHeader, containsForbiddenMaterial, isPlainObject, maxRequestBytes, maxRequestsPerMinute } from "./boundary.mjs";
 import { executeGraph, graphs } from "./graph.mjs";
 
 const port = Number(process.env.PORT || 8788);
-const maxBytes = 65_536;
-const maxRequestsPerMinute = 30;
-const forbiddenKeys = new Set([
-  "password",
-  "passcode",
-  "secret",
-  "token",
-  "apiKey",
-  "api_key",
-  "authorization",
-  "cookie",
-  "ssn",
-  "socialSecurityNumber",
-  "dateOfBirth",
-  "dob",
-  "medicalRecord",
-  "medicalRecordNumber",
-  "diagnosis",
-]);
-const forbiddenValuePatterns = [
-  /\bsk-(?:proj-)?[A-Za-z0-9_-]{20,}\b/u,
-  /\bAKIA[0-9A-Z]{16}\b/u,
-  /\b(?:ghp_|github_pat_)[A-Za-z0-9_]{20,}\b/u,
-  /-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----/u,
-  /\b\d{3}-\d{2}-\d{4}\b/u,
-];
 const requestBuckets = new Map();
 
 function json(response, status, body) {
@@ -43,18 +17,8 @@ function json(response, status, body) {
   response.end(JSON.stringify(body));
 }
 
-function constantTimeEqual(actual, expected) {
-  const actualBuffer = Buffer.from(actual);
-  const expectedBuffer = Buffer.from(expected);
-  if (actualBuffer.length !== expectedBuffer.length) return false;
-  return timingSafeEqual(actualBuffer, expectedBuffer);
-}
-
 function authorized(request) {
-  const expected = process.env.FOUNDATION_AGENT_SERVICE_TOKEN;
-  if (!expected || expected.length < 24) return false;
-  const actual = typeof request.headers.authorization === "string" ? request.headers.authorization : "";
-  return constantTimeEqual(actual, `Bearer ${expected}`);
+  return authorizedHeader(request.headers.authorization, process.env.FOUNDATION_AGENT_SERVICE_TOKEN);
 }
 
 function clientKey(request) {
@@ -75,19 +39,12 @@ function rateLimited(request) {
   return current.count > maxRequestsPerMinute;
 }
 
-function containsForbiddenMaterial(value) {
-  if (typeof value === "string") return forbiddenValuePatterns.some((pattern) => pattern.test(value));
-  if (!value || typeof value !== "object") return false;
-  if (Array.isArray(value)) return value.some(containsForbiddenMaterial);
-  return Object.entries(value).some(([key, child]) => forbiddenKeys.has(key) || containsForbiddenMaterial(child));
-}
-
 async function readJson(request) {
   const chunks = [];
   let size = 0;
   for await (const chunk of request) {
     size += chunk.length;
-    if (size > maxBytes) throw new Error("payload_too_large");
+    if (size > maxRequestBytes) throw new Error("payload_too_large");
     chunks.push(chunk);
   }
   const text = Buffer.concat(chunks).toString("utf8");
@@ -130,14 +87,12 @@ const server = http.createServer(async (request, response) => {
 
   try {
     const body = await readJson(request);
-    if (!body || typeof body !== "object" || Array.isArray(body)) return json(response, 400, { error: "invalid_body" });
+    if (!isPlainObject(body)) return json(response, 400, { error: "invalid_body" });
 
     const graphId = typeof body.graphId === "string" ? body.graphId : "";
     if (!graphs[graphId]) return json(response, 400, { error: "invalid_graph" });
     if (body.input === undefined || body.input === null) return json(response, 400, { error: "input_required" });
-    if (body.context !== undefined && (!body.context || typeof body.context !== "object" || Array.isArray(body.context))) {
-      return json(response, 400, { error: "invalid_context" });
-    }
+    if (body.context !== undefined && !isPlainObject(body.context)) return json(response, 400, { error: "invalid_context" });
     if (containsForbiddenMaterial(body)) return json(response, 400, { error: "sensitive_material_not_allowed" });
 
     const result = await executeGraph({
