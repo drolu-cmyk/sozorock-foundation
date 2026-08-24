@@ -1,41 +1,63 @@
 import http from "node:http";
+import { authorizedHeader, containsForbiddenMaterial, isPlainObject, maxRequestBytes, maxRequestsPerMinute } from "./boundary.mjs";
 import { executeGraph, graphs } from "./graph.mjs";
 
 const port = Number(process.env.PORT || 8788);
-const maxBytes = 65_536;
-const forbiddenKeys = new Set([
-  "password",
-  "passcode",
-  "secret",
-  "token",
-  "apiKey",
-  "ssn",
-  "socialSecurityNumber",
-  "dateOfBirth",
-  "dob",
-  "medicalRecord",
-  "diagnosis",
-]);
+const trustProxyHeaders = process.env.TRUST_PROXY_HEADERS === "true";
+const requestBuckets = new Map();
+const bucketWindowMs = 60_000;
+const bucketPruneThreshold = 2_048;
+const bucketHardLimit = 4_096;
 
 function json(response, status, body) {
   response.writeHead(status, {
     "Content-Type": "application/json; charset=utf-8",
     "Cache-Control": "no-store",
+    "Content-Security-Policy": "default-src 'none'; frame-ancestors 'none'",
+    "Referrer-Policy": "no-referrer",
     "X-Content-Type-Options": "nosniff",
+    "X-Frame-Options": "DENY",
   });
   response.end(JSON.stringify(body));
 }
 
 function authorized(request) {
-  const expected = process.env.FOUNDATION_AGENT_SERVICE_TOKEN;
-  if (!expected) return false;
-  return request.headers.authorization === `Bearer ${expected}`;
+  return authorizedHeader(request.headers.authorization, process.env.FOUNDATION_AGENT_SERVICE_TOKEN);
 }
 
-function containsForbiddenKey(value) {
-  if (!value || typeof value !== "object") return false;
-  if (Array.isArray(value)) return value.some(containsForbiddenKey);
-  return Object.entries(value).some(([key, child]) => forbiddenKeys.has(key) || containsForbiddenKey(child));
+function clientKey(request) {
+  if (trustProxyHeaders && typeof request.headers["x-forwarded-for"] === "string") {
+    const forwarded = request.headers["x-forwarded-for"].split(",")[0].trim().slice(0, 64);
+    if (forwarded) return forwarded;
+  }
+  return String(request.socket.remoteAddress || "unknown").slice(0, 64);
+}
+
+function pruneExpiredBuckets(now) {
+  for (const [key, bucket] of requestBuckets.entries()) {
+    if (now - bucket.startedAt >= bucketWindowMs) requestBuckets.delete(key);
+  }
+}
+
+function rateLimited(request) {
+  const now = Date.now();
+  if (requestBuckets.size >= bucketPruneThreshold) pruneExpiredBuckets(now);
+
+  const key = clientKey(request);
+  const current = requestBuckets.get(key);
+  if (!current) {
+    if (requestBuckets.size >= bucketHardLimit) return true;
+    requestBuckets.set(key, { startedAt: now, count: 1 });
+    return false;
+  }
+
+  if (now - current.startedAt >= bucketWindowMs) {
+    requestBuckets.set(key, { startedAt: now, count: 1 });
+    return false;
+  }
+
+  current.count += 1;
+  return current.count > maxRequestsPerMinute;
 }
 
 async function readJson(request) {
@@ -43,11 +65,25 @@ async function readJson(request) {
   let size = 0;
   for await (const chunk of request) {
     size += chunk.length;
-    if (size > maxBytes) throw new Error("payload_too_large");
+    if (size > maxRequestBytes) throw new Error("payload_too_large");
     chunks.push(chunk);
   }
   const text = Buffer.concat(chunks).toString("utf8");
   return text ? JSON.parse(text) : {};
+}
+
+function graphIndex() {
+  return Object.fromEntries(
+    Object.entries(graphs).map(([graphId, graph]) => [
+      graphId,
+      {
+        surface: graph.surface,
+        description: graph.description,
+        candidateNode: graph.candidateNode,
+        nodes: graph.nodes,
+      },
+    ])
+  );
 }
 
 const server = http.createServer(async (request, response) => {
@@ -57,24 +93,34 @@ const server = http.createServer(async (request, response) => {
     return json(response, 200, { ok: true, service: "foundation-agents" });
   }
 
+  if (request.method === "GET" && url.pathname === "/v1/graphs") {
+    if (!authorized(request)) return json(response, 401, { error: "unauthorized" });
+    return json(response, 200, { graphs: graphIndex() });
+  }
+
   if (request.method !== "POST" || url.pathname !== "/v1/run") {
     return json(response, 404, { error: "not_found" });
   }
 
   if (!authorized(request)) return json(response, 401, { error: "unauthorized" });
+  if (rateLimited(request)) return json(response, 429, { error: "rate_limited" });
   if (!process.env.OPENAI_API_KEY) return json(response, 503, { error: "model_service_not_configured" });
 
   try {
     const body = await readJson(request);
+    if (!isPlainObject(body)) return json(response, 400, { error: "invalid_body" });
+
     const graphId = typeof body.graphId === "string" ? body.graphId : "";
     if (!graphs[graphId]) return json(response, 400, { error: "invalid_graph" });
     if (body.input === undefined || body.input === null) return json(response, 400, { error: "input_required" });
-    if (containsForbiddenKey(body)) return json(response, 400, { error: "sensitive_fields_not_allowed" });
+    if (body.context !== undefined && !isPlainObject(body.context)) return json(response, 400, { error: "invalid_context" });
+    if (containsForbiddenMaterial(body)) return json(response, 400, { error: "sensitive_material_not_allowed" });
 
     const result = await executeGraph({
       graphId,
       input: body.input,
       context: body.context || {},
+      maxRevisionCycles: 1,
     });
     return json(response, 200, result);
   } catch (error) {
