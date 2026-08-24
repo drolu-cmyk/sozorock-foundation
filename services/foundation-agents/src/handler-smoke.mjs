@@ -1,32 +1,48 @@
 import assert from "node:assert/strict";
 import { handler } from "./handler.mjs";
 
-function event(method, path, body) {
+function event(method, path, body, rawQueryString = "") {
   return {
     rawPath: path,
+    rawQueryString,
     requestContext: { http: { method, path } },
     body: body === undefined ? undefined : JSON.stringify(body),
     isBase64Encoded: false,
   };
 }
 
-const priorKey = process.env.OPENAI_API_KEY;
-delete process.env.OPENAI_API_KEY;
+const saved = {
+  OPENAI_API_KEY: process.env.OPENAI_API_KEY,
+  OPENAI_IDENTITY_PROVIDER_ID: process.env.OPENAI_IDENTITY_PROVIDER_ID,
+  OPENAI_SERVICE_ACCOUNT_ID: process.env.OPENAI_SERVICE_ACCOUNT_ID,
+  OPENAI_WIF_AUDIENCE: process.env.OPENAI_WIF_AUDIENCE,
+  AWS_REGION: process.env.AWS_REGION,
+};
+for (const key of Object.keys(saved)) delete process.env[key];
 
-const health = await handler(event("GET", "/health"));
+const redirect = await handler(event("GET", "/publication/rrg-v1-2025", undefined, "source=apex-cutover"));
+assert.equal(redirect.statusCode, 308);
+assert.equal(redirect.headers.location, "https://www.sozorockfoundation.org/publication/rrg-v1-2025?source=apex-cutover");
+
+const health = await handler(event("GET", "/internal/health"));
 assert.equal(health.statusCode, 200);
 assert.equal(JSON.parse(health.body).modelConfigured, false);
 assert.equal(health.headers["cache-control"], "no-store");
 
-const index = await handler(event("GET", "/v1/graphs"));
+const index = await handler(event("GET", "/internal/v1/graphs"));
 assert.equal(index.statusCode, 200);
 assert.equal(Object.keys(JSON.parse(index.body).graphs).length, 5);
 
-const runWithoutModel = await handler(event("POST", "/v1/run", { graphId: "foundationSiteAssurance", input: { task: "test" } }));
+const runWithoutModel = await handler(
+  event("POST", "/internal/v1/run", { graphId: "foundationSiteAssurance", input: { task: "test" } })
+);
 assert.equal(runWithoutModel.statusCode, 503);
 
-const missing = await handler(event("GET", "/missing"));
-assert.equal(missing.statusCode, 404);
+const missingInternal = await handler(event("GET", "/internal/missing"));
+assert.equal(missingInternal.statusCode, 404);
 
-if (priorKey) process.env.OPENAI_API_KEY = priorKey;
-console.log("Validated Foundation agent Lambda boundary.");
+for (const [key, value] of Object.entries(saved)) {
+  if (value === undefined) delete process.env[key];
+  else process.env[key] = value;
+}
+console.log("Validated combined Foundation redirect and internal agent Lambda boundary.");
