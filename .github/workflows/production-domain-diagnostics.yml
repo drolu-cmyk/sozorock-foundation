@@ -1,0 +1,136 @@
+name: Production domain diagnostics
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/production-domain-diagnostics.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+  id-token: write
+
+env:
+  AWS_REGION: us-east-1
+  AWS_ROLE_TO_ASSUME: arn:aws:iam::791860731989:role/GitHubActionsSozorockFoundationSiteDeployRole
+  FOUNDATION_HOSTED_ZONE_ID: Z07905293AANZWGYZ84F3
+
+jobs:
+  diagnose:
+    if: github.repository == 'drolu-cmyk/sozorock-foundation' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out main
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Inspect public DNS and HTTPS behavior
+        shell: bash
+        run: |
+          set -euo pipefail
+          report="$RUNNER_TEMP/domain-report.md"
+          echo '## Production domain diagnostic' > "$report"
+          echo >> "$report"
+          echo "Run: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}" >> "$report"
+          echo "Commit: \`${GITHUB_SHA}\`" >> "$report"
+
+          hosts=(
+            sozorockfoundation.org
+            www.sozorockfoundation.org
+            health.sozorockfoundation.org
+            cbcap.sozorockfoundation.org
+            ai-lab.sozorockfoundation.org
+            sozorockhealth.com
+            www.sozorockhealth.com
+          )
+          for host in "${hosts[@]}"; do
+            addresses="$(python3 - "$host" <<'PY'
+          import socket, sys
+          host = sys.argv[1]
+          try:
+              rows = sorted({item[4][0] for item in socket.getaddrinfo(host, 443, type=socket.SOCK_STREAM)})
+              print(", ".join(rows) if rows else "none")
+          except Exception:
+              print("dns-failed")
+          PY
+          )"
+            headers="$(curl --silent --show-error --head --max-time 20 "https://${host}/" 2>/dev/null || true)"
+            status="$(awk '/^HTTP\// {code=$2} END {print code}' <<<"$headers")"
+            location="$(awk 'BEGIN{IGNORECASE=1} /^location:/ {sub(/\r$/, ""); sub(/^location:[[:space:]]*/, ""); value=$0} END {print value}' <<<"$headers")"
+            server="$(awk 'BEGIN{IGNORECASE=1} /^server:/ {sub(/\r$/, ""); sub(/^server:[[:space:]]*/, ""); value=$0} END {print value}' <<<"$headers")"
+            {
+              echo
+              echo "- \`${host}\`: addresses=\`${addresses}\`; status=\`${status:-probe-failed}\`; location=\`${location:-none}\`; server=\`${server:-unspecified}\`"
+            } >> "$report"
+          done
+          echo "REPORT_PATH=$report" >> "$GITHUB_ENV"
+
+      - name: Configure historical Foundation AWS role for read-only inventory
+        id: aws_auth
+        continue-on-error: true
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: ${{ env.AWS_ROLE_TO_ASSUME }}
+          role-session-name: FoundationDomainInventory-${{ github.run_id }}
+          aws-region: ${{ env.AWS_REGION }}
+          retry-max-attempts: 3
+
+      - name: Inspect public-facing AWS domain state without mutation
+        shell: bash
+        run: |
+          set -euo pipefail
+          report="$REPORT_PATH"
+          echo >> "$report"
+          echo '### AWS domain inventory' >> "$report"
+
+          if [[ "${{ steps.aws_auth.outcome }}" != "success" ]]; then
+            echo '- Historical Foundation AWS role: unavailable. No AWS resource was changed.' >> "$report"
+            exit 0
+          fi
+
+          echo '- Historical Foundation AWS role: available for diagnostic commands.' >> "$report"
+
+          records="$(aws route53 list-resource-record-sets \
+            --hosted-zone-id "$FOUNDATION_HOSTED_ZONE_ID" \
+            --query "ResourceRecordSets[?Name=='sozorockfoundation.org.' || Name=='www.sozorockfoundation.org.'].{Name:Name,Type:Type,Alias:AliasTarget.DNSName,Values:ResourceRecords[].Value}" \
+            --output json 2>/dev/null || echo '[]')"
+          echo "- Foundation Route 53 apex/www records: \`${records}\`" >> "$report"
+
+          health_zone_count="$(aws route53 list-hosted-zones-by-name \
+            --dns-name sozorockhealth.com \
+            --max-items 5 \
+            --query "length(HostedZones[?Name=='sozorockhealth.com.'])" \
+            --output text 2>/dev/null || echo 'unavailable')"
+          echo "- Route 53 hosted zone for \`sozorockhealth.com\`: \`${health_zone_count}\` matching zone(s)." >> "$report"
+
+          health_app_id="$(aws amplify list-apps \
+            --query "apps[?contains(repository, 'agentic-ai-sozorock-health')].appId | [0]" \
+            --output text 2>/dev/null || true)"
+          if [[ -n "$health_app_id" && "$health_app_id" != "None" ]]; then
+            association="$(aws amplify get-domain-association \
+              --app-id "$health_app_id" \
+              --domain-name sozorockhealth.com \
+              --query 'domainAssociation.{domain:domainName,status:domainStatus,updateStatus:updateStatus,subdomains:subDomains[].{prefix:subDomainSetting.prefix,branch:subDomainSetting.branchName,verified:dnsRecord}}' \
+              --output json 2>/dev/null || echo '{}')"
+            echo "- Legacy Health Amplify domain association: \`${association}\`" >> "$report"
+          else
+            echo '- Legacy Health Amplify application: not visible to this role.' >> "$report"
+          fi
+
+          distributions="$(aws cloudfront list-distributions \
+            --query "DistributionList.Items[?Aliases.Items && (contains(Aliases.Items, 'sozorockfoundation.org') || contains(Aliases.Items, 'www.sozorockfoundation.org') || contains(Aliases.Items, 'sozorockhealth.com') || contains(Aliases.Items, 'www.sozorockhealth.com'))].{domain:DomainName,aliases:Aliases.Items,enabled:Enabled,status:Status}" \
+            --output json 2>/dev/null || echo '[]')"
+          echo "- Matching CloudFront public aliases: \`${distributions}\`" >> "$report"
+
+      - name: Publish diagnostic receipt
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh issue comment 15 --repo "$GITHUB_REPOSITORY" --body-file "$REPORT_PATH"
+          cat "$REPORT_PATH" >> "$GITHUB_STEP_SUMMARY"
