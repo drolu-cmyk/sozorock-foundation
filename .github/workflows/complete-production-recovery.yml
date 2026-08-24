@@ -241,16 +241,19 @@ jobs:
           HEALTH_JOB: ${{ steps.health.outputs.job_id }}
         shell: bash
         run: |
-          body="## Production recovery bridge receipt
-
-Run: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}
-Commit: \`${GITHUB_SHA}\`
-
-- Temporary AI Lab recovery role assumption: completed before any mutation.
-- Foundation ACM and verifier permissions: applied with additive policy only.
-- Foundation edge model role: restricted to GPT-5.6 Sol Mantle inference with short-term bearer-token use.
-- Legacy Health Amplify release job: \`${HEALTH_JOB:-not-completed}\`.
-- Apex cutover: dispatched only after ACM inspection and exact Lambda invocation succeeded.
-
-The temporary cross-repository trust must be removed after the apex and retired Health live checks both pass."
-          gh issue comment 15 --repo "$GITHUB_REPOSITORY" --body "$body"
+          receipt="$RUNNER_TEMP/production-recovery-receipt.md"
+          {
+            echo '## Production recovery bridge receipt'
+            echo
+            echo "Run: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+            echo "Commit: \`${GITHUB_SHA}\`"
+            echo
+            echo '- Temporary AI Lab recovery role assumption: completed before any mutation.'
+            echo '- Foundation ACM and verifier permissions: applied with additive policy only.'
+            echo '- Foundation edge model role: restricted to GPT-5.6 Sol Mantle inference with short-term bearer-token use.'
+            echo "- Legacy Health Amplify release job: \`${HEALTH_JOB:-not-completed}\`."
+            echo '- Apex cutover: dispatched only after ACM inspection and exact Lambda invocation succeeded.'
+            echo
+            echo 'The temporary cross-repository trust must be removed after the apex and retired Health live checks both pass.'
+          } > "$receipt"
+          gh issue comment 15 --repo "$GITHUB_REPOSITORY" --body-file "$receipt"
