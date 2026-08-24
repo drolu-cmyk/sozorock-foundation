@@ -1,0 +1,113 @@
+name: Deploy Foundation agent control plane
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - services/foundation-agents/**
+      - .github/workflows/deploy-foundation-agent-control-plane.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+  id-token: write
+
+concurrency:
+  group: foundation-agent-control-plane
+  cancel-in-progress: false
+
+env:
+  AWS_REGION: us-east-1
+  AWS_ROLE_TO_ASSUME: arn:aws:iam::791860731989:role/GitHubActionsSozorockFoundationSiteDeployRole
+  ACCOUNT_ID: '791860731989'
+  FUNCTION_NAME: SozoRockFoundationParentOrigin
+  API_NAME: SozoRockFoundationParentSite
+  RECEIPT_ISSUE: '58'
+
+jobs:
+  deploy:
+    if: github.repository == 'drolu-cmyk/sozorock-foundation' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Check out main
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install and validate agent runtime
+        working-directory: services/foundation-agents
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --ignore-scripts --no-audit --no-fund
+          npm run smoke
+
+      - name: Package Lambda runtime
+        working-directory: services/foundation-agents
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm prune --omit=dev --ignore-scripts
+          rm -f "$RUNNER_TEMP/foundation-agents.zip"
+          zip -qr "$RUNNER_TEMP/foundation-agents.zip" src node_modules package.json
+          size="$(stat -c '%s' "$RUNNER_TEMP/foundation-agents.zip")"
+          test "$size" -lt 52428800
+          echo "LAMBDA_ZIP=$RUNNER_TEMP/foundation-agents.zip" >> "$GITHUB_ENV"
+          echo "Lambda package bytes: ${size}" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Configure trusted Foundation AWS role
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: ${{ env.AWS_ROLE_TO_ASSUME }}
+          role-session-name: FoundationAgents-${{ github.run_id }}
+          aws-region: ${{ env.AWS_REGION }}
+          retry-max-attempts: 3
+
+      - name: Record deployment start
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          gh issue comment "$RECEIPT_ISSUE" --repo "$GITHUB_REPOSITORY" --body "Agent control-plane deployment **started** for commit \`${GITHUB_SHA}\` (run \`${GITHUB_RUN_ID}\`). No production completion is claimed until redirect, IAM-route, Lambda, and model smoke checks finish."
+
+      - name: Deploy combined redirect and private agent control plane
+        id: deploy
+        continue-on-error: true
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_IDENTITY_PROVIDER_ID: ${{ vars.OPENAI_IDENTITY_PROVIDER_ID }}
+          OPENAI_SERVICE_ACCOUNT_ID: ${{ vars.OPENAI_SERVICE_ACCOUNT_ID }}
+          OPENAI_WIF_AUDIENCE: ${{ vars.OPENAI_WIF_AUDIENCE || 'https://api.openai.com/v1' }}
+        shell: bash
+        run: bash services/foundation-agents/scripts/deploy-control-plane.sh
+
+      - name: Publish deployment receipt
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          outcome='${{ steps.deploy.outcome }}'
+          configured='${{ steps.deploy.outputs.model_configured }}'
+          auth_mode='${{ steps.deploy.outputs.auth_mode }}'
+          graph_status='${{ steps.deploy.outputs.graph_status }}'
+          graph_decision='${{ steps.deploy.outputs.graph_decision }}'
+          body="Agent control-plane run \`${GITHUB_RUN_ID}\`: deployment **${outcome}**. Public edge rollback is automatic unless the canonical redirect and IAM-protected internal routes verify. Model configured: **${configured:-unknown}**; auth mode: \`${auth_mode:-none}\`; graph smoke status: \`${graph_status:-not-run}\`; decision: \`${graph_decision:-not-run}\`. No secret values are included in this receipt."
+          gh issue comment "$RECEIPT_ISSUE" --repo "$GITHUB_REPOSITORY" --body "$body"
+          printf '%s\n' "$body" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Require fully operational control plane
+        if: always()
+        shell: bash
+        run: |
+          test "${{ steps.deploy.outcome }}" = 'success'
+          test "${{ steps.deploy.outputs.model_configured }}" = 'true'
+          status='${{ steps.deploy.outputs.graph_status }}'
+          [[ "$status" = 'review_required' || "$status" = 'escalated' ]]
