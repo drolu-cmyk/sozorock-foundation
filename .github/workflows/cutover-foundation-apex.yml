@@ -1,0 +1,199 @@
+name: Cut over Foundation apex to canonical www
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/cutover-foundation-apex.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+  id-token: write
+
+env:
+  AWS_REGION: us-east-1
+  AWS_ROLE_TO_ASSUME: arn:aws:iam::791860731989:role/GitHubActionsSozoRockFoundationSiteDeployRole
+  FOUNDATION_HOSTED_ZONE_ID: Z07905293AANZWGYZ84F3
+  APEX_HOST: sozorockfoundation.org
+  CANONICAL_HOST: www.sozorockfoundation.org
+  REDIRECT_FUNCTION_NAME: sozorockfoundation-apex-redirect
+
+jobs:
+  cutover:
+    if: github.repository == 'drolu-cmyk/sozorock-foundation' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Configure scoped AWS credentials
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: ${{ env.AWS_ROLE_TO_ASSUME }}
+          role-session-name: FoundationApexCutover-${{ github.run_id }}
+          aws-region: ${{ env.AWS_REGION }}
+          retry-max-attempts: 3
+
+      - name: Preflight exact Route 53 and CloudFront ownership
+        id: preflight
+        shell: bash
+        run: |
+          set -euo pipefail
+          alias_target="$(aws route53 list-resource-record-sets \
+            --hosted-zone-id "$FOUNDATION_HOSTED_ZONE_ID" \
+            --query "ResourceRecordSets[?Name=='${APEX_HOST}.' && Type=='A'].AliasTarget.DNSName | [0]" \
+            --output text)"
+          test -n "$alias_target"
+          test "$alias_target" != "None"
+          cloudfront_domain="${alias_target%.}"
+
+          distribution_id="$(aws cloudfront list-distributions \
+            --query "DistributionList.Items[?DomainName=='${cloudfront_domain}'].Id | [0]" \
+            --output text)"
+          test -n "$distribution_id"
+          test "$distribution_id" != "None"
+
+          config_json="$RUNNER_TEMP/distribution-before.json"
+          aws cloudfront get-distribution-config --id "$distribution_id" --output json > "$config_json"
+
+          alias_count="$(jq --arg host "$APEX_HOST" '[.DistributionConfig.Aliases.Items[]? | select(. == $host)] | length' "$config_json")"
+          test "$alias_count" = "1"
+
+          existing_functions="$(jq '.DistributionConfig.DefaultCacheBehavior.FunctionAssociations.Quantity // 0' "$config_json")"
+          existing_viewer_lambdas="$(jq '[.DistributionConfig.DefaultCacheBehavior.LambdaFunctionAssociations.Items[]? | select(.EventType == "viewer-request")] | length' "$config_json")"
+          if [[ "$existing_functions" != "0" || "$existing_viewer_lambdas" != "0" ]]; then
+            echo "Refusing cutover: the default behavior already has viewer code that must be reviewed before replacement."
+            exit 1
+          fi
+
+          echo "distribution_id=$distribution_id" >> "$GITHUB_OUTPUT"
+          echo "cloudfront_domain=$cloudfront_domain" >> "$GITHUB_OUTPUT"
+          echo "etag=$(jq -r '.ETag' "$config_json")" >> "$GITHUB_OUTPUT"
+
+      - name: Create or update redirect function in development stage
+        id: function
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat > "$RUNNER_TEMP/apex-redirect.js" <<'JS'
+          function encodeQuery(querystring) {
+            var parts = [];
+            for (var key in querystring) {
+              if (!Object.prototype.hasOwnProperty.call(querystring, key)) continue;
+              var item = querystring[key];
+              if (item.multiValue) {
+                for (var i = 0; i < item.multiValue.length; i++) {
+                  parts.push(encodeURIComponent(key) + '=' + encodeURIComponent(item.multiValue[i].value));
+                }
+              } else if (item.value !== undefined) {
+                parts.push(encodeURIComponent(key) + '=' + encodeURIComponent(item.value));
+              }
+            }
+            return parts.length ? '?' + parts.join('&') : '';
+          }
+
+          function handler(event) {
+            var request = event.request;
+            var host = request.headers.host && request.headers.host.value;
+            if (host !== 'sozorockfoundation.org') return request;
+            return {
+              statusCode: 308,
+              statusDescription: 'Permanent Redirect',
+              headers: {
+                location: { value: 'https://www.sozorockfoundation.org' + request.uri + encodeQuery(request.querystring || {}) },
+                'cache-control': { value: 'public, max-age=300' }
+              }
+            };
+          }
+          JS
+
+          if aws cloudfront describe-function --name "$REDIRECT_FUNCTION_NAME" --stage DEVELOPMENT >/dev/null 2>&1; then
+            function_etag="$(aws cloudfront describe-function --name "$REDIRECT_FUNCTION_NAME" --stage DEVELOPMENT --query ETag --output text)"
+            aws cloudfront update-function \
+              --name "$REDIRECT_FUNCTION_NAME" \
+              --if-match "$function_etag" \
+              --function-config Comment='Permanent apex-to-www redirect for The SozoRock Foundation',Runtime=cloudfront-js-2.0 \
+              --function-code "fileb://$RUNNER_TEMP/apex-redirect.js" >/dev/null
+          else
+            aws cloudfront create-function \
+              --name "$REDIRECT_FUNCTION_NAME" \
+              --function-config Comment='Permanent apex-to-www redirect for The SozoRock Foundation',Runtime=cloudfront-js-2.0 \
+              --function-code "fileb://$RUNNER_TEMP/apex-redirect.js" >/dev/null
+          fi
+
+          development_etag="$(aws cloudfront describe-function --name "$REDIRECT_FUNCTION_NAME" --stage DEVELOPMENT --query ETag --output text)"
+          publish_json="$(aws cloudfront publish-function --name "$REDIRECT_FUNCTION_NAME" --if-match "$development_etag" --output json)"
+          function_arn="$(jq -r '.FunctionSummary.FunctionMetadata.FunctionARN' <<<"$publish_json")"
+          test -n "$function_arn"
+          test "$function_arn" != "null"
+          echo "function_arn=$function_arn" >> "$GITHUB_OUTPUT"
+
+      - name: Associate redirect function with exact apex distribution
+        id: update
+        shell: bash
+        run: |
+          set -euo pipefail
+          before="$RUNNER_TEMP/distribution-before.json"
+          original="$RUNNER_TEMP/distribution-original-config.json"
+          updated="$RUNNER_TEMP/distribution-updated-config.json"
+          jq '.DistributionConfig' "$before" > "$original"
+          jq --arg arn "${{ steps.function.outputs.function_arn }}" \
+            '.DistributionConfig
+             | .DefaultCacheBehavior.FunctionAssociations = {
+                 "Quantity": 1,
+                 "Items": [{"FunctionARN": $arn, "EventType": "viewer-request"}]
+               }' "$before" > "$updated"
+
+          update_json="$(aws cloudfront update-distribution \
+            --id "${{ steps.preflight.outputs.distribution_id }}" \
+            --if-match "${{ steps.preflight.outputs.etag }}" \
+            --distribution-config "file://$updated" \
+            --output json)"
+          echo "new_etag=$(jq -r '.ETag' <<<"$update_json")" >> "$GITHUB_OUTPUT"
+
+      - name: Wait for CloudFront deployment
+        run: aws cloudfront wait distribution-deployed --id "${{ steps.preflight.outputs.distribution_id }}"
+
+      - name: Verify apex redirect and canonical www
+        id: verify
+        shell: bash
+        run: |
+          set -euo pipefail
+          apex_headers="$RUNNER_TEMP/apex-headers.txt"
+          apex_status="$(curl --silent --show-error --dump-header "$apex_headers" --output /dev/null --max-time 30 --write-out '%{http_code}' "https://${APEX_HOST}/publication/rrg-v1-2025?source=apex-cutover")"
+          test "$apex_status" = "308"
+          apex_location="$(awk 'BEGIN{IGNORECASE=1} /^location:/ {sub(/\r$/, ""); sub(/^location:[[:space:]]*/, ""); print; exit}' "$apex_headers")"
+          test "$apex_location" = "https://${CANONICAL_HOST}/publication/rrg-v1-2025?source=apex-cutover"
+
+          canonical_status="$(curl --silent --show-error --output "$RUNNER_TEMP/canonical.html" --max-time 30 --write-out '%{http_code}' "https://${CANONICAL_HOST}/")"
+          test "$canonical_status" = "200"
+          grep -q 'Access. Assurance. Intelligence.' "$RUNNER_TEMP/canonical.html"
+
+      - name: Roll back distribution if live verification failed
+        if: failure() && steps.update.outcome == 'success'
+        shell: bash
+        run: |
+          set -euo pipefail
+          distribution_id="${{ steps.preflight.outputs.distribution_id }}"
+          current_etag="$(aws cloudfront get-distribution-config --id "$distribution_id" --query ETag --output text)"
+          aws cloudfront update-distribution \
+            --id "$distribution_id" \
+            --if-match "$current_etag" \
+            --distribution-config "file://$RUNNER_TEMP/distribution-original-config.json" >/dev/null
+          aws cloudfront wait distribution-deployed --id "$distribution_id"
+
+      - name: Record successful apex cutover
+        if: success()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          gh issue comment 15 --repo "$GITHUB_REPOSITORY" --body "**APEX CUTOVER SUCCESS** — \`https://${APEX_HOST}\` now returns a permanent 308 redirect to \`https://${CANONICAL_HOST}\`, preserving path and query. The canonical www homepage returned 200 with the approved Foundation identity. Run: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}; commit: \`${GITHUB_SHA}\`."
+
+      - name: Record failed or rolled-back cutover
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          gh issue comment 15 --repo "$GITHUB_REPOSITORY" --body "**APEX CUTOVER FAILED** — the fail-closed cutover did not complete. If the CloudFront distribution had been changed before verification failed, the workflow attempted to restore the original distribution configuration. Production must not be treated as complete from this run. Run: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}; commit: \`${GITHUB_SHA}\`."
