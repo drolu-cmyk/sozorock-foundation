@@ -10,6 +10,8 @@ assert.equal(authorizedHeader("Bearer short", "short"), false);
 assert.equal(containsForbiddenMaterial({ evidence: { note: "Approved source material only." } }), false);
 assert.equal(containsForbiddenMaterial({ password: "example" }), true);
 assert.equal(containsForbiddenMaterial({ nested: { apiKey: "redacted" } }), true);
+assert.equal(containsForbiddenMaterial({ nested: { API_KEY: "redacted" } }), true);
+assert.equal(containsForbiddenMaterial({ nested: { medical_record_number: "redacted" } }), true);
 assert.equal(containsForbiddenMaterial({ note: "sk-proj-abcdefghijklmnopqrstuvwxyz0123456789" }), true);
 assert.equal(containsForbiddenMaterial({ note: "AKIAABCDEFGHIJKLMNOP" }), true);
 assert.equal(containsForbiddenMaterial({ note: "123-45-6789" }), true);
