@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { modelAuthConfigured, modelAuthMode } from "./model-auth.mjs";
 
 const keys = [
+  "FOUNDATION_MODEL_PROVIDER",
   "OPENAI_API_KEY",
   "OPENAI_IDENTITY_PROVIDER_ID",
   "OPENAI_SERVICE_ACCOUNT_ID",
@@ -28,6 +29,14 @@ assert.equal(modelAuthMode(), "aws_wif");
 
 delete process.env.OPENAI_SERVICE_ACCOUNT_ID;
 assert.equal(modelAuthConfigured(), false);
+
+process.env.FOUNDATION_MODEL_PROVIDER = "bedrock";
+assert.equal(modelAuthConfigured(), true);
+assert.equal(modelAuthMode(), "bedrock_short_term");
+
+delete process.env.AWS_REGION;
+assert.equal(modelAuthConfigured(), false);
+assert.equal(modelAuthMode(), null);
 
 for (const key of keys) {
   if (saved[key] === undefined) delete process.env[key];
