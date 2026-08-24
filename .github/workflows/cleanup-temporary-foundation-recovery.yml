@@ -1,0 +1,41 @@
+name: Cleanup temporary Foundation recovery policy
+
+on:
+  workflow_run:
+    workflows:
+      - Temporary Foundation self recovery
+      - Production domain diagnostics
+    types: [completed]
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  cleanup:
+    if: >-
+      (github.event.workflow_run.name == 'Temporary Foundation self recovery' && github.event.workflow_run.conclusion != 'success') ||
+      (github.event.workflow_run.name == 'Production domain diagnostics' && github.event.workflow_run.conclusion == 'success')
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Configure trusted Foundation AWS role
+        id: aws
+        continue-on-error: true
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: arn:aws:iam::791860731989:role/GitHubActionsSozorockFoundationSiteDeployRole
+          role-session-name: FoundationRecoveryCleanup-${{ github.run_id }}
+          aws-region: us-east-1
+          retry-max-attempts: 2
+
+      - name: Remove only the temporary recovery policy
+        if: steps.aws.outcome == 'success'
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(aws sts get-caller-identity --query Account --output text)" = '791860731989'
+          aws iam delete-role-policy \
+            --role-name GitHubActionsSozorockFoundationSiteDeployRole \
+            --policy-name TemporarySozoRockFoundationRecovery
