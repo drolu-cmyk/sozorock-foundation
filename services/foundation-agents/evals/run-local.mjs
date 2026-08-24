@@ -28,7 +28,13 @@ const results = [];
 for (const testCase of cases) {
   const startedAt = new Date().toISOString();
   try {
-    const result = await executeGraph({ ...testCase, maxRevisionCycles: 1 });
+    const { expectedBehavior, ...graphContext } = testCase.context || {};
+    const result = await executeGraph({
+      graphId: testCase.graphId,
+      input: testCase.input,
+      context: graphContext,
+      maxRevisionCycles: 1,
+    });
     const graph = graphs[testCase.graphId];
     const nodesSeen = new Set(result.outputs.map((entry) => entry.node));
     const structuralChecks = {
@@ -48,7 +54,7 @@ for (const testCase of cases) {
     const graderInput = [
       `Case id: ${testCase.id}`,
       `Graph: ${testCase.graphId}`,
-      `Expected behavior: ${safeValue(testCase.context?.expectedBehavior, 4_000)}`,
+      `Expected behavior: ${safeValue(expectedBehavior, 4_000)}`,
       `Original eval input: ${safeValue(testCase.input, 10_000)}`,
       `Graph terminal state: ${safeValue({ status: result.status, decision: result.decision, escalationReason: result.escalationReason, revisionCount: result.revisionCount }, 4_000)}`,
       `Graph evaluation: ${safeValue(result.evaluation, 8_000)}`,
