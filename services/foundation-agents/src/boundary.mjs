@@ -3,21 +3,20 @@ import { timingSafeEqual } from "node:crypto";
 export const maxRequestBytes = 65_536;
 export const maxRequestsPerMinute = 30;
 
-const forbiddenKeys = new Set([
+const forbiddenNormalizedKeys = new Set([
   "password",
   "passcode",
   "secret",
   "token",
-  "apiKey",
-  "api_key",
+  "apikey",
   "authorization",
   "cookie",
   "ssn",
-  "socialSecurityNumber",
-  "dateOfBirth",
+  "socialsecuritynumber",
+  "dateofbirth",
   "dob",
-  "medicalRecord",
-  "medicalRecordNumber",
+  "medicalrecord",
+  "medicalrecordnumber",
   "diagnosis",
 ]);
 
@@ -36,6 +35,10 @@ function constantTimeEqual(actual, expected) {
   return timingSafeEqual(actualBuffer, expectedBuffer);
 }
 
+function normalizedKey(key) {
+  return String(key).replace(/[_-]/gu, "").toLowerCase();
+}
+
 export function authorizedHeader(actualHeader, expectedToken) {
   if (typeof expectedToken !== "string" || expectedToken.length < 24) return false;
   const actual = typeof actualHeader === "string" ? actualHeader : "";
@@ -46,7 +49,9 @@ export function containsForbiddenMaterial(value) {
   if (typeof value === "string") return forbiddenValuePatterns.some((pattern) => pattern.test(value));
   if (!value || typeof value !== "object") return false;
   if (Array.isArray(value)) return value.some(containsForbiddenMaterial);
-  return Object.entries(value).some(([key, child]) => forbiddenKeys.has(key) || containsForbiddenMaterial(child));
+  return Object.entries(value).some(
+    ([key, child]) => forbiddenNormalizedKeys.has(normalizedKey(key)) || containsForbiddenMaterial(child)
+  );
 }
 
 export function isPlainObject(value) {
