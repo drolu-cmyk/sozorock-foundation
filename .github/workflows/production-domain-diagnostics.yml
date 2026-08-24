@@ -14,12 +14,15 @@ permissions:
 
 env:
   AWS_REGION: us-east-1
-  AWS_ROLE_TO_ASSUME: arn:aws:iam::791860731989:role/GitHubActionsSozorockFoundationSiteDeployRole
+  AWS_ROLE_TO_ASSUME: arn:aws:iam::791860731989:role/GitHubActionsSozoRockFoundationSiteDeployRole
   FOUNDATION_HOSTED_ZONE_ID: Z07905293AANZWGYZ84F3
+  CERTIFICATE_ARN: arn:aws:acm:us-east-1:791860731989:certificate/d2b11522-63cb-4c7f-b5a8-c0c25a39a2f7
+  LAMBDA_ROLE_ARN: arn:aws:iam::791860731989:role/SozoRockFoundationParentLambdaRole
   LEGACY_HEALTH_AMPLIFY_APP_ID: d3uqnxmsmefokf
   APEX_HOST: sozorockfoundation.org
   CANONICAL_HOST: www.sozorockfoundation.org
-  REDIRECT_FUNCTION_NAME: sozorockfoundation-apex-redirect
+  REDIRECT_FUNCTION_NAME: SozoRockFoundationApexRedirect
+  REDIRECT_API_NAME: SozoRockFoundationApexRedirect
 
 jobs:
   diagnose:
@@ -98,28 +101,27 @@ jobs:
         run: |
           set -euo pipefail
           report="$REPORT_PATH"
-          original="$RUNNER_TEMP/distribution-original-config.json"
-          distribution_id=""
-          distribution_updated=0
+          dns_changed=0
           live_verified=0
+          old_record="$RUNNER_TEMP/apex-old-record.json"
 
-          rollback_if_needed() {
-            if [[ "$distribution_updated" = "1" && "$live_verified" != "1" && -n "$distribution_id" && -s "$original" ]]; then
-              current_etag="$(aws cloudfront get-distribution-config --id "$distribution_id" --query ETag --output text 2>/dev/null || true)"
-              if [[ -n "$current_etag" && "$current_etag" != "None" ]]; then
-                if aws cloudfront update-distribution \
-                  --id "$distribution_id" \
-                  --if-match "$current_etag" \
-                  --distribution-config "file://$original" >/dev/null 2>&1; then
-                  aws cloudfront wait distribution-deployed --id "$distribution_id" || true
-                  echo '- Rollback: original CloudFront distribution configuration restored after failed live verification.' >> "$report"
-                else
-                  echo '- Rollback: attempted but AWS rejected restoration. Manual AWS review is required before treating apex as stable.' >> "$report"
-                fi
+          rollback_dns() {
+            if [[ "$dns_changed" = "1" && "$live_verified" != "1" && -s "$old_record" ]]; then
+              jq -n --argjson record "$(cat "$old_record")" \
+                '{Comment:"Rollback failed Foundation apex redirect cutover",Changes:[{Action:"UPSERT",ResourceRecordSet:$record}]}' \
+                > "$RUNNER_TEMP/apex-rollback.json"
+              if change_id="$(aws route53 change-resource-record-sets \
+                --hosted-zone-id "$FOUNDATION_HOSTED_ZONE_ID" \
+                --change-batch "file://$RUNNER_TEMP/apex-rollback.json" \
+                --query 'ChangeInfo.Id' --output text 2>/dev/null)"; then
+                aws route53 wait resource-record-sets-changed --id "$change_id" || true
+                echo '- Rollback: original apex Route 53 record restored after failed public verification.' >> "$report"
+              else
+                echo '- Rollback: AWS rejected restoration; manual Route 53 review is required.' >> "$report"
               fi
             fi
           }
-          trap rollback_if_needed EXIT
+          trap rollback_dns EXIT
 
           {
             echo
@@ -141,11 +143,6 @@ jobs:
 
           if legacy_app="$(aws amplify get-app --app-id "$LEGACY_HEALTH_AMPLIFY_APP_ID" --query 'app.{appId:appId,name:name,repository:repository,defaultDomain:defaultDomain,platform:platform}' --output json 2>"$RUNNER_TEMP/legacy-app.err")"; then
             echo "- Legacy Health Amplify app: \`${legacy_app}\`" >> "$report"
-            if legacy_domain="$(aws amplify get-domain-association --app-id "$LEGACY_HEALTH_AMPLIFY_APP_ID" --domain-name sozorockhealth.com --query 'domainAssociation.{domain:domainName,status:domainStatus,updateStatus:updateStatus,subdomains:subDomains[].{prefix:subDomainSetting.prefix,branch:subDomainSetting.branchName,dnsRecord:dnsRecord}}' --output json 2>"$RUNNER_TEMP/legacy-domain.err")"; then
-              echo "- Legacy Health Amplify domain association: \`${legacy_domain}\`" >> "$report"
-            else
-              echo "- Legacy Health domain-association lookup error: \`$(tr '\n' ' ' < "$RUNNER_TEMP/legacy-domain.err" | sed 's/`/'"'"'/g')\`" >> "$report"
-            fi
           else
             echo "- Legacy Health Amplify app lookup error: \`$(tr '\n' ' ' < "$RUNNER_TEMP/legacy-app.err" | sed 's/`/'"'"'/g')\`" >> "$report"
           fi
@@ -155,107 +152,199 @@ jobs:
             echo '### Foundation apex repair'
           } >> "$report"
 
-          alias_target="$(aws route53 list-resource-record-sets \
+          cert_json="$(aws acm describe-certificate --certificate-arn "$CERTIFICATE_ARN" --query 'Certificate.{Status:Status,DomainName:DomainName,SANs:SubjectAlternativeNames}' --output json 2>"$RUNNER_TEMP/cert.err" || true)"
+          if [[ -z "$cert_json" ]]; then
+            echo "- Certificate preflight error: \`$(tr '\n' ' ' < "$RUNNER_TEMP/cert.err" | sed 's/`/'"'"'/g')\`" >> "$report"
+            exit 1
+          fi
+          cert_status="$(jq -r '.Status // ""' <<<"$cert_json")"
+          apex_in_cert="$(jq --arg host "$APEX_HOST" '[.SANs[]? | select(. == $host)] | length' <<<"$cert_json")"
+          if [[ "$cert_status" != "ISSUED" || "$apex_in_cert" != "1" ]]; then
+            echo "- Certificate preflight stopped: known certificate is \`${cert_status}\` and apex SAN match count is \`${apex_in_cert}\`. No DNS change made." >> "$report"
+            exit 1
+          fi
+          echo '- Certificate preflight: issued certificate covers the Foundation apex.' >> "$report"
+
+          current_record="$(aws route53 list-resource-record-sets \
             --hosted-zone-id "$FOUNDATION_HOSTED_ZONE_ID" \
-            --query "ResourceRecordSets[?Name=='${APEX_HOST}.' && Type=='A'].AliasTarget.DNSName | [0]" \
-            --output text)"
-          test -n "$alias_target"
-          test "$alias_target" != "None"
-          cloudfront_domain="${alias_target%.}"
-
-          if ! distribution_id="$(aws cloudfront list-distributions \
-            --query "DistributionList.Items[?DomainName=='${cloudfront_domain}'].Id | [0]" \
-            --output text 2>"$RUNNER_TEMP/cloudfront-list.err")"; then
-            echo "- Preflight error: \`$(tr '\n' ' ' < "$RUNNER_TEMP/cloudfront-list.err" | sed 's/`/'"'"'/g')\`" >> "$report"
+            --query "ResourceRecordSets[?Name=='${APEX_HOST}.' && Type=='A'] | [0]" \
+            --output json)"
+          test -n "$current_record"
+          test "$current_record" != "null"
+          printf '%s' "$current_record" > "$old_record"
+          current_alias="$(jq -r '.AliasTarget.DNSName // ""' <<<"$current_record")"
+          current_alias="${current_alias%.}."
+          if [[ "$current_alias" != 'd1w2jx9m5e0d5u.cloudfront.net.' ]]; then
+            echo "- DNS preflight stopped: unexpected current apex alias \`${current_alias}\`. No mutation made." >> "$report"
             exit 1
           fi
-          test -n "$distribution_id"
-          test "$distribution_id" != "None"
+          echo "- DNS preflight: apex still points to the retired CloudFront target \`${current_alias}\`." >> "$report"
 
-          before="$RUNNER_TEMP/distribution-before.json"
-          aws cloudfront get-distribution-config --id "$distribution_id" --output json > "$before"
-          jq '.DistributionConfig' "$before" > "$original"
-          alias_count="$(jq --arg host "$APEX_HOST" '[.DistributionConfig.Aliases.Items[]? | select(. == $host)] | length' "$before")"
-          test "$alias_count" = "1"
-          existing_functions="$(jq '.DistributionConfig.DefaultCacheBehavior.FunctionAssociations.Quantity // 0' "$before")"
-          existing_viewer_lambdas="$(jq '[.DistributionConfig.DefaultCacheBehavior.LambdaFunctionAssociations.Items[]? | select(.EventType == "viewer-request")] | length' "$before")"
-          if [[ "$existing_functions" != "0" || "$existing_viewer_lambdas" != "0" ]]; then
-            echo '- Preflight stopped: existing viewer-request code is attached; no distribution change made.' >> "$report"
-            exit 1
-          fi
-          echo "- Preflight: exact apex alias maps to CloudFront distribution \`${distribution_id}\` (\`${cloudfront_domain}\`); no existing viewer-request code." >> "$report"
-
-          cat > "$RUNNER_TEMP/apex-redirect.js" <<'JS'
-          function encodeQuery(querystring) {
-            var parts = [];
-            for (var key in querystring) {
-              if (!Object.prototype.hasOwnProperty.call(querystring, key)) continue;
-              var item = querystring[key];
-              if (item.multiValue) {
-                for (var i = 0; i < item.multiValue.length; i++) {
-                  parts.push(encodeURIComponent(key) + '=' + encodeURIComponent(item.multiValue[i].value));
-                }
-              } else if (item.value !== undefined) {
-                parts.push(encodeURIComponent(key) + '=' + encodeURIComponent(item.value));
+          cat > "$RUNNER_TEMP/index.py" <<'PY'
+          def handler(event, context):
+              path = event.get("rawPath") or "/"
+              query = event.get("rawQueryString") or ""
+              location = "https://www.sozorockfoundation.org" + path
+              if query:
+                  location += "?" + query
+              return {
+                  "statusCode": 308,
+                  "headers": {
+                      "location": location,
+                      "cache-control": "public, max-age=300",
+                      "strict-transport-security": "max-age=31536000",
+                      "x-content-type-options": "nosniff",
+                  },
+                  "body": "",
               }
-            }
-            return parts.length ? '?' + parts.join('&') : '';
-          }
-          function handler(event) {
-            var request = event.request;
-            var host = request.headers.host && request.headers.host.value;
-            if (host !== 'sozorockfoundation.org') return request;
-            return {
-              statusCode: 308,
-              statusDescription: 'Permanent Redirect',
-              headers: {
-                location: { value: 'https://www.sozorockfoundation.org' + request.uri + encodeQuery(request.querystring || {}) },
-                'cache-control': { value: 'public, max-age=300' }
-              }
-            };
-          }
-          JS
+          PY
+          (cd "$RUNNER_TEMP" && python3 -m zipfile -c redirect.zip index.py)
 
-          if aws cloudfront describe-function --name "$REDIRECT_FUNCTION_NAME" --stage DEVELOPMENT >/dev/null 2>&1; then
-            function_etag="$(aws cloudfront describe-function --name "$REDIRECT_FUNCTION_NAME" --stage DEVELOPMENT --query ETag --output text)"
-            aws cloudfront update-function \
-              --name "$REDIRECT_FUNCTION_NAME" \
-              --if-match "$function_etag" \
-              --function-config Comment='Permanent apex-to-www redirect for The SozoRock Foundation',Runtime=cloudfront-js-2.0 \
-              --function-code "fileb://$RUNNER_TEMP/apex-redirect.js" >/dev/null
+          if aws lambda get-function --function-name "$REDIRECT_FUNCTION_NAME" >/dev/null 2>&1; then
+            aws lambda update-function-configuration \
+              --function-name "$REDIRECT_FUNCTION_NAME" \
+              --runtime python3.13 --handler index.handler \
+              --role "$LAMBDA_ROLE_ARN" --memory-size 128 --timeout 5 >/dev/null
+            aws lambda wait function-updated-v2 --function-name "$REDIRECT_FUNCTION_NAME"
+            aws lambda update-function-code \
+              --function-name "$REDIRECT_FUNCTION_NAME" \
+              --zip-file "fileb://$RUNNER_TEMP/redirect.zip" >/dev/null
+            aws lambda wait function-updated-v2 --function-name "$REDIRECT_FUNCTION_NAME"
           else
-            aws cloudfront create-function \
-              --name "$REDIRECT_FUNCTION_NAME" \
-              --function-config Comment='Permanent apex-to-www redirect for The SozoRock Foundation',Runtime=cloudfront-js-2.0 \
-              --function-code "fileb://$RUNNER_TEMP/apex-redirect.js" >/dev/null
+            aws lambda create-function \
+              --function-name "$REDIRECT_FUNCTION_NAME" \
+              --runtime python3.13 --handler index.handler \
+              --role "$LAMBDA_ROLE_ARN" \
+              --zip-file "fileb://$RUNNER_TEMP/redirect.zip" \
+              --memory-size 128 --timeout 5 >/dev/null
+            aws lambda wait function-active-v2 --function-name "$REDIRECT_FUNCTION_NAME"
           fi
-          development_etag="$(aws cloudfront describe-function --name "$REDIRECT_FUNCTION_NAME" --stage DEVELOPMENT --query ETag --output text)"
-          publish_json="$(aws cloudfront publish-function --name "$REDIRECT_FUNCTION_NAME" --if-match "$development_etag" --output json)"
-          function_arn="$(jq -r '.FunctionSummary.FunctionMetadata.FunctionARN' <<<"$publish_json")"
+          function_arn="$(aws lambda get-function --function-name "$REDIRECT_FUNCTION_NAME" --query 'Configuration.FunctionArn' --output text)"
           test -n "$function_arn"
-          test "$function_arn" != "null"
 
-          updated="$RUNNER_TEMP/distribution-updated-config.json"
-          jq --arg arn "$function_arn" \
-            '.DistributionConfig | .DefaultCacheBehavior.FunctionAssociations = {"Quantity":1,"Items":[{"FunctionARN":$arn,"EventType":"viewer-request"}]}' \
-            "$before" > "$updated"
-          aws cloudfront update-distribution \
-            --id "$distribution_id" \
-            --if-match "$(jq -r '.ETag' "$before")" \
-            --distribution-config "file://$updated" >/dev/null
-          distribution_updated=1
-          aws cloudfront wait distribution-deployed --id "$distribution_id"
+          api_id="$(aws apigatewayv2 get-apis --output json | jq -r --arg name "$REDIRECT_API_NAME" '.Items[]? | select(.Name==$name) | .ApiId' | head -n1)"
+          if [[ -z "$api_id" ]]; then
+            api_id="$(aws apigatewayv2 create-api \
+              --name "$REDIRECT_API_NAME" --protocol-type HTTP --target "$function_arn" \
+              --query 'ApiId' --output text)"
+          fi
+          test -n "$api_id"
 
-          headers="$RUNNER_TEMP/apex-verify-headers.txt"
-          status="$(curl --silent --show-error --dump-header "$headers" --output /dev/null --max-time 30 --write-out '%{http_code}' "https://${APEX_HOST}/publication/rrg-v1-2025?source=apex-cutover")"
-          test "$status" = "308"
-          location="$(awk 'BEGIN{IGNORECASE=1} /^location:/ {sub(/\r$/, ""); sub(/^location:[[:space:]]*/, ""); print; exit}' "$headers")"
-          test "$location" = "https://${CANONICAL_HOST}/publication/rrg-v1-2025?source=apex-cutover"
+          integration_id="$(aws apigatewayv2 get-integrations --api-id "$api_id" --output json | jq -r --arg arn "$function_arn" '.Items[]? | select(.IntegrationUri==$arn) | .IntegrationId' | head -n1)"
+          if [[ -z "$integration_id" ]]; then
+            integration_id="$(aws apigatewayv2 create-integration \
+              --api-id "$api_id" --integration-type AWS_PROXY --integration-uri "$function_arn" \
+              --payload-format-version 2.0 --query 'IntegrationId' --output text)"
+          fi
+          route_id="$(aws apigatewayv2 get-routes --api-id "$api_id" --output json | jq -r '.Items[]? | select(.RouteKey=="$default") | .RouteId' | head -n1)"
+          if [[ -z "$route_id" ]]; then
+            aws apigatewayv2 create-route --api-id "$api_id" --route-key '$default' --target "integrations/$integration_id" >/dev/null
+          else
+            aws apigatewayv2 update-route --api-id "$api_id" --route-id "$route_id" --target "integrations/$integration_id" >/dev/null
+          fi
+          stage_count="$(aws apigatewayv2 get-stages --api-id "$api_id" --output json | jq -r '[.Items[]? | select(.StageName=="$default")] | length')"
+          if [[ "$stage_count" = "0" ]]; then
+            aws apigatewayv2 create-stage --api-id "$api_id" --stage-name '$default' --auto-deploy >/dev/null
+          else
+            aws apigatewayv2 update-stage --api-id "$api_id" --stage-name '$default' --auto-deploy >/dev/null
+          fi
+
+          aws lambda remove-permission --function-name "$REDIRECT_FUNCTION_NAME" --statement-id AllowApexRedirectApi >/dev/null 2>&1 || true
+          aws lambda add-permission \
+            --function-name "$REDIRECT_FUNCTION_NAME" \
+            --statement-id AllowApexRedirectApi \
+            --action lambda:InvokeFunction --principal apigateway.amazonaws.com \
+            --source-arn "arn:aws:execute-api:${AWS_REGION}:791860731989:${api_id}/*" >/dev/null
+
+          api_endpoint="$(aws apigatewayv2 get-api --api-id "$api_id" --query 'ApiEndpoint' --output text)"
+          endpoint_headers="$RUNNER_TEMP/endpoint-headers.txt"
+          endpoint_status="$(curl --silent --show-error --dump-header "$endpoint_headers" --output /dev/null --max-time 30 --write-out '%{http_code}' "${api_endpoint}/publication/rrg-v1-2025?source=endpoint")"
+          test "$endpoint_status" = "308"
+          endpoint_location="$(awk 'BEGIN{IGNORECASE=1} /^location:/ {sub(/\r$/, ""); sub(/^location:[[:space:]]*/, ""); print; exit}' "$endpoint_headers")"
+          test "$endpoint_location" = "https://${CANONICAL_HOST}/publication/rrg-v1-2025?source=endpoint"
+
+          if domain_json="$(aws apigatewayv2 get-domain-name --domain-name "$APEX_HOST" --output json 2>/dev/null)"; then
+            current_cert="$(jq -r '.DomainNameConfigurations[0].CertificateArn // ""' <<<"$domain_json")"
+            if [[ "$current_cert" != "$CERTIFICATE_ARN" ]]; then
+              aws apigatewayv2 update-domain-name \
+                --domain-name "$APEX_HOST" \
+                --domain-name-configurations "CertificateArn=$CERTIFICATE_ARN,EndpointType=REGIONAL,SecurityPolicy=TLS_1_2" >/dev/null
+            fi
+          else
+            aws apigatewayv2 create-domain-name \
+              --domain-name "$APEX_HOST" \
+              --domain-name-configurations "CertificateArn=$CERTIFICATE_ARN,EndpointType=REGIONAL,SecurityPolicy=TLS_1_2" >/dev/null
+          fi
+
+          domain_ready=0
+          for _ in $(seq 1 120); do
+            domain_json="$(aws apigatewayv2 get-domain-name --domain-name "$APEX_HOST" --output json 2>/dev/null || true)"
+            domain_status="$(jq -r '.DomainNameConfigurations[0].DomainNameStatus // ""' <<<"${domain_json:-{}}")"
+            if [[ "$domain_status" = "AVAILABLE" ]]; then domain_ready=1; break; fi
+            if [[ "$domain_status" = "FAILED" ]]; then echo "$domain_json" >&2; exit 1; fi
+            sleep 5
+          done
+          test "$domain_ready" = "1"
+          target="$(jq -r '.DomainNameConfigurations[0].ApiGatewayDomainName' <<<"$domain_json")"
+          target_zone="$(jq -r '.DomainNameConfigurations[0].HostedZoneId' <<<"$domain_json")"
+          test -n "$target"; test "$target" != "null"
+          test -n "$target_zone"; test "$target_zone" != "null"
+
+          mapping_id="$(aws apigatewayv2 get-api-mappings --domain-name "$APEX_HOST" --output json | jq -r '.Items[]? | select((.ApiMappingKey // "")=="") | .ApiMappingId' | head -n1)"
+          if [[ -z "$mapping_id" ]]; then
+            aws apigatewayv2 create-api-mapping --domain-name "$APEX_HOST" --api-id "$api_id" --stage '$default' >/dev/null
+          else
+            aws apigatewayv2 update-api-mapping --domain-name "$APEX_HOST" --api-mapping-id "$mapping_id" --api-id "$api_id" --stage '$default' >/dev/null
+          fi
+
+          direct_ok=0
+          for _ in $(seq 1 60); do
+            target_ip="$(getent ahostsv4 "$target" | awk 'NR==1{print $1}' || true)"
+            if [[ -n "$target_ip" ]]; then
+              direct_headers="$RUNNER_TEMP/direct-headers.txt"
+              direct_status="$(curl --silent --show-error --dump-header "$direct_headers" --output /dev/null --max-time 20 --write-out '%{http_code}' \
+                --resolve "${APEX_HOST}:443:${target_ip}" \
+                "https://${APEX_HOST}/publication/rrg-v1-2025?source=direct" || true)"
+              direct_location="$(awk 'BEGIN{IGNORECASE=1} /^location:/ {sub(/\r$/, ""); sub(/^location:[[:space:]]*/, ""); print; exit}' "$direct_headers" 2>/dev/null || true)"
+              if [[ "$direct_status" = "308" && "$direct_location" = "https://${CANONICAL_HOST}/publication/rrg-v1-2025?source=direct" ]]; then
+                direct_ok=1; break
+              fi
+            fi
+            sleep 5
+          done
+          test "$direct_ok" = "1"
+          echo "- Direct pre-DNS verification: regional redirect endpoint returned the expected 308 for the apex host." >> "$report"
+
+          target_dot="${target%.}."
+          jq -n --arg name "${APEX_HOST}." --arg target "$target_dot" --arg zone "$target_zone" \
+            '{Comment:"Cut Foundation apex to canonical www redirect endpoint",Changes:[{Action:"UPSERT",ResourceRecordSet:{Name:$name,Type:"A",AliasTarget:{HostedZoneId:$zone,DNSName:$target,EvaluateTargetHealth:false}}}]}' \
+            > "$RUNNER_TEMP/apex-cutover.json"
+          change_id="$(aws route53 change-resource-record-sets \
+            --hosted-zone-id "$FOUNDATION_HOSTED_ZONE_ID" \
+            --change-batch "file://$RUNNER_TEMP/apex-cutover.json" \
+            --query 'ChangeInfo.Id' --output text)"
+          dns_changed=1
+          aws route53 wait resource-record-sets-changed --id "$change_id"
+
+          public_ok=0
+          for _ in $(seq 1 60); do
+            live_headers="$RUNNER_TEMP/live-headers.txt"
+            live_status="$(curl --silent --show-error --dump-header "$live_headers" --output /dev/null --max-time 20 --write-out '%{http_code}' \
+              "https://${APEX_HOST}/publication/rrg-v1-2025?source=apex-cutover" || true)"
+            live_location="$(awk 'BEGIN{IGNORECASE=1} /^location:/ {sub(/\r$/, ""); sub(/^location:[[:space:]]*/, ""); print; exit}' "$live_headers" 2>/dev/null || true)"
+            if [[ "$live_status" = "308" && "$live_location" = "https://${CANONICAL_HOST}/publication/rrg-v1-2025?source=apex-cutover" ]]; then
+              public_ok=1; break
+            fi
+            sleep 5
+          done
+          test "$public_ok" = "1"
+
           canonical_status="$(curl --silent --show-error --output "$RUNNER_TEMP/canonical.html" --max-time 30 --write-out '%{http_code}' "https://${CANONICAL_HOST}/")"
           test "$canonical_status" = "200"
           grep -q 'Access. Assurance. Intelligence.' "$RUNNER_TEMP/canonical.html"
           live_verified=1
-          echo '- Live verification: apex returns 308 to canonical www with path/query preserved; canonical identity check passed.' >> "$report"
+          echo "- Live verification: apex returns 308 to canonical www with path/query preserved; canonical identity check passed."
+          echo "- Live verification: apex returns 308 to canonical www with path/query preserved; canonical identity check passed." >> "$report"
           echo 'apex_verified=true' >> "$GITHUB_OUTPUT"
 
       - name: Record unavailable AWS trust
