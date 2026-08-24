@@ -1,0 +1,49 @@
+name: Inspect Foundation CloudFormation execution role
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/inspect-foundation-stack-role.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+  id-token: write
+
+jobs:
+  inspect:
+    if: github.repository == 'drolu-cmyk/sozorock-foundation' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: arn:aws:iam::791860731989:role/GitHubActionsSozorockFoundationSiteDeployRole
+          role-session-name: FoundationStackRoleInspect-${{ github.run_id }}
+          aws-region: us-east-1
+          retry-max-attempts: 2
+
+      - name: Inspect only the existing parent stack execution role
+        id: inspect
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(aws sts get-caller-identity --query Account --output text)" = '791860731989'
+          stack='sozorock-foundation-parent-regional'
+          role_arn="$(aws cloudformation describe-stacks --stack-name "$stack" --query 'Stacks[0].RoleARN' --output text)"
+          status="$(aws cloudformation describe-stacks --stack-name "$stack" --query 'Stacks[0].StackStatus' --output text)"
+          [[ "$role_arn" != 'None' ]] || role_arn='none'
+          echo "role_arn=$role_arn" >> "$GITHUB_OUTPUT"
+          echo "status=$status" >> "$GITHUB_OUTPUT"
+
+      - name: Publish read-only result
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          body="CloudFormation execution-role inspection (read only): stack status \`${{ steps.inspect.outputs.status }}\`; RoleARN: \`${{ steps.inspect.outputs.role_arn }}\`. No AWS resource was changed."
+          gh issue comment 15 --repo "$GITHUB_REPOSITORY" --body "$body"
+          printf '%s\n' "$body" >> "$GITHUB_STEP_SUMMARY"
