@@ -1,0 +1,41 @@
+name: Foundation site and agents
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [agentic-foundation-phase-1]
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install parent site dependencies
+        run: npm ci
+
+      - name: Build parent site
+        run: npm run build
+
+      - name: Test Sites worker
+        run: npm run test:sites
+
+      - name: Install agent runtime dependencies
+        working-directory: services/foundation-agents
+        run: npm install --ignore-scripts --no-audit --no-fund
+
+      - name: Validate agent graph structure
+        working-directory: services/foundation-agents
+        run: npm run smoke

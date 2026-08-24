@@ -1,6 +1,12 @@
 import { useEffect, useState } from "react";
 
+const EXTERNAL_PLATFORM_ROUTES = new Map([
+  ["/platforms/health", "https://health.sozorockfoundation.org/"],
+  ["/platforms/ai-lab", "https://ai-lab.sozorockfoundation.org/"],
+]);
+
 const isExternal = (href = "") => /^(https?:|mailto:)/.test(href);
+const resolvedHref = (href = "") => EXTERNAL_PLATFORM_ROUTES.get(href) || href;
 
 export function useCurrentPath() {
   const [location, setLocation] = useState(() => ({
@@ -18,15 +24,17 @@ export function useCurrentPath() {
 }
 
 export function Link({ href, children, className = "", onClick, ...props }) {
-  if (isExternal(href)) {
-    return <a href={href} className={className} onClick={onClick} {...props}>{children}</a>;
+  const targetHref = resolvedHref(href);
+
+  if (isExternal(targetHref)) {
+    return <a href={targetHref} className={className} onClick={onClick} {...props}>{children}</a>;
   }
 
   const handleClick = (event) => {
     onClick?.(event);
     if (event.defaultPrevented || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
     event.preventDefault();
-    const target = new URL(href, window.location.origin);
+    const target = new URL(targetHref, window.location.origin);
     const next = `${target.pathname}${target.hash}`;
     const current = `${window.location.pathname}${window.location.hash}`;
     if (next !== current) window.history.pushState({}, "", next);
@@ -37,5 +45,5 @@ export function Link({ href, children, className = "", onClick, ...props }) {
     });
   };
 
-  return <a href={href} className={className} onClick={handleClick} {...props}>{children}</a>;
+  return <a href={targetHref} className={className} onClick={handleClick} {...props}>{children}</a>;
 }
