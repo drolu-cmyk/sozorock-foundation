@@ -39,3 +39,6 @@ jobs:
       - name: Validate agent graph structure
         working-directory: services/foundation-agents
         run: npm run smoke
+
+      - name: Validate agent deployment shell
+        run: bash -n services/foundation-agents/scripts/deploy-control-plane.sh
