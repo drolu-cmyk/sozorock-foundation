@@ -21,7 +21,7 @@ env:
   CANONICAL_HOST: www.sozorockfoundation.org
   REDIRECT_FUNCTION_NAME: SozoRockFoundationParentOrigin
   REDIRECT_API_NAME: SozoRockFoundationParentSite
-  CERTIFICATE_ARN: arn:aws:acm:us-east-1:791860731989:certificate/d2b11522-63cb-4c7f-b5a8-c0c25a39a2f7
+  WWW_CERTIFICATE_ARN: arn:aws:acm:us-east-1:791860731989:certificate/d2b11522-63cb-4c7f-b5a8-c0c25a39a2f7
 
 jobs:
   diagnose:
@@ -91,7 +91,7 @@ jobs:
           aws-region: ${{ env.AWS_REGION }}
           retry-max-attempts: 3
 
-      - name: Build and verify regional apex redirect before DNS cutover
+      - name: Provision certificate and verify regional apex redirect before DNS cutover
         id: cutover
         if: steps.aws_auth.outcome == 'success'
         continue-on-error: true
@@ -142,13 +142,71 @@ jobs:
           printf '%s\n' "$apex_record" > "$original_record"
           echo '- Preflight: the apex still points to the retired CloudFront endpoint expected by this cutover.' >> "$report"
 
-          if cert="$(aws acm describe-certificate --certificate-arn "$CERTIFICATE_ARN" --query 'Certificate.{domain:DomainName,status:Status,sans:SubjectAlternativeNames}' --output json 2>"$RUNNER_TEMP/cert.err")"; then
-            echo "- Certificate: \`${cert}\`" >> "$report"
-            jq -e --arg apex "$APEX_HOST" '(.status == "ISSUED") and ((.domain == $apex) or ([.sans[]?] | index($apex) != null))' <<<"$cert" >/dev/null
+          certificate_arn=""
+          if existing_arn="$(aws acm list-certificates \
+            --certificate-statuses ISSUED PENDING_VALIDATION \
+            --query "CertificateSummaryList[?DomainName=='${APEX_HOST}'].CertificateArn | [0]" \
+            --output text 2>/dev/null)" && [[ -n "$existing_arn" && "$existing_arn" != "None" ]]; then
+            certificate_arn="$existing_arn"
+            echo "- Apex certificate: reusing \`${certificate_arn}\`." >> "$report"
           else
-            echo "- Certificate lookup error: \`$(tr '\n' ' ' < "$RUNNER_TEMP/cert.err" | sed 's/`/'"'"'/g')\`" >> "$report"
-            exit 1
+            if ! certificate_arn="$(aws acm request-certificate \
+              --domain-name "$APEX_HOST" \
+              --validation-method DNS \
+              --idempotency-token SozoRockApexRedirect \
+              --options CertificateTransparencyLoggingPreference=ENABLED \
+              --query CertificateArn \
+              --output text 2>"$RUNNER_TEMP/cert-request.err")"; then
+              echo "- Apex certificate request error: \`$(tr '\n' ' ' < "$RUNNER_TEMP/cert-request.err" | sed 's/`/'"'"'/g')\`" >> "$report"
+              exit 1
+            fi
+            echo "- Apex certificate: requested \`${certificate_arn}\`." >> "$report"
           fi
+          test -n "$certificate_arn"
+          test "$certificate_arn" != "None"
+
+          cert_validated=0
+          for _ in $(seq 1 180); do
+            cert_json="$(aws acm describe-certificate --certificate-arn "$certificate_arn" --output json)"
+            cert_status="$(jq -r '.Certificate.Status // ""' <<<"$cert_json")"
+            if [[ "$cert_status" = "ISSUED" ]]; then
+              cert_validated=1
+              break
+            fi
+            if [[ "$cert_status" != "PENDING_VALIDATION" ]]; then
+              echo "- Apex certificate entered unexpected state: \`${cert_status}\`." >> "$report"
+              exit 1
+            fi
+
+            validation_name="$(jq -r '.Certificate.DomainValidationOptions[0].ResourceRecord.Name // ""' <<<"$cert_json")"
+            validation_type="$(jq -r '.Certificate.DomainValidationOptions[0].ResourceRecord.Type // ""' <<<"$cert_json")"
+            validation_value="$(jq -r '.Certificate.DomainValidationOptions[0].ResourceRecord.Value // ""' <<<"$cert_json")"
+            if [[ -n "$validation_name" && -n "$validation_type" && -n "$validation_value" ]]; then
+              cat > "$RUNNER_TEMP/cert-validation.json" <<JSON
+          {
+            "Comment": "Validate ACM certificate for SozoRock Foundation apex redirect",
+            "Changes": [{
+              "Action": "UPSERT",
+              "ResourceRecordSet": {
+                "Name": "${validation_name}",
+                "Type": "${validation_type}",
+                "TTL": 300,
+                "ResourceRecords": [{"Value": "${validation_value}"}]
+              }
+            }]
+          }
+          JSON
+              validation_change="$(aws route53 change-resource-record-sets \
+                --hosted-zone-id "$FOUNDATION_HOSTED_ZONE_ID" \
+                --change-batch "file://$RUNNER_TEMP/cert-validation.json" \
+                --query 'ChangeInfo.Id' \
+                --output text)"
+              aws route53 wait resource-record-sets-changed --id "$validation_change"
+            fi
+            sleep 5
+          done
+          test "$cert_validated" = "1"
+          echo "- Apex certificate: \`${certificate_arn}\` is ISSUED and DNS-validated." >> "$report"
 
           cat > "$RUNNER_TEMP/index.py" <<'PY'
           def handler(event, context):
@@ -203,15 +261,15 @@ jobs:
 
           if domain_json="$(aws apigatewayv2 get-domain-name --domain-name "$APEX_HOST" --output json 2>/dev/null)"; then
             current_cert="$(jq -r '.DomainNameConfigurations[0].CertificateArn // ""' <<<"$domain_json")"
-            if [[ "$current_cert" != "$CERTIFICATE_ARN" ]]; then
+            if [[ "$current_cert" != "$certificate_arn" ]]; then
               aws apigatewayv2 update-domain-name \
                 --domain-name "$APEX_HOST" \
-                --domain-name-configurations "CertificateArn=$CERTIFICATE_ARN,EndpointType=REGIONAL,SecurityPolicy=TLS_1_2" >/dev/null
+                --domain-name-configurations "CertificateArn=$certificate_arn,EndpointType=REGIONAL,SecurityPolicy=TLS_1_2" >/dev/null
             fi
           else
             aws apigatewayv2 create-domain-name \
               --domain-name "$APEX_HOST" \
-              --domain-name-configurations "CertificateArn=$CERTIFICATE_ARN,EndpointType=REGIONAL,SecurityPolicy=TLS_1_2" >/dev/null
+              --domain-name-configurations "CertificateArn=$certificate_arn,EndpointType=REGIONAL,SecurityPolicy=TLS_1_2" >/dev/null
           fi
 
           domain_ready=0
