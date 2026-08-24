@@ -3,6 +3,7 @@ import { containsForbiddenMaterial, isPlainObject, maxRequestBytes } from "./bou
 import { executeGraph, graphs } from "./graph.mjs";
 import { modelAuthConfigured, modelAuthMode } from "./model-auth.mjs";
 
+const canonicalOrigin = "https://www.sozorockfoundation.org";
 const securityHeaders = {
   "cache-control": "no-store",
   "content-security-policy": "default-src 'none'; frame-ancestors 'none'",
@@ -12,11 +13,27 @@ const securityHeaders = {
   "x-frame-options": "DENY",
 };
 
-function response(statusCode, body) {
+function response(statusCode, body, headers = securityHeaders) {
   return {
     statusCode,
-    headers: securityHeaders,
+    headers,
     body: JSON.stringify(body),
+    isBase64Encoded: false,
+  };
+}
+
+function redirect(event) {
+  const path = requestPath(event);
+  const query = typeof event?.rawQueryString === "string" && event.rawQueryString ? `?${event.rawQueryString}` : "";
+  return {
+    statusCode: 308,
+    headers: {
+      "cache-control": "public, max-age=300",
+      location: `${canonicalOrigin}${path}${query}`,
+      "referrer-policy": "no-referrer",
+      "x-content-type-options": "nosniff",
+    },
+    body: "",
     isBase64Encoded: false,
   };
 }
@@ -54,7 +71,9 @@ export async function handler(event) {
   const method = requestMethod(event);
   const path = requestPath(event);
 
-  if (method === "GET" && path === "/health") {
+  if (!path.startsWith("/internal/")) return redirect(event);
+
+  if (method === "GET" && path === "/internal/health") {
     return response(200, {
       ok: true,
       service: "foundation-agents",
@@ -64,11 +83,11 @@ export async function handler(event) {
     });
   }
 
-  if (method === "GET" && path === "/v1/graphs") {
+  if (method === "GET" && path === "/internal/v1/graphs") {
     return response(200, { graphs: graphIndex() });
   }
 
-  if (method !== "POST" || path !== "/v1/run") return response(404, { error: "not_found" });
+  if (method !== "POST" || path !== "/internal/v1/run") return response(404, { error: "not_found" });
   if (!modelAuthConfigured()) return response(503, { error: "model_service_not_configured" });
 
   try {
