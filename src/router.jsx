@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 
 const EXTERNAL_PLATFORM_ROUTES = new Map([
+  ["/platforms/institute", "https://institute.sozorockfoundation.org/"],
   ["/platforms/health", "https://health.sozorockfoundation.org/"],
   ["/platforms/ai-lab", "https://ai-lab.sozorockfoundation.org/"],
   ["/platforms/cbcap", "https://cbcap.sozorockfoundation.org/"],
