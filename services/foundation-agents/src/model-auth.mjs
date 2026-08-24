@@ -1,8 +1,10 @@
+import { getTokenProvider } from "@aws/bedrock-token-generator";
 import { GetWebIdentityTokenCommand, STSClient } from "@aws-sdk/client-sts";
 import { setDefaultOpenAIClient, setTracingDisabled } from "@openai/agents";
 import OpenAI from "openai";
 
 let configuredMode = null;
+let bedrockTokenProvider = null;
 
 function wifConfig() {
   const identityProviderId = process.env.OPENAI_IDENTITY_PROVIDER_ID?.trim();
@@ -13,7 +15,18 @@ function wifConfig() {
   return { identityProviderId, serviceAccountId, audience, awsRegion };
 }
 
+function bedrockConfig() {
+  if (process.env.FOUNDATION_MODEL_PROVIDER?.trim() !== "bedrock") return null;
+  const awsRegion = process.env.AWS_REGION?.trim();
+  if (!awsRegion) return null;
+  return {
+    awsRegion,
+    baseURL: `https://bedrock-mantle.${awsRegion}.api.aws/openai/v1`,
+  };
+}
+
 export function modelAuthMode() {
+  if (bedrockConfig()) return "bedrock_short_term";
   if (process.env.OPENAI_API_KEY?.trim()) return "api_key";
   return wifConfig() ? "aws_wif" : null;
 }
@@ -25,14 +38,36 @@ export function modelAuthConfigured() {
 export async function ensureModelAuthConfigured() {
   const mode = modelAuthMode();
   if (!mode) {
-    throw new Error("OpenAI model authentication is not configured.");
+    throw new Error("OpenAI-compatible model authentication is not configured.");
   }
-  if (configuredMode === mode) return mode;
 
   if (mode === "api_key") {
     configuredMode = mode;
     return mode;
   }
+
+  if (mode === "bedrock_short_term") {
+    const config = bedrockConfig();
+    if (!bedrockTokenProvider) {
+      bedrockTokenProvider = getTokenProvider({
+        region: config.awsRegion,
+        expiresInSeconds: 900,
+      });
+    }
+
+    // Generate a short-lived Bedrock API key from the Lambda's IAM role for
+    // each graph run. The generator is inexpensive and the key is never stored
+    // or logged. This avoids long-lived model credentials in Lambda or GitHub.
+    const token = await bedrockTokenProvider();
+    if (!token) throw new Error("Amazon Bedrock did not return a short-term API key.");
+    const client = new OpenAI({ apiKey: token, baseURL: config.baseURL });
+    setDefaultOpenAIClient(client);
+    setTracingDisabled(true);
+    configuredMode = mode;
+    return mode;
+  }
+
+  if (configuredMode === mode) return mode;
 
   const config = wifConfig();
   const sts = new STSClient({ region: config.awsRegion });
