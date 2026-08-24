@@ -3,6 +3,7 @@ import { GetWebIdentityTokenCommand, STSClient } from "@aws-sdk/client-sts";
 import { setDefaultOpenAIClient, setTracingDisabled } from "@openai/agents";
 import OpenAI from "openai";
 
+const foundationEdgeFunction = "SozoRockFoundationParentOrigin";
 let configuredMode = null;
 let bedrockTokenProvider = null;
 
@@ -15,8 +16,15 @@ function wifConfig() {
   return { identityProviderId, serviceAccountId, audience, awsRegion };
 }
 
+function bedrockRequested() {
+  return (
+    process.env.FOUNDATION_MODEL_PROVIDER?.trim() === "bedrock" ||
+    process.env.AWS_LAMBDA_FUNCTION_NAME?.trim() === foundationEdgeFunction
+  );
+}
+
 function bedrockConfig() {
-  if (process.env.FOUNDATION_MODEL_PROVIDER?.trim() !== "bedrock") return null;
+  if (!bedrockRequested()) return null;
   const awsRegion = process.env.AWS_REGION?.trim();
   if (!awsRegion) return null;
   return {
@@ -26,6 +34,9 @@ function bedrockConfig() {
 }
 
 export function modelAuthMode() {
+  // An explicit Foundation Bedrock deployment or the exact owned production
+  // Lambda uses short-term Bedrock credentials. This prevents an unrelated
+  // Lambda from silently acquiring model access.
   if (bedrockConfig()) return "bedrock_short_term";
   if (process.env.OPENAI_API_KEY?.trim()) return "api_key";
   return wifConfig() ? "aws_wif" : null;
@@ -56,8 +67,7 @@ export async function ensureModelAuthConfigured() {
     }
 
     // Generate a short-lived Bedrock API key from the Lambda's IAM role for
-    // each graph run. The generator is inexpensive and the key is never stored
-    // or logged. This avoids long-lived model credentials in Lambda or GitHub.
+    // each graph run. The key is never persisted or logged.
     const token = await bedrockTokenProvider();
     if (!token) throw new Error("Amazon Bedrock did not return a short-term API key.");
     const client = new OpenAI({ apiKey: token, baseURL: config.baseURL });
