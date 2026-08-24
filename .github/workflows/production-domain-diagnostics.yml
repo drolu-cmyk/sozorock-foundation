@@ -1,4 +1,4 @@
-name: Production domain diagnostics and repair
+name: Production domain diagnostics
 
 on:
   push:
@@ -14,7 +14,7 @@ permissions:
 
 env:
   AWS_REGION: us-east-1
-  AWS_ROLE_TO_ASSUME: arn:aws:iam::791860731989:role/GitHubActionsSozoRockFoundationSiteDeployRole
+  AWS_ROLE_TO_ASSUME: arn:aws:iam::791860731989:role/GitHubActionsSozorockFoundationSiteDeployRole
   FOUNDATION_HOSTED_ZONE_ID: Z07905293AANZWGYZ84F3
   LEGACY_HEALTH_AMPLIFY_APP_ID: d3uqnxmsmefokf
   APEX_HOST: sozorockfoundation.org
@@ -22,7 +22,7 @@ env:
   REDIRECT_FUNCTION_NAME: sozorockfoundation-apex-redirect
 
 jobs:
-  diagnose-and-repair:
+  diagnose:
     if: github.repository == 'drolu-cmyk/sozorock-foundation' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     timeout-minutes: 30
@@ -32,28 +32,29 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Capture public DNS and HTTPS baseline
+      - name: Capture public domain baseline
         shell: bash
         run: |
           set -euo pipefail
           report="$RUNNER_TEMP/domain-report.md"
-          echo '## Production domain diagnostic and repair' > "$report"
-          echo >> "$report"
-          echo "Run: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}" >> "$report"
-          echo "Commit: \`${GITHUB_SHA}\`" >> "$report"
-          echo >> "$report"
-          echo '### Public baseline' >> "$report"
+          {
+            echo '## Production domain diagnostic and repair'
+            echo
+            echo "Run: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+            echo "Commit: \`${GITHUB_SHA}\`"
+            echo
+            echo '### Public baseline'
+          } > "$report"
 
-          hosts=(
-            sozorockfoundation.org
-            www.sozorockfoundation.org
-            health.sozorockfoundation.org
-            cbcap.sozorockfoundation.org
-            ai-lab.sozorockfoundation.org
-            sozorockhealth.com
-            www.sozorockhealth.com
-          )
-          for host in "${hosts[@]}"; do
+          for host in \
+            sozorockfoundation.org \
+            www.sozorockfoundation.org \
+            health.sozorockfoundation.org \
+            cbcap.sozorockfoundation.org \
+            ai-lab.sozorockfoundation.org \
+            institute.sozorockfoundation.org \
+            sozorockhealth.com \
+            www.sozorockhealth.com; do
             addresses="$(python3 - "$host" <<'PY'
           import socket, sys
           host = sys.argv[1]
@@ -71,13 +72,15 @@ jobs:
             echo "- \`${host}\`: addresses=\`${addresses}\`; status=\`${status:-probe-failed}\`; location=\`${location:-none}\`; server=\`${server:-unspecified}\`" >> "$report"
           done
 
-          echo >> "$report"
-          echo '### Legacy Health public DNS' >> "$report"
-          echo "- Nameservers: \`$(dig +short NS sozorockhealth.com | sort | paste -sd, - || true)\`" >> "$report"
-          echo "- www CNAME: \`$(dig +short CNAME www.sozorockhealth.com | paste -sd, - || true)\`" >> "$report"
+          {
+            echo
+            echo '### Legacy Health public DNS'
+            echo "- Nameservers: \`$(dig +short NS sozorockhealth.com | sort | paste -sd, - || true)\`"
+            echo "- www CNAME: \`$(dig +short CNAME www.sozorockhealth.com | paste -sd, - || true)\`"
+          } >> "$report"
           echo "REPORT_PATH=$report" >> "$GITHUB_ENV"
 
-      - name: Configure trusted Foundation AWS role
+      - name: Configure historical Foundation AWS role for read-only inventory
         id: aws_auth
         continue-on-error: true
         uses: aws-actions/configure-aws-credentials@v6
@@ -87,15 +90,42 @@ jobs:
           aws-region: ${{ env.AWS_REGION }}
           retry-max-attempts: 3
 
-      - name: Inspect AWS domain state with explicit legacy app lookup
+      - name: Inspect AWS state and repair Foundation apex
+        id: repair
         if: steps.aws_auth.outcome == 'success'
+        continue-on-error: true
         shell: bash
         run: |
           set -euo pipefail
           report="$REPORT_PATH"
-          echo >> "$report"
-          echo '### AWS domain inventory' >> "$report"
-          echo '- Trusted Foundation AWS role: assumed successfully.' >> "$report"
+          original="$RUNNER_TEMP/distribution-original-config.json"
+          distribution_id=""
+          distribution_updated=0
+          live_verified=0
+
+          rollback_if_needed() {
+            if [[ "$distribution_updated" = "1" && "$live_verified" != "1" && -n "$distribution_id" && -s "$original" ]]; then
+              current_etag="$(aws cloudfront get-distribution-config --id "$distribution_id" --query ETag --output text 2>/dev/null || true)"
+              if [[ -n "$current_etag" && "$current_etag" != "None" ]]; then
+                if aws cloudfront update-distribution \
+                  --id "$distribution_id" \
+                  --if-match "$current_etag" \
+                  --distribution-config "file://$original" >/dev/null 2>&1; then
+                  aws cloudfront wait distribution-deployed --id "$distribution_id" || true
+                  echo '- Rollback: original CloudFront distribution configuration restored after failed live verification.' >> "$report"
+                else
+                  echo '- Rollback: attempted but AWS rejected restoration. Manual AWS review is required before treating apex as stable.' >> "$report"
+                fi
+              fi
+            fi
+          }
+          trap rollback_if_needed EXIT
+
+          {
+            echo
+            echo '### AWS domain inventory'
+            echo '- Trusted Foundation AWS role: assumed successfully.'
+          } >> "$report"
 
           records="$(aws route53 list-resource-record-sets \
             --hosted-zone-id "$FOUNDATION_HOSTED_ZONE_ID" \
@@ -120,22 +150,11 @@ jobs:
             echo "- Legacy Health Amplify app lookup error: \`$(tr '\n' ' ' < "$RUNNER_TEMP/legacy-app.err" | sed 's/`/'"'"'/g')\`" >> "$report"
           fi
 
-      - name: Record unavailable AWS trust
-        if: steps.aws_auth.outcome != 'success'
-        run: |
           {
             echo
-            echo '### AWS domain inventory'
-            echo '- Trusted Foundation AWS role could not be assumed. No AWS resource was changed.'
-          } >> "$REPORT_PATH"
+            echo '### Foundation apex repair'
+          } >> "$report"
 
-      - name: Preflight exact Foundation apex distribution
-        id: preflight
-        if: steps.aws_auth.outcome == 'success'
-        continue-on-error: true
-        shell: bash
-        run: |
-          set -euo pipefail
           alias_target="$(aws route53 list-resource-record-sets \
             --hosted-zone-id "$FOUNDATION_HOSTED_ZONE_ID" \
             --query "ResourceRecordSets[?Name=='${APEX_HOST}.' && Type=='A'].AliasTarget.DNSName | [0]" \
@@ -144,49 +163,28 @@ jobs:
           test "$alias_target" != "None"
           cloudfront_domain="${alias_target%.}"
 
-          distribution_id="$(aws cloudfront list-distributions \
+          if ! distribution_id="$(aws cloudfront list-distributions \
             --query "DistributionList.Items[?DomainName=='${cloudfront_domain}'].Id | [0]" \
-            --output text)"
+            --output text 2>"$RUNNER_TEMP/cloudfront-list.err")"; then
+            echo "- Preflight error: \`$(tr '\n' ' ' < "$RUNNER_TEMP/cloudfront-list.err" | sed 's/`/'"'"'/g')\`" >> "$report"
+            exit 1
+          fi
           test -n "$distribution_id"
           test "$distribution_id" != "None"
 
-          config_json="$RUNNER_TEMP/distribution-before.json"
-          aws cloudfront get-distribution-config --id "$distribution_id" --output json > "$config_json"
-          alias_count="$(jq --arg host "$APEX_HOST" '[.DistributionConfig.Aliases.Items[]? | select(. == $host)] | length' "$config_json")"
+          before="$RUNNER_TEMP/distribution-before.json"
+          aws cloudfront get-distribution-config --id "$distribution_id" --output json > "$before"
+          jq '.DistributionConfig' "$before" > "$original"
+          alias_count="$(jq --arg host "$APEX_HOST" '[.DistributionConfig.Aliases.Items[]? | select(. == $host)] | length' "$before")"
           test "$alias_count" = "1"
-
-          existing_functions="$(jq '.DistributionConfig.DefaultCacheBehavior.FunctionAssociations.Quantity // 0' "$config_json")"
-          existing_viewer_lambdas="$(jq '[.DistributionConfig.DefaultCacheBehavior.LambdaFunctionAssociations.Items[]? | select(.EventType == "viewer-request")] | length' "$config_json")"
+          existing_functions="$(jq '.DistributionConfig.DefaultCacheBehavior.FunctionAssociations.Quantity // 0' "$before")"
+          existing_viewer_lambdas="$(jq '[.DistributionConfig.DefaultCacheBehavior.LambdaFunctionAssociations.Items[]? | select(.EventType == "viewer-request")] | length' "$before")"
           if [[ "$existing_functions" != "0" || "$existing_viewer_lambdas" != "0" ]]; then
-            echo "Refusing repair: default behavior already has viewer-request code that requires manual review."
+            echo '- Preflight stopped: existing viewer-request code is attached; no distribution change made.' >> "$report"
             exit 1
           fi
+          echo "- Preflight: exact apex alias maps to CloudFront distribution \`${distribution_id}\` (\`${cloudfront_domain}\`); no existing viewer-request code." >> "$report"
 
-          echo "distribution_id=$distribution_id" >> "$GITHUB_OUTPUT"
-          echo "cloudfront_domain=$cloudfront_domain" >> "$GITHUB_OUTPUT"
-          echo "etag=$(jq -r '.ETag' "$config_json")" >> "$GITHUB_OUTPUT"
-          {
-            echo
-            echo '### Foundation apex repair'
-            echo "- Preflight: exact Route 53 alias and CloudFront distribution ownership proven for \`${cloudfront_domain}\`."
-          } >> "$REPORT_PATH"
-
-      - name: Record apex preflight failure
-        if: steps.aws_auth.outcome == 'success' && steps.preflight.outcome != 'success'
-        run: |
-          {
-            echo
-            echo '### Foundation apex repair'
-            echo '- Preflight failed before mutation. No Foundation apex infrastructure was changed.'
-          } >> "$REPORT_PATH"
-
-      - name: Create or update apex redirect function
-        id: redirect_function
-        if: steps.preflight.outcome == 'success'
-        continue-on-error: true
-        shell: bash
-        run: |
-          set -euo pipefail
           cat > "$RUNNER_TEMP/apex-redirect.js" <<'JS'
           function encodeQuery(querystring) {
             var parts = [];
@@ -203,7 +201,6 @@ jobs:
             }
             return parts.length ? '?' + parts.join('&') : '';
           }
-
           function handler(event) {
             var request = event.request;
             var host = request.headers.host && request.headers.host.value;
@@ -232,77 +229,45 @@ jobs:
               --function-config Comment='Permanent apex-to-www redirect for The SozoRock Foundation',Runtime=cloudfront-js-2.0 \
               --function-code "fileb://$RUNNER_TEMP/apex-redirect.js" >/dev/null
           fi
-
           development_etag="$(aws cloudfront describe-function --name "$REDIRECT_FUNCTION_NAME" --stage DEVELOPMENT --query ETag --output text)"
           publish_json="$(aws cloudfront publish-function --name "$REDIRECT_FUNCTION_NAME" --if-match "$development_etag" --output json)"
           function_arn="$(jq -r '.FunctionSummary.FunctionMetadata.FunctionARN' <<<"$publish_json")"
           test -n "$function_arn"
           test "$function_arn" != "null"
-          echo "function_arn=$function_arn" >> "$GITHUB_OUTPUT"
 
-      - name: Record redirect-function failure
-        if: steps.preflight.outcome == 'success' && steps.redirect_function.outcome != 'success'
-        run: echo '- Redirect function could not be prepared. Distribution configuration was not changed.' >> "$REPORT_PATH"
-
-      - name: Associate redirect function with apex distribution
-        id: distribution_update
-        if: steps.redirect_function.outcome == 'success'
-        continue-on-error: true
-        shell: bash
-        run: |
-          set -euo pipefail
-          before="$RUNNER_TEMP/distribution-before.json"
-          original="$RUNNER_TEMP/distribution-original-config.json"
           updated="$RUNNER_TEMP/distribution-updated-config.json"
-          jq '.DistributionConfig' "$before" > "$original"
-          jq --arg arn "${{ steps.redirect_function.outputs.function_arn }}" \
-            '.DistributionConfig
-             | .DefaultCacheBehavior.FunctionAssociations = {
-                 "Quantity": 1,
-                 "Items": [{"FunctionARN": $arn, "EventType": "viewer-request"}]
-               }' "$before" > "$updated"
-
+          jq --arg arn "$function_arn" \
+            '.DistributionConfig | .DefaultCacheBehavior.FunctionAssociations = {"Quantity":1,"Items":[{"FunctionARN":$arn,"EventType":"viewer-request"}]}' \
+            "$before" > "$updated"
           aws cloudfront update-distribution \
-            --id "${{ steps.preflight.outputs.distribution_id }}" \
-            --if-match "${{ steps.preflight.outputs.etag }}" \
+            --id "$distribution_id" \
+            --if-match "$(jq -r '.ETag' "$before")" \
             --distribution-config "file://$updated" >/dev/null
-          aws cloudfront wait distribution-deployed --id "${{ steps.preflight.outputs.distribution_id }}"
+          distribution_updated=1
+          aws cloudfront wait distribution-deployed --id "$distribution_id"
 
-      - name: Verify Foundation apex redirect live
-        id: apex_verify
-        if: steps.distribution_update.outcome == 'success'
-        continue-on-error: true
-        shell: bash
-        run: |
-          set -euo pipefail
-          apex_headers="$RUNNER_TEMP/apex-headers.txt"
-          apex_status="$(curl --silent --show-error --dump-header "$apex_headers" --output /dev/null --max-time 30 --write-out '%{http_code}' "https://${APEX_HOST}/publication/rrg-v1-2025?source=apex-cutover")"
-          test "$apex_status" = "308"
-          apex_location="$(awk 'BEGIN{IGNORECASE=1} /^location:/ {sub(/\r$/, ""); sub(/^location:[[:space:]]*/, ""); print; exit}' "$apex_headers")"
-          test "$apex_location" = "https://${CANONICAL_HOST}/publication/rrg-v1-2025?source=apex-cutover"
-
+          headers="$RUNNER_TEMP/apex-verify-headers.txt"
+          status="$(curl --silent --show-error --dump-header "$headers" --output /dev/null --max-time 30 --write-out '%{http_code}' "https://${APEX_HOST}/publication/rrg-v1-2025?source=apex-cutover")"
+          test "$status" = "308"
+          location="$(awk 'BEGIN{IGNORECASE=1} /^location:/ {sub(/\r$/, ""); sub(/^location:[[:space:]]*/, ""); print; exit}' "$headers")"
+          test "$location" = "https://${CANONICAL_HOST}/publication/rrg-v1-2025?source=apex-cutover"
           canonical_status="$(curl --silent --show-error --output "$RUNNER_TEMP/canonical.html" --max-time 30 --write-out '%{http_code}' "https://${CANONICAL_HOST}/")"
           test "$canonical_status" = "200"
           grep -q 'Access. Assurance. Intelligence.' "$RUNNER_TEMP/canonical.html"
-          echo '- Live verification: apex returns 308 to canonical www with path/query preserved; canonical identity check passed.' >> "$REPORT_PATH"
+          live_verified=1
+          echo '- Live verification: apex returns 308 to canonical www with path/query preserved; canonical identity check passed.' >> "$report"
+          echo 'apex_verified=true' >> "$GITHUB_OUTPUT"
 
-      - name: Roll back failed Foundation apex verification
-        if: steps.distribution_update.outcome == 'success' && steps.apex_verify.outcome != 'success'
-        id: rollback
-        continue-on-error: true
-        shell: bash
+      - name: Record unavailable AWS trust
+        if: steps.aws_auth.outcome != 'success'
         run: |
-          set -euo pipefail
-          distribution_id="${{ steps.preflight.outputs.distribution_id }}"
-          current_etag="$(aws cloudfront get-distribution-config --id "$distribution_id" --query ETag --output text)"
-          aws cloudfront update-distribution \
-            --id "$distribution_id" \
-            --if-match "$current_etag" \
-            --distribution-config "file://$RUNNER_TEMP/distribution-original-config.json" >/dev/null
-          aws cloudfront wait distribution-deployed --id "$distribution_id"
-          echo '- Live verification failed after distribution update; original CloudFront distribution configuration was restored.' >> "$REPORT_PATH"
+          {
+            echo
+            echo '### AWS domain inventory'
+            echo '- Trusted Foundation AWS role could not be assumed. No AWS resource was changed.'
+          } >> "$REPORT_PATH"
 
-      - name: Capture post-repair public state
+      - name: Capture post-run public state
         if: always()
         shell: bash
         run: |
@@ -328,12 +293,11 @@ jobs:
           gh issue comment 15 --repo "$GITHUB_REPOSITORY" --body-file "$REPORT_PATH"
           cat "$REPORT_PATH" >> "$GITHUB_STEP_SUMMARY"
 
-      - name: Fail if apex repair did not verify
+      - name: Require verified Foundation apex repair
         if: always()
         shell: bash
         run: |
           set -euo pipefail
-          if [[ "${{ steps.apex_verify.outcome }}" != "success" ]]; then
-            echo 'Foundation apex repair is not verified.' >&2
-            exit 1
-          fi
+          test "${{ steps.aws_auth.outcome }}" = "success"
+          test "${{ steps.repair.outcome }}" = "success"
+          test "${{ steps.repair.outputs.apex_verified }}" = "true"
