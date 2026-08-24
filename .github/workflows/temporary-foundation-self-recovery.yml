@@ -1,0 +1,242 @@
+name: Temporary Foundation self recovery
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/temporary-foundation-self-recovery.yml
+  workflow_dispatch:
+
+permissions:
+  actions: write
+  contents: read
+  issues: write
+  id-token: write
+
+concurrency:
+  group: temporary-foundation-self-recovery
+  cancel-in-progress: false
+
+env:
+  AWS_REGION: us-east-1
+  AWS_ROLE_TO_ASSUME: arn:aws:iam::791860731989:role/GitHubActionsSozorockFoundationSiteDeployRole
+  ACCOUNT_ID: '791860731989'
+  ROLE_NAME: GitHubActionsSozorockFoundationSiteDeployRole
+  POLICY_NAME: TemporarySozoRockFoundationRecovery
+  FOUNDATION_ZONE_ID: Z07905293AANZWGYZ84F3
+  LEGACY_HEALTH_APP_ID: d3uqnxmsmefokf
+  LEGACY_HEALTH_DOMAIN: sozorockhealth.com
+  FOUNDATION_ISSUE: '15'
+  HEALTH_REPO: drolu-cmyk/agentic-ai-sozorock-health
+  HEALTH_ISSUE: '41'
+
+jobs:
+  recover:
+    if: github.repository == 'drolu-cmyk/sozorock-foundation' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Configure trusted Foundation AWS role
+        id: aws
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: ${{ env.AWS_ROLE_TO_ASSUME }}
+          role-session-name: FoundationTemporaryRecovery-${{ github.run_id }}
+          aws-region: ${{ env.AWS_REGION }}
+          retry-max-attempts: 3
+
+      - name: Attempt exact-scope temporary self-recovery policy
+        id: grant
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(aws sts get-caller-identity --query Account --output text)" = "$ACCOUNT_ID"
+
+          cat > "$RUNNER_TEMP/recovery-policy.json" <<EOF
+          {
+            "Version":"2012-10-17",
+            "Statement":[
+              {
+                "Sid":"RequestOnlyFoundationApexCertificate",
+                "Effect":"Allow",
+                "Action":"acm:RequestCertificate",
+                "Resource":"*",
+                "Condition":{
+                  "ForAllValues:StringEquals":{"acm:DomainNames":["sozorockfoundation.org"]},
+                  "StringEquals":{"acm:ValidationMethod":"DNS","aws:RequestedRegion":"${AWS_REGION}"}
+                }
+              },
+              {
+                "Sid":"ValidateAndCutOverOnlyFoundationApex",
+                "Effect":"Allow",
+                "Action":"route53:ChangeResourceRecordSets",
+                "Resource":"arn:aws:route53:::hostedzone/${FOUNDATION_ZONE_ID}",
+                "Condition":{
+                  "ForAllValues:StringLike":{"route53:ChangeResourceRecordSetsNormalizedRecordNames":["sozorockfoundation.org","_*.sozorockfoundation.org"]},
+                  "ForAllValues:StringEquals":{
+                    "route53:ChangeResourceRecordSetsRecordTypes":["A","CNAME"],
+                    "route53:ChangeResourceRecordSetsActions":["UPSERT"]
+                  }
+                }
+              },
+              {
+                "Sid":"OperateOnlyLegacyHealthAmplifyApp",
+                "Effect":"Allow",
+                "Action":[
+                  "amplify:GetApp",
+                  "amplify:ListBranches",
+                  "amplify:GetBranch",
+                  "amplify:GetDomainAssociation",
+                  "amplify:UpdateDomainAssociation",
+                  "amplify:StartJob",
+                  "amplify:GetJob"
+                ],
+                "Resource":"arn:aws:amplify:${AWS_REGION}:${ACCOUNT_ID}:apps/${LEGACY_HEALTH_APP_ID}*"
+              },
+              {
+                "Sid":"RemoveThisTemporaryRecoveryPolicy",
+                "Effect":"Allow",
+                "Action":"iam:DeleteRolePolicy",
+                "Resource":"arn:aws:iam::${ACCOUNT_ID}:role/${ROLE_NAME}"
+              }
+            ]
+          }
+          EOF
+
+          if ! aws iam put-role-policy \
+            --role-name "$ROLE_NAME" \
+            --policy-name "$POLICY_NAME" \
+            --policy-document "file://$RUNNER_TEMP/recovery-policy.json" \
+            2>"$RUNNER_TEMP/grant.err"; then
+            echo "grant_error=$(tr '\n' ' ' < "$RUNNER_TEMP/grant.err" | sed 's/%/%25/g; s/\r/%0D/g; s/\n/%0A/g')" >> "$GITHUB_OUTPUT"
+            exit 1
+          fi
+
+          sleep 10
+          echo 'granted=true' >> "$GITHUB_OUTPUT"
+
+      - name: Rebuild and verify retired Health domains
+        id: health
+        if: steps.grant.outcome == 'success'
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -euo pipefail
+          app="$(aws amplify get-app --app-id "$LEGACY_HEALTH_APP_ID" --output json)"
+          repository="$(jq -r '.app.repository // ""' <<<"$app")"
+          if [[ "$repository" != *"agentic-ai-sozorock-health"* ]]; then
+            echo "Refusing unexpected Amplify repository: $repository" >&2
+            exit 1
+          fi
+
+          branches="$(aws amplify list-branches --app-id "$LEGACY_HEALTH_APP_ID" --output json)"
+          if jq -e '.branches[]? | select(.branchName == "main")' <<<"$branches" >/dev/null; then
+            branch='main'
+          else
+            branch="$(jq -r '.branches[]? | select(.stage == "PRODUCTION") | .branchName' <<<"$branches" | head -n1)"
+          fi
+          test -n "$branch"
+
+          domain="$(aws amplify get-domain-association --app-id "$LEGACY_HEALTH_APP_ID" --domain-name "$LEGACY_HEALTH_DOMAIN" --output json)"
+          settings="$(jq -c --arg branch "$branch" '[.domainAssociation.subDomains[].subDomainSetting | if (.prefix == "" or .prefix == "www") then .branchName = $branch else . end]' <<<"$domain")"
+          apex_branch="$(jq -r '.domainAssociation.subDomains[]? | select(.subDomainSetting.prefix == "") | .subDomainSetting.branchName' <<<"$domain" | head -n1)"
+          www_branch="$(jq -r '.domainAssociation.subDomains[]? | select(.subDomainSetting.prefix == "www") | .subDomainSetting.branchName' <<<"$domain" | head -n1)"
+          if [[ "$apex_branch" != "$branch" || "$www_branch" != "$branch" ]]; then
+            aws amplify update-domain-association \
+              --app-id "$LEGACY_HEALTH_APP_ID" \
+              --domain-name "$LEGACY_HEALTH_DOMAIN" \
+              --sub-domain-settings "$settings" >/dev/null
+          fi
+
+          job_id="$(aws amplify start-job \
+            --app-id "$LEGACY_HEALTH_APP_ID" \
+            --branch-name "$branch" \
+            --job-type RELEASE \
+            --job-reason 'Retire legacy Health domains to canonical Foundation properties' \
+            --query 'jobSummary.jobId' --output text)"
+          test -n "$job_id"
+
+          build_status=''
+          for _ in $(seq 1 120); do
+            build_status="$(aws amplify get-job \
+              --app-id "$LEGACY_HEALTH_APP_ID" \
+              --branch-name "$branch" \
+              --job-id "$job_id" \
+              --query 'job.summary.status' --output text)"
+            case "$build_status" in
+              SUCCEED) break ;;
+              FAILED|CANCELLED) echo "Amplify build ended: $build_status" >&2; exit 1 ;;
+            esac
+            sleep 10
+          done
+          test "$build_status" = 'SUCCEED'
+
+          for host in sozorockhealth.com www.sozorockhealth.com; do
+            verified=0
+            for _ in $(seq 1 60); do
+              headers="$(curl --silent --show-error --head --max-time 20 "https://${host}/" || true)"
+              status="$(awk '/^HTTP\// {code=$2} END {print code}' <<<"$headers")"
+              location="$(awk 'BEGIN{IGNORECASE=1} /^location:/ {sub(/\r$/, ""); sub(/^location:[[:space:]]*/, ""); value=$0} END {print value}' <<<"$headers")"
+              if [[ "$status" = '308' && "$location" = 'https://health.sozorockfoundation.org/' ]]; then
+                verified=1
+                break
+              fi
+              sleep 10
+            done
+            test "$verified" = '1'
+          done
+
+          cb_headers="$(curl --silent --show-error --head --max-time 20 'https://sozorockhealth.com/cb-cap')"
+          cb_status="$(awk '/^HTTP\// {code=$2} END {print code}' <<<"$cb_headers")"
+          cb_location="$(awk 'BEGIN{IGNORECASE=1} /^location:/ {sub(/\r$/, ""); sub(/^location:[[:space:]]*/, ""); value=$0} END {print value}' <<<"$cb_headers")"
+          test "$cb_status" = '308'
+          test "$cb_location" = 'https://cbcap.sozorockfoundation.org/'
+
+          echo "branch=$branch" >> "$GITHUB_OUTPUT"
+          echo "job_id=$job_id" >> "$GITHUB_OUTPUT"
+
+      - name: Trigger safe Foundation apex cutover
+        id: apex_trigger
+        if: steps.grant.outcome == 'success'
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh workflow run production-domain-diagnostics.yml --repo "$GITHUB_REPOSITORY" --ref main
+          echo 'triggered=true' >> "$GITHUB_OUTPUT"
+
+      - name: Publish temporary recovery receipt
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          grant='${{ steps.grant.outcome }}'
+          health='${{ steps.health.outcome }}'
+          trigger='${{ steps.apex_trigger.outcome }}'
+          grant_error='${{ steps.grant.outputs.grant_error }}'
+          if [[ "$grant" != 'success' ]]; then
+            foundation_body="Temporary self-recovery policy attempt **failed safely**. AWS did not permit the Foundation deploy role to attach the exact-scope inline recovery policy. No additional AWS capability was granted and no Health/Apex recovery action was started. Error: \`${grant_error}\`."
+          else
+            foundation_body="Temporary self-recovery policy was attached to the Foundation deploy role with exact apex/legacy-Health scope. Legacy Health recovery outcome: **${health}**; apex cutover trigger outcome: **${trigger}**. The temporary policy remains until verified recovery is complete, after which it can delete itself via its scoped cleanup permission."
+          fi
+          gh issue comment "$FOUNDATION_ISSUE" --repo "$GITHUB_REPOSITORY" --body "$foundation_body"
+
+          health_body="Foundation temporary recovery run \`${GITHUB_RUN_ID}\`: policy grant **${grant}**; Amplify recovery **${health}**; branch \`${{ steps.health.outputs.branch }}\`; job \`${{ steps.health.outputs.job_id }}\`. Live legacy-domain retirement is complete only when the Amplify step reports success."
+          gh issue comment "$HEALTH_ISSUE" --repo "$HEALTH_REPO" --body "$health_body"
+          printf '%s\n\n%s\n' "$foundation_body" "$health_body" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Require the temporary authorization and legacy Health recovery
+        if: always()
+        shell: bash
+        run: |
+          test "${{ steps.grant.outcome }}" = 'success'
+          test "${{ steps.health.outcome }}" = 'success'
+          test "${{ steps.apex_trigger.outcome }}" = 'success'
