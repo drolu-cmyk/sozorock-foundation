@@ -1,6 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { run } from "@openai/agents";
 import { agents } from "./agents.mjs";
+import { ensureModelAuthConfigured, modelAuthConfigured } from "./model-auth.mjs";
 
 export const graphs = Object.freeze({
   foundationContentRefresh: {
@@ -120,7 +121,8 @@ export async function executeGraph({
 }) {
   const graph = graphs[graphId];
   if (!graph) throw new Error(`Unknown graph: ${graphId}`);
-  if (!process.env.OPENAI_API_KEY) throw new Error("OPENAI_API_KEY is required by the Foundation agent runtime.");
+  if (!modelAuthConfigured()) throw new Error("OpenAI model authentication is required by the Foundation agent runtime.");
+  await ensureModelAuthConfigured();
 
   const revisionLimit = Math.max(0, Math.min(Number(maxRevisionCycles) || 0, 2));
   const turnLimit = Math.max(1, Math.min(Number(maxTurns) || 5, 8));
