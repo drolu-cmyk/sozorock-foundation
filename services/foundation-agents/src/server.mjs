@@ -3,7 +3,11 @@ import { authorizedHeader, containsForbiddenMaterial, isPlainObject, maxRequestB
 import { executeGraph, graphs } from "./graph.mjs";
 
 const port = Number(process.env.PORT || 8788);
+const trustProxyHeaders = process.env.TRUST_PROXY_HEADERS === "true";
 const requestBuckets = new Map();
+const bucketWindowMs = 60_000;
+const bucketPruneThreshold = 2_048;
+const bucketHardLimit = 4_096;
 
 function json(response, status, body) {
   response.writeHead(status, {
@@ -22,19 +26,36 @@ function authorized(request) {
 }
 
 function clientKey(request) {
-  const forwarded = typeof request.headers["x-forwarded-for"] === "string" ? request.headers["x-forwarded-for"].split(",")[0].trim() : "";
-  return forwarded || request.socket.remoteAddress || "unknown";
+  if (trustProxyHeaders && typeof request.headers["x-forwarded-for"] === "string") {
+    const forwarded = request.headers["x-forwarded-for"].split(",")[0].trim().slice(0, 64);
+    if (forwarded) return forwarded;
+  }
+  return String(request.socket.remoteAddress || "unknown").slice(0, 64);
+}
+
+function pruneExpiredBuckets(now) {
+  for (const [key, bucket] of requestBuckets.entries()) {
+    if (now - bucket.startedAt >= bucketWindowMs) requestBuckets.delete(key);
+  }
 }
 
 function rateLimited(request) {
-  const key = clientKey(request);
   const now = Date.now();
-  const minute = 60_000;
+  if (requestBuckets.size >= bucketPruneThreshold) pruneExpiredBuckets(now);
+
+  const key = clientKey(request);
   const current = requestBuckets.get(key);
-  if (!current || now - current.startedAt >= minute) {
+  if (!current) {
+    if (requestBuckets.size >= bucketHardLimit) return true;
     requestBuckets.set(key, { startedAt: now, count: 1 });
     return false;
   }
+
+  if (now - current.startedAt >= bucketWindowMs) {
+    requestBuckets.set(key, { startedAt: now, count: 1 });
+    return false;
+  }
+
   current.count += 1;
   return current.count > maxRequestsPerMinute;
 }
