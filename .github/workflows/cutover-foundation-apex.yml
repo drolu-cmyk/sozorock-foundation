@@ -26,11 +26,16 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 25
     steps:
+      - name: Check out main
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
       - name: Configure scoped AWS credentials
         uses: aws-actions/configure-aws-credentials@v6
         with:
           role-to-assume: ${{ env.AWS_ROLE_TO_ASSUME }}
-          role-session-name: FoundationApexCutover-${{ github.run_id }}
+          role-session-name: FoundationDomainInventory-${{ github.run_id }}
           aws-region: ${{ env.AWS_REGION }}
           retry-max-attempts: 3
 
