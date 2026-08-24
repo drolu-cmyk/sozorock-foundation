@@ -1,0 +1,63 @@
+name: Probe AI Lab production role trust
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/probe-ai-lab-production-role.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+  id-token: write
+
+jobs:
+  probe:
+    if: github.repository == 'drolu-cmyk/sozorock-foundation' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Attempt AI Lab production role through Foundation OIDC
+        id: auth
+        continue-on-error: true
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: arn:aws:iam::791860731989:role/GitHubActionsSozorockAiLabDeployRole
+          role-session-name: FoundationAiLabRoleProbe-${{ github.run_id }}
+          aws-region: us-east-1
+          retry-max-attempts: 2
+
+      - name: Verify caller if trust succeeds
+        id: caller
+        if: steps.auth.outcome == 'success'
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -euo pipefail
+          account="$(aws sts get-caller-identity --query Account --output text)"
+          arn="$(aws sts get-caller-identity --query Arn --output text)"
+          test "$account" = '791860731989'
+          echo "arn=$arn" >> "$GITHUB_OUTPUT"
+
+      - name: Publish read-only trust result
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ "${{ steps.auth.outcome }}" = 'success' && "${{ steps.caller.outcome }}" = 'success' ]]; then
+            body="AI Lab production-role bridge probe: **SUCCESS**. The Foundation OIDC identity can assume the existing AI Lab production role. Caller: \`${{ steps.caller.outputs.arn }}\`. No AWS resource was changed by this probe."
+          else
+            body="AI Lab production-role bridge probe: **NOT TRUSTED**. The Foundation OIDC identity cannot use the AI Lab production role through this path. No AWS resource was changed by this probe."
+          fi
+          gh issue comment 15 --repo "$GITHUB_REPOSITORY" --body "$body"
+          printf '%s\n' "$body" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Require trusted bridge
+        if: always()
+        shell: bash
+        run: |
+          test "${{ steps.auth.outcome }}" = 'success'
+          test "${{ steps.caller.outcome }}" = 'success'
