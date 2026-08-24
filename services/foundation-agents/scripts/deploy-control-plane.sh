@@ -112,14 +112,14 @@ snapshot_route 'GET /internal/health' health "$routes_before"
 snapshot_route 'GET /internal/v1/graphs' graphs "$routes_before"
 snapshot_route 'POST /internal/v1/run' run "$routes_before"
 
+# Lambda supplies AWS_REGION as a reserved runtime variable. Do not set it here.
 jq -n \
   --arg model 'gpt-5.6-sol' \
-  --arg region "$AWS_REGION" \
   --arg key "${OPENAI_API_KEY:-}" \
   --arg provider "${OPENAI_IDENTITY_PROVIDER_ID:-}" \
   --arg service "${OPENAI_SERVICE_ACCOUNT_ID:-}" \
   --arg audience "${OPENAI_WIF_AUDIENCE:-}" \
-  '{Variables:{OPENAI_AGENT_MODEL:$model,AWS_REGION:$region,OPENAI_API_KEY:$key,OPENAI_IDENTITY_PROVIDER_ID:$provider,OPENAI_SERVICE_ACCOUNT_ID:$service,OPENAI_WIF_AUDIENCE:$audience}} | .Variables |= with_entries(select(.value != ""))' \
+  '{Variables:{OPENAI_AGENT_MODEL:$model,OPENAI_API_KEY:$key,OPENAI_IDENTITY_PROVIDER_ID:$provider,OPENAI_SERVICE_ACCOUNT_ID:$service,OPENAI_WIF_AUDIENCE:$audience}} | .Variables |= with_entries(select(.value != ""))' \
   > "$work/lambda-env.json"
 
 aws lambda update-function-code --function-name "$FUNCTION_NAME" --zip-file "fileb://$LAMBDA_ZIP" >/dev/null
