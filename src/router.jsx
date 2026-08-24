@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 const EXTERNAL_PLATFORM_ROUTES = new Map([
   ["/platforms/health", "https://health.sozorockfoundation.org/"],
   ["/platforms/ai-lab", "https://ai-lab.sozorockfoundation.org/"],
+  ["/platforms/cbcap", "https://cbcap.sozorockfoundation.org/"],
+  ["/platforms/cb-cap", "https://cbcap.sozorockfoundation.org/"],
 ]);
 
 const isExternal = (href = "") => /^(https?:|mailto:)/.test(href);
