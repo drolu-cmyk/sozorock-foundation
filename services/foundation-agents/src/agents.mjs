@@ -1,12 +1,13 @@
 import { Agent } from "@openai/agents";
 import { z } from "zod";
 
-const bedrockRuntime =
-  process.env.FOUNDATION_MODEL_PROVIDER === "bedrock" ||
+const foundationProductionEdge =
   process.env.AWS_LAMBDA_FUNCTION_NAME === "SozoRockFoundationParentOrigin";
+const explicitBedrockRuntime = process.env.FOUNDATION_MODEL_PROVIDER === "bedrock";
 const configuredModel = process.env.OPENAI_AGENT_MODEL;
-const model =
-  bedrockRuntime && (!configuredModel || configuredModel === "gpt-5.6-sol")
+const model = foundationProductionEdge
+  ? "openai.gpt-5.6-sol"
+  : explicitBedrockRuntime && (!configuredModel || configuredModel === "gpt-5.6-sol")
     ? "openai.gpt-5.6-sol"
     : configuredModel || "gpt-5.6-sol";
 const sharedRules = `You are an internal SozoRock specialist. Work only from supplied evidence and clearly identified source material. Never invent achievements, partners, funding, adoption, student outcomes, publication status, citations, dates, metrics, or institutional relationships. Distinguish facts from recommendations. Do not publish, deploy, send, delete, authorize, or change external systems. Produce a reviewable internal result for the next graph node.`;
