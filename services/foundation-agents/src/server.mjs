@@ -1,6 +1,7 @@
 import http from "node:http";
 import { authorizedHeader, containsForbiddenMaterial, isPlainObject, maxRequestBytes, maxRequestsPerMinute } from "./boundary.mjs";
 import { executeGraph, graphs } from "./graph.mjs";
+import { modelAuthConfigured, modelAuthMode } from "./model-auth.mjs";
 
 const port = Number(process.env.PORT || 8788);
 const trustProxyHeaders = process.env.TRUST_PROXY_HEADERS === "true";
@@ -90,7 +91,12 @@ const server = http.createServer(async (request, response) => {
   const url = new URL(request.url || "/", `http://${request.headers.host || "localhost"}`);
 
   if (request.method === "GET" && url.pathname === "/health") {
-    return json(response, 200, { ok: true, service: "foundation-agents" });
+    return json(response, 200, {
+      ok: true,
+      service: "foundation-agents",
+      modelConfigured: modelAuthConfigured(),
+      modelAuthMode: modelAuthMode(),
+    });
   }
 
   if (request.method === "GET" && url.pathname === "/v1/graphs") {
@@ -104,7 +110,7 @@ const server = http.createServer(async (request, response) => {
 
   if (!authorized(request)) return json(response, 401, { error: "unauthorized" });
   if (rateLimited(request)) return json(response, 429, { error: "rate_limited" });
-  if (!process.env.OPENAI_API_KEY) return json(response, 503, { error: "model_service_not_configured" });
+  if (!modelAuthConfigured()) return json(response, 503, { error: "model_service_not_configured" });
 
   try {
     const body = await readJson(request);
