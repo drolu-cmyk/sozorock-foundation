@@ -14,15 +14,14 @@ permissions:
 
 env:
   AWS_REGION: us-east-1
-  AWS_ROLE_TO_ASSUME: arn:aws:iam::791860731989:role/GitHubActionsSozoRockFoundationSiteDeployRole
+  AWS_ROLE_TO_ASSUME: arn:aws:iam::791860731989:role/GitHubActionsSozorockFoundationSiteDeployRole
+  ACCOUNT_ID: '791860731989'
   FOUNDATION_HOSTED_ZONE_ID: Z07905293AANZWGYZ84F3
-  CERTIFICATE_ARN: arn:aws:acm:us-east-1:791860731989:certificate/d2b11522-63cb-4c7f-b5a8-c0c25a39a2f7
-  LAMBDA_ROLE_ARN: arn:aws:iam::791860731989:role/SozoRockFoundationParentLambdaRole
-  LEGACY_HEALTH_AMPLIFY_APP_ID: d3uqnxmsmefokf
   APEX_HOST: sozorockfoundation.org
   CANONICAL_HOST: www.sozorockfoundation.org
-  REDIRECT_FUNCTION_NAME: SozoRockFoundationApexRedirect
-  REDIRECT_API_NAME: SozoRockFoundationApexRedirect
+  REDIRECT_FUNCTION_NAME: SozoRockFoundationParentOrigin
+  REDIRECT_API_NAME: SozoRockFoundationParentSite
+  CERTIFICATE_ARN: arn:aws:acm:us-east-1:791860731989:certificate/d2b11522-63cb-4c7f-b5a8-c0c25a39a2f7
 
 jobs:
   diagnose:
@@ -35,13 +34,13 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Capture public domain baseline
+      - name: Capture public baseline
         shell: bash
         run: |
           set -euo pipefail
           report="$RUNNER_TEMP/domain-report.md"
           {
-            echo '## Production domain diagnostic and repair'
+            echo '## Production domain diagnostic and apex cutover'
             echo
             echo "Run: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
             echo "Commit: \`${GITHUB_SHA}\`"
@@ -71,8 +70,7 @@ jobs:
             headers="$(curl --silent --show-error --head --max-time 20 "https://${host}/" 2>/dev/null || true)"
             status="$(awk '/^HTTP\// {code=$2} END {print code}' <<<"$headers")"
             location="$(awk 'BEGIN{IGNORECASE=1} /^location:/ {sub(/\r$/, ""); sub(/^location:[[:space:]]*/, ""); value=$0} END {print value}' <<<"$headers")"
-            server="$(awk 'BEGIN{IGNORECASE=1} /^server:/ {sub(/\r$/, ""); sub(/^server:[[:space:]]*/, ""); value=$0} END {print value}' <<<"$headers")"
-            echo "- \`${host}\`: addresses=\`${addresses}\`; status=\`${status:-probe-failed}\`; location=\`${location:-none}\`; server=\`${server:-unspecified}\`" >> "$report"
+            echo "- \`${host}\`: addresses=\`${addresses}\`; status=\`${status:-probe-failed}\`; location=\`${location:-none}\`" >> "$report"
           done
 
           {
@@ -83,7 +81,7 @@ jobs:
           } >> "$report"
           echo "REPORT_PATH=$report" >> "$GITHUB_ENV"
 
-      - name: Configure historical Foundation AWS role for read-only inventory
+      - name: Configure trusted Foundation AWS role
         id: aws_auth
         continue-on-error: true
         uses: aws-actions/configure-aws-credentials@v6
@@ -93,31 +91,34 @@ jobs:
           aws-region: ${{ env.AWS_REGION }}
           retry-max-attempts: 3
 
-      - name: Inspect AWS state and repair Foundation apex
-        id: repair
+      - name: Build and verify regional apex redirect before DNS cutover
+        id: cutover
         if: steps.aws_auth.outcome == 'success'
         continue-on-error: true
         shell: bash
         run: |
           set -euo pipefail
           report="$REPORT_PATH"
+          original_record="$RUNNER_TEMP/apex-record-original.json"
           dns_changed=0
           live_verified=0
-          old_record="$RUNNER_TEMP/apex-old-record.json"
 
           rollback_dns() {
-            if [[ "$dns_changed" = "1" && "$live_verified" != "1" && -s "$old_record" ]]; then
-              jq -n --argjson record "$(cat "$old_record")" \
-                '{Comment:"Rollback failed Foundation apex redirect cutover",Changes:[{Action:"UPSERT",ResourceRecordSet:$record}]}' \
-                > "$RUNNER_TEMP/apex-rollback.json"
-              if change_id="$(aws route53 change-resource-record-sets \
-                --hosted-zone-id "$FOUNDATION_HOSTED_ZONE_ID" \
-                --change-batch "file://$RUNNER_TEMP/apex-rollback.json" \
-                --query 'ChangeInfo.Id' --output text 2>/dev/null)"; then
+            if [[ "$dns_changed" = "1" && "$live_verified" != "1" && -s "$original_record" ]]; then
+              cat > "$RUNNER_TEMP/rollback.json" <<JSON
+          {
+            "Comment": "Rollback failed SozoRock Foundation apex redirect cutover",
+            "Changes": [{
+              "Action": "UPSERT",
+              "ResourceRecordSet": $(cat "$original_record")
+            }]
+          }
+          JSON
+              if change_id="$(aws route53 change-resource-record-sets --hosted-zone-id "$FOUNDATION_HOSTED_ZONE_ID" --change-batch "file://$RUNNER_TEMP/rollback.json" --query 'ChangeInfo.Id' --output text 2>/dev/null)"; then
                 aws route53 wait resource-record-sets-changed --id "$change_id" || true
-                echo '- Rollback: original apex Route 53 record restored after failed public verification.' >> "$report"
+                echo '- Rollback: original apex Route 53 record restored after failed live verification.' >> "$report"
               else
-                echo '- Rollback: AWS rejected restoration; manual Route 53 review is required.' >> "$report"
+                echo '- Rollback failed: manual Route 53 review is required before treating the apex as stable.' >> "$report"
               fi
             fi
           }
@@ -125,143 +126,80 @@ jobs:
 
           {
             echo
-            echo '### AWS domain inventory'
+            echo '### AWS redirect cutover'
             echo '- Trusted Foundation AWS role: assumed successfully.'
           } >> "$report"
 
-          records="$(aws route53 list-resource-record-sets \
-            --hosted-zone-id "$FOUNDATION_HOSTED_ZONE_ID" \
-            --query "ResourceRecordSets[?Name=='sozorockfoundation.org.' || Name=='www.sozorockfoundation.org.'].{Name:Name,Type:Type,Alias:AliasTarget.DNSName,Values:ResourceRecords[].Value}" \
-            --output json)"
-          echo "- Foundation Route 53 apex/www records: \`${records}\`" >> "$report"
+          test "$(aws sts get-caller-identity --query Account --output text)" = "$ACCOUNT_ID"
 
-          if health_zones="$(aws route53 list-hosted-zones-by-name --dns-name sozorockhealth.com --max-items 5 --query "HostedZones[?Name=='sozorockhealth.com.'].{Id:Id,Name:Name,Private:Config.PrivateZone}" --output json 2>"$RUNNER_TEMP/health-zone.err")"; then
-            echo "- Route 53 hosted zones matching \`sozorockhealth.com\`: \`${health_zones}\`" >> "$report"
-          else
-            echo "- Route 53 legacy Health lookup error: \`$(tr '\n' ' ' < "$RUNNER_TEMP/health-zone.err" | sed 's/`/'"'"'/g')\`" >> "$report"
-          fi
-
-          if legacy_app="$(aws amplify get-app --app-id "$LEGACY_HEALTH_AMPLIFY_APP_ID" --query 'app.{appId:appId,name:name,repository:repository,defaultDomain:defaultDomain,platform:platform}' --output json 2>"$RUNNER_TEMP/legacy-app.err")"; then
-            echo "- Legacy Health Amplify app: \`${legacy_app}\`" >> "$report"
-          else
-            echo "- Legacy Health Amplify app lookup error: \`$(tr '\n' ' ' < "$RUNNER_TEMP/legacy-app.err" | sed 's/`/'"'"'/g')\`" >> "$report"
-          fi
-
-          {
-            echo
-            echo '### Foundation apex repair'
-          } >> "$report"
-
-          cert_json="$(aws acm describe-certificate --certificate-arn "$CERTIFICATE_ARN" --query 'Certificate.{Status:Status,DomainName:DomainName,SANs:SubjectAlternativeNames}' --output json 2>"$RUNNER_TEMP/cert.err" || true)"
-          if [[ -z "$cert_json" ]]; then
-            echo "- Certificate preflight error: \`$(tr '\n' ' ' < "$RUNNER_TEMP/cert.err" | sed 's/`/'"'"'/g')\`" >> "$report"
-            exit 1
-          fi
-          cert_status="$(jq -r '.Status // ""' <<<"$cert_json")"
-          apex_in_cert="$(jq --arg host "$APEX_HOST" '[.SANs[]? | select(. == $host)] | length' <<<"$cert_json")"
-          if [[ "$cert_status" != "ISSUED" || "$apex_in_cert" != "1" ]]; then
-            echo "- Certificate preflight stopped: known certificate is \`${cert_status}\` and apex SAN match count is \`${apex_in_cert}\`. No DNS change made." >> "$report"
-            exit 1
-          fi
-          echo '- Certificate preflight: issued certificate covers the Foundation apex.' >> "$report"
-
-          current_record="$(aws route53 list-resource-record-sets \
+          apex_record="$(aws route53 list-resource-record-sets \
             --hosted-zone-id "$FOUNDATION_HOSTED_ZONE_ID" \
             --query "ResourceRecordSets[?Name=='${APEX_HOST}.' && Type=='A'] | [0]" \
             --output json)"
-          test -n "$current_record"
-          test "$current_record" != "null"
-          printf '%s' "$current_record" > "$old_record"
-          current_alias="$(jq -r '.AliasTarget.DNSName // ""' <<<"$current_record")"
-          current_alias="${current_alias%.}."
-          if [[ "$current_alias" != 'd1w2jx9m5e0d5u.cloudfront.net.' ]]; then
-            echo "- DNS preflight stopped: unexpected current apex alias \`${current_alias}\`. No mutation made." >> "$report"
+          test -n "$apex_record"
+          test "$apex_record" != "null"
+          jq -e '.AliasTarget.DNSName == "d1w2jx9m5e0d5u.cloudfront.net."' <<<"$apex_record" >/dev/null
+          printf '%s\n' "$apex_record" > "$original_record"
+          echo '- Preflight: the apex still points to the retired CloudFront endpoint expected by this cutover.' >> "$report"
+
+          if cert="$(aws acm describe-certificate --certificate-arn "$CERTIFICATE_ARN" --query 'Certificate.{domain:DomainName,status:Status,sans:SubjectAlternativeNames}' --output json 2>"$RUNNER_TEMP/cert.err")"; then
+            echo "- Certificate: \`${cert}\`" >> "$report"
+            jq -e --arg apex "$APEX_HOST" '(.status == "ISSUED") and ((.domain == $apex) or ([.sans[]?] | index($apex) != null))' <<<"$cert" >/dev/null
+          else
+            echo "- Certificate lookup error: \`$(tr '\n' ' ' < "$RUNNER_TEMP/cert.err" | sed 's/`/'"'"'/g')\`" >> "$report"
             exit 1
           fi
-          echo "- DNS preflight: apex still points to the retired CloudFront target \`${current_alias}\`." >> "$report"
 
           cat > "$RUNNER_TEMP/index.py" <<'PY'
           def handler(event, context):
-              path = event.get("rawPath") or "/"
-              query = event.get("rawQueryString") or ""
-              location = "https://www.sozorockfoundation.org" + path
+              path = event.get('rawPath') or event.get('path') or '/'
+              query = event.get('rawQueryString') or ''
+              location = 'https://www.sozorockfoundation.org' + path
               if query:
-                  location += "?" + query
+                  location += '?' + query
               return {
-                  "statusCode": 308,
-                  "headers": {
-                      "location": location,
-                      "cache-control": "public, max-age=300",
-                      "strict-transport-security": "max-age=31536000",
-                      "x-content-type-options": "nosniff",
+                  'statusCode': 308,
+                  'headers': {
+                      'location': location,
+                      'cache-control': 'public, max-age=300',
+                      'x-content-type-options': 'nosniff'
                   },
-                  "body": "",
+                  'body': '',
+                  'isBase64Encoded': False,
               }
           PY
-          (cd "$RUNNER_TEMP" && python3 -m zipfile -c redirect.zip index.py)
+          (
+            cd "$RUNNER_TEMP"
+            rm -f apex-origin.zip
+            python3 -m zipfile -c apex-origin.zip index.py
+          )
 
-          if aws lambda get-function --function-name "$REDIRECT_FUNCTION_NAME" >/dev/null 2>&1; then
-            aws lambda update-function-configuration \
-              --function-name "$REDIRECT_FUNCTION_NAME" \
-              --runtime python3.13 --handler index.handler \
-              --role "$LAMBDA_ROLE_ARN" --memory-size 128 --timeout 5 >/dev/null
-            aws lambda wait function-updated-v2 --function-name "$REDIRECT_FUNCTION_NAME"
-            aws lambda update-function-code \
-              --function-name "$REDIRECT_FUNCTION_NAME" \
-              --zip-file "fileb://$RUNNER_TEMP/redirect.zip" >/dev/null
-            aws lambda wait function-updated-v2 --function-name "$REDIRECT_FUNCTION_NAME"
-          else
-            aws lambda create-function \
-              --function-name "$REDIRECT_FUNCTION_NAME" \
-              --runtime python3.13 --handler index.handler \
-              --role "$LAMBDA_ROLE_ARN" \
-              --zip-file "fileb://$RUNNER_TEMP/redirect.zip" \
-              --memory-size 128 --timeout 5 >/dev/null
-            aws lambda wait function-active-v2 --function-name "$REDIRECT_FUNCTION_NAME"
-          fi
-          function_arn="$(aws lambda get-function --function-name "$REDIRECT_FUNCTION_NAME" --query 'Configuration.FunctionArn' --output text)"
-          test -n "$function_arn"
+          aws lambda get-function --function-name "$REDIRECT_FUNCTION_NAME" >/dev/null
+          aws lambda update-function-code \
+            --function-name "$REDIRECT_FUNCTION_NAME" \
+            --zip-file "fileb://$RUNNER_TEMP/apex-origin.zip" >/dev/null
+          for _ in $(seq 1 90); do
+            state="$(aws lambda get-function-configuration --function-name "$REDIRECT_FUNCTION_NAME" --query 'State' --output text 2>/dev/null || true)"
+            update_status="$(aws lambda get-function-configuration --function-name "$REDIRECT_FUNCTION_NAME" --query 'LastUpdateStatus' --output text 2>/dev/null || true)"
+            if [[ "$state" = "Active" && ( "$update_status" = "Successful" || "$update_status" = "None" || -z "$update_status" ) ]]; then
+              break
+            fi
+            test "$state" != "Failed"
+            test "$update_status" != "Failed"
+            sleep 2
+          done
 
           api_id="$(aws apigatewayv2 get-apis --output json | jq -r --arg name "$REDIRECT_API_NAME" '.Items[]? | select(.Name==$name) | .ApiId' | head -n1)"
-          if [[ -z "$api_id" ]]; then
-            api_id="$(aws apigatewayv2 create-api \
-              --name "$REDIRECT_API_NAME" --protocol-type HTTP --target "$function_arn" \
-              --query 'ApiId' --output text)"
-          fi
           test -n "$api_id"
-
-          integration_id="$(aws apigatewayv2 get-integrations --api-id "$api_id" --output json | jq -r --arg arn "$function_arn" '.Items[]? | select(.IntegrationUri==$arn) | .IntegrationId' | head -n1)"
-          if [[ -z "$integration_id" ]]; then
-            integration_id="$(aws apigatewayv2 create-integration \
-              --api-id "$api_id" --integration-type AWS_PROXY --integration-uri "$function_arn" \
-              --payload-format-version 2.0 --query 'IntegrationId' --output text)"
-          fi
-          route_id="$(aws apigatewayv2 get-routes --api-id "$api_id" --output json | jq -r '.Items[]? | select(.RouteKey=="$default") | .RouteId' | head -n1)"
-          if [[ -z "$route_id" ]]; then
-            aws apigatewayv2 create-route --api-id "$api_id" --route-key '$default' --target "integrations/$integration_id" >/dev/null
-          else
-            aws apigatewayv2 update-route --api-id "$api_id" --route-id "$route_id" --target "integrations/$integration_id" >/dev/null
-          fi
-          stage_count="$(aws apigatewayv2 get-stages --api-id "$api_id" --output json | jq -r '[.Items[]? | select(.StageName=="$default")] | length')"
-          if [[ "$stage_count" = "0" ]]; then
-            aws apigatewayv2 create-stage --api-id "$api_id" --stage-name '$default' --auto-deploy >/dev/null
-          else
-            aws apigatewayv2 update-stage --api-id "$api_id" --stage-name '$default' --auto-deploy >/dev/null
-          fi
-
-          aws lambda remove-permission --function-name "$REDIRECT_FUNCTION_NAME" --statement-id AllowApexRedirectApi >/dev/null 2>&1 || true
-          aws lambda add-permission \
-            --function-name "$REDIRECT_FUNCTION_NAME" \
-            --statement-id AllowApexRedirectApi \
-            --action lambda:InvokeFunction --principal apigateway.amazonaws.com \
-            --source-arn "arn:aws:execute-api:${AWS_REGION}:791860731989:${api_id}/*" >/dev/null
-
           api_endpoint="$(aws apigatewayv2 get-api --api-id "$api_id" --query 'ApiEndpoint' --output text)"
-          endpoint_headers="$RUNNER_TEMP/endpoint-headers.txt"
-          endpoint_status="$(curl --silent --show-error --dump-header "$endpoint_headers" --output /dev/null --max-time 30 --write-out '%{http_code}' "${api_endpoint}/publication/rrg-v1-2025?source=endpoint")"
-          test "$endpoint_status" = "308"
-          endpoint_location="$(awk 'BEGIN{IGNORECASE=1} /^location:/ {sub(/\r$/, ""); sub(/^location:[[:space:]]*/, ""); print; exit}' "$endpoint_headers")"
-          test "$endpoint_location" = "https://${CANONICAL_HOST}/publication/rrg-v1-2025?source=endpoint"
+          test -n "$api_endpoint"
+
+          api_headers="$RUNNER_TEMP/api-headers.txt"
+          api_status="$(curl --silent --show-error --dump-header "$api_headers" --output /dev/null --max-time 30 --write-out '%{http_code}' "${api_endpoint}/publication/rrg-v1-2025?source=api-preflight")"
+          test "$api_status" = "308"
+          api_location="$(awk 'BEGIN{IGNORECASE=1} /^location:/ {sub(/\r$/, ""); sub(/^location:[[:space:]]*/, ""); print; exit}' "$api_headers")"
+          test "$api_location" = "https://${CANONICAL_HOST}/publication/rrg-v1-2025?source=api-preflight"
+          echo '- Redirect Lambda and existing HTTP API verified before custom-domain or DNS changes.' >> "$report"
 
           if domain_json="$(aws apigatewayv2 get-domain-name --domain-name "$APEX_HOST" --output json 2>/dev/null)"; then
             current_cert="$(jq -r '.DomainNameConfigurations[0].CertificateArn // ""' <<<"$domain_json")"
@@ -280,80 +218,95 @@ jobs:
           for _ in $(seq 1 120); do
             domain_json="$(aws apigatewayv2 get-domain-name --domain-name "$APEX_HOST" --output json 2>/dev/null || true)"
             domain_status="$(jq -r '.DomainNameConfigurations[0].DomainNameStatus // ""' <<<"${domain_json:-{}}")"
-            if [[ "$domain_status" = "AVAILABLE" ]]; then domain_ready=1; break; fi
-            if [[ "$domain_status" = "FAILED" ]]; then echo "$domain_json" >&2; exit 1; fi
+            if [[ "$domain_status" = "AVAILABLE" ]]; then
+              domain_ready=1
+              break
+            fi
             sleep 5
           done
           test "$domain_ready" = "1"
+
           target="$(jq -r '.DomainNameConfigurations[0].ApiGatewayDomainName' <<<"$domain_json")"
           target_zone="$(jq -r '.DomainNameConfigurations[0].HostedZoneId' <<<"$domain_json")"
-          test -n "$target"; test "$target" != "null"
-          test -n "$target_zone"; test "$target_zone" != "null"
+          test -n "$target"
+          test "$target" != "null"
+          test -n "$target_zone"
+          test "$target_zone" != "null"
 
-          mapping_id="$(aws apigatewayv2 get-api-mappings --domain-name "$APEX_HOST" --output json | jq -r '.Items[]? | select((.ApiMappingKey // "")=="") | .ApiMappingId' | head -n1)"
-          if [[ -z "$mapping_id" ]]; then
-            aws apigatewayv2 create-api-mapping --domain-name "$APEX_HOST" --api-id "$api_id" --stage '$default' >/dev/null
+          mappings="$(aws apigatewayv2 get-api-mappings --domain-name "$APEX_HOST" --output json)"
+          root_mapping="$(jq -r '.Items[]? | select((.ApiMappingKey // "") == "") | @base64' <<<"$mappings" | head -n1)"
+          if [[ -n "$root_mapping" ]]; then
+            mapped_api="$(printf '%s' "$root_mapping" | base64 --decode | jq -r '.ApiId')"
+            mapped_stage="$(printf '%s' "$root_mapping" | base64 --decode | jq -r '.Stage')"
+            test "$mapped_api" = "$api_id"
+            test "$mapped_stage" = '$default'
           else
-            aws apigatewayv2 update-api-mapping --domain-name "$APEX_HOST" --api-mapping-id "$mapping_id" --api-id "$api_id" --stage '$default' >/dev/null
+            aws apigatewayv2 create-api-mapping \
+              --domain-name "$APEX_HOST" \
+              --api-id "$api_id" \
+              --stage '$default' >/dev/null
           fi
 
-          direct_ok=0
-          for _ in $(seq 1 60); do
-            target_ip="$(getent ahostsv4 "$target" | awk 'NR==1{print $1}' || true)"
-            if [[ -n "$target_ip" ]]; then
-              direct_headers="$RUNNER_TEMP/direct-headers.txt"
-              direct_status="$(curl --silent --show-error --dump-header "$direct_headers" --output /dev/null --max-time 20 --write-out '%{http_code}' \
-                --resolve "${APEX_HOST}:443:${target_ip}" \
-                "https://${APEX_HOST}/publication/rrg-v1-2025?source=direct" || true)"
-              direct_location="$(awk 'BEGIN{IGNORECASE=1} /^location:/ {sub(/\r$/, ""); sub(/^location:[[:space:]]*/, ""); print; exit}' "$direct_headers" 2>/dev/null || true)"
-              if [[ "$direct_status" = "308" && "$direct_location" = "https://${CANONICAL_HOST}/publication/rrg-v1-2025?source=direct" ]]; then
-                direct_ok=1; break
-              fi
-            fi
-            sleep 5
-          done
-          test "$direct_ok" = "1"
-          echo "- Direct pre-DNS verification: regional redirect endpoint returned the expected 308 for the apex host." >> "$report"
+          target_ip="$(getent ahostsv4 "$target" | awk 'NR==1{print $1}')"
+          test -n "$target_ip"
+          direct_headers="$RUNNER_TEMP/direct-target-headers.txt"
+          direct_status="$(curl --silent --show-error --dump-header "$direct_headers" --output /dev/null --max-time 30 --resolve "${APEX_HOST}:443:${target_ip}" --write-out '%{http_code}' "https://${APEX_HOST}/publication/rrg-v1-2025?source=target-preflight")"
+          test "$direct_status" = "308"
+          direct_location="$(awk 'BEGIN{IGNORECASE=1} /^location:/ {sub(/\r$/, ""); sub(/^location:[[:space:]]*/, ""); print; exit}' "$direct_headers")"
+          test "$direct_location" = "https://${CANONICAL_HOST}/publication/rrg-v1-2025?source=target-preflight"
+          echo '- Regional custom-domain target passed direct TLS and redirect verification before DNS cutover.' >> "$report"
 
-          target_dot="${target%.}."
-          jq -n --arg name "${APEX_HOST}." --arg target "$target_dot" --arg zone "$target_zone" \
-            '{Comment:"Cut Foundation apex to canonical www redirect endpoint",Changes:[{Action:"UPSERT",ResourceRecordSet:{Name:$name,Type:"A",AliasTarget:{HostedZoneId:$zone,DNSName:$target,EvaluateTargetHealth:false}}}]}' \
-            > "$RUNNER_TEMP/apex-cutover.json"
+          cat > "$RUNNER_TEMP/cutover.json" <<JSON
+          {
+            "Comment": "Cut over The SozoRock Foundation apex to permanent www redirect",
+            "Changes": [{
+              "Action": "UPSERT",
+              "ResourceRecordSet": {
+                "Name": "${APEX_HOST}.",
+                "Type": "A",
+                "AliasTarget": {
+                  "HostedZoneId": "${target_zone}",
+                  "DNSName": "${target}.",
+                  "EvaluateTargetHealth": false
+                }
+              }
+            }]
+          }
+          JSON
           change_id="$(aws route53 change-resource-record-sets \
             --hosted-zone-id "$FOUNDATION_HOSTED_ZONE_ID" \
-            --change-batch "file://$RUNNER_TEMP/apex-cutover.json" \
-            --query 'ChangeInfo.Id' --output text)"
+            --change-batch "file://$RUNNER_TEMP/cutover.json" \
+            --query 'ChangeInfo.Id' \
+            --output text)"
           dns_changed=1
           aws route53 wait resource-record-sets-changed --id "$change_id"
 
-          public_ok=0
-          for _ in $(seq 1 60); do
-            live_headers="$RUNNER_TEMP/live-headers.txt"
-            live_status="$(curl --silent --show-error --dump-header "$live_headers" --output /dev/null --max-time 20 --write-out '%{http_code}' \
-              "https://${APEX_HOST}/publication/rrg-v1-2025?source=apex-cutover" || true)"
-            live_location="$(awk 'BEGIN{IGNORECASE=1} /^location:/ {sub(/\r$/, ""); sub(/^location:[[:space:]]*/, ""); print; exit}' "$live_headers" 2>/dev/null || true)"
-            if [[ "$live_status" = "308" && "$live_location" = "https://${CANONICAL_HOST}/publication/rrg-v1-2025?source=apex-cutover" ]]; then
-              public_ok=1; break
-            fi
-            sleep 5
-          done
-          test "$public_ok" = "1"
+          live_headers="$RUNNER_TEMP/live-apex-headers.txt"
+          live_status="$(curl --silent --show-error --dump-header "$live_headers" --output /dev/null --max-time 30 --write-out '%{http_code}' "https://${APEX_HOST}/publication/rrg-v1-2025?source=live-cutover")"
+          test "$live_status" = "308"
+          live_location="$(awk 'BEGIN{IGNORECASE=1} /^location:/ {sub(/\r$/, ""); sub(/^location:[[:space:]]*/, ""); print; exit}' "$live_headers")"
+          test "$live_location" = "https://${CANONICAL_HOST}/publication/rrg-v1-2025?source=live-cutover"
 
           canonical_status="$(curl --silent --show-error --output "$RUNNER_TEMP/canonical.html" --max-time 30 --write-out '%{http_code}' "https://${CANONICAL_HOST}/")"
           test "$canonical_status" = "200"
           grep -q 'Access. Assurance. Intelligence.' "$RUNNER_TEMP/canonical.html"
-          live_verified=1
-          echo "- Live verification: apex returns 308 to canonical www with path/query preserved; canonical identity check passed."
-          echo "- Live verification: apex returns 308 to canonical www with path/query preserved; canonical identity check passed." >> "$report"
-          echo 'apex_verified=true' >> "$GITHUB_OUTPUT"
 
-      - name: Record unavailable AWS trust
-        if: steps.aws_auth.outcome != 'success'
+          live_verified=1
+          echo 'apex_verified=true' >> "$GITHUB_OUTPUT"
+          echo "- Live verification: \`https://${APEX_HOST}\` returns 308 to canonical www with path/query preserved; canonical identity check passed." >> "$report"
+
+      - name: Record AWS trust or cutover failure
+        if: steps.aws_auth.outcome != 'success' || steps.cutover.outcome != 'success'
+        shell: bash
         run: |
           {
             echo
-            echo '### AWS domain inventory'
-            echo '- Trusted Foundation AWS role could not be assumed. No AWS resource was changed.'
+            echo '### Cutover status'
+            if [[ "${{ steps.aws_auth.outcome }}" != "success" ]]; then
+              echo '- AWS role could not be assumed. No DNS change was attempted.'
+            else
+              echo '- Regional apex cutover did not complete successfully. The workflow rolls DNS back if it had already changed.'
+            fi
           } >> "$REPORT_PATH"
 
       - name: Capture post-run public state
@@ -382,11 +335,11 @@ jobs:
           gh issue comment 15 --repo "$GITHUB_REPOSITORY" --body-file "$REPORT_PATH"
           cat "$REPORT_PATH" >> "$GITHUB_STEP_SUMMARY"
 
-      - name: Require verified Foundation apex repair
+      - name: Enforce verified apex state
         if: always()
         shell: bash
         run: |
           set -euo pipefail
           test "${{ steps.aws_auth.outcome }}" = "success"
-          test "${{ steps.repair.outcome }}" = "success"
-          test "${{ steps.repair.outputs.apex_verified }}" = "true"
+          test "${{ steps.cutover.outcome }}" = "success"
+          test "${{ steps.cutover.outputs.apex_verified }}" = "true"
