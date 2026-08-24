@@ -75,7 +75,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
-          gh issue comment "$RECEIPT_ISSUE" --repo "$GITHUB_REPOSITORY" --body "Agent control-plane deployment **started** for commit \`${GITHUB_SHA}\` (run \`${GITHUB_RUN_ID}\`). No production completion is claimed until redirect, IAM-route, Lambda, and model smoke checks finish."
+          gh issue comment "$RECEIPT_ISSUE" --repo "$GITHUB_REPOSITORY" --body "Agent control-plane deployment **started** for commit \`${GITHUB_SHA}\` (run \`${GITHUB_RUN_ID}\`). Infrastructure is verified separately from model activation; no model-backed completion is claimed unless a real graph smoke run succeeds."
 
       - name: Deploy combined redirect and private agent control plane
         id: deploy
@@ -97,17 +97,23 @@ jobs:
           outcome='${{ steps.deploy.outcome }}'
           configured='${{ steps.deploy.outputs.model_configured }}'
           auth_mode='${{ steps.deploy.outputs.auth_mode }}'
+          signed_route='${{ steps.deploy.outputs.signed_route_verified }}'
           graph_status='${{ steps.deploy.outputs.graph_status }}'
           graph_decision='${{ steps.deploy.outputs.graph_decision }}'
-          body="Agent control-plane run \`${GITHUB_RUN_ID}\`: deployment **${outcome}**. Public edge rollback is automatic unless the canonical redirect and IAM-protected internal routes verify. Model configured: **${configured:-unknown}**; auth mode: \`${auth_mode:-none}\`; graph smoke status: \`${graph_status:-not-run}\`; decision: \`${graph_decision:-not-run}\`. No secret values are included in this receipt."
+          body="Agent control-plane run \`${GITHUB_RUN_ID}\`: secure infrastructure deployment **${outcome}**. Canonical redirect and unsigned 403 protection are required before infrastructure remains deployed. Model configured: **${configured:-unknown}**; auth mode: \`${auth_mode:-none}\`; deploy-role signed internal probe: \`${signed_route:-not-run}\`; graph smoke status: \`${graph_status:-not-run}\`; decision: \`${graph_decision:-not-run}\`. No secret values are included in this receipt."
           gh issue comment "$RECEIPT_ISSUE" --repo "$GITHUB_REPOSITORY" --body "$body"
           printf '%s\n' "$body" >> "$GITHUB_STEP_SUMMARY"
 
-      - name: Require fully operational control plane
+      - name: Require secure infrastructure and validate activation when configured
         if: always()
         shell: bash
         run: |
+          set -euo pipefail
           test "${{ steps.deploy.outcome }}" = 'success'
-          test "${{ steps.deploy.outputs.model_configured }}" = 'true'
-          status='${{ steps.deploy.outputs.graph_status }}'
-          [[ "$status" = 'review_required' || "$status" = 'escalated' ]]
+          configured='${{ steps.deploy.outputs.model_configured }}'
+          if [[ "$configured" = 'true' ]]; then
+            status='${{ steps.deploy.outputs.graph_status }}'
+            [[ "$status" = 'review_required' || "$status" = 'escalated' ]]
+          else
+            echo 'Secure agent infrastructure is deployed; model activation remains intentionally pending until an approved OpenAI credential or WIF mapping is provisioned.'
+          fi
