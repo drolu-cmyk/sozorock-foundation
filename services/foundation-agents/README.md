@@ -20,6 +20,7 @@ Each graph starts with the Foundation Orchestrator, passes through deterministic
 - The service does not publish, deploy, email, post to social media, alter DOI routes, authorize access, issue credentials, or release publication files.
 - Publication release, deployment, external communication, access control, learner completion/credential decisions, and other high-impact actions remain human approval gates.
 - Requests are size-limited, rate-limited, non-cacheable, and rejected when they contain known sensitive field names or common credential/private-key patterns.
+- Forwarding headers are ignored for throttling by default. Set `TRUST_PROXY_HEADERS=true` only behind a trusted reverse proxy that removes client-supplied forwarding headers and sets its own.
 - Do not submit patient records, diagnoses, passwords, API keys, authentication tokens, government identifiers, or other regulated/sensitive records to this service.
 - Learner workflows should use an opaque learner reference and the minimum evidence needed for the learning task. Do not send unnecessary identifying information.
 
@@ -47,6 +48,7 @@ Optional:
 ```text
 OPENAI_AGENT_MODEL=gpt-5.6-sol
 PORT=8788
+TRUST_PROXY_HEADERS=false
 ```
 
 The OpenAI credential and internal service token must be stored in the deployment platform's secret manager or equivalent environment-secret facility. Never commit either value to GitHub or a browser bundle.
@@ -67,7 +69,7 @@ npm start
 npm run eval
 ```
 
-The live eval harness exercises the real graph path, allows one bounded revision, and then uses a separate structured grader to judge the result against each case's expected behavior. Current regressions cover conflicting evidence, unsupported funding claims, prompt injection embedded in source material, permanent publication routes, false release/deployment claims, cross-property routing, AI Lab completion gates, and overgeneralization from a single learner.
+The live eval harness exercises the real graph path, allows one bounded revision, and then uses a separate structured grader to judge the result against each case's expected behavior. Current regressions cover conflicting evidence, unsupported funding claims, prompt injection embedded in source material, permanent publication routes, false release/deployment claims, cross-property routing, AI Lab completion gates, and overgeneralization from a single learner. The expected-behavior text is withheld from the graph and supplied only to the grader.
 
 ## Request contract
 
