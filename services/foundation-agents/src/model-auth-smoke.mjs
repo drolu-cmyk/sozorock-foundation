@@ -7,6 +7,7 @@ const keys = [
   "OPENAI_IDENTITY_PROVIDER_ID",
   "OPENAI_SERVICE_ACCOUNT_ID",
   "OPENAI_WIF_AUDIENCE",
+  "AWS_LAMBDA_FUNCTION_NAME",
   "AWS_REGION",
 ];
 const saved = Object.fromEntries(keys.map((key) => [key, process.env[key]]));
@@ -31,6 +32,15 @@ delete process.env.OPENAI_SERVICE_ACCOUNT_ID;
 assert.equal(modelAuthConfigured(), false);
 
 process.env.FOUNDATION_MODEL_PROVIDER = "bedrock";
+assert.equal(modelAuthConfigured(), true);
+assert.equal(modelAuthMode(), "bedrock_short_term");
+delete process.env.FOUNDATION_MODEL_PROVIDER;
+
+process.env.AWS_LAMBDA_FUNCTION_NAME = "UnrelatedFunction";
+assert.equal(modelAuthConfigured(), false);
+assert.equal(modelAuthMode(), null);
+
+process.env.AWS_LAMBDA_FUNCTION_NAME = "SozoRockFoundationParentOrigin";
 assert.equal(modelAuthConfigured(), true);
 assert.equal(modelAuthMode(), "bedrock_short_term");
 
