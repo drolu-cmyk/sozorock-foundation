@@ -1,6 +1,7 @@
 import { Buffer } from "node:buffer";
 import { containsForbiddenMaterial, isPlainObject, maxRequestBytes } from "./boundary.mjs";
 import { executeGraph, graphs } from "./graph.mjs";
+import { modelAuthConfigured, modelAuthMode } from "./model-auth.mjs";
 
 const securityHeaders = {
   "cache-control": "no-store",
@@ -57,7 +58,8 @@ export async function handler(event) {
     return response(200, {
       ok: true,
       service: "foundation-agents",
-      modelConfigured: Boolean(process.env.OPENAI_API_KEY),
+      modelConfigured: modelAuthConfigured(),
+      modelAuthMode: modelAuthMode(),
       surface: "internal",
     });
   }
@@ -67,7 +69,7 @@ export async function handler(event) {
   }
 
   if (method !== "POST" || path !== "/v1/run") return response(404, { error: "not_found" });
-  if (!process.env.OPENAI_API_KEY) return response(503, { error: "model_service_not_configured" });
+  if (!modelAuthConfigured()) return response(503, { error: "model_service_not_configured" });
 
   try {
     const body = requestBody(event);
@@ -85,6 +87,17 @@ export async function handler(event) {
       context: body.context || {},
       maxRevisionCycles: 1,
     });
+    console.log(
+      "foundation-agent-run-complete",
+      JSON.stringify({
+        runId: result.runId,
+        graphId: result.graphId,
+        surface: result.surface,
+        status: result.status,
+        decision: result.decision,
+        revisionCount: result.revisionCount,
+      })
+    );
     return response(200, result);
   } catch (error) {
     if (error instanceof SyntaxError) return response(400, { error: "invalid_json" });
