@@ -109,6 +109,7 @@ else
 fi
 
 if [[ -n "${GITHUB_ENV:-}" ]]; then
+  echo "CERTIFICATE_ARN=$selected_cert_arn" >> "$GITHUB_ENV"
   echo "APEX_CERTIFICATE_ARN=$selected_cert_arn" >> "$GITHUB_ENV"
 fi
 if [[ -n "${GITHUB_OUTPUT:-}" ]]; then
