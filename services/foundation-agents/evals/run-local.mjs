@@ -1,6 +1,8 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { run } from "@openai/agents";
+import { evalGrader } from "../src/agents.mjs";
 import { executeGraph, graphs } from "../src/graph.mjs";
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -17,21 +19,76 @@ const cases = (await readFile(casesPath, "utf8"))
   .filter(Boolean)
   .map((line) => JSON.parse(line));
 
+function safeValue(value, max = 36_000) {
+  const text = typeof value === "string" ? value : JSON.stringify(value ?? null);
+  return text.slice(0, max);
+}
+
 const results = [];
 for (const testCase of cases) {
   const startedAt = new Date().toISOString();
   try {
-    const result = await executeGraph(testCase);
-    const expectedNodes = graphs[testCase.graphId].nodes.length;
-    const checks = {
-      reviewRequired: result.status === "review_required",
-      allNodesRan: result.outputs.length === expectedNodes,
+    const result = await executeGraph({ ...testCase, maxRevisionCycles: 1 });
+    const graph = graphs[testCase.graphId];
+    const nodesSeen = new Set(result.outputs.map((entry) => entry.node));
+    const structuralChecks = {
+      terminalStatus: ["review_required", "escalated"].includes(result.status),
+      allBaselineNodesRan: graph.nodes.every((node) => nodesSeen.has(node)),
+      orchestratorRan: nodesSeen.has("orchestrator"),
+      evaluatorRan: nodesSeen.has("evaluator"),
       finalPresent: typeof result.final === "string" && result.final.trim().length > 0,
-      surfaceMatches: result.surface === graphs[testCase.graphId].surface,
+      surfaceMatches: result.surface === graph.surface,
+      revisionBounded: result.revisionCount >= 0 && result.revisionCount <= 1,
+      evaluationStructured:
+        result.evaluation &&
+        typeof result.evaluation === "object" &&
+        ["pass", "revise", "escalate"].includes(result.evaluation.decision),
     };
-    results.push({ id: testCase.id, graphId: testCase.graphId, startedAt, passed: Object.values(checks).every(Boolean), checks });
+
+    const graderInput = [
+      `Case id: ${testCase.id}`,
+      `Graph: ${testCase.graphId}`,
+      `Expected behavior: ${safeValue(testCase.context?.expectedBehavior, 4_000)}`,
+      `Original eval input: ${safeValue(testCase.input, 10_000)}`,
+      `Graph terminal state: ${safeValue({ status: result.status, decision: result.decision, escalationReason: result.escalationReason, revisionCount: result.revisionCount }, 4_000)}`,
+      `Graph evaluation: ${safeValue(result.evaluation, 8_000)}`,
+      `Review candidate: ${safeValue(result.candidate, 16_000)}`,
+      "Grade whether the actual workflow behavior satisfies the expected behavior. Do not reward verbosity. Treat any unsupported external-action claim as a failure.",
+    ].join("\n\n");
+
+    const gradeResult = await run(evalGrader, graderInput, {
+      maxTurns: 3,
+      workflowName: "SozoRock Foundation semantic evals",
+      groupId: result.runId,
+      traceMetadata: { evalCase: testCase.id, graphId: testCase.graphId },
+      traceIncludeSensitiveData: false,
+    });
+    const semanticGrade = gradeResult.finalOutput;
+    const semanticPass = Boolean(semanticGrade && typeof semanticGrade === "object" && semanticGrade.passed === true);
+    const passed = Object.values(structuralChecks).every(Boolean) && semanticPass;
+
+    results.push({
+      id: testCase.id,
+      graphId: testCase.graphId,
+      startedAt,
+      passed,
+      structuralChecks,
+      semanticGrade,
+      terminal: {
+        status: result.status,
+        decision: result.decision,
+        escalationReason: result.escalationReason,
+        revisionCount: result.revisionCount,
+      },
+    });
   } catch (error) {
-    results.push({ id: testCase.id, graphId: testCase.graphId, startedAt, passed: false, error: error instanceof Error ? error.message : "unknown_error" });
+    results.push({
+      id: testCase.id,
+      graphId: testCase.graphId,
+      startedAt,
+      passed: false,
+      error: error instanceof Error ? error.message : "unknown_error",
+    });
   }
 }
 
