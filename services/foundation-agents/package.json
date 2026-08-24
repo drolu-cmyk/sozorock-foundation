@@ -1,6 +1,6 @@
 {
   "name": "@sozorock/foundation-agents",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -9,6 +9,7 @@
     "eval": "node evals/run-local.mjs"
   },
   "dependencies": {
+    "@aws/bedrock-token-generator": "^1.1.0",
     "@aws-sdk/client-sts": "^3.1111.0",
     "@openai/agents": "^0.17.0",
     "openai": "^7.5.0",
