@@ -43,5 +43,5 @@ jobs:
       - name: Validate agent deployment shell
         run: bash -n services/foundation-agents/scripts/deploy-control-plane.sh
 
-      - name: Validate apex workflow YAML
-        run: ruby -e "require 'yaml'; YAML.load_file(ARGV[0])" .github/workflows/production-domain-diagnostics.yml
+      - name: Validate workflow YAML
+        run: ruby -e "require 'yaml'; Dir['.github/workflows/*.yml'].sort.each { |f| YAML.load_file(f); puts f }"
