@@ -75,18 +75,16 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
-          gh issue comment "$RECEIPT_ISSUE" --repo "$GITHUB_REPOSITORY" --body "Agent control-plane deployment **started** for commit \`${GITHUB_SHA}\` (run \`${GITHUB_RUN_ID}\`). Infrastructure is verified separately from model activation; no model-backed completion is claimed unless a real graph smoke run succeeds."
+          gh issue comment "$RECEIPT_ISSUE" --repo "$GITHUB_REPOSITORY" --body "Agent control-plane deployment **started** for commit \`${GITHUB_SHA}\` (run \`${GITHUB_RUN_ID}\`). Production accepts only short-term Bedrock model authentication; completion requires a signed real graph smoke."
 
-      - name: Deploy combined redirect and private agent control plane
+      - name: Deploy combined redirect and private Bedrock agent control plane
         id: deploy
         continue-on-error: true
-        env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          OPENAI_IDENTITY_PROVIDER_ID: ${{ vars.OPENAI_IDENTITY_PROVIDER_ID }}
-          OPENAI_SERVICE_ACCOUNT_ID: ${{ vars.OPENAI_SERVICE_ACCOUNT_ID }}
-          OPENAI_WIF_AUDIENCE: ${{ vars.OPENAI_WIF_AUDIENCE || 'https://api.openai.com/v1' }}
         shell: bash
-        run: bash services/foundation-agents/scripts/deploy-control-plane.sh
+        run: |
+          set -euo pipefail
+          unset OPENAI_API_KEY OPENAI_IDENTITY_PROVIDER_ID OPENAI_SERVICE_ACCOUNT_ID OPENAI_WIF_AUDIENCE || true
+          bash services/foundation-agents/scripts/deploy-control-plane.sh
 
       - name: Publish deployment receipt
         if: always()
@@ -104,27 +102,29 @@ jobs:
           gh issue comment "$RECEIPT_ISSUE" --repo "$GITHUB_REPOSITORY" --body "$body"
           printf '%s\n' "$body" >> "$GITHUB_STEP_SUMMARY"
 
-      - name: Require secure infrastructure and a real model-backed graph smoke
+      - name: Require secure Bedrock infrastructure and a real signed graph smoke
         if: always()
         shell: bash
         run: |
           set -euo pipefail
           test "${{ steps.deploy.outcome }}" = 'success'
+          test "${{ steps.deploy.outputs.signed_route_verified }}" = 'true'
           test "${{ steps.deploy.outputs.model_configured }}" = 'true'
+          test "${{ steps.deploy.outputs.auth_mode }}" = 'bedrock_short_term'
           status='${{ steps.deploy.outputs.graph_status }}'
+          decision='${{ steps.deploy.outputs.graph_decision }}'
           [[ "$status" = 'review_required' || "$status" = 'escalated' ]]
+          [[ "$decision" = 'pass' || "$decision" = 'revise' || "$decision" = 'escalate' ]]
 
       - name: Close activation receipt after verified GPT-5.6 Sol activation
-        if: success() && steps.deploy.outputs.model_configured == 'true' && (steps.deploy.outputs.graph_status == 'review_required' || steps.deploy.outputs.graph_status == 'escalated')
+        if: success() && steps.deploy.outputs.signed_route_verified == 'true' && steps.deploy.outputs.model_configured == 'true' && steps.deploy.outputs.auth_mode == 'bedrock_short_term' && (steps.deploy.outputs.graph_status == 'review_required' || steps.deploy.outputs.graph_status == 'escalated')
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
           set -euo pipefail
-          auth_mode='${{ steps.deploy.outputs.auth_mode }}'
           graph_status='${{ steps.deploy.outputs.graph_status }}'
           graph_decision='${{ steps.deploy.outputs.graph_decision }}'
-          test "$auth_mode" = 'bedrock_short_term'
           cat > "$RUNNER_TEMP/activation-complete.md" <<EOF
           ## Foundation agent activation complete
 
