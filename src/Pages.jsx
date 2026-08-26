@@ -351,7 +351,9 @@ export function PublicationAccessPage({ publication }) {
         body: JSON.stringify(payload),
       });
       const body = await response.json().catch(() => ({}));
-      if (!response.ok) throw new Error(body.error || "We could not process this request.");
+      if (!response.ok || body.accepted !== true || body.verificationSent !== true) {
+        throw new Error(body.error || "We could not send the verification email. Please try again.");
+      }
       setMessage(body.message || "Check your email for a verification link.");
       setStatus("sent");
       form.reset();
