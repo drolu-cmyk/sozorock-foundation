@@ -1,6 +1,6 @@
 # The SozoRock Foundation parent site
 
-The canonical Sites source for `www.sozorockfoundation.org`. The site is a responsive institutional experience with a Cloudflare Worker entry point for clean-route delivery and verified publication-access requests.
+The canonical repository source for `www.sozorockfoundation.org`. The site is a responsive institutional experience deployed to AWS CloudFront from a private, versioned S3 origin.
 
 ## Run locally
 
@@ -13,15 +13,15 @@ Production build and verification:
 
 ```bash
 npm run build
-node scripts/prepare-sites-build.mjs
-node --test tests/sites-worker.test.mjs
+npm run test:sites
+npm run test:aws
 ```
 
 ## Architecture and production source
 
-The site uses React and Vite with a lightweight History API router. The Sites worker serves the app shell directly for every permanent route so copied links and browser refreshes retain the requested path. It includes distinct views for Platforms, Publications, Insights, Events, About, Leadership, Partner, Support, Standards, the three platform detail pages, and the three DOI-facing publication routes.
+The site uses React and Vite with a lightweight History API router. The build emits route-specific HTML so copied links, search crawlers, and browser refreshes retain each permanent path. It includes distinct views for Platforms, Publications, Insights, Events, About, Leadership, Partner, Support, Standards, the three platform detail pages, and the three DOI-facing publication routes.
 
-Sites is the only production deployment source for the parent website. This repository does not contain an AWS parent-site deployment workflow or reconstructed AWS clone.
+Production hosting is fully defined in `infra/cloudformation/parent-cloudfront.yml`: private S3, CloudFront Origin Access Control, an ACM certificate for apex and `www`, strict response headers, clean-route/redirect logic, IPv4/IPv6 aliases, and a no-cache `/api/*` origin to the established SozoRock Health service. `.github/workflows/deploy-parent-cloudfront.yml` builds and verifies an isolated target, attaches the aliases, changes only the web DNS records, proves Google Workspace MX/TXT records are unchanged, and rolls web DNS back automatically if live checks fail.
 
 The homepage includes a rotating, pausable initiative feature with keyboard-operable tabs. Motion is intentionally restrained and respects `prefers-reduced-motion`.
 
@@ -52,6 +52,8 @@ Direct legacy file URLs redirect to that access route. The current Health verifi
 
 ## Form behavior
 
-The Partner and Support forms validate locally and prepare an addressed email inquiry; they do not claim to submit to a CRM. The HSA publication-access form posts to the Sites worker, which validates the request and forwards it to the established SozoRock Health verification service. Required delivery consent and optional updates consent are separate.
+The Partner and Support forms submit real consent-based inquiries through the established SozoRock Health intake service. Contact replies use `contact@sozorockfoundation.org`. HSA publication access uses the established verification service and sends from `publications@sozorockfoundation.org`; required delivery consent and optional updates consent remain separate. The parent CloudFront distribution exposes both services at same-origin `/api/*` paths without caching requests or responses.
+
+Google Workspace remains the domain's email authority. The AWS deployment never changes MX or TXT records and compares those record sets before and after every DNS cutover.
 
 No DOI is displayed or embedded until a registered DOI is supplied. Adding a DOI later requires only the publication metadata field; the permanent route does not change.

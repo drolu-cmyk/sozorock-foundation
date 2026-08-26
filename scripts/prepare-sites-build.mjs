@@ -118,6 +118,11 @@ function routeHtml(route) {
 
 writeFileSync(index, routeHtml("/"));
 
+let notFoundHtml = routeHtml("/");
+notFoundHtml = upsertMeta(notFoundHtml, "name", "robots", "noindex, nofollow, noarchive");
+notFoundHtml = notFoundHtml.replace(/<link\s+rel="canonical"[^>]*>\s*/u, "");
+writeFileSync(path.join(dist, "client", "404.html"), notFoundHtml);
+
 // Sites' edge dispatcher resolves a clean GET path against static HTML before
 // the worker fallback. Emitting route.html entry files keeps copied links and
 // browser refreshes on their permanent path instead of redirecting to `/`.

@@ -1,0 +1,269 @@
+name: Deploy parent website to AWS CloudFront
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - src/**
+      - public/**
+      - index.html
+      - package.json
+      - package-lock.json
+      - scripts/prepare-sites-build.mjs
+      - scripts/bootstrap-parent-aws.sh
+      - scripts/validate-aws-release.mjs
+      - infra/cloudformation/parent-cloudfront.yml
+      - .github/workflows/deploy-parent-cloudfront.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+  issues: write
+
+concurrency:
+  group: sozorock-foundation-parent-cloudfront
+  cancel-in-progress: false
+
+env:
+  AWS_REGION: us-east-1
+  ACCOUNT_ID: '791860731989'
+  BOOTSTRAP_ROLE_ARN: arn:aws:iam::791860731989:role/GitHubActionsSozorockAiLabDeployRole
+  DEPLOY_ROLE_ARN: arn:aws:iam::791860731989:role/GitHubActionsSozorockFoundationSiteDeployRole
+  EXECUTION_ROLE_ARN: arn:aws:iam::791860731989:role/SozoRockFoundationParentCloudFormationRole
+  STACK_NAME: sozorock-foundation-parent-cloudfront
+  BUCKET_NAME: sozorock-foundation-parent-cloudfront-prod-791860731989
+  HOSTED_ZONE_ID: Z07905293AANZWGYZ84F3
+  APEX_HOST: sozorockfoundation.org
+  CANONICAL_HOST: www.sozorockfoundation.org
+  CLOUDFRONT_ZONE_ID: Z2FDTNDATAQYW2
+  RECEIPT_ISSUE: '15'
+
+jobs:
+  deploy:
+    if: github.repository == 'drolu-cmyk/sozorock-foundation' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    steps:
+      - name: Check out exact main commit
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          ref: main
+          persist-credentials: false
+
+      - name: Set up Node
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Build and validate the approved site
+        run: |
+          set -euo pipefail
+          npm ci
+          npm run build
+          npm run test:sites
+          npm run test:aws
+          npm audit --omit=dev --audit-level=high
+          bash -n scripts/bootstrap-parent-aws.sh
+
+      - name: Assume the bounded bootstrap authority
+        uses: aws-actions/configure-aws-credentials@e6de054238d6b7531b4efff3b6587d9aade6a06c
+        with:
+          role-to-assume: ${{ env.BOOTSTRAP_ROLE_ARN }}
+          role-session-name: FoundationCloudFrontBootstrap-${{ github.run_id }}
+          aws-region: ${{ env.AWS_REGION }}
+          unset-current-credentials: true
+
+      - name: Establish narrow repeatable deployment authority
+        run: bash scripts/bootstrap-parent-aws.sh
+
+      - name: Switch to the Foundation deployment role
+        uses: aws-actions/configure-aws-credentials@e6de054238d6b7531b4efff3b6587d9aade6a06c
+        with:
+          role-to-assume: ${{ env.DEPLOY_ROLE_ARN }}
+          role-session-name: FoundationCloudFrontDeploy-${{ github.run_id }}
+          aws-region: ${{ env.AWS_REGION }}
+          unset-current-credentials: true
+
+      - name: Record protected mail DNS before deployment
+        shell: bash
+        run: |
+          set -euo pipefail
+          aws cloudformation validate-template --template-body file://infra/cloudformation/parent-cloudfront.yml >/dev/null
+          aws route53 list-resource-record-sets --hosted-zone-id "$HOSTED_ZONE_ID" --output json \
+            | jq -S '[.ResourceRecordSets[] | select(.Type == "MX" or .Type == "TXT")]' \
+            > "$RUNNER_TEMP/mail-records-before.json"
+          test "$(jq length "$RUNNER_TEMP/mail-records-before.json")" -ge 2
+
+      - name: Create isolated AWS target without public aliases
+        shell: bash
+        run: |
+          set -euo pipefail
+          aws cloudformation deploy \
+            --stack-name "$STACK_NAME" \
+            --template-file infra/cloudformation/parent-cloudfront.yml \
+            --role-arn "$EXECUTION_ROLE_ARN" \
+            --parameter-overrides \
+              ApexDomain="$APEX_HOST" \
+              CanonicalDomain="$CANONICAL_HOST" \
+              HostedZoneId="$HOSTED_ZONE_ID" \
+              SiteBucketName="$BUCKET_NAME" \
+              EnableAliases=false \
+            --no-fail-on-empty-changeset
+
+      - name: Publish the exact verified build to private S3
+        shell: bash
+        run: |
+          set -euo pipefail
+          aws s3 sync dist/client/ "s3://${BUCKET_NAME}/" --delete --exclude 'assets/*' --cache-control 'public,max-age=300,must-revalidate'
+          aws s3 sync dist/client/assets/ "s3://${BUCKET_NAME}/assets/" --delete --cache-control 'public,max-age=31536000,immutable'
+
+      - name: Resolve and verify the isolated target
+        id: target
+        shell: bash
+        run: |
+          set -euo pipefail
+          distribution_id="$(aws cloudformation describe-stacks --stack-name "$STACK_NAME" --query 'Stacks[0].Outputs[?OutputKey==`DistributionId`].OutputValue' --output text)"
+          distribution_domain="$(aws cloudformation describe-stacks --stack-name "$STACK_NAME" --query 'Stacks[0].Outputs[?OutputKey==`DistributionDomainName`].OutputValue' --output text)"
+          test -n "$distribution_id"
+          test -n "$distribution_domain"
+          aws cloudfront wait distribution-deployed --id "$distribution_id"
+          aws cloudfront create-invalidation --distribution-id "$distribution_id" --paths '/*' >/dev/null
+          for attempt in $(seq 1 30); do
+            page="$(curl --proto '=https' --tlsv1.2 --fail --silent --show-error --max-time 20 "https://${distribution_domain}/?preview=${GITHUB_RUN_ID}" || true)"
+            if grep -Fq 'Access. Assurance. Intelligence.' <<<"$page"; then break; fi
+            test "$attempt" -lt 30
+            sleep 10
+          done
+          curl --proto '=https' --tlsv1.2 --fail --silent --show-error "https://${distribution_domain}/platforms" | grep -Fq 'Three platforms'
+          api_status="$(curl --proto '=https' --tlsv1.2 --silent --show-error --output "$RUNNER_TEMP/api-preflight.json" --write-out '%{http_code}' \
+            --request POST --header 'Content-Type: application/json' --data '{"email":"invalid"}' \
+            "https://${distribution_domain}/api/contact")"
+          test "$api_status" = '400'
+          echo "distribution_id=$distribution_id" >> "$GITHUB_OUTPUT"
+          echo "distribution_domain=$distribution_domain" >> "$GITHUB_OUTPUT"
+
+      - name: Attach both production aliases after preflight
+        shell: bash
+        run: |
+          set -euo pipefail
+          aws cloudformation deploy \
+            --stack-name "$STACK_NAME" \
+            --template-file infra/cloudformation/parent-cloudfront.yml \
+            --role-arn "$EXECUTION_ROLE_ARN" \
+            --parameter-overrides \
+              ApexDomain="$APEX_HOST" \
+              CanonicalDomain="$CANONICAL_HOST" \
+              HostedZoneId="$HOSTED_ZONE_ID" \
+              SiteBucketName="$BUCKET_NAME" \
+              EnableAliases=true \
+            --no-fail-on-empty-changeset
+          aws cloudfront wait distribution-deployed --id '${{ steps.target.outputs.distribution_id }}'
+
+      - name: Verify production certificates before DNS
+        shell: bash
+        env:
+          DISTRIBUTION_DOMAIN: ${{ steps.target.outputs.distribution_domain }}
+        run: |
+          set -euo pipefail
+          target_ip="$(getent ahostsv4 "$DISTRIBUTION_DOMAIN" | awk 'NR==1 {print $1}')"
+          test -n "$target_ip"
+          curl --proto '=https' --tlsv1.2 --fail --silent --show-error --resolve "${CANONICAL_HOST}:443:${target_ip}" "https://${CANONICAL_HOST}/platforms" | grep -Fq 'Three platforms'
+          headers="$(mktemp)"
+          status="$(curl --proto '=https' --tlsv1.2 --silent --show-error --dump-header "$headers" --output /dev/null --resolve "${APEX_HOST}:443:${target_ip}" --write-out '%{http_code}' "https://${APEX_HOST}/publication/rrg-v1-2025?source=precutover")"
+          location="$(awk 'BEGIN{IGNORECASE=1} /^location:/ {sub(/\r$/, ""); sub(/^location:[[:space:]]*/, ""); print}' "$headers")"
+          test "$status" = '308'
+          test "$location" = "https://${CANONICAL_HOST}/publication/rrg-v1-2025?source=precutover"
+
+      - name: Atomically cut over DNS with automatic rollback
+        id: dns
+        shell: bash
+        env:
+          DISTRIBUTION_DOMAIN: ${{ steps.target.outputs.distribution_domain }}
+        run: |
+          set -euo pipefail
+          original="$RUNNER_TEMP/original-web-records.json"
+          rollback="$RUNNER_TEMP/rollback-web-records.json"
+          changed=0
+          verified=0
+
+          rollback_dns() {
+            if [[ "$changed" = '1' && "$verified" != '1' ]]; then
+              jq -n --arg apex "${APEX_HOST}." --arg www "${CANONICAL_HOST}." --arg target "${DISTRIBUTION_DOMAIN}." --arg zone "$CLOUDFRONT_ZONE_ID" --slurpfile old "$original" '{
+                Comment:"Rollback failed Foundation CloudFront cutover",
+                Changes: ([
+                  {Action:"DELETE",ResourceRecordSet:{Name:$apex,Type:"A",AliasTarget:{HostedZoneId:$zone,DNSName:$target,EvaluateTargetHealth:false}}},
+                  {Action:"DELETE",ResourceRecordSet:{Name:$apex,Type:"AAAA",AliasTarget:{HostedZoneId:$zone,DNSName:$target,EvaluateTargetHealth:false}}},
+                  {Action:"DELETE",ResourceRecordSet:{Name:$www,Type:"A",AliasTarget:{HostedZoneId:$zone,DNSName:$target,EvaluateTargetHealth:false}}},
+                  {Action:"DELETE",ResourceRecordSet:{Name:$www,Type:"AAAA",AliasTarget:{HostedZoneId:$zone,DNSName:$target,EvaluateTargetHealth:false}}}
+                ] + ($old[0] | map({Action:"CREATE",ResourceRecordSet:.})))
+              }' > "$rollback"
+              change_id="$(aws route53 change-resource-record-sets --hosted-zone-id "$HOSTED_ZONE_ID" --change-batch "file://$rollback" --query ChangeInfo.Id --output text)"
+              aws route53 wait resource-record-sets-changed --id "$change_id" || true
+            fi
+          }
+          trap rollback_dns EXIT
+
+          records="$(aws route53 list-resource-record-sets --hosted-zone-id "$HOSTED_ZONE_ID" --output json)"
+          jq --arg apex "${APEX_HOST}." --arg www "${CANONICAL_HOST}." '[.ResourceRecordSets[] | select((.Name==$apex or .Name==$www) and (.Type=="A" or .Type=="AAAA" or .Type=="CNAME"))]' <<<"$records" > "$original"
+
+          if jq -e --arg target "${DISTRIBUTION_DOMAIN}." 'length == 4 and all(.[]; .AliasTarget.DNSName == $target)' "$original" >/dev/null; then
+            echo 'Production web DNS already points to this distribution.'
+          else
+            jq -e --arg apex "${APEX_HOST}." --arg www "${CANONICAL_HOST}." '
+              any(.[]; .Name==$apex and .Type=="A" and .AliasTarget.DNSName=="d1w2jx9m5e0d5u.cloudfront.net.") and
+              any(.[]; .Name==$www and .Type=="CNAME" and .ResourceRecords[0].Value=="custom-domains.chatgpt.site.")
+            ' "$original" >/dev/null
+            jq -n --arg apex "${APEX_HOST}." --arg www "${CANONICAL_HOST}." --arg target "${DISTRIBUTION_DOMAIN}." --arg zone "$CLOUDFRONT_ZONE_ID" --slurpfile old "$original" '{
+              Comment:"Move the Foundation parent website from Sites to AWS CloudFront",
+              Changes: (($old[0] | map({Action:"DELETE",ResourceRecordSet:.})) + [
+                {Action:"CREATE",ResourceRecordSet:{Name:$apex,Type:"A",AliasTarget:{HostedZoneId:$zone,DNSName:$target,EvaluateTargetHealth:false}}},
+                {Action:"CREATE",ResourceRecordSet:{Name:$apex,Type:"AAAA",AliasTarget:{HostedZoneId:$zone,DNSName:$target,EvaluateTargetHealth:false}}},
+                {Action:"CREATE",ResourceRecordSet:{Name:$www,Type:"A",AliasTarget:{HostedZoneId:$zone,DNSName:$target,EvaluateTargetHealth:false}}},
+                {Action:"CREATE",ResourceRecordSet:{Name:$www,Type:"AAAA",AliasTarget:{HostedZoneId:$zone,DNSName:$target,EvaluateTargetHealth:false}}}
+              ])
+            }' > "$RUNNER_TEMP/cloudfront-cutover.json"
+            change_id="$(aws route53 change-resource-record-sets --hosted-zone-id "$HOSTED_ZONE_ID" --change-batch "file://$RUNNER_TEMP/cloudfront-cutover.json" --query ChangeInfo.Id --output text)"
+            changed=1
+            aws route53 wait resource-record-sets-changed --id "$change_id"
+          fi
+
+          for attempt in $(seq 1 30); do
+            page="$(curl --proto '=https' --tlsv1.2 --fail --silent --show-error --max-time 20 "https://${CANONICAL_HOST}/?live=${GITHUB_RUN_ID}" || true)"
+            if grep -Fq 'Access. Assurance. Intelligence.' <<<"$page"; then break; fi
+            test "$attempt" -lt 30
+            sleep 10
+          done
+          curl --proto '=https' --tlsv1.2 --fail --silent --show-error "https://${CANONICAL_HOST}/publication/hsa-v1-2026" | grep -Fq 'Health Systems Assurance'
+          apex_headers="$(mktemp)"
+          apex_status="$(curl --proto '=https' --tlsv1.2 --silent --show-error --dump-header "$apex_headers" --output /dev/null --write-out '%{http_code}' "https://${APEX_HOST}/platforms?source=live")"
+          apex_location="$(awk 'BEGIN{IGNORECASE=1} /^location:/ {sub(/\r$/, ""); sub(/^location:[[:space:]]*/, ""); print}' "$apex_headers")"
+          test "$apex_status" = '308'
+          test "$apex_location" = "https://${CANONICAL_HOST}/platforms?source=live"
+
+          aws route53 list-resource-record-sets --hosted-zone-id "$HOSTED_ZONE_ID" --output json \
+            | jq -S '[.ResourceRecordSets[] | select(.Type == "MX" or .Type == "TXT")]' \
+            > "$RUNNER_TEMP/mail-records-after.json"
+          cmp "$RUNNER_TEMP/mail-records-before.json" "$RUNNER_TEMP/mail-records-after.json"
+          verified=1
+          echo 'verified=true' >> "$GITHUB_OUTPUT"
+
+      - name: Publish production receipt
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          if [[ '${{ steps.dns.outputs.verified }}' = 'true' ]]; then
+            result='SUCCESS — www and apex are live on AWS CloudFront; Google Workspace MX/TXT records are unchanged.'
+          else
+            result='FAILURE — AWS cutover did not verify; the workflow retained or restored the prior web DNS.'
+          fi
+          body="## AWS parent-site migration receipt\n\n**${result}**\n\nRun: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}\nCommit: \`${GITHUB_SHA}\`\nDistribution: \`${{ steps.target.outputs.distribution_id || 'not-created' }}\`"
+          gh issue comment "$RECEIPT_ISSUE" --repo "$GITHUB_REPOSITORY" --body "$body"
+          printf '%b\n' "$body" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Require verified live deployment
+        if: always()
+        run: test '${{ steps.dns.outputs.verified }}' = 'true'

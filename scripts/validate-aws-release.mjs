@@ -1,0 +1,30 @@
+#!/usr/bin/env node
+import assert from "node:assert/strict";
+import { access, readFile } from "node:fs/promises";
+
+const root = new URL("../", import.meta.url);
+const template = await readFile(new URL("infra/cloudformation/parent-cloudfront.yml", root), "utf8");
+const workflow = await readFile(new URL(".github/workflows/deploy-parent-cloudfront.yml", root), "utf8");
+
+for (const fragment of [
+  "AWS::S3::Bucket",
+  "AWS::CloudFront::Distribution",
+  "AWS::CloudFront::OriginAccessControl",
+  "AWS::CertificateManager::Certificate",
+  "health.sozorockfoundation.org",
+  "sozorockfoundation.org",
+  "www.sozorockfoundation.org",
+]) assert.ok(template.includes(fragment), `template includes ${fragment}`);
+
+assert.match(template, /BlockPublicAcls:\s+true/u);
+assert.match(template, /VersioningConfiguration:\s+Status: Enabled/u);
+assert.match(template, /CachePolicyId: 4135ea2d-6df8-44a3-9df3-4b5a84be39ad/u);
+assert.match(template, /response\(308,/u);
+assert.match(template, /health-systems-assurance-volume-1/u);
+assert.doesNotMatch(workflow, /SMTP\.GOOGLE\.COM[^\n]*DELETE/iu);
+assert.match(workflow, /mail-records-before/u);
+assert.match(workflow, /rollback_dns/u);
+
+await access(new URL("dist/client/index.html", root));
+await access(new URL("dist/client/404.html", root));
+console.log("AWS release contract is valid.");

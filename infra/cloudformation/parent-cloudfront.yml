@@ -1,0 +1,295 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: SozoRock Foundation parent website on private S3 and CloudFront, with same-origin form proxying to the established Health service.
+
+Parameters:
+  ApexDomain:
+    Type: String
+    Default: sozorockfoundation.org
+  CanonicalDomain:
+    Type: String
+    Default: www.sozorockfoundation.org
+  HostedZoneId:
+    Type: String
+    Default: Z07905293AANZWGYZ84F3
+  SiteBucketName:
+    Type: String
+    Default: sozorock-foundation-parent-cloudfront-prod-791860731989
+  EnableAliases:
+    Type: String
+    Default: 'false'
+    AllowedValues: ['true', 'false']
+
+Conditions:
+  UseAliases: !Equals [!Ref EnableAliases, 'true']
+
+Resources:
+  SiteBucket:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      BucketName: !Ref SiteBucketName
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      OwnershipControls:
+        Rules:
+          - ObjectOwnership: BucketOwnerEnforced
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      VersioningConfiguration:
+        Status: Enabled
+
+  OriginAccessControl:
+    Type: AWS::CloudFront::OriginAccessControl
+    Properties:
+      OriginAccessControlConfig:
+        Description: Private access to the SozoRock Foundation parent-site bucket
+        Name: sozorock-foundation-parent-oac-2026
+        OriginAccessControlOriginType: s3
+        SigningBehavior: always
+        SigningProtocol: sigv4
+
+  SiteCertificate:
+    Type: AWS::CertificateManager::Certificate
+    Properties:
+      DomainName: !Ref CanonicalDomain
+      SubjectAlternativeNames:
+        - !Ref ApexDomain
+      DomainValidationOptions:
+        - DomainName: !Ref CanonicalDomain
+          HostedZoneId: !Ref HostedZoneId
+        - DomainName: !Ref ApexDomain
+          HostedZoneId: !Ref HostedZoneId
+      ValidationMethod: DNS
+
+  RequestRouter:
+    Type: AWS::CloudFront::Function
+    Properties:
+      AutoPublish: true
+      Name: sozorock-foundation-parent-router-2026
+      FunctionConfig:
+        Comment: Canonical host, legacy redirects, private-publication guards, and clean route rewrites
+        Runtime: cloudfront-js-2.0
+      FunctionCode: |
+        function response(statusCode, location, cacheControl) {
+          return {
+            statusCode: statusCode,
+            headers: {
+              location: { value: location },
+              'cache-control': { value: cacheControl }
+            }
+          };
+        }
+
+        function handler(event) {
+          var request = event.request;
+          var uri = request.uri;
+          var host = request.headers.host && request.headers.host.value;
+          var query = request.querystring;
+          var queryParts = [];
+          var key;
+
+          for (key in query) {
+            if (Object.prototype.hasOwnProperty.call(query, key)) {
+              if (query[key].multiValue) {
+                for (var i = 0; i < query[key].multiValue.length; i += 1) {
+                  queryParts.push(encodeURIComponent(key) + '=' + encodeURIComponent(query[key].multiValue[i].value));
+                }
+              } else {
+                queryParts.push(encodeURIComponent(key) + '=' + encodeURIComponent(query[key].value));
+              }
+            }
+          }
+          var suffix = queryParts.length ? '?' + queryParts.join('&') : '';
+
+          if (host === 'sozorockfoundation.org') {
+            return response(308, 'https://www.sozorockfoundation.org' + uri + suffix, 'public, max-age=86400');
+          }
+
+          var privateFiles = {
+            '/publications/hsa-volume-1-2026.pdf': '/publication/hsa-v1-2026/access',
+            '/publications/hsa-volume-1-2026.bib': '/publication/hsa-v1-2026/access',
+            '/publications/hsa-volume-1-2026.ris': '/publication/hsa-v1-2026/access'
+          };
+          if (privateFiles[uri]) return response(302, privateFiles[uri], 'no-store');
+
+          var legacy = {
+            '/work': '/platforms',
+            '/work/global-institute': '/platforms/institute',
+            '/work/health': '/platforms/health',
+            '/work/ai-lab': '/platforms/ai-lab'
+          };
+          if (legacy[uri]) return response(301, legacy[uri] + suffix, 'public, max-age=3600');
+
+          if (uri.length > 1 && uri.charAt(uri.length - 1) === '/') {
+            return response(308, uri.replace(/\/+$/, '') + suffix, 'public, max-age=3600');
+          }
+
+          if (uri === '/api/publications/access/hsa-v1-2026') {
+            request.uri = '/api/publications/access/health-systems-assurance-volume-1';
+            return request;
+          }
+          if (uri.indexOf('/api/') === 0) return request;
+
+          var routes = {
+            '/': true,
+            '/platforms': true,
+            '/platforms/institute': true,
+            '/platforms/health': true,
+            '/platforms/ai-lab': true,
+            '/publications': true,
+            '/insights': true,
+            '/events': true,
+            '/about': true,
+            '/leadership': true,
+            '/partner': true,
+            '/support': true,
+            '/standards': true,
+            '/privacy': true,
+            '/accessibility': true,
+            '/nondiscrimination': true,
+            '/terms': true,
+            '/publication/hsa-v1-2026': true,
+            '/publication/hsa-v1-2026/access': true,
+            '/publication/rrg-v1-2025': true,
+            '/publication/rebs-v1-2025': true
+          };
+          if (uri === '/') request.uri = '/index.html';
+          else if (routes[uri]) request.uri = uri + '.html';
+          return request;
+        }
+
+  SecurityHeaders:
+    Type: AWS::CloudFront::ResponseHeadersPolicy
+    Properties:
+      ResponseHeadersPolicyConfig:
+        Name: sozorock-foundation-parent-security-2026
+        Comment: Browser security policy for the Foundation parent website
+        SecurityHeadersConfig:
+          ContentSecurityPolicy:
+            ContentSecurityPolicy: "default-src 'self'; base-uri 'self'; connect-src 'self'; font-src 'self' https://fonts.gstatic.com data:; form-action 'self'; frame-ancestors 'none'; img-src 'self' data: https:; object-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; upgrade-insecure-requests"
+            Override: true
+          ContentTypeOptions:
+            Override: true
+          FrameOptions:
+            FrameOption: DENY
+            Override: true
+          ReferrerPolicy:
+            ReferrerPolicy: strict-origin-when-cross-origin
+            Override: true
+          StrictTransportSecurity:
+            AccessControlMaxAgeSec: 31536000
+            IncludeSubdomains: true
+            Override: true
+            Preload: true
+        CustomHeadersConfig:
+          Items:
+            - Header: Permissions-Policy
+              Override: true
+              Value: camera=(), geolocation=(), microphone=(), payment=(), usb=()
+
+  Distribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        Aliases: !If
+          - UseAliases
+          - [!Ref ApexDomain, !Ref CanonicalDomain]
+          - !Ref AWS::NoValue
+        Comment: SozoRock Foundation parent website
+        DefaultCacheBehavior:
+          AllowedMethods: [GET, HEAD, OPTIONS]
+          CachedMethods: [GET, HEAD, OPTIONS]
+          CachePolicyId: 658327ea-f89d-4fab-a63d-7e88639e58f6
+          Compress: true
+          FunctionAssociations:
+            - EventType: viewer-request
+              FunctionARN: !GetAtt RequestRouter.FunctionARN
+          ResponseHeadersPolicyId: !Ref SecurityHeaders
+          TargetOriginId: static-site
+          ViewerProtocolPolicy: redirect-to-https
+        CacheBehaviors:
+          - PathPattern: /api/*
+            AllowedMethods: [GET, HEAD, OPTIONS, PUT, PATCH, POST, DELETE]
+            CachedMethods: [GET, HEAD, OPTIONS]
+            CachePolicyId: 4135ea2d-6df8-44a3-9df3-4b5a84be39ad
+            Compress: true
+            FunctionAssociations:
+              - EventType: viewer-request
+                FunctionARN: !GetAtt RequestRouter.FunctionARN
+            OriginRequestPolicyId: b689b0a8-53d0-40ab-baf2-68738e2966ac
+            ResponseHeadersPolicyId: !Ref SecurityHeaders
+            TargetOriginId: health-service
+            ViewerProtocolPolicy: https-only
+        CustomErrorResponses:
+          - ErrorCachingMinTTL: 0
+            ErrorCode: 403
+            ResponseCode: 404
+            ResponsePagePath: /404.html
+          - ErrorCachingMinTTL: 0
+            ErrorCode: 404
+            ResponseCode: 404
+            ResponsePagePath: /404.html
+        DefaultRootObject: index.html
+        Enabled: true
+        HttpVersion: http2and3
+        IPV6Enabled: true
+        Origins:
+          - DomainName: !GetAtt SiteBucket.RegionalDomainName
+            Id: static-site
+            OriginAccessControlId: !Ref OriginAccessControl
+            S3OriginConfig:
+              OriginAccessIdentity: ''
+          - CustomOriginConfig:
+              HTTPSPort: 443
+              OriginProtocolPolicy: https-only
+              OriginReadTimeout: 30
+              OriginSSLProtocols: [TLSv1.2]
+            DomainName: health.sozorockfoundation.org
+            Id: health-service
+            OriginCustomHeaders:
+              - HeaderName: Origin
+                HeaderValue: https://health.sozorockfoundation.org
+              - HeaderName: Referer
+                HeaderValue: https://health.sozorockfoundation.org/contact
+              - HeaderName: X-SozoRock-Source
+                HeaderValue: parent-foundation
+        PriceClass: PriceClass_100
+        ViewerCertificate: !If
+          - UseAliases
+          - AcmCertificateArn: !Ref SiteCertificate
+            MinimumProtocolVersion: TLSv1.2_2021
+            SslSupportMethod: sni-only
+          - CloudFrontDefaultCertificate: true
+
+  SiteBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref SiteBucket
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: AllowCloudFrontReadOnly
+            Effect: Allow
+            Principal:
+              Service: cloudfront.amazonaws.com
+            Action: s3:GetObject
+            Resource: !Sub '${SiteBucket.Arn}/*'
+            Condition:
+              StringEquals:
+                AWS:SourceArn: !Sub 'arn:${AWS::Partition}:cloudfront::${AWS::AccountId}:distribution/${Distribution}'
+
+Outputs:
+  CertificateArn:
+    Value: !Ref SiteCertificate
+  DistributionDomainName:
+    Value: !GetAtt Distribution.DomainName
+  DistributionId:
+    Value: !Ref Distribution
+  SiteBucketName:
+    Value: !Ref SiteBucket

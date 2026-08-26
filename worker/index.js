@@ -246,7 +246,10 @@ async function handleContact(request, env) {
 
   const upstreamFetch = typeof env.UPSTREAM_FETCH === "function" ? env.UPSTREAM_FETCH : fetch;
   const { organization, ...upstreamPayload } = result.payload;
-  upstreamPayload.message = `Organization or affiliation: ${organization}\n\n${upstreamPayload.message}`;
+  const organizationPrefix = `Organization or affiliation: ${organization}\n\n`;
+  if (!upstreamPayload.message.startsWith(organizationPrefix)) {
+    upstreamPayload.message = `${organizationPrefix}${upstreamPayload.message}`;
+  }
   let upstream;
   try {
     upstream = await upstreamFetch(`${ACCESS_SERVICE_ORIGIN}/api/contact`, {

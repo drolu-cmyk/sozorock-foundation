@@ -107,10 +107,14 @@ export function EngagementForm({ kind }) {
     setStatus("sending");
     setMessage("");
     try {
+      const servicePayload = {
+        ...payload,
+        message: `Organization or affiliation: ${payload.organization}\n\n${payload.message}`,
+      };
       const response = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
+        body: JSON.stringify(servicePayload),
       });
       const body = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(body.error || "We could not send this inquiry right now.");
