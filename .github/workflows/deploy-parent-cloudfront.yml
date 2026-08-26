@@ -166,6 +166,8 @@ jobs:
           distribution_domain="$(aws cloudformation describe-stacks --stack-name "$STACK_NAME" --query 'Stacks[0].Outputs[?OutputKey==`DistributionDomainName`].OutputValue' --output text)"
           test -n "$distribution_id"
           test -n "$distribution_domain"
+          echo "distribution_id=$distribution_id" >> "$GITHUB_OUTPUT"
+          echo "distribution_domain=$distribution_domain" >> "$GITHUB_OUTPUT"
           aws cloudfront wait distribution-deployed --id "$distribution_id"
           aws cloudfront create-invalidation --distribution-id "$distribution_id" --paths '/*' >/dev/null
           for attempt in $(seq 1 30); do
@@ -174,7 +176,7 @@ jobs:
             test "$attempt" -lt 30
             sleep 10
           done
-          curl --proto '=https' --tlsv1.2 --fail --silent --show-error "https://${distribution_domain}/platforms" | grep -Fq 'Three platforms'
+          curl --proto '=https' --tlsv1.2 --fail --silent --show-error "https://${distribution_domain}/platforms" | grep -Fq '<title>Platforms | The SozoRock Foundation</title>'
           api_status="$(curl --proto '=https' --tlsv1.2 --silent --show-error --output "$RUNNER_TEMP/api-preflight.json" --write-out '%{http_code}' \
             --request POST --header 'Content-Type: application/json' --data '{"email":"invalid"}' \
             "https://${distribution_domain}/api/contact")"
@@ -183,9 +185,6 @@ jobs:
             --request POST --header 'Content-Type: application/json' --data '{"email":"invalid"}' \
             "https://${distribution_domain}/api/publications/access/hsa-v1-2026")"
           test "$publication_status" = '400'
-          echo "distribution_id=$distribution_id" >> "$GITHUB_OUTPUT"
-          echo "distribution_domain=$distribution_domain" >> "$GITHUB_OUTPUT"
-
       - name: Move and attach both production aliases after preflight
         if: steps.release_state.outputs.enable_aliases != 'true'
         shell: bash
