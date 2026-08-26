@@ -214,6 +214,18 @@ Resources:
           TargetOriginId: static-site
           ViewerProtocolPolicy: redirect-to-https
         CacheBehaviors:
+          - PathPattern: /api/publications/*
+            AllowedMethods: [GET, HEAD, OPTIONS, PUT, PATCH, POST, DELETE]
+            CachedMethods: [GET, HEAD, OPTIONS]
+            CachePolicyId: 4135ea2d-6df8-44a3-9df3-4b5a84be39ad
+            Compress: true
+            FunctionAssociations:
+              - EventType: viewer-request
+                FunctionARN: !GetAtt RequestRouter.FunctionARN
+            OriginRequestPolicyId: b689b0a8-53d0-40ab-baf2-68738e2966ac
+            ResponseHeadersPolicyId: !Ref SecurityHeaders
+            TargetOriginId: health-publications
+            ViewerProtocolPolicy: https-only
           - PathPattern: /api/*
             AllowedMethods: [GET, HEAD, OPTIONS, PUT, PATCH, POST, DELETE]
             CachedMethods: [GET, HEAD, OPTIONS]
@@ -224,7 +236,7 @@ Resources:
                 FunctionARN: !GetAtt RequestRouter.FunctionARN
             OriginRequestPolicyId: b689b0a8-53d0-40ab-baf2-68738e2966ac
             ResponseHeadersPolicyId: !Ref SecurityHeaders
-            TargetOriginId: health-service
+            TargetOriginId: health-contact
             ViewerProtocolPolicy: https-only
         CustomErrorResponses:
           - ErrorCachingMinTTL: 0
@@ -251,7 +263,7 @@ Resources:
               OriginReadTimeout: 30
               OriginSSLProtocols: [TLSv1.2]
             DomainName: health.sozorockfoundation.org
-            Id: health-service
+            Id: health-contact
             OriginCustomHeaders:
               - HeaderName: Origin
                 HeaderValue: https://health.sozorockfoundation.org
@@ -259,13 +271,25 @@ Resources:
                 HeaderValue: https://health.sozorockfoundation.org/contact
               - HeaderName: X-SozoRock-Source
                 HeaderValue: parent-foundation
+          - CustomOriginConfig:
+              HTTPSPort: 443
+              OriginProtocolPolicy: https-only
+              OriginReadTimeout: 30
+              OriginSSLProtocols: [TLSv1.2]
+            DomainName: health.sozorockfoundation.org
+            Id: health-publications
+            OriginCustomHeaders:
+              - HeaderName: Origin
+                HeaderValue: https://health.sozorockfoundation.org
+              - HeaderName: Referer
+                HeaderValue: https://health.sozorockfoundation.org/publications/health-systems-assurance-volume-1/access
+              - HeaderName: X-SozoRock-Source
+                HeaderValue: parent-foundation
         PriceClass: PriceClass_100
-        ViewerCertificate: !If
-          - UseAliases
-          - AcmCertificateArn: !Ref SiteCertificate
-            MinimumProtocolVersion: TLSv1.2_2021
-            SslSupportMethod: sni-only
-          - CloudFrontDefaultCertificate: true
+        ViewerCertificate:
+          AcmCertificateArn: !Ref SiteCertificate
+          MinimumProtocolVersion: TLSv1.2_2021
+          SslSupportMethod: sni-only
 
   SiteBucketPolicy:
     Type: AWS::S3::BucketPolicy
