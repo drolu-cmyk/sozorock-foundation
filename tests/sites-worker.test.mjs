@@ -178,7 +178,11 @@ test("forwards a valid access request to the established Health verification ser
   assert.equal(upstreamCalls[0].options.headers.Referer, "https://health.sozorockfoundation.org/publications/health-systems-assurance-volume-1/access");
   assert.equal(upstreamCalls[0].body.email, "amina@example.org");
   assert.equal(upstreamCalls[0].body.updatesConsent, false);
-  assert.deepEqual(await response.json(), { message: "Check your email for a verification link. It expires in 30 minutes." });
+  assert.deepEqual(await response.json(), {
+    accepted: true,
+    verificationSent: true,
+    message: "Check your email for a verification link. It expires in 30 minutes.",
+  });
 });
 
 test("does not claim verification was sent when the delivery service reports otherwise", async () => {
@@ -219,6 +223,11 @@ test("quietly accepts honeypot submissions without sending email", async () => {
 
   assert.equal(response.status, 200);
   assert.equal(upstreamCalls, 0);
+  assert.deepEqual(await response.json(), {
+    accepted: true,
+    verificationSent: true,
+    message: "Check your email for a verification link.",
+  });
 });
 
 test("rejects repeated-character and placeholder form entries", async () => {
