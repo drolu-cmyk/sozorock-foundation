@@ -125,7 +125,7 @@ jobs:
           apex_source_id="$(jq -r --arg alias "$APEX_HOST" '[.DistributionList.Items[]? | select((.Aliases.Items // []) | index($alias)) | .Id][0] // ""' <<<"$distributions")"
           www_source_id="$(jq -r --arg alias "$CANONICAL_HOST" '[.DistributionList.Items[]? | select((.Aliases.Items // []) | index($alias)) | .Id][0] // ""' <<<"$distributions")"
           if [[ "$enable_aliases" = false && -z "$apex_source_id" ]]; then
-            echo "The apex alias is external to this AWS account or currently unassociated; CloudFront will validate ownership during associate-alias."
+            echo "No in-account apex alias owner was found; DNS remains unchanged while CloudFront validates ownership during associate-alias."
           fi
 
           {
