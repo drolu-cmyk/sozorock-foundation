@@ -32,6 +32,15 @@ jobs:
       - name: Test Sites worker
         run: npm run test:sites
 
+      - name: Validate AWS CloudFront release contract
+        run: npm run test:aws
+
+      - name: Audit production dependencies
+        run: npm audit --omit=dev --audit-level=high
+
+      - name: Validate AWS bootstrap shell
+        run: bash -n scripts/bootstrap-parent-aws.sh
+
       - name: Install agent runtime dependencies
         working-directory: services/foundation-agents
         run: npm install --ignore-scripts --no-audit --no-fund
