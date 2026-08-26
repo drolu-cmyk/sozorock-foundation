@@ -21,9 +21,18 @@ assert.match(template, /VersioningConfiguration:\s+Status: Enabled/u);
 assert.match(template, /CachePolicyId: 4135ea2d-6df8-44a3-9df3-4b5a84be39ad/u);
 assert.match(template, /response\(308,/u);
 assert.match(template, /health-systems-assurance-volume-1/u);
+assert.match(template, /PathPattern: \/api\/publications\/\*/u);
+assert.match(template, /HeaderValue: https:\/\/health\.sozorockfoundation\.org\/publications\/health-systems-assurance-volume-1\/access/u);
+assert.match(template, /TargetOriginId: health-publications/u);
+assert.match(template, /TargetOriginId: health-contact/u);
 assert.doesNotMatch(workflow, /SMTP\.GOOGLE\.COM[^\n]*DELETE/iu);
 assert.match(workflow, /mail-records-before/u);
 assert.match(workflow, /rollback_dns/u);
+assert.match(workflow, /associate-alias/u);
+assert.match(workflow, /enable_aliases/u);
+
+const pages = await readFile(new URL("src/Pages.jsx", root), "utf8");
+assert.match(pages, /body\.accepted !== true \|\| body\.verificationSent !== true/u);
 
 await access(new URL("dist/client/index.html", root));
 await access(new URL("dist/client/404.html", root));
