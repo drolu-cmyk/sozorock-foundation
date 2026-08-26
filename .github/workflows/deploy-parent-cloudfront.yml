@@ -96,7 +96,45 @@ jobs:
             > "$RUNNER_TEMP/mail-records-before.json"
           test "$(jq length "$RUNNER_TEMP/mail-records-before.json")" -ge 2
 
-      - name: Create isolated AWS target without public aliases
+      - name: Resolve alias ownership and repeat-deployment mode
+        id: release_state
+        shell: bash
+        run: |
+          set -euo pipefail
+          enable_aliases=false
+          target_id=''
+          target_domain=''
+          if aws cloudformation describe-stacks --stack-name "$STACK_NAME" >/dev/null 2>&1; then
+            target_id="$(aws cloudformation describe-stacks --stack-name "$STACK_NAME" --query 'Stacks[0].Outputs[?OutputKey==`DistributionId`].OutputValue' --output text)"
+            target_domain="$(aws cloudformation describe-stacks --stack-name "$STACK_NAME" --query 'Stacks[0].Outputs[?OutputKey==`DistributionDomainName`].OutputValue' --output text)"
+          fi
+
+          web_records="$(aws route53 list-resource-record-sets --hosted-zone-id "$HOSTED_ZONE_ID" --output json)"
+          if [[ -n "$target_id" && -n "$target_domain" ]]; then
+            aliases="$(aws cloudfront get-distribution --id "$target_id" --query 'Distribution.DistributionConfig.Aliases.Items' --output json)"
+            if jq -e --arg apex "$APEX_HOST" --arg www "$CANONICAL_HOST" 'index($apex) and index($www)' <<<"$aliases" >/dev/null \
+              && jq -e --arg apex "${APEX_HOST}." --arg www "${CANONICAL_HOST}." --arg target "${target_domain}." '
+                [.ResourceRecordSets[] | select((.Name==$apex or .Name==$www) and (.Type=="A" or .Type=="AAAA"))] as $web |
+                ($web | length) == 4 and all($web[]; .AliasTarget.DNSName == $target)
+              ' <<<"$web_records" >/dev/null; then
+              enable_aliases=true
+            fi
+          fi
+
+          distributions="$(aws cloudfront list-distributions --output json)"
+          apex_source_id="$(jq -r --arg alias "$APEX_HOST" '[.DistributionList.Items[]? | select((.Aliases.Items // []) | index($alias)) | .Id][0] // ""' <<<"$distributions")"
+          www_source_id="$(jq -r --arg alias "$CANONICAL_HOST" '[.DistributionList.Items[]? | select((.Aliases.Items // []) | index($alias)) | .Id][0] // ""' <<<"$distributions")"
+          if [[ "$enable_aliases" = false ]]; then
+            test -n "$apex_source_id"
+          fi
+
+          {
+            echo "enable_aliases=$enable_aliases"
+            echo "apex_source_id=$apex_source_id"
+            echo "www_source_id=$www_source_id"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Create or update the AWS target without disrupting live aliases
         shell: bash
         run: |
           set -euo pipefail
@@ -109,7 +147,7 @@ jobs:
               CanonicalDomain="$CANONICAL_HOST" \
               HostedZoneId="$HOSTED_ZONE_ID" \
               SiteBucketName="$BUCKET_NAME" \
-              EnableAliases=false \
+              EnableAliases='${{ steps.release_state.outputs.enable_aliases }}' \
             --no-fail-on-empty-changeset
 
       - name: Publish the exact verified build to private S3
@@ -141,13 +179,43 @@ jobs:
             --request POST --header 'Content-Type: application/json' --data '{"email":"invalid"}' \
             "https://${distribution_domain}/api/contact")"
           test "$api_status" = '400'
+          publication_status="$(curl --proto '=https' --tlsv1.2 --silent --show-error --output "$RUNNER_TEMP/publication-preflight.json" --write-out '%{http_code}' \
+            --request POST --header 'Content-Type: application/json' --data '{"email":"invalid"}' \
+            "https://${distribution_domain}/api/publications/access/hsa-v1-2026")"
+          test "$publication_status" = '400'
           echo "distribution_id=$distribution_id" >> "$GITHUB_OUTPUT"
           echo "distribution_domain=$distribution_domain" >> "$GITHUB_OUTPUT"
 
-      - name: Attach both production aliases after preflight
+      - name: Move and attach both production aliases after preflight
+        if: steps.release_state.outputs.enable_aliases != 'true'
         shell: bash
+        env:
+          APEX_SOURCE_ID: ${{ steps.release_state.outputs.apex_source_id }}
+          WWW_SOURCE_ID: ${{ steps.release_state.outputs.www_source_id }}
         run: |
           set -euo pipefail
+          distribution_id='${{ steps.target.outputs.distribution_id }}'
+          moved=0
+          complete=0
+          rollback_aliases() {
+            if [[ "$moved" = '1' && "$complete" != '1' ]]; then
+              config="$RUNNER_TEMP/target-distribution-config.json"
+              update="$RUNNER_TEMP/target-distribution-without-aliases.json"
+              etag="$(aws cloudfront get-distribution-config --id "$distribution_id" --query ETag --output text)"
+              aws cloudfront get-distribution-config --id "$distribution_id" --query DistributionConfig --output json > "$config"
+              jq '.Aliases = {Quantity:0}' "$config" > "$update"
+              aws cloudfront update-distribution --id "$distribution_id" --if-match "$etag" --distribution-config "file://$update" >/dev/null || true
+              aws cloudfront wait distribution-deployed --id "$distribution_id" || true
+              [[ -z "$APEX_SOURCE_ID" ]] || aws cloudfront associate-alias --alias "$APEX_HOST" --target-distribution-id "$APEX_SOURCE_ID" || true
+              [[ -z "$WWW_SOURCE_ID" ]] || aws cloudfront associate-alias --alias "$CANONICAL_HOST" --target-distribution-id "$WWW_SOURCE_ID" || true
+            fi
+          }
+          trap rollback_aliases EXIT
+
+          aws cloudfront associate-alias --alias "$APEX_HOST" --target-distribution-id "$distribution_id"
+          moved=1
+          aws cloudfront associate-alias --alias "$CANONICAL_HOST" --target-distribution-id "$distribution_id"
+          aws cloudfront wait distribution-deployed --id "$distribution_id"
           aws cloudformation deploy \
             --stack-name "$STACK_NAME" \
             --template-file infra/cloudformation/parent-cloudfront.yml \
@@ -160,8 +228,19 @@ jobs:
               EnableAliases=true \
             --no-fail-on-empty-changeset
           aws cloudfront wait distribution-deployed --id '${{ steps.target.outputs.distribution_id }}'
+          target_ip="$(getent ahostsv4 '${{ steps.target.outputs.distribution_domain }}' | awk 'NR==1 {print $1}')"
+          test -n "$target_ip"
+          curl --proto '=https' --tlsv1.2 --fail --silent --show-error --resolve "${CANONICAL_HOST}:443:${target_ip}" "https://${CANONICAL_HOST}/platforms" | grep -Fq 'Three platforms'
+          headers="$(mktemp)"
+          status="$(curl --proto '=https' --tlsv1.2 --silent --show-error --dump-header "$headers" --output /dev/null --resolve "${APEX_HOST}:443:${target_ip}" --write-out '%{http_code}' "https://${APEX_HOST}/publication/rrg-v1-2025?source=precutover")"
+          location="$(awk 'BEGIN{IGNORECASE=1} /^location:/ {sub(/\r$/, ""); sub(/^location:[[:space:]]*/, ""); print}' "$headers")"
+          test "$status" = '308'
+          test "$location" = "https://${CANONICAL_HOST}/publication/rrg-v1-2025?source=precutover"
+          complete=1
+          touch "$RUNNER_TEMP/foundation-aliases-moved"
 
       - name: Verify production certificates before DNS
+        if: steps.release_state.outputs.enable_aliases == 'true'
         shell: bash
         env:
           DISTRIBUTION_DOMAIN: ${{ steps.target.outputs.distribution_domain }}
@@ -181,6 +260,10 @@ jobs:
         shell: bash
         env:
           DISTRIBUTION_DOMAIN: ${{ steps.target.outputs.distribution_domain }}
+          DISTRIBUTION_ID: ${{ steps.target.outputs.distribution_id }}
+          INITIAL_ENABLE_ALIASES: ${{ steps.release_state.outputs.enable_aliases }}
+          APEX_SOURCE_ID: ${{ steps.release_state.outputs.apex_source_id }}
+          WWW_SOURCE_ID: ${{ steps.release_state.outputs.www_source_id }}
         run: |
           set -euo pipefail
           original="$RUNNER_TEMP/original-web-records.json"
@@ -189,18 +272,36 @@ jobs:
           verified=0
 
           rollback_dns() {
-            if [[ "$changed" = '1' && "$verified" != '1' ]]; then
-              jq -n --arg apex "${APEX_HOST}." --arg www "${CANONICAL_HOST}." --arg target "${DISTRIBUTION_DOMAIN}." --arg zone "$CLOUDFRONT_ZONE_ID" --slurpfile old "$original" '{
-                Comment:"Rollback failed Foundation CloudFront cutover",
-                Changes: ([
-                  {Action:"DELETE",ResourceRecordSet:{Name:$apex,Type:"A",AliasTarget:{HostedZoneId:$zone,DNSName:$target,EvaluateTargetHealth:false}}},
-                  {Action:"DELETE",ResourceRecordSet:{Name:$apex,Type:"AAAA",AliasTarget:{HostedZoneId:$zone,DNSName:$target,EvaluateTargetHealth:false}}},
-                  {Action:"DELETE",ResourceRecordSet:{Name:$www,Type:"A",AliasTarget:{HostedZoneId:$zone,DNSName:$target,EvaluateTargetHealth:false}}},
-                  {Action:"DELETE",ResourceRecordSet:{Name:$www,Type:"AAAA",AliasTarget:{HostedZoneId:$zone,DNSName:$target,EvaluateTargetHealth:false}}}
-                ] + ($old[0] | map({Action:"CREATE",ResourceRecordSet:.})))
-              }' > "$rollback"
-              change_id="$(aws route53 change-resource-record-sets --hosted-zone-id "$HOSTED_ZONE_ID" --change-batch "file://$rollback" --query ChangeInfo.Id --output text)"
-              aws route53 wait resource-record-sets-changed --id "$change_id" || true
+            if [[ "$verified" != '1' ]]; then
+              if [[ "$INITIAL_ENABLE_ALIASES" != 'true' && -f "$RUNNER_TEMP/foundation-aliases-moved" ]]; then
+                aws cloudformation deploy \
+                  --stack-name "$STACK_NAME" \
+                  --template-file infra/cloudformation/parent-cloudfront.yml \
+                  --role-arn "$EXECUTION_ROLE_ARN" \
+                  --parameter-overrides \
+                    ApexDomain="$APEX_HOST" \
+                    CanonicalDomain="$CANONICAL_HOST" \
+                    HostedZoneId="$HOSTED_ZONE_ID" \
+                    SiteBucketName="$BUCKET_NAME" \
+                    EnableAliases=false \
+                  --no-fail-on-empty-changeset || true
+                aws cloudfront wait distribution-deployed --id "$DISTRIBUTION_ID" || true
+                [[ -z "$APEX_SOURCE_ID" ]] || aws cloudfront associate-alias --alias "$APEX_HOST" --target-distribution-id "$APEX_SOURCE_ID" || true
+                [[ -z "$WWW_SOURCE_ID" ]] || aws cloudfront associate-alias --alias "$CANONICAL_HOST" --target-distribution-id "$WWW_SOURCE_ID" || true
+              fi
+              if [[ "$changed" = '1' ]]; then
+                jq -n --arg apex "${APEX_HOST}." --arg www "${CANONICAL_HOST}." --arg target "${DISTRIBUTION_DOMAIN}." --arg zone "$CLOUDFRONT_ZONE_ID" --slurpfile old "$original" '{
+                  Comment:"Rollback failed Foundation CloudFront cutover",
+                  Changes: ([
+                    {Action:"DELETE",ResourceRecordSet:{Name:$apex,Type:"A",AliasTarget:{HostedZoneId:$zone,DNSName:$target,EvaluateTargetHealth:false}}},
+                    {Action:"DELETE",ResourceRecordSet:{Name:$apex,Type:"AAAA",AliasTarget:{HostedZoneId:$zone,DNSName:$target,EvaluateTargetHealth:false}}},
+                    {Action:"DELETE",ResourceRecordSet:{Name:$www,Type:"A",AliasTarget:{HostedZoneId:$zone,DNSName:$target,EvaluateTargetHealth:false}}},
+                    {Action:"DELETE",ResourceRecordSet:{Name:$www,Type:"AAAA",AliasTarget:{HostedZoneId:$zone,DNSName:$target,EvaluateTargetHealth:false}}}
+                  ] + ($old[0] | map({Action:"CREATE",ResourceRecordSet:.})))
+                }' > "$rollback"
+                change_id="$(aws route53 change-resource-record-sets --hosted-zone-id "$HOSTED_ZONE_ID" --change-batch "file://$rollback" --query ChangeInfo.Id --output text)"
+                aws route53 wait resource-record-sets-changed --id "$change_id" || true
+              fi
             fi
           }
           trap rollback_dns EXIT
