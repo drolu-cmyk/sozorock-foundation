@@ -30,6 +30,7 @@ assert.match(workflow, /mail-records-before/u);
 assert.match(workflow, /rollback_dns/u);
 assert.match(workflow, /associate-alias/u);
 assert.match(workflow, /enable_aliases/u);
+assert.match(workflow, /<title>Platforms \| The SozoRock Foundation<\/title>/u);
 
 const pages = await readFile(new URL("src/Pages.jsx", root), "utf8");
 assert.match(pages, /body\.accepted !== true \|\| body\.verificationSent !== true/u);
