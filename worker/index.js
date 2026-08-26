@@ -174,7 +174,7 @@ async function handlePublicationAccess(request, env, slug) {
 
   // Quietly accept honeypot submissions so automated form abuse receives no useful signal.
   if (result.payload.website) {
-    return json({ message: "Check your email for a verification link." });
+    return json({ accepted: true, verificationSent: true, message: "Check your email for a verification link." });
   }
 
   const upstreamFetch = typeof env.UPSTREAM_FETCH === "function" ? env.UPSTREAM_FETCH : fetch;
@@ -202,7 +202,7 @@ async function handlePublicationAccess(request, env, slug) {
   if (body.verificationSent !== true) {
     return json({ error: "Email verification is temporarily unavailable. Please try again later." }, 503);
   }
-  return json({ message: "Check your email for a verification link. It expires in 30 minutes." });
+  return json({ accepted: true, verificationSent: true, message: "Check your email for a verification link. It expires in 30 minutes." });
 }
 
 function validateContactPayload(input) {
