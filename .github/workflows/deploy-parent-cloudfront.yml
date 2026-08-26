@@ -185,6 +185,7 @@ jobs:
             --request POST --header 'Content-Type: application/json' --data '{"email":"invalid"}' \
             "https://${distribution_domain}/api/publications/access/hsa-v1-2026")"
           test "$publication_status" = '400'
+
       - name: Move and attach both production aliases after preflight
         if: steps.release_state.outputs.enable_aliases != 'true'
         shell: bash
