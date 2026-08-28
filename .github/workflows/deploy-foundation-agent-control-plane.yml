@@ -96,10 +96,11 @@ jobs:
           configured='${{ steps.deploy.outputs.model_configured }}'
           auth_mode='${{ steps.deploy.outputs.auth_mode }}'
           api_mode='${{ steps.deploy.outputs.model_api_mode }}'
+          selected_model='${{ steps.deploy.outputs.selected_model }}'
           signed_route='${{ steps.deploy.outputs.signed_route_verified }}'
           graph_status='${{ steps.deploy.outputs.graph_status }}'
           graph_decision='${{ steps.deploy.outputs.graph_decision }}'
-          body="Agent control-plane run \`${GITHUB_RUN_ID}\`: secure infrastructure deployment **${outcome}**. Canonical redirect and unsigned 403 protection are required before infrastructure remains deployed. Model configured: **${configured:-unknown}**; auth mode: \`${auth_mode:-none}\`; model API: \`${api_mode:-unknown}\`; deploy-role signed internal probe: \`${signed_route:-not-run}\`; graph smoke status: \`${graph_status:-not-run}\`; decision: \`${graph_decision:-not-run}\`. No secret values are included in this receipt."
+          body="Agent control-plane run \`${GITHUB_RUN_ID}\`: secure infrastructure deployment **${outcome}**. Canonical redirect and unsigned 403 protection are required before infrastructure remains deployed. Model configured: **${configured:-unknown}**; selected model: \`${selected_model:-unknown}\`; auth mode: \`${auth_mode:-none}\`; model API: \`${api_mode:-unknown}\`; deploy-role signed internal probe: \`${signed_route:-not-run}\`; graph smoke status: \`${graph_status:-not-run}\`; decision: \`${graph_decision:-not-run}\`. No secret values are included in this receipt."
           gh issue comment "$RECEIPT_ISSUE" --repo "$GITHUB_REPOSITORY" --body "$body"
           printf '%s\n' "$body" >> "$GITHUB_STEP_SUMMARY"
 
@@ -113,12 +114,13 @@ jobs:
           test "${{ steps.deploy.outputs.model_configured }}" = 'true'
           test "${{ steps.deploy.outputs.auth_mode }}" = 'bedrock_short_term'
           test "${{ steps.deploy.outputs.model_api_mode }}" = 'responses'
+          [[ "${{ steps.deploy.outputs.selected_model }}" = 'openai.gpt-5.5' || "${{ steps.deploy.outputs.selected_model }}" = 'openai.gpt-5.4' || "${{ steps.deploy.outputs.selected_model }}" = 'openai.gpt-5.6-luna' ]]
           status='${{ steps.deploy.outputs.graph_status }}'
           decision='${{ steps.deploy.outputs.graph_decision }}'
           [[ "$status" = 'review_required' || "$status" = 'escalated' ]]
           [[ "$decision" = 'pass' || "$decision" = 'revise' || "$decision" = 'escalate' ]]
 
-      - name: Close activation receipt after verified GPT-5.6 Terra activation
+      - name: Close activation receipt after verified Bedrock model activation
         if: success() && steps.deploy.outputs.signed_route_verified == 'true' && steps.deploy.outputs.model_configured == 'true' && steps.deploy.outputs.auth_mode == 'bedrock_short_term' && steps.deploy.outputs.model_api_mode == 'responses' && (steps.deploy.outputs.graph_status == 'review_required' || steps.deploy.outputs.graph_status == 'escalated')
         env:
           GH_TOKEN: ${{ github.token }}
@@ -127,10 +129,11 @@ jobs:
           set -euo pipefail
           graph_status='${{ steps.deploy.outputs.graph_status }}'
           graph_decision='${{ steps.deploy.outputs.graph_decision }}'
+          selected_model='${{ steps.deploy.outputs.selected_model }}'
           cat > "$RUNNER_TEMP/activation-complete.md" <<EOF
           ## Foundation agent activation complete
 
-          GPT-5.6 Terra is active through short-term Amazon Bedrock credentials and the Bedrock OpenAI-compatible Responses API on the private AWS-IAM-protected Foundation control plane. The production deployment passed canonical redirect verification, unsigned 403 protection, the signed internal route check, and a real model-backed bounded graph smoke ending in \`${graph_status}\` with decision \`${graph_decision}\`.
+          \`${selected_model}\` is active through short-term Amazon Bedrock credentials and the Bedrock OpenAI-compatible Responses API on the private AWS-IAM-protected Foundation control plane. The production deployment passed canonical redirect verification, unsigned 403 protection, the signed internal route check, and a real model-backed bounded graph smoke ending in \`${graph_status}\` with decision \`${graph_decision}\`.
 
           No long-lived model credential is stored in the Foundation runtime.
           EOF

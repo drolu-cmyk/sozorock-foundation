@@ -6,6 +6,7 @@ import OpenAI from "openai";
 const foundationEdgeFunction = "SozoRockFoundationParentOrigin";
 let configuredMode = null;
 let bedrockTokenProvider = null;
+let bedrockClient = null;
 
 function wifConfig() {
   const identityProviderId = process.env.OPENAI_IDENTITY_PROVIDER_ID?.trim();
@@ -69,8 +70,8 @@ export async function ensureModelAuthConfigured() {
     }
     const token = await bedrockTokenProvider();
     if (!token) throw new Error("Amazon Bedrock did not return a short-term API key.");
-    const client = new OpenAI({ apiKey: token, baseURL: config.baseURL });
-    setDefaultOpenAIClient(client);
+    bedrockClient = new OpenAI({ apiKey: token, baseURL: config.baseURL });
+    setDefaultOpenAIClient(bedrockClient);
     setOpenAIAPI("responses");
     setTracingDisabled(true);
     configuredMode = mode;
@@ -108,4 +109,13 @@ export async function ensureModelAuthConfigured() {
   setTracingDisabled(true);
   configuredMode = mode;
   return mode;
+}
+
+export async function listAvailableBedrockModels() {
+  if (modelAuthMode() !== "bedrock_short_term") {
+    throw new Error("Amazon Bedrock model discovery requires the Bedrock runtime.");
+  }
+  await ensureModelAuthConfigured();
+  const page = await bedrockClient.models.list();
+  return [...new Set(page.data.map((entry) => entry.id).filter((id) => typeof id === "string"))].sort();
 }

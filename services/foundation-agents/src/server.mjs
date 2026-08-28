@@ -97,6 +97,7 @@ const server = http.createServer(async (request, response) => {
       modelConfigured: modelAuthConfigured(),
       modelAuthMode: modelAuthMode(),
       modelApiMode: modelApiMode(),
+      model: process.env.OPENAI_AGENT_MODEL || null,
     });
   }
 

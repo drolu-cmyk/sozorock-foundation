@@ -30,6 +30,9 @@ assert.equal(JSON.parse(health.body).modelConfigured, false);
 assert.equal(JSON.parse(health.body).modelApiMode, "responses");
 assert.equal(health.headers["cache-control"], "no-store");
 
+const catalogWithoutModel = await handler({ operation: "deployment:model-catalog" });
+assert.equal(catalogWithoutModel.statusCode, 503);
+
 const index = await handler(event("GET", "/internal/v1/graphs"));
 assert.equal(index.statusCode, 200);
 assert.equal(Object.keys(JSON.parse(index.body).graphs).length, 6);

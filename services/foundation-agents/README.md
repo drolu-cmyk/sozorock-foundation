@@ -49,7 +49,7 @@ The execution graph is not the institutional knowledge graph. Public navigation 
 
 ## Model authentication
 
-Production uses Amazon Bedrock's OpenAI-compatible Responses API with `openai.gpt-5.6-terra` in `us-east-1`. Bedrock serves this OpenAI model at `/openai/v1/responses`, so the runtime uses the `/openai/v1` base URL while retaining the same agent graph, structured outputs, bounded revisions, and evaluator gates. The exact production Lambda derives a short-term Bedrock API key from its IAM role using `@aws/bedrock-token-generator`. The key is generated for a graph run, is never persisted or logged, and expires with the underlying AWS session. The Lambda role is restricted to GPT-5.6 Terra inference and `SHORT_TERM` bearer-token use.
+Production uses Amazon Bedrock's OpenAI-compatible Responses API in `us-east-1`. Deployment queries the authenticated Bedrock model catalog and selects the strongest account-available model from the bounded approved set (`openai.gpt-5.5`, `openai.gpt-5.4`, or `openai.gpt-5.6-luna`) before the real graph smoke. Bedrock serves these OpenAI models at `/openai/v1/responses`, so the runtime uses the `/openai/v1` base URL while retaining the same agent graph, structured outputs, bounded revisions, and evaluator gates. The exact production Lambda derives a short-term Bedrock API key from its IAM role using `@aws/bedrock-token-generator`. The key is generated for a graph run, is never persisted or logged, and expires with the underlying AWS session. The Lambda role is restricted to the approved model set and `SHORT_TERM` bearer-token use.
 
 The runtime keeps two controlled alternatives for non-production environments:
 
@@ -80,7 +80,7 @@ The production fallback to Bedrock is scoped to the exact Lambda name `SozoRockF
 Optional local runtime settings:
 
 ```text
-OPENAI_AGENT_MODEL=openai.gpt-5.6-terra
+OPENAI_AGENT_MODEL=openai.gpt-5.4
 PORT=8788
 FOUNDATION_AGENT_SERVICE_TOKEN=<local-service-only secret>
 TRUST_PROXY_HEADERS=false

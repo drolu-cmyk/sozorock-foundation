@@ -119,7 +119,7 @@ snapshot_route 'OPTIONS /public/v1/navigate' public-options "$routes_before"
 
 # AWS_REGION is injected by Lambda as a reserved runtime variable.
 jq -n \
-  --arg model 'openai.gpt-5.6-terra' \
+  --arg model 'openai.gpt-5.4' \
   --arg key "${OPENAI_API_KEY:-}" \
   --arg provider "${OPENAI_IDENTITY_PROVIDER_ID:-}" \
   --arg service "${OPENAI_SERVICE_ACCOUNT_ID:-}" \
@@ -129,6 +129,35 @@ jq -n \
 
 aws lambda update-function-code --function-name "$FUNCTION_NAME" --zip-file "fileb://$LAMBDA_ZIP" >/dev/null
 function_changed=1
+aws lambda wait function-updated --function-name "$FUNCTION_NAME"
+
+cat > "$work/model-catalog-payload.json" <<'JSON'
+{"operation":"deployment:model-catalog"}
+JSON
+catalog_function_error="$(aws lambda invoke \
+  --function-name "$FUNCTION_NAME" \
+  --cli-binary-format raw-in-base64-out \
+  --payload "fileb://$work/model-catalog-payload.json" \
+  --query 'FunctionError' \
+  --output text \
+  "$work/model-catalog-response.json")"
+test "$catalog_function_error" = 'None'
+test "$(jq -r '.statusCode' "$work/model-catalog-response.json")" = '200'
+jq -e '.body | fromjson | .models | type == "array" and length > 0' "$work/model-catalog-response.json" >/dev/null
+
+selected_model=''
+for candidate in openai.gpt-5.5 openai.gpt-5.4 openai.gpt-5.6-luna; do
+  if jq -e --arg candidate "$candidate" '.body | fromjson | .models | index($candidate)' "$work/model-catalog-response.json" >/dev/null; then
+    selected_model="$candidate"
+    break
+  fi
+done
+test -n "$selected_model"
+jq --arg model "$selected_model" '.Variables.OPENAI_AGENT_MODEL = $model' "$work/lambda-env.json" > "$work/lambda-env-selected.json"
+mv "$work/lambda-env-selected.json" "$work/lambda-env.json"
+aws lambda update-function-configuration \
+  --function-name "$FUNCTION_NAME" \
+  --environment "file://$work/lambda-env.json" >/dev/null
 aws lambda wait function-updated --function-name "$FUNCTION_NAME"
 aws lambda update-function-configuration \
   --function-name "$FUNCTION_NAME" \
@@ -263,9 +292,11 @@ if curl --help all 2>/dev/null | grep -q -- '--aws-sigv4'; then
     model_configured="$(jq -r '.modelConfigured' "$work/signed-health.json")"
     auth_mode="$(jq -r '.modelAuthMode // "none"' "$work/signed-health.json")"
     model_api_mode="$(jq -r '.modelApiMode // "unknown"' "$work/signed-health.json")"
+    health_model="$(jq -r '.model // "unknown"' "$work/signed-health.json")"
 
     if [[ "$model_configured" = 'true' ]]; then
       test "$model_api_mode" = 'responses'
+      test "$health_model" = "$selected_model"
       cat > "$work/run-payload.json" <<'JSON'
 {"graphId":"foundationSiteAssurance","input":{"task":"Review a bounded synthetic deployment change.","evidence":{"repository":"sozorock-foundation","liveVerification":"not supplied","constraint":"Do not claim production completion without live evidence."}},"context":{"source":"deployment-smoke"}}
 JSON
@@ -303,6 +334,7 @@ if [[ -n "${GITHUB_OUTPUT:-}" ]]; then
   echo "public_navigator_endpoint=${api_endpoint}/public/v1/navigate" >> "$GITHUB_OUTPUT"
   echo "auth_mode=$auth_mode" >> "$GITHUB_OUTPUT"
   echo "model_api_mode=$model_api_mode" >> "$GITHUB_OUTPUT"
+  echo "selected_model=$selected_model" >> "$GITHUB_OUTPUT"
   echo "model_configured=$model_configured" >> "$GITHUB_OUTPUT"
   echo "signed_route_verified=$signed_route_verified" >> "$GITHUB_OUTPUT"
   echo "graph_status=$graph_status" >> "$GITHUB_OUTPUT"

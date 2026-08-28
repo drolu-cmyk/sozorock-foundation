@@ -1,7 +1,7 @@
 import { Buffer } from "node:buffer";
 import { containsForbiddenMaterial, isPlainObject, maxRequestBytes } from "./boundary.mjs";
 import { executeGraph, graphs } from "./graph.mjs";
-import { modelApiMode, modelAuthConfigured, modelAuthMode } from "./model-auth.mjs";
+import { listAvailableBedrockModels, modelApiMode, modelAuthConfigured, modelAuthMode } from "./model-auth.mjs";
 import { normalizePublicAnswer } from "./public-knowledge.mjs";
 
 const canonicalOrigin = "https://www.sozorockfoundation.org";
@@ -180,6 +180,15 @@ function requestBody(event) {
 }
 
 export async function handler(event) {
+  if (event?.operation === "deployment:model-catalog") {
+    if (!modelAuthConfigured()) return response(503, { error: "model_service_not_configured" });
+    try {
+      return response(200, { models: await listAvailableBedrockModels() });
+    } catch (error) {
+      return response(502, { error: "model_catalog_failed", failure: modelFailureClass(error) });
+    }
+  }
+
   const method = requestMethod(event);
   const path = requestPath(event);
 
@@ -199,6 +208,7 @@ export async function handler(event) {
       modelConfigured: modelAuthConfigured(),
       modelAuthMode: modelAuthMode(),
       modelApiMode: modelApiMode(),
+      model: process.env.OPENAI_AGENT_MODEL || null,
       surface: "internal",
     });
   }
