@@ -113,7 +113,7 @@ jobs:
           test "${{ steps.deploy.outputs.signed_route_verified }}" = 'true'
           test "${{ steps.deploy.outputs.model_configured }}" = 'true'
           test "${{ steps.deploy.outputs.auth_mode }}" = 'bedrock_short_term'
-          test "${{ steps.deploy.outputs.model_api_mode }}" = 'responses'
+          test "${{ steps.deploy.outputs.model_api_mode }}" = 'chat_completions'
           [[ "${{ steps.deploy.outputs.selected_model }}" = 'openai.gpt-oss-120b' || "${{ steps.deploy.outputs.selected_model }}" = 'openai.gpt-oss-20b' ]]
           status='${{ steps.deploy.outputs.graph_status }}'
           decision='${{ steps.deploy.outputs.graph_decision }}'
@@ -121,7 +121,7 @@ jobs:
           [[ "$decision" = 'pass' || "$decision" = 'revise' || "$decision" = 'escalate' ]]
 
       - name: Close activation receipt after verified Bedrock model activation
-        if: success() && steps.deploy.outputs.signed_route_verified == 'true' && steps.deploy.outputs.model_configured == 'true' && steps.deploy.outputs.auth_mode == 'bedrock_short_term' && steps.deploy.outputs.model_api_mode == 'responses' && (steps.deploy.outputs.graph_status == 'review_required' || steps.deploy.outputs.graph_status == 'escalated')
+        if: success() && steps.deploy.outputs.signed_route_verified == 'true' && steps.deploy.outputs.model_configured == 'true' && steps.deploy.outputs.auth_mode == 'bedrock_short_term' && steps.deploy.outputs.model_api_mode == 'chat_completions' && (steps.deploy.outputs.graph_status == 'review_required' || steps.deploy.outputs.graph_status == 'escalated')
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
@@ -133,7 +133,7 @@ jobs:
           cat > "$RUNNER_TEMP/activation-complete.md" <<EOF
           ## Foundation agent activation complete
 
-          \`${selected_model}\` is active through short-term Amazon Bedrock credentials and the Bedrock OpenAI-compatible Responses API on the private AWS-IAM-protected Foundation control plane. The production deployment passed canonical redirect verification, unsigned 403 protection, the signed internal route check, and an authenticated parallel canary across all six real model-backed site-assurance agents ending in \`${graph_status}\` with decision \`${graph_decision}\`.
+          \`${selected_model}\` is active through short-term Amazon Bedrock credentials and the Bedrock OpenAI-compatible Chat Completions API on the private AWS-IAM-protected Foundation control plane. The production deployment passed canonical redirect verification, unsigned 403 protection, the signed internal route check, and an authenticated parallel canary across all six real model-backed site-assurance agents ending in \`${graph_status}\` with decision \`${graph_decision}\`.
 
           No long-lived model credential is stored in the Foundation runtime.
           EOF

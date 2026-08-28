@@ -53,7 +53,7 @@ jobs:
             .ok == true and
             .modelConfigured == true and
             .modelAuthMode == "bedrock_short_term" and
-            .modelApiMode == "responses" and
+            .modelApiMode == "chat_completions" and
             (.model == "openai.gpt-oss-20b" or .model == "openai.gpt-oss-120b")
           ' "$RUNNER_TEMP/health.json" >/dev/null
           echo "model=$(jq -r '.model' "$RUNNER_TEMP/health.json")" >> "$GITHUB_OUTPUT"

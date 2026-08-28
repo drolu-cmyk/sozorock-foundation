@@ -291,7 +291,7 @@ if curl --help all 2>/dev/null | grep -q -- '--aws-sigv4'; then
     health_model="$(jq -r '.model // "unknown"' "$work/signed-health.json")"
 
     if [[ "$model_configured" = 'true' ]]; then
-      test "$model_api_mode" = 'responses'
+      test "$model_api_mode" = 'chat_completions'
       test "$health_model" = "$selected_model"
       cat > "$work/run-payload.json" <<'JSON'
 {"operation":"deployment:agent-canary"}
