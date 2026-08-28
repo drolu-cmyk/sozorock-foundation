@@ -39,7 +39,7 @@ export function bedrockRuntimeModelId(model) {
 
 function bedrockConfig() {
   if (!bedrockRequested()) return null;
-  const awsRegion = process.env.AWS_REGION?.trim();
+  const awsRegion = process.env.BEDROCK_MODEL_REGION?.trim() || process.env.AWS_REGION?.trim();
   if (!awsRegion) return null;
   const model = process.env.OPENAI_AGENT_MODEL?.trim() || "";
   return {

@@ -124,7 +124,8 @@ jq -n \
   --arg provider "${OPENAI_IDENTITY_PROVIDER_ID:-}" \
   --arg service "${OPENAI_SERVICE_ACCOUNT_ID:-}" \
   --arg audience "${OPENAI_WIF_AUDIENCE:-}" \
-  '{Variables:{OPENAI_AGENT_MODEL:$model,OPENAI_API_KEY:$key,OPENAI_IDENTITY_PROVIDER_ID:$provider,OPENAI_SERVICE_ACCOUNT_ID:$service,OPENAI_WIF_AUDIENCE:$audience}} | .Variables |= with_entries(select(.value != ""))' \
+  --arg bedrockRegion "$AWS_REGION" \
+  '{Variables:{OPENAI_AGENT_MODEL:$model,BEDROCK_MODEL_REGION:$bedrockRegion,OPENAI_API_KEY:$key,OPENAI_IDENTITY_PROVIDER_ID:$provider,OPENAI_SERVICE_ACCOUNT_ID:$service,OPENAI_WIF_AUDIENCE:$audience}} | .Variables |= with_entries(select(.value != ""))' \
   > "$work/lambda-env.json"
 
 aws lambda update-function-code --function-name "$FUNCTION_NAME" --zip-file "fileb://$LAMBDA_ZIP" >/dev/null
@@ -132,24 +133,37 @@ function_changed=1
 aws lambda wait function-updated --function-name "$FUNCTION_NAME"
 
 selected_model=''
-for candidate in openai.gpt-oss-20b openai.gpt-oss-120b; do
-  jq -n --arg model "$candidate" '{operation:"deployment:model-probe",model:$model}' > "$work/model-probe-payload.json"
-  aws lambda invoke \
-    --function-name "$FUNCTION_NAME" \
-    --cli-binary-format raw-in-base64-out \
-    --payload "fileb://$work/model-probe-payload.json" \
-    "$work/model-probe-response.json" >/dev/null
-  probe_status="$(jq -r '.statusCode // 500' "$work/model-probe-response.json")"
-  if [[ "$probe_status" = '200' ]] && jq -e '.body | fromjson | .available == true' "$work/model-probe-response.json" >/dev/null; then
-    selected_model="$candidate"
-    break
-  fi
-  probe_code="$(jq -r '.body | fromjson | .failure.providerCode // "unknown"' "$work/model-probe-response.json" 2>/dev/null || echo unknown)"
-  probe_detail="$(jq -r '.body | fromjson | .failure.providerDetail // "not supplied"' "$work/model-probe-response.json" 2>/dev/null || echo 'not supplied')"
-  echo "Bedrock model probe rejected ${candidate}: provider_code=${probe_code}; detail=${probe_detail}." >&2
+selected_model_region=''
+for model_region in us-east-2 us-west-2 us-east-1; do
+  for candidate in openai.gpt-oss-20b openai.gpt-oss-120b; do
+    jq --arg model "$candidate" --arg region "$model_region" \
+      '.Variables.OPENAI_AGENT_MODEL = $model | .Variables.BEDROCK_MODEL_REGION = $region' \
+      "$work/lambda-env.json" > "$work/lambda-env-probe.json"
+    aws lambda update-function-configuration \
+      --function-name "$FUNCTION_NAME" \
+      --environment "file://$work/lambda-env-probe.json" >/dev/null
+    aws lambda wait function-updated --function-name "$FUNCTION_NAME"
+    jq -n --arg model "$candidate" '{operation:"deployment:model-probe",model:$model}' > "$work/model-probe-payload.json"
+    aws lambda invoke \
+      --function-name "$FUNCTION_NAME" \
+      --cli-binary-format raw-in-base64-out \
+      --payload "fileb://$work/model-probe-payload.json" \
+      "$work/model-probe-response.json" >/dev/null
+    probe_status="$(jq -r '.statusCode // 500' "$work/model-probe-response.json")"
+    if [[ "$probe_status" = '200' ]] && jq -e '.body | fromjson | .available == true' "$work/model-probe-response.json" >/dev/null; then
+      selected_model="$candidate"
+      selected_model_region="$model_region"
+      break 2
+    fi
+    probe_code="$(jq -r '.body | fromjson | .failure.providerCode // "unknown"' "$work/model-probe-response.json" 2>/dev/null || echo unknown)"
+    probe_detail="$(jq -r '.body | fromjson | .failure.providerDetail // "not supplied"' "$work/model-probe-response.json" 2>/dev/null || echo 'not supplied')"
+    echo "Bedrock model probe rejected ${candidate} in ${model_region}: provider_code=${probe_code}; detail=${probe_detail}." >&2
+  done
 done
 test -n "$selected_model"
-jq --arg model "$selected_model" '.Variables.OPENAI_AGENT_MODEL = $model' "$work/lambda-env.json" > "$work/lambda-env-selected.json"
+jq --arg model "$selected_model" --arg region "$selected_model_region" \
+  '.Variables.OPENAI_AGENT_MODEL = $model | .Variables.BEDROCK_MODEL_REGION = $region' \
+  "$work/lambda-env.json" > "$work/lambda-env-selected.json"
 mv "$work/lambda-env-selected.json" "$work/lambda-env.json"
 aws lambda update-function-configuration \
   --function-name "$FUNCTION_NAME" \
@@ -328,6 +342,7 @@ if [[ -n "${GITHUB_OUTPUT:-}" ]]; then
   echo "auth_mode=$auth_mode" >> "$GITHUB_OUTPUT"
   echo "model_api_mode=$model_api_mode" >> "$GITHUB_OUTPUT"
   echo "selected_model=$selected_model" >> "$GITHUB_OUTPUT"
+  echo "selected_model_region=$selected_model_region" >> "$GITHUB_OUTPUT"
   echo "model_configured=$model_configured" >> "$GITHUB_OUTPUT"
   echo "signed_route_verified=$signed_route_verified" >> "$GITHUB_OUTPUT"
   echo "graph_status=$graph_status" >> "$GITHUB_OUTPUT"

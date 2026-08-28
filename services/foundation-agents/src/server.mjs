@@ -98,6 +98,7 @@ const server = http.createServer(async (request, response) => {
       modelAuthMode: modelAuthMode(),
       modelApiMode: modelApiMode(),
       model: process.env.OPENAI_AGENT_MODEL || null,
+      modelRegion: process.env.BEDROCK_MODEL_REGION || process.env.AWS_REGION || null,
     });
   }
 

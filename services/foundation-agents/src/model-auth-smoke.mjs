@@ -27,6 +27,7 @@ const keys = [
   "OPENAI_WIF_AUDIENCE",
   "AWS_LAMBDA_FUNCTION_NAME",
   "AWS_REGION",
+  "BEDROCK_MODEL_REGION",
 ];
 const saved = Object.fromEntries(keys.map((key) => [key, process.env[key]]));
 
@@ -67,7 +68,15 @@ assert.equal(modelAuthConfigured(), true);
 assert.equal(modelAuthMode(), "bedrock_short_term");
 assert.equal(modelApiMode(), "chat_completions");
 
+process.env.BEDROCK_MODEL_REGION = "us-east-2";
+assert.equal(modelAuthConfigured(), true);
+assert.equal(modelAuthMode(), "bedrock_short_term");
+
 delete process.env.AWS_REGION;
+assert.equal(modelAuthConfigured(), true);
+assert.equal(modelAuthMode(), "bedrock_short_term");
+
+delete process.env.BEDROCK_MODEL_REGION;
 assert.equal(modelAuthConfigured(), false);
 assert.equal(modelAuthMode(), null);
 
