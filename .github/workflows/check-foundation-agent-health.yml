@@ -1,0 +1,70 @@
+name: Check Foundation agent health
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/check-foundation-agent-health.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+  issues: write
+
+env:
+  AWS_REGION: us-east-1
+  AWS_ROLE_TO_ASSUME: arn:aws:iam::791860731989:role/GitHubActionsSozorockFoundationSiteDeployRole
+  API_NAME: SozoRockFoundationParentSite
+  RECEIPT_ISSUE: '58'
+
+jobs:
+  health:
+    if: github.repository == 'drolu-cmyk/sozorock-foundation' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Assume the Foundation deployment role
+        uses: aws-actions/configure-aws-credentials@e6de054238d6b7531b4efff3b6587d9aade6a06c
+        with:
+          role-to-assume: ${{ env.AWS_ROLE_TO_ASSUME }}
+          role-session-name: FoundationAgentHealth-${{ github.run_id }}
+          aws-region: ${{ env.AWS_REGION }}
+          retry-max-attempts: 3
+
+      - name: Verify the signed production health route
+        id: health
+        shell: bash
+        run: |
+          set -euo pipefail
+          api_id="$(aws apigatewayv2 get-apis --output json | jq -r --arg name "$API_NAME" '.Items[]? | select(.Name == $name) | .ApiId' | head -n1)"
+          test -n "$api_id"
+          api_endpoint="$(aws apigatewayv2 get-api --api-id "$api_id" --query ApiEndpoint --output text)"
+          status="$(curl --silent --show-error \
+            --output "$RUNNER_TEMP/health.json" \
+            --max-time 30 \
+            --write-out '%{http_code}' \
+            --aws-sigv4 "aws:amz:${AWS_REGION}:execute-api" \
+            --user "${AWS_ACCESS_KEY_ID}:${AWS_SECRET_ACCESS_KEY}" \
+            -H "x-amz-security-token: ${AWS_SESSION_TOKEN}" \
+            "${api_endpoint}/internal/health")"
+          test "$status" = '200'
+          jq -e '
+            .ok == true and
+            .modelConfigured == true and
+            .modelAuthMode == "bedrock_short_term" and
+            .modelApiMode == "responses" and
+            (.model == "openai.gpt-oss-20b" or .model == "openai.gpt-oss-120b")
+          ' "$RUNNER_TEMP/health.json" >/dev/null
+          echo "model=$(jq -r '.model' "$RUNNER_TEMP/health.json")" >> "$GITHUB_OUTPUT"
+          echo "auth=$(jq -r '.modelAuthMode' "$RUNNER_TEMP/health.json")" >> "$GITHUB_OUTPUT"
+          echo "api=$(jq -r '.modelApiMode' "$RUNNER_TEMP/health.json")" >> "$GITHUB_OUTPUT"
+
+      - name: Publish the health receipt
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          body="Signed Foundation agent health passed. Model: `${{ steps.health.outputs.model }}`; authentication: `${{ steps.health.outputs.auth }}`; API: `${{ steps.health.outputs.api }}`. No secret values were read or logged."
+          gh issue comment "$RECEIPT_ISSUE" --repo "$GITHUB_REPOSITORY" --body "$body"
+          printf '%s\n' "$body" >> "$GITHUB_STEP_SUMMARY"
