@@ -62,6 +62,22 @@ jobs:
               "Action":"bedrock:CallWithBearerToken",
               "Resource":"*",
               "Condition":{"StringEquals":{"bedrock:BearerTokenType":"SHORT_TERM"}}
+            },
+            {
+              "Sid":"FoundationAgentApprovedMantleInferenceOnly",
+              "Effect":"Allow",
+              "Action":"bedrock-mantle:CreateInference",
+              "Resource":[
+                "arn:aws:bedrock-mantle:${AWS_REGION}:${ACCOUNT_ID}:project/default",
+                "arn:aws:bedrock-mantle:us-east-2:${ACCOUNT_ID}:project/default"
+              ]
+            },
+            {
+              "Sid":"FoundationAgentShortTermMantleTokenOnly",
+              "Effect":"Allow",
+              "Action":"bedrock-mantle:CallWithBearerToken",
+              "Resource":"*",
+              "Condition":{"StringEquals":{"bedrock-mantle:BearerTokenType":"SHORT_TERM"}}
             }
           ]}
           EOF
@@ -92,7 +108,11 @@ jobs:
               "arn:aws:bedrock:us-west-2:" + $account + ":project/default"
             ] and
             [.Statement[] | select(.Action == "bedrock:CallWithBearerToken")][0].Condition.StringEquals["bedrock:BearerTokenType"] == "SHORT_TERM" and
-            ([.Statement[].Action] | all(. == "bedrock:InvokeModel" or . == "bedrock:CallWithBearerToken"))
+            [.Statement[] | select(.Action == "bedrock-mantle:CreateInference")][0].Resource == [
+              "arn:aws:bedrock-mantle:" + $region + ":" + $account + ":project/default",
+              "arn:aws:bedrock-mantle:us-east-2:" + $account + ":project/default"
+            ] and
+            [.Statement[] | select(.Action == "bedrock-mantle:CallWithBearerToken")][0].Condition.StringEquals["bedrock-mantle:BearerTokenType"] == "SHORT_TERM"
           ' <<<"$policy" >/dev/null
 
       - name: Publish activation receipt
