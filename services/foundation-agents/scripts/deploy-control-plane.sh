@@ -119,7 +119,7 @@ snapshot_route 'OPTIONS /public/v1/navigate' public-options "$routes_before"
 
 # AWS_REGION is injected by Lambda as a reserved runtime variable.
 jq -n \
-  --arg model 'openai.gpt-oss-120b' \
+  --arg model 'openai.gpt-oss-20b' \
   --arg key "${OPENAI_API_KEY:-}" \
   --arg provider "${OPENAI_IDENTITY_PROVIDER_ID:-}" \
   --arg service "${OPENAI_SERVICE_ACCOUNT_ID:-}" \
@@ -132,7 +132,7 @@ function_changed=1
 aws lambda wait function-updated --function-name "$FUNCTION_NAME"
 
 selected_model=''
-for candidate in openai.gpt-oss-120b openai.gpt-oss-20b; do
+for candidate in openai.gpt-oss-20b openai.gpt-oss-120b; do
   jq -n --arg model "$candidate" '{operation:"deployment:model-probe",model:$model}' > "$work/model-probe-payload.json"
   aws lambda invoke \
     --function-name "$FUNCTION_NAME" \

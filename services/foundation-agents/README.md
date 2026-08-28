@@ -49,7 +49,7 @@ The execution graph is not the institutional knowledge graph. Public navigation 
 
 ## Model authentication
 
-Production uses Amazon Bedrock's OpenAI-compatible Responses API in `us-east-1`. Deployment runs a tiny real Responses probe and selects the strongest account-available model from the bounded approved set (`openai.gpt-oss-120b` or `openai.gpt-oss-20b`) before the full graph smoke. Bedrock serves these models at `/v1/responses`; the runtime retains the same agent graph, structured outputs, bounded revisions, and evaluator gates. The exact production Lambda derives a short-term Bedrock API key from its IAM role using `@aws/bedrock-token-generator`. The key is generated for a graph run, is never persisted or logged, and expires with the underlying AWS session. The Lambda role is restricted to the approved model set and `SHORT_TERM` bearer-token use.
+Production uses Amazon Bedrock's OpenAI-compatible Responses API in `us-east-1`. Deployment runs a tiny real Responses probe and selects the lowest-latency account-available model from the bounded approved set (`openai.gpt-oss-20b`, with `openai.gpt-oss-120b` as fallback) before the full graph smoke. Bedrock serves these models at `/v1/responses`; the runtime retains the same agent graph, structured outputs, bounded revisions, and evaluator gates. The exact production Lambda derives a short-term Bedrock API key from its IAM role using `@aws/bedrock-token-generator`. The key is generated for a graph run, is never persisted or logged, and expires with the underlying AWS session. The Lambda role is restricted to the approved model set and `SHORT_TERM` bearer-token use.
 
 The runtime keeps two controlled alternatives for non-production environments:
 
@@ -80,7 +80,7 @@ The production fallback to Bedrock is scoped to the exact Lambda name `SozoRockF
 Optional local runtime settings:
 
 ```text
-OPENAI_AGENT_MODEL=openai.gpt-oss-120b
+OPENAI_AGENT_MODEL=openai.gpt-oss-20b
 PORT=8788
 FOUNDATION_AGENT_SERVICE_TOKEN=<local-service-only secret>
 TRUST_PROXY_HEADERS=false
