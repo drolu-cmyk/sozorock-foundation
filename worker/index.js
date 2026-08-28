@@ -271,6 +271,66 @@ async function handleContact(request, env) {
   return json({ message: typeof body.message === "string" ? body.message : "Thank you. Your inquiry has been received." });
 }
 
+async function handleNavigator(request, env) {
+  const contentLength = Number(request.headers.get("content-length") || 0);
+  if (contentLength > MAX_REQUEST_BYTES) return json({ error: "Request is too large." }, 413);
+  let input;
+  try {
+    input = await request.json();
+  } catch {
+    return json({ error: "Submit the question as JSON." }, 400);
+  }
+  const question = typeof input?.question === "string" ? input.question.trim() : "";
+  if (!input || typeof input !== "object" || Array.isArray(input) || question.length < 3 || question.length > 600) {
+    return json({ error: "Enter a question between 3 and 600 characters." }, 400);
+  }
+
+  const endpoint = typeof env.FOUNDATION_AGENT_PUBLIC_ORIGIN === "string"
+    ? env.FOUNDATION_AGENT_PUBLIC_ORIGIN.trim()
+    : "";
+  if (!/^https:\/\/[^/]+\/public\/v1\/navigate$/u.test(endpoint)) {
+    return json({ error: "The website guide is temporarily unavailable." }, 503);
+  }
+
+  const agentFetch = typeof env.AGENT_FETCH === "function" ? env.AGENT_FETCH : fetch;
+  let upstream;
+  try {
+    upstream = await agentFetch(endpoint, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+        "Origin": `https://${CANONICAL_HOSTNAME}`,
+        "X-SozoRock-Source": "parent-foundation",
+      },
+      body: JSON.stringify({ question }),
+    });
+  } catch {
+    return json({ error: "The website guide is temporarily unavailable." }, 502);
+  }
+
+  const body = await upstream.json().catch(() => ({}));
+  if (!upstream.ok) {
+    const status = upstream.status === 429 ? 429 : upstream.status >= 400 && upstream.status < 500 ? upstream.status : 502;
+    return json({
+      error: typeof body.message === "string"
+        ? body.message
+        : status === 429
+          ? "The website guide is busy. Please wait a minute and try again."
+          : "The website guide is temporarily unavailable.",
+    }, status);
+  }
+  return json({
+    answer: typeof body.answer === "string" ? body.answer.slice(0, 1200) : "",
+    links: Array.isArray(body.links)
+      ? body.links
+        .filter((link) => link && typeof link.label === "string" && typeof link.href === "string" && /^\/[a-z0-9/-]*$/u.test(link.href))
+        .slice(0, 3)
+      : [],
+    notice: typeof body.notice === "string" ? body.notice.slice(0, 500) : null,
+  });
+}
+
 function redirect(url, pathname, status = 308) {
   const destination = new URL(url);
   destination.pathname = pathname;
@@ -361,6 +421,11 @@ export default {
     if (url.pathname === "/api/contact") {
       if (request.method !== "POST") return json({ error: "Method not allowed." }, 405);
       return handleContact(request, env);
+    }
+
+    if (url.pathname === "/api/navigator") {
+      if (request.method !== "POST") return json({ error: "Method not allowed." }, 405);
+      return handleNavigator(request, env);
     }
 
     const response = await env.ASSETS.fetch(request);

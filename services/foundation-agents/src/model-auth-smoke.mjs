@@ -2,10 +2,12 @@ import assert from "node:assert/strict";
 import { modelAuthConfigured, modelAuthMode } from "./model-auth.mjs";
 
 const keys = [
+  "FOUNDATION_MODEL_PROVIDER",
   "OPENAI_API_KEY",
   "OPENAI_IDENTITY_PROVIDER_ID",
   "OPENAI_SERVICE_ACCOUNT_ID",
   "OPENAI_WIF_AUDIENCE",
+  "AWS_LAMBDA_FUNCTION_NAME",
   "AWS_REGION",
 ];
 const saved = Object.fromEntries(keys.map((key) => [key, process.env[key]]));
@@ -28,6 +30,23 @@ assert.equal(modelAuthMode(), "aws_wif");
 
 delete process.env.OPENAI_SERVICE_ACCOUNT_ID;
 assert.equal(modelAuthConfigured(), false);
+
+process.env.FOUNDATION_MODEL_PROVIDER = "bedrock";
+assert.equal(modelAuthConfigured(), true);
+assert.equal(modelAuthMode(), "bedrock_short_term");
+delete process.env.FOUNDATION_MODEL_PROVIDER;
+
+process.env.AWS_LAMBDA_FUNCTION_NAME = "UnrelatedFunction";
+assert.equal(modelAuthConfigured(), false);
+assert.equal(modelAuthMode(), null);
+
+process.env.AWS_LAMBDA_FUNCTION_NAME = "SozoRockFoundationParentOrigin";
+assert.equal(modelAuthConfigured(), true);
+assert.equal(modelAuthMode(), "bedrock_short_term");
+
+delete process.env.AWS_REGION;
+assert.equal(modelAuthConfigured(), false);
+assert.equal(modelAuthMode(), null);
 
 for (const key of keys) {
   if (saved[key] === undefined) delete process.env[key];

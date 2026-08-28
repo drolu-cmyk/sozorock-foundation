@@ -63,7 +63,10 @@ rollback() {
     restore_route health
     restore_route graphs
     restore_route run
+    restore_route public-navigate
+    restore_route public-options
     aws lambda remove-permission --function-name "$FUNCTION_NAME" --statement-id FoundationAgentsInternalApiInvoke >/dev/null 2>&1 || true
+    aws lambda remove-permission --function-name "$FUNCTION_NAME" --statement-id FoundationAgentsPublicApiInvoke >/dev/null 2>&1 || true
     if [[ "$integration_created" = '1' && -n "$integration_id" ]]; then
       aws apigatewayv2 delete-integration --api-id "$api_id" --integration-id "$integration_id" >/dev/null 2>&1 || true
     fi
@@ -111,6 +114,8 @@ routes_before="$(aws apigatewayv2 get-routes --api-id "$api_id" --output json)"
 snapshot_route 'GET /internal/health' health "$routes_before"
 snapshot_route 'GET /internal/v1/graphs' graphs "$routes_before"
 snapshot_route 'POST /internal/v1/run' run "$routes_before"
+snapshot_route 'POST /public/v1/navigate' public-navigate "$routes_before"
+snapshot_route 'OPTIONS /public/v1/navigate' public-options "$routes_before"
 
 # AWS_REGION is injected by Lambda as a reserved runtime variable.
 jq -n \
@@ -150,18 +155,21 @@ test -n "$integration_id"
 
 upsert_route() {
   local route_key="$1"
+  local authorization_type="${2:-AWS_IAM}"
   local current route_id
   current="$(aws apigatewayv2 get-routes --api-id "$api_id" --output json)"
   route_id="$(jq -r --arg key "$route_key" '.Items[]? | select(.RouteKey == $key) | .RouteId' <<<"$current" | head -n1)"
   if [[ -n "$route_id" ]]; then
-    aws apigatewayv2 update-route --api-id "$api_id" --route-id "$route_id" --authorization-type AWS_IAM --target "integrations/${integration_id}" >/dev/null
+    aws apigatewayv2 update-route --api-id "$api_id" --route-id "$route_id" --authorization-type "$authorization_type" --target "integrations/${integration_id}" >/dev/null
   else
-    aws apigatewayv2 create-route --api-id "$api_id" --route-key "$route_key" --authorization-type AWS_IAM --target "integrations/${integration_id}" >/dev/null
+    aws apigatewayv2 create-route --api-id "$api_id" --route-key "$route_key" --authorization-type "$authorization_type" --target "integrations/${integration_id}" >/dev/null
   fi
 }
 upsert_route 'GET /internal/health'
 upsert_route 'GET /internal/v1/graphs'
 upsert_route 'POST /internal/v1/run'
+upsert_route 'POST /public/v1/navigate' NONE
+upsert_route 'OPTIONS /public/v1/navigate' NONE
 routes_changed=1
 
 aws lambda remove-permission --function-name "$FUNCTION_NAME" --statement-id FoundationAgentsInternalApiInvoke >/dev/null 2>&1 || true
@@ -172,11 +180,25 @@ aws lambda add-permission \
   --principal apigateway.amazonaws.com \
   --source-arn "arn:aws:execute-api:${AWS_REGION}:${ACCOUNT_ID}:${api_id}/*/*/internal/*" >/dev/null
 
+aws lambda remove-permission --function-name "$FUNCTION_NAME" --statement-id FoundationAgentsPublicApiInvoke >/dev/null 2>&1 || true
+aws lambda add-permission \
+  --function-name "$FUNCTION_NAME" \
+  --statement-id FoundationAgentsPublicApiInvoke \
+  --action lambda:InvokeFunction \
+  --principal apigateway.amazonaws.com \
+  --source-arn "arn:aws:execute-api:${AWS_REGION}:${ACCOUNT_ID}:${api_id}/*/*/public/*" >/dev/null
+
 routes_after="$(aws apigatewayv2 get-routes --api-id "$api_id" --output json)"
 for key in 'GET /internal/health' 'GET /internal/v1/graphs' 'POST /internal/v1/run'; do
   auth="$(jq -r --arg key "$key" '.Items[]? | select(.RouteKey == $key) | .AuthorizationType' <<<"$routes_after")"
   target="$(jq -r --arg key "$key" '.Items[]? | select(.RouteKey == $key) | .Target' <<<"$routes_after")"
   test "$auth" = 'AWS_IAM'
+  test "$target" = "integrations/${integration_id}"
+done
+for key in 'POST /public/v1/navigate' 'OPTIONS /public/v1/navigate'; do
+  auth="$(jq -r --arg key "$key" '.Items[]? | select(.RouteKey == $key) | .AuthorizationType' <<<"$routes_after")"
+  target="$(jq -r --arg key "$key" '.Items[]? | select(.RouteKey == $key) | .Target' <<<"$routes_after")"
+  test "$auth" = 'NONE'
   test "$target" = "integrations/${integration_id}"
 done
 
@@ -191,6 +213,17 @@ test "$public_location" = 'https://www.sozorockfoundation.org/publication/rrg-v1
 # AWS_IAM must block an unsigned caller before Lambda executes.
 unauth_status="$(curl --silent --show-error --output /dev/null --max-time 20 --write-out '%{http_code}' "${api_endpoint}/internal/health" || true)"
 test "$unauth_status" = '403'
+
+# The public route is intentionally read-only and schema-constrained. Prove that
+# it is reachable without consuming a model turn by sending an invalid prompt.
+public_navigator_status="$(curl --silent --show-error --output "$work/public-navigator.json" --max-time 30 --write-out '%{http_code}' \
+  --request POST \
+  -H 'content-type: application/json' \
+  -H 'origin: https://www.sozorockfoundation.org' \
+  --data '{"question":"x"}' \
+  "${api_endpoint}/public/v1/navigate" || true)"
+test "$public_navigator_status" = '400'
+test "$(jq -r '.error' "$work/public-navigator.json")" = 'question_must_be_3_to_600_characters'
 
 # At this point the production edge and authorization boundary are verified and
 # can remain deployed even if the deploy role itself lacks execute-api:Invoke or
@@ -257,6 +290,7 @@ fi
 if [[ -n "${GITHUB_OUTPUT:-}" ]]; then
   echo "api_id=$api_id" >> "$GITHUB_OUTPUT"
   echo "api_endpoint=$api_endpoint" >> "$GITHUB_OUTPUT"
+  echo "public_navigator_endpoint=${api_endpoint}/public/v1/navigate" >> "$GITHUB_OUTPUT"
   echo "auth_mode=$auth_mode" >> "$GITHUB_OUTPUT"
   echo "model_configured=$model_configured" >> "$GITHUB_OUTPUT"
   echo "signed_route_verified=$signed_route_verified" >> "$GITHUB_OUTPUT"

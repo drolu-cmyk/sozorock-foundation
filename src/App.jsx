@@ -80,6 +80,7 @@ export function App() {
     canonical.setAttribute("href", seo.canonicalUrl);
 
     setMeta("description", seo.description);
+    setMeta("keywords", seo.keywords);
     setMeta("robots", seo.robots);
     setMeta("og:site_name", "The SozoRock Foundation", "property");
     setMeta("og:locale", "en_US", "property");
@@ -94,6 +95,7 @@ export function App() {
     setMeta("og:image:height", "630", "property");
     setMeta("og:image:alt", seo.imageAlt, "property");
     setMeta("twitter:card", "summary_large_image");
+    setMeta("twitter:domain", "sozorockfoundation.org");
     setMeta("twitter:site", "@srockfoundation");
     setMeta("twitter:creator", "@srockfoundation");
     setMeta("twitter:title", seo.title);

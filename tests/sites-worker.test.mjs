@@ -46,7 +46,7 @@ test("marks the publication access page noindex at the HTTP layer", async () => 
   assert.equal(response.headers.get("x-robots-tag"), "noindex, nofollow, noarchive");
 });
 
-test("redirects legacy AWS clone routes to their canonical Sites routes", async () => {
+test("redirects legacy AWS clone routes to their canonical public routes", async () => {
   for (const [pathname, destination] of LEGACY_ROUTES) {
     const response = await worker.fetch(new Request(`https://example.test${pathname}?source=legacy`, {
       headers: { accept: "text/html" },
@@ -304,7 +304,46 @@ test("rejects invalid contact submissions and quietly accepts the honeypot", asy
   assert.equal(upstreamCalls, 0);
 });
 
-test("emits the files required by Sites packaging", async () => {
+test("proxies a bounded navigator question to the public Foundation graph", async () => {
+  const calls = [];
+  const response = await worker.fetch(new Request("https://example.test/api/navigator", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ question: "Where can I find Foundation publications?" }),
+  }), {
+    FOUNDATION_AGENT_PUBLIC_ORIGIN: "https://abc.execute-api.us-east-1.amazonaws.com/public/v1/navigate",
+    AGENT_FETCH: async (url, options) => {
+      calls.push({ url, options, body: JSON.parse(options.body) });
+      return Response.json({
+        answer: "Start with the Foundation publications index.",
+        links: [{ key: "publications", label: "Publications", href: "/publications" }],
+        notice: null,
+      });
+    },
+  });
+
+  assert.equal(response.status, 200);
+  assert.equal(calls.length, 1);
+  assert.equal(calls[0].options.headers.Origin, "https://www.sozorockfoundation.org");
+  assert.equal(calls[0].body.question, "Where can I find Foundation publications?");
+  assert.deepEqual(await response.json(), {
+    answer: "Start with the Foundation publications index.",
+    links: [{ key: "publications", label: "Publications", href: "/publications" }],
+    notice: null,
+  });
+});
+
+test("fails closed when the public navigator endpoint is not configured", async () => {
+  const response = await worker.fetch(new Request("https://example.test/api/navigator", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ question: "Where are the publications?" }),
+  }), {});
+  assert.equal(response.status, 503);
+  assert.deepEqual(await response.json(), { error: "The website guide is temporarily unavailable." });
+});
+
+test("emits the files required by CloudFront plus the compatibility worker package", async () => {
   await access(new URL("../dist/client/index.html", import.meta.url));
   await access(new URL("../dist/server/index.js", import.meta.url));
   await access(new URL("../dist/.openai/hosting.json", import.meta.url));
@@ -322,13 +361,16 @@ test("emits unique canonical SEO metadata and valid schema for every indexable r
     const title = html.match(/<title>([^<]+)<\/title>/u)?.[1];
     const canonical = html.match(/<link rel="canonical" href="([^"]+)"/u)?.[1];
     const description = html.match(/<meta name="description" content="([^"]+)"/u)?.[1];
+    const keywords = html.match(/<meta name="keywords" content="([^"]+)"/u)?.[1];
     const schemaText = html.match(/<script id="site-schema" type="application\/ld\+json">([^<]+)<\/script>/u)?.[1];
     assert.ok(title, `${pathname} title`);
     assert.ok(description && description.length <= 160, `${pathname} concise description`);
+    assert.ok(keywords, `${pathname} keywords`);
     assert.equal(canonical, `https://www.sozorockfoundation.org${pathname === "/" ? "" : pathname}`, `${pathname} canonical`);
     assert.match(html, /<meta property="og:title"/u, `${pathname} Open Graph title`);
     assert.match(html, /<meta name="twitter:card" content="summary_large_image"/u, `${pathname} X card`);
-    assert.match(html, /<meta name="sozorock-release" content="sites-seo-2026-08-23"/u, `${pathname} release marker`);
+    assert.match(html, /<meta name="twitter:domain" content="sozorockfoundation\.org"/u, `${pathname} X domain`);
+    assert.match(html, /<meta name="sozorock-release" content="cloudfront-agentic-seo-2026-08-28"/u, `${pathname} release marker`);
     assert.ok(schemaText, `${pathname} schema`);
     assert.doesNotThrow(() => JSON.parse(schemaText), `${pathname} valid JSON-LD`);
     if (pathname !== "/publication/hsa-v1-2026/access") {
@@ -350,7 +392,6 @@ test("ships crawl controls, sitemap, favicon, and social images", async () => {
   }
   for (const file of [
     "../dist/client/favicon.ico",
-    "../dist/client/favicon.svg",
     "../dist/client/apple-touch-icon.png",
     "../dist/client/media/sozorock-social-card.png",
     "../dist/client/media/hsa-social-card.png",

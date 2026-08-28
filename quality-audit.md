@@ -48,7 +48,7 @@ The implementation does not copy the typography, layouts, language, or imagery o
 - Initiative pause control changes to Play; arrow keys move between initiative tabs.
 - No site-generated console errors were found. Browser-extension metadata errors were excluded.
 - Key contrast ratios: white/navy 16.53:1, ice/navy 12.57:1, ink/white 17.37:1, muted/paper 5.64:1, royal/white 8.09:1, white/cobalt 10.76:1.
-- Production build and Sites worker tests pass.
+- Production build, CloudFront router, compatibility-worker, and SEO tests pass.
 
 ## Preserved constraints
 

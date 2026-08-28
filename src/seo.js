@@ -94,6 +94,21 @@ const routeSeo = {
   },
 };
 
+const routeKeywords = {
+  "/": ["SozoRock Foundation", "health access", "health systems assurance", "public systems", "responsible AI"],
+  "/platforms": ["SozoRock platforms", "Global Institute", "SozoRock Health", "SozoRock AI Lab"],
+  "/platforms/institute": ["public-interest research", "systems intelligence", "governance research", "SozoRock Global Institute"],
+  "/platforms/health": ["health access", "place intelligence", "community health evidence", "SozoRock Health"],
+  "/platforms/ai-lab": ["responsible artificial intelligence", "applied AI learning", "AI verification", "SozoRock AI Lab"],
+  "/publications": ["health systems publications", "rural governance research", "health equity research", "public-interest reports"],
+  "/insights": ["health access insights", "public systems intelligence", "responsible AI insights"],
+  "/events": ["public-interest briefings", "health systems roundtables", "SozoRock events"],
+  "/about": ["SozoRock Foundation mission", "public-interest foundation", "health and AI nonprofit"],
+  "/leadership": ["SozoRock Foundation leadership", "global health leadership", "public-interest governance"],
+  "/partner": ["partner with SozoRock", "health access partnership", "research partnership"],
+  "/support": ["support SozoRock Foundation", "support health access", "support public-interest research"],
+};
+
 const breadcrumbNames = {
   platforms: "Platforms",
   institute: "SozoRock Global Institute",
@@ -204,6 +219,9 @@ export function getSeoForPath(inputPathname = "/") {
         };
 
   const image = base.image || DEFAULT_SOCIAL_IMAGE;
+  const keywords = publication
+    ? [publication.theme, publication.title, "public-interest research", "systems intelligence"].filter(Boolean)
+    : routeKeywords[pathname] || ["SozoRock Foundation", "public-interest research"];
   const breadcrumb = breadcrumbsForPath(pathname, publication);
   const graph = [
     {
@@ -250,6 +268,7 @@ export function getSeoForPath(inputPathname = "/") {
       url: canonicalUrl,
       name: base.title,
       description: base.description,
+      keywords: keywords.join(", "),
       isPartOf: { "@id": WEBSITE_ID },
       about: { "@id": ORGANIZATION_ID },
       breadcrumb: breadcrumb ? { "@id": breadcrumb["@id"] } : undefined,
@@ -277,6 +296,7 @@ export function getSeoForPath(inputPathname = "/") {
     pathname,
     title: base.title,
     description: base.description,
+    keywords: keywords.join(", "),
     canonicalUrl,
     robots: base.robots || "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
     ogType: base.ogType || "website",

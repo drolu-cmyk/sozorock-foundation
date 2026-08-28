@@ -25,7 +25,7 @@ env:
   CANONICAL_HOST: www.sozorockfoundation.org
   REDIRECT_API_NAME: SozoRockFoundationParentSite
   EXPECTED_STALE_APEX_TARGET: d1w2jx9m5e0d5u.cloudfront.net.
-  RECEIPT_ISSUE: '15'
+  RECEIPT_ISSUE: '84'
 
 jobs:
   cutover:

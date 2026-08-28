@@ -49,8 +49,17 @@ All live reference and implementation captures were reviewed together at the sam
 - The packaged PDF matches the supplied publication byte-for-byte; PDF, BibTeX, and RIS files are present in the production build.
 - Work menu opens with Enter and closes with Escape.
 - 16 routes have one `h1`, no duplicate IDs, no missing images, and no desktop horizontal overflow.
-- Build and Sites worker tests pass.
+- Build, CloudFront router, compatibility-worker, and SEO tests pass.
 - No site-generated console error was observed.
+
+## Website guide extension · 2026-08-28
+
+- Compared the current live homepage and updated preview together at the same desktop browser state. The original hero, navigation, campaign, platform index, engagement routes, and footer retain their established layout, typography, palette, rule treatment, and assets.
+- The new Website guide sits as one restrained white editorial band between the hero and campaign. It uses the existing shell, display/body type pairing, cobalt link treatment, square geometry, and horizontal rules; it introduces no new visual language, gradient, icon, or generated asset.
+- The guide's primary example-question flow fills the labelled input, the submit control returns to its enabled state, and the unavailable-service error is announced in the existing status region.
+- The input has an explicit label, length limits, sensitive-information warning, keyboard-operable example prompts, visible focus treatment, live loading/error/result announcements, and reduced-motion inheritance.
+- The live campaign and preview campaign were captured at different points in the existing rotating feature; that expected content-state difference is unrelated to the guide extension.
+- Production build, route packaging, worker tests, AWS release-contract validation, agent graph smoke tests, and shell syntax validation pass.
 
 ## Final result
 
