@@ -80,6 +80,11 @@ function modelFailureClass(error) {
   const rawCode = typeof error?.code === "string" ? error.code : typeof error?.type === "string" ? error.type : "";
   const providerCode = /^[a-z0-9_.-]{1,80}$/iu.test(rawCode) ? rawCode : null;
   const message = error instanceof Error ? error.message : "";
+  const providerParam = typeof error?.param === "string" && /^[a-z0-9_.\[\]-]{1,120}$/iu.test(error.param) ? error.param : null;
+  const providerDetail = message
+    .replace(/(bearer|api[_ -]?key|authorization|token)[=: ]+[^\s,;]+/giu, "$1=[redacted]")
+    .replace(/[\r\n\t]+/gu, " ")
+    .slice(0, 300);
   let category = "unknown";
   if (status === 401) category = "authentication";
   else if (status === 403) category = "model_or_project_access";
@@ -88,7 +93,7 @@ function modelFailureClass(error) {
   else if (status >= 500) category = "provider_service";
   else if (/fetch|network|socket|connect|timed?\s*out|dns/iu.test(message)) category = "transport";
   else if (status >= 400) category = "invalid_request";
-  return { category, providerStatus: Number.isInteger(status) ? status : null, providerCode };
+  return { category, providerStatus: Number.isInteger(status) ? status : null, providerCode, providerParam, providerDetail };
 }
 
 async function handlePublicNavigator(event) {
