@@ -315,22 +315,27 @@ export async function executeGraphCanary({ graphId, input, context = {} }) {
 
   const runId = resolvedRunId(context);
   const outputs = await Promise.all(
-    graph.nodes.map((nodeId) =>
-      runNode({
-        graphId,
-        graph,
-        nodeId,
-        originalInput: input,
-        outputs: [],
-        context,
-        // Chat Completions providers can require one bounded follow-up turn to
-        // satisfy the agent's strict structured-output schema.
-        maxTurns: 2,
-        runId,
-        iteration: 0,
-        evaluationFeedback: null,
-      })
-    )
+    graph.nodes.map(async (nodeId) => {
+      try {
+        return await runNode({
+          graphId,
+          graph,
+          nodeId,
+          originalInput: input,
+          outputs: [],
+          context,
+          // Chat Completions providers can require one bounded follow-up turn to
+          // satisfy the agent's strict structured-output schema.
+          maxTurns: 2,
+          runId,
+          iteration: 0,
+          evaluationFeedback: null,
+        });
+      } catch (error) {
+        const detail = error instanceof Error ? error.message : "unknown model error";
+        throw new Error(`Canary node ${nodeId} failed: ${detail}`);
+      }
+    })
   );
   const evaluation = latestOutput(outputs, "evaluator");
   if (!isEvaluationDecision(evaluation)) throw new Error(`Graph ${graphId} evaluator canary returned an invalid decision.`);
