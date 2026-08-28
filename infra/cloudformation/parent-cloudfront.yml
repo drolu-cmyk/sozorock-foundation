@@ -24,6 +24,7 @@ Parameters:
 
 Conditions:
   UseAliases: !Equals [!Ref EnableAliases, 'true']
+  UseCanonicalBridge: !Equals [!Ref EnableAliases, 'false']
 
 Resources:
   SiteBucket:
@@ -317,6 +318,85 @@ Resources:
           MinimumProtocolVersion: TLSv1.2_2021
           SslSupportMethod: sni-only
 
+  CanonicalBridgeApi:
+    Type: AWS::ApiGatewayV2::Api
+    Condition: UseCanonicalBridge
+    Properties:
+      Description: Temporary canonical-host bridge to the Foundation CloudFront distribution
+      DisableExecuteApiEndpoint: false
+      Name: SozoRockFoundationCanonicalCloudFrontBridge
+      ProtocolType: HTTP
+
+  CanonicalBridgeRootIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    Condition: UseCanonicalBridge
+    Properties:
+      ApiId: !Ref CanonicalBridgeApi
+      Description: Proxy the canonical root to the isolated CloudFront distribution
+      IntegrationMethod: ANY
+      IntegrationType: HTTP_PROXY
+      IntegrationUri: !Sub 'https://${Distribution.DomainName}/'
+      PayloadFormatVersion: '1.0'
+      TimeoutInMillis: 30000
+
+  CanonicalBridgePathIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    Condition: UseCanonicalBridge
+    Properties:
+      ApiId: !Ref CanonicalBridgeApi
+      Description: Proxy canonical paths to the isolated CloudFront distribution
+      IntegrationMethod: ANY
+      IntegrationType: HTTP_PROXY
+      IntegrationUri: !Sub 'https://${Distribution.DomainName}/{proxy}'
+      PayloadFormatVersion: '1.0'
+      TimeoutInMillis: 30000
+
+  CanonicalBridgeRootRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Condition: UseCanonicalBridge
+    Properties:
+      ApiId: !Ref CanonicalBridgeApi
+      AuthorizationType: NONE
+      RouteKey: 'ANY /'
+      Target: !Sub 'integrations/${CanonicalBridgeRootIntegration}'
+
+  CanonicalBridgePathRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Condition: UseCanonicalBridge
+    Properties:
+      ApiId: !Ref CanonicalBridgeApi
+      AuthorizationType: NONE
+      RouteKey: 'ANY /{proxy+}'
+      Target: !Sub 'integrations/${CanonicalBridgePathIntegration}'
+
+  CanonicalBridgeStage:
+    Type: AWS::ApiGatewayV2::Stage
+    Condition: UseCanonicalBridge
+    Properties:
+      ApiId: !Ref CanonicalBridgeApi
+      AutoDeploy: true
+      Description: Production canonical-host bridge
+      StageName: '$default'
+
+  CanonicalBridgeDomain:
+    Type: AWS::ApiGatewayV2::DomainName
+    Condition: UseCanonicalBridge
+    Properties:
+      DomainName: !Ref CanonicalDomain
+      DomainNameConfigurations:
+        - CertificateArn: !Ref SiteCertificate
+          EndpointType: REGIONAL
+          SecurityPolicy: TLS_1_2
+
+  CanonicalBridgeMapping:
+    Type: AWS::ApiGatewayV2::ApiMapping
+    Condition: UseCanonicalBridge
+    DependsOn: CanonicalBridgeStage
+    Properties:
+      ApiId: !Ref CanonicalBridgeApi
+      DomainName: !Ref CanonicalBridgeDomain
+      Stage: !Ref CanonicalBridgeStage
+
   SiteBucketPolicy:
     Type: AWS::S3::BucketPolicy
     Properties:
@@ -335,6 +415,12 @@ Resources:
                 AWS:SourceArn: !Sub 'arn:${AWS::Partition}:cloudfront::${AWS::AccountId}:distribution/${Distribution}'
 
 Outputs:
+  CanonicalBridgeDomainName:
+    Condition: UseCanonicalBridge
+    Value: !GetAtt CanonicalBridgeDomain.RegionalDomainName
+  CanonicalBridgeHostedZoneId:
+    Condition: UseCanonicalBridge
+    Value: !GetAtt CanonicalBridgeDomain.RegionalHostedZoneId
   CertificateArn:
     Value: !Ref SiteCertificate
   DistributionDomainName:
