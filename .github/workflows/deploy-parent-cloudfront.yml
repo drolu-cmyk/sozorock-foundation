@@ -221,8 +221,50 @@ jobs:
         run: |
           set -euo pipefail
           distribution_id='${{ steps.target.outputs.distribution_id }}'
+          distribution_domain='${{ steps.target.outputs.distribution_domain }}'
+          verification_before="$RUNNER_TEMP/alias-verification-before.json"
           moved=0
           complete=0
+
+          records="$(aws route53 list-resource-record-sets --hosted-zone-id "$HOSTED_ZONE_ID" --output json)"
+          jq --arg apex "_.${APEX_HOST}." --arg www "_${CANONICAL_HOST}." \
+            '[.ResourceRecordSets[] | select((.Name==$apex or .Name==$www) and .Type=="TXT")]' \
+            <<<"$records" > "$verification_before"
+
+          jq -n \
+            --arg apex "_.${APEX_HOST}." \
+            --arg www "_${CANONICAL_HOST}." \
+            --arg value "\"${distribution_domain}\"" \
+            '{Comment:"Temporarily verify ownership for the Foundation CloudFront alias move",Changes:[
+              {Action:"UPSERT",ResourceRecordSet:{Name:$apex,Type:"TXT",TTL:60,ResourceRecords:[{Value:$value}]}},
+              {Action:"UPSERT",ResourceRecordSet:{Name:$www,Type:"TXT",TTL:60,ResourceRecords:[{Value:$value}]}}
+            ]}' > "$RUNNER_TEMP/alias-verification-upsert.json"
+          verification_change="$(aws route53 change-resource-record-sets \
+            --hosted-zone-id "$HOSTED_ZONE_ID" \
+            --change-batch "file://$RUNNER_TEMP/alias-verification-upsert.json" \
+            --query ChangeInfo.Id --output text)"
+          aws route53 wait resource-record-sets-changed --id "$verification_change"
+
+          restore_verification_records() {
+            current="$RUNNER_TEMP/alias-verification-current.json"
+            restore="$RUNNER_TEMP/alias-verification-restore.json"
+            aws route53 list-resource-record-sets --hosted-zone-id "$HOSTED_ZONE_ID" --output json \
+              | jq --arg apex "_.${APEX_HOST}." --arg www "_${CANONICAL_HOST}." \
+                '[.ResourceRecordSets[] | select((.Name==$apex or .Name==$www) and .Type=="TXT")]' \
+              > "$current"
+            jq -n --slurpfile current "$current" --slurpfile old "$verification_before" '{
+              Comment:"Restore Foundation DNS after CloudFront alias ownership verification",
+              Changes:(($current[0] | map({Action:"DELETE",ResourceRecordSet:.})) + ($old[0] | map({Action:"CREATE",ResourceRecordSet:.})))
+            }' > "$restore"
+            if [[ "$(jq '.Changes | length' "$restore")" -gt 0 ]]; then
+              restore_change="$(aws route53 change-resource-record-sets \
+                --hosted-zone-id "$HOSTED_ZONE_ID" \
+                --change-batch "file://$restore" \
+                --query ChangeInfo.Id --output text)"
+              aws route53 wait resource-record-sets-changed --id "$restore_change"
+            fi
+          }
+
           rollback_aliases() {
             if [[ "$moved" = '1' && "$complete" != '1' ]]; then
               config="$RUNNER_TEMP/target-distribution-config.json"
@@ -236,7 +278,20 @@ jobs:
               [[ -z "$WWW_SOURCE_ID" ]] || aws cloudfront associate-alias --alias "$CANONICAL_HOST" --target-distribution-id "$WWW_SOURCE_ID" || true
             fi
           }
-          trap rollback_aliases EXIT
+
+          finish_alias_move() {
+            status=$?
+            trap - EXIT
+            set +e
+            rollback_aliases
+            rollback_status=$?
+            restore_verification_records
+            restore_status=$?
+            if [[ "$status" = '0' && "$rollback_status" != '0' ]]; then status="$rollback_status"; fi
+            if [[ "$status" = '0' && "$restore_status" != '0' ]]; then status="$restore_status"; fi
+            exit "$status"
+          }
+          trap finish_alias_move EXIT
 
           aws cloudfront associate-alias --alias "$APEX_HOST" --target-distribution-id "$distribution_id"
           moved=1

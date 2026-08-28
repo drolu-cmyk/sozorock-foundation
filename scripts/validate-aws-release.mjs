@@ -29,6 +29,11 @@ assert.doesNotMatch(workflow, /SMTP\.GOOGLE\.COM[^\n]*DELETE/iu);
 assert.match(workflow, /mail-records-before/u);
 assert.match(workflow, /rollback_dns/u);
 assert.match(workflow, /associate-alias/u);
+assert.match(workflow, /_\.\$\{APEX_HOST\}/u);
+assert.match(workflow, /_\$\{CANONICAL_HOST\}/u);
+assert.match(workflow, /Temporarily verify ownership for the Foundation CloudFront alias move/u);
+assert.match(workflow, /restore_verification_records/u);
+assert.match(workflow, /route53 wait resource-record-sets-changed/u);
 assert.match(workflow, /enable_aliases/u);
 assert.match(workflow, /<title>Platforms \| The SozoRock Foundation<\/title>/u);
 
