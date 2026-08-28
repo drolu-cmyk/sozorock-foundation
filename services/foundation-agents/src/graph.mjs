@@ -323,7 +323,9 @@ export async function executeGraphCanary({ graphId, input, context = {} }) {
         originalInput: input,
         outputs: [],
         context,
-        maxTurns: 1,
+        // Chat Completions providers can require one bounded follow-up turn to
+        // satisfy the agent's strict structured-output schema.
+        maxTurns: 2,
         runId,
         iteration: 0,
         evaluationFeedback: null,
