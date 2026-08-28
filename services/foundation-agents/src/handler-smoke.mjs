@@ -31,7 +31,20 @@ assert.equal(health.headers["cache-control"], "no-store");
 
 const index = await handler(event("GET", "/internal/v1/graphs"));
 assert.equal(index.statusCode, 200);
-assert.equal(Object.keys(JSON.parse(index.body).graphs).length, 5);
+assert.equal(Object.keys(JSON.parse(index.body).graphs).length, 6);
+
+const publicOptions = await handler({
+  ...event("OPTIONS", "/public/v1/navigate"),
+  headers: { origin: "https://www.sozorockfoundation.org" },
+});
+assert.equal(publicOptions.statusCode, 204);
+assert.equal(publicOptions.headers["access-control-allow-origin"], "https://www.sozorockfoundation.org");
+
+const rejectedOrigin = await handler({
+  ...event("POST", "/public/v1/navigate", { question: "Where are the publications?" }),
+  headers: { origin: "https://example.com" },
+});
+assert.equal(rejectedOrigin.statusCode, 403);
 
 const runWithoutModel = await handler(
   event("POST", "/internal/v1/run", { graphId: "foundationSiteAssurance", input: { task: "test" } })

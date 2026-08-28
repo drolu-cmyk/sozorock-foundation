@@ -2,8 +2,23 @@ import { randomUUID } from "node:crypto";
 import { run } from "@openai/agents";
 import { agents } from "./agents.mjs";
 import { ensureModelAuthConfigured, modelAuthConfigured } from "./model-auth.mjs";
+import { publicKnowledgeSnapshot } from "./public-knowledge.mjs";
 
 export const graphs = Object.freeze({
+  publicNavigator: {
+    surface: "public",
+    description: "Route a visitor question to one bounded Foundation guide and return a verified website orientation response.",
+    nodes: ["navigatorRouter", "programGuide", "publicationGuide", "engagementGuide", "navigatorResponder", "evaluator"],
+    routerNode: "navigatorRouter",
+    routes: {
+      programs: "programGuide",
+      publications: "publicationGuide",
+      engagement: "engagementGuide",
+      out_of_scope: "engagementGuide",
+    },
+    responseNode: "navigatorResponder",
+    candidateNode: "navigatorResponder",
+  },
   foundationContentRefresh: {
     surface: "foundation",
     description: "Turn new Foundation source material into a verified, reviewable content candidate.",
@@ -68,6 +83,13 @@ function latestOutput(outputs, nodeId) {
   return [...outputs].reverse().find((entry) => entry.node === nodeId)?.output ?? "";
 }
 
+function routedNodes(graph, routerOutput) {
+  const route = typeof routerOutput?.route === "string" ? routerOutput.route : "";
+  const specialist = graph.routes?.[route];
+  if (!specialist || !graph.nodes.includes(specialist)) throw new Error("Public navigator returned an invalid route.");
+  return [specialist, graph.responseNode];
+}
+
 function isEvaluationDecision(value) {
   return Boolean(
     value &&
@@ -128,10 +150,12 @@ export async function executeGraph({
   const turnLimit = Math.max(1, Math.min(Number(maxTurns) || 5, 8));
   const runId = resolvedRunId(context);
   const { traceGroupId: _ignoredTraceGroupId, ...modelContext } = context;
+  if (graph.surface === "public") modelContext.approvedKnowledge = publicKnowledgeSnapshot();
   const outputs = [];
   let iteration = 0;
 
-  for (const nodeId of graph.nodes.filter((node) => node !== "evaluator")) {
+  const initialNodes = graph.routerNode ? [graph.routerNode] : graph.nodes.filter((node) => node !== "evaluator");
+  for (const nodeId of initialNodes) {
     const nodeResult = await runNode({
       graphId,
       graph,
@@ -145,6 +169,25 @@ export async function executeGraph({
       evaluationFeedback: null,
     });
     outputs.push(nodeResult);
+  }
+
+  if (graph.routerNode) {
+    const routerOutput = latestOutput(outputs, graph.routerNode);
+    for (const nodeId of routedNodes(graph, routerOutput)) {
+      const nodeResult = await runNode({
+        graphId,
+        graph,
+        nodeId,
+        originalInput: input,
+        outputs,
+        context: modelContext,
+        maxTurns: turnLimit,
+        runId,
+        iteration,
+        evaluationFeedback: null,
+      });
+      outputs.push(nodeResult);
+    }
   }
 
   let evaluationResult = await runNode({
@@ -168,7 +211,9 @@ export async function executeGraph({
   let evaluation = evaluationResult.output;
   let revisionCount = 0;
   let escalationReason = null;
-  const revisionTargets = graph.nodes.filter((node) => !["orchestrator", "evaluator"].includes(node));
+  const revisionTargets = graph.routerNode
+    ? routedNodes(graph, latestOutput(outputs, graph.routerNode))
+    : graph.nodes.filter((node) => !["orchestrator", "evaluator"].includes(node));
 
   while (evaluation.decision === "revise" && revisionCount < revisionLimit) {
     const target = evaluation.revisionTarget;
@@ -180,7 +225,11 @@ export async function executeGraph({
     revisionCount += 1;
     iteration += 1;
     const startIndex = graph.nodes.indexOf(target);
-    const rerunNodes = graph.nodes.slice(startIndex).filter((node) => node !== "evaluator");
+    const rerunNodes = graph.routerNode
+      ? target === graph.responseNode
+        ? [graph.responseNode]
+        : [target, graph.responseNode]
+      : graph.nodes.slice(startIndex).filter((node) => node !== "evaluator");
 
     for (const nodeId of rerunNodes) {
       const nodeResult = await runNode({

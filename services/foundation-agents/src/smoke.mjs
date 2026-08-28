@@ -3,6 +3,7 @@ import { agents } from "./agents.mjs";
 import { graphs } from "./graph.mjs";
 
 const requiredGraphs = [
+  "publicNavigator",
   "foundationContentRefresh",
   "publicationRelease",
   "foundationSiteAssurance",
@@ -15,16 +16,16 @@ assert.ok(agents.orchestrator, "Foundation Orchestrator is required");
 assert.ok(agents.evaluator, "Graph evaluator is required");
 
 for (const [graphId, graph] of Object.entries(graphs)) {
-  assert.ok(["foundation", "ai-lab"].includes(graph.surface), `${graphId} has an invalid surface`);
+  assert.ok(["public", "foundation", "ai-lab"].includes(graph.surface), `${graphId} has an invalid surface`);
   assert.ok(graph.nodes.length >= 5, `${graphId} is not a meaningful multi-step graph`);
-  assert.equal(graph.nodes[0], "orchestrator", `${graphId} must begin with Foundation Orchestrator planning`);
+  assert.equal(graph.nodes[0], graph.routerNode || "orchestrator", `${graphId} must begin with its declared planner or router`);
   assert.equal(graph.nodes.at(-1), "evaluator", `${graphId} must terminate in evaluation`);
   assert.ok(graph.candidateNode, `${graphId} must identify its review candidate node`);
   assert.ok(graph.nodes.includes(graph.candidateNode), `${graphId} candidate node is not in the graph`);
   assert.notEqual(graph.candidateNode, "orchestrator", `${graphId} cannot use the plan as its final candidate`);
   assert.notEqual(graph.candidateNode, "evaluator", `${graphId} cannot use evaluation as its final candidate`);
 
-  const revisionTargets = graph.nodes.filter((node) => !["orchestrator", "evaluator"].includes(node));
+  const revisionTargets = graph.nodes.filter((node) => !["orchestrator", graph.routerNode, "evaluator"].includes(node));
   assert.ok(revisionTargets.length >= 2, `${graphId} must expose bounded specialist revision targets`);
   assert.ok(revisionTargets.includes(graph.candidateNode), `${graphId} candidate must be a valid revision target`);
 
@@ -34,6 +35,11 @@ for (const [graphId, graph] of Object.entries(graphs)) {
 }
 
 assert.notDeepEqual(graphs.foundationContentRefresh.nodes, graphs.aiLabLearnerLoop.nodes);
+assert.equal(graphs.publicNavigator.surface, "public");
+assert.equal(graphs.publicNavigator.routes.programs, "programGuide");
+assert.equal(graphs.publicNavigator.routes.publications, "publicationGuide");
+assert.equal(graphs.publicNavigator.routes.engagement, "engagementGuide");
+assert.equal(graphs.publicNavigator.candidateNode, "navigatorResponder");
 assert.equal(graphs.aiLabLearnerLoop.surface, "ai-lab");
 assert.equal(graphs.foundationContentRefresh.surface, "foundation");
 assert.equal(graphs.publicationRelease.candidateNode, "distributionEditor");

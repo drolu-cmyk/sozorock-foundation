@@ -1,0 +1,260 @@
+name: Complete Foundation production recovery
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/complete-production-recovery.yml
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+  actions: write
+  issues: write
+
+env:
+  AWS_REGION: us-east-1
+  ACCOUNT_ID: '791860731989'
+  AI_LAB_RECOVERY_ROLE: arn:aws:iam::791860731989:role/GitHubActionsSozorockAiLabDeployRole
+  FOUNDATION_DEPLOY_ROLE: arn:aws:iam::791860731989:role/GitHubActionsSozorockFoundationSiteDeployRole
+  FOUNDATION_DEPLOY_ROLE_NAME: GitHubActionsSozorockFoundationSiteDeployRole
+  PARENT_LAMBDA_ROLE_NAME: SozoRockFoundationParentLambdaRole
+  PARENT_FUNCTION_NAME: SozoRockFoundationParentOrigin
+  LEGACY_HEALTH_APP_ID: d3uqnxmsmefokf
+  LEGACY_HEALTH_DOMAIN: sozorockhealth.com
+  RECOVERY_ISSUE: '84'
+
+jobs:
+  recover:
+    if: github.repository == 'drolu-cmyk/sozorock-foundation' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - name: Check out main
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          ref: main
+          persist-credentials: false
+
+      - name: Assume temporarily trusted AI Lab recovery role
+        uses: aws-actions/configure-aws-credentials@e6de054238d6b7531b4efff3b6587d9aade6a06c # v6.2.3
+        with:
+          role-to-assume: ${{ env.AI_LAB_RECOVERY_ROLE }}
+          role-session-name: FoundationRecoveryBridge-${{ github.run_id }}
+          aws-region: ${{ env.AWS_REGION }}
+          retry-max-attempts: 3
+
+      - name: Grant only missing Foundation recovery permissions
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(aws sts get-caller-identity --query Account --output text)" = "$ACCOUNT_ID"
+
+          cat >/tmp/parent-agent-model-policy.json <<EOF
+          {"Version":"2012-10-17","Statement":[
+            {
+              "Sid":"FoundationAgentSolInferenceOnly",
+              "Effect":"Allow",
+              "Action":"bedrock-mantle:CreateInference",
+              "Resource":"arn:aws:bedrock-mantle:${AWS_REGION}:${ACCOUNT_ID}:project/*",
+              "Condition":{"StringEquals":{"bedrock-mantle:Model":"openai.gpt-5.6-sol"}}
+            },
+            {
+              "Sid":"FoundationAgentProjectReadOnly",
+              "Effect":"Allow",
+              "Action":["bedrock-mantle:GetProject","bedrock-mantle:ListProjects"],
+              "Resource":"*"
+            },
+            {
+              "Sid":"FoundationAgentShortTermTokenOnly",
+              "Effect":"Allow",
+              "Action":"bedrock-mantle:CallWithBearerToken",
+              "Resource":"*",
+              "Condition":{"StringEquals":{"bedrock-mantle:BearerTokenType":"SHORT_TERM"}}
+            }
+          ]}
+          EOF
+          aws iam get-role --role-name "$PARENT_LAMBDA_ROLE_NAME" >/dev/null
+          aws iam put-role-policy \
+            --role-name "$PARENT_LAMBDA_ROLE_NAME" \
+            --policy-name SozoRockFoundationAgentModelInference \
+            --policy-document file:///tmp/parent-agent-model-policy.json
+
+          cat >/tmp/foundation-recovery-policy.json <<EOF
+          {"Version":"2012-10-17","Statement":[
+            {
+              "Sid":"RequestOnlyFoundationApexCertificate",
+              "Effect":"Allow",
+              "Action":"acm:RequestCertificate",
+              "Resource":"*",
+              "Condition":{
+                "ForAllValues:StringEquals":{"acm:DomainNames":["sozorockfoundation.org"]},
+                "StringEquals":{"acm:ValidationMethod":"DNS","aws:RequestedRegion":"${AWS_REGION}"}
+              }
+            },
+            {"Sid":"InspectFoundationCertificates","Effect":"Allow","Action":"acm:ListCertificates","Resource":"*"},
+            {"Sid":"ReadFoundationCertificates","Effect":"Allow","Action":["acm:DescribeCertificate","acm:GetCertificate","acm:ListTagsForCertificate"],"Resource":"arn:aws:acm:${AWS_REGION}:${ACCOUNT_ID}:certificate/*"},
+            {
+              "Sid":"VerifyOnlyCombinedFoundationEdge",
+              "Effect":"Allow",
+              "Action":"lambda:InvokeFunction",
+              "Resource":"arn:aws:lambda:${AWS_REGION}:${ACCOUNT_ID}:function:${PARENT_FUNCTION_NAME}"
+            }
+          ]}
+          EOF
+          aws iam put-role-policy \
+            --role-name "$FOUNDATION_DEPLOY_ROLE_NAME" \
+            --policy-name SozoRockFoundationRecoveryAddon \
+            --policy-document file:///tmp/foundation-recovery-policy.json
+
+          echo 'Foundation recovery and model-inference prerequisites applied.' >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Rebuild retired Health application from canonical redirect source
+        id: health
+        shell: bash
+        run: |
+          set -euo pipefail
+          app="$(aws amplify get-app --app-id "$LEGACY_HEALTH_APP_ID" --output json)"
+          repository="$(jq -r '.app.repository // ""' <<<"$app")"
+          if [[ "$repository" != *'drolu-cmyk/agentic-ai-sozorock-health'* && "$repository" != *'agentic-ai-sozorock-health'* ]]; then
+            echo "Refusing unexpected Amplify repository: $repository" >&2
+            exit 1
+          fi
+
+          branches="$(aws amplify list-branches --app-id "$LEGACY_HEALTH_APP_ID" --output json)"
+          if jq -e '.branches[]? | select(.branchName == "main")' <<<"$branches" >/dev/null; then
+            branch='main'
+          else
+            branch="$(jq -r '.branches[]? | select(.stage == "PRODUCTION") | .branchName' <<<"$branches" | head -n1)"
+          fi
+          test -n "$branch"
+
+          domain="$(aws amplify get-domain-association \
+            --app-id "$LEGACY_HEALTH_APP_ID" \
+            --domain-name "$LEGACY_HEALTH_DOMAIN" \
+            --output json)"
+          settings="$(jq -c --arg branch "$branch" '[.domainAssociation.subDomains[].subDomainSetting | if (.prefix == "" or .prefix == "www") then .branchName = $branch else . end]' <<<"$domain")"
+          apex_present="$(jq -r '[.domainAssociation.subDomains[]? | select(.subDomainSetting.prefix == "")] | length' <<<"$domain")"
+          www_present="$(jq -r '[.domainAssociation.subDomains[]? | select(.subDomainSetting.prefix == "www")] | length' <<<"$domain")"
+          test "$apex_present" = '1'
+          test "$www_present" = '1'
+
+          apex_branch="$(jq -r '.domainAssociation.subDomains[] | select(.subDomainSetting.prefix == "") | .subDomainSetting.branchName' <<<"$domain")"
+          www_branch="$(jq -r '.domainAssociation.subDomains[] | select(.subDomainSetting.prefix == "www") | .subDomainSetting.branchName' <<<"$domain")"
+          if [[ "$apex_branch" != "$branch" || "$www_branch" != "$branch" ]]; then
+            aws amplify update-domain-association \
+              --app-id "$LEGACY_HEALTH_APP_ID" \
+              --domain-name "$LEGACY_HEALTH_DOMAIN" \
+              --sub-domain-settings "$settings" >/dev/null
+          fi
+
+          job_id="$(aws amplify start-job \
+            --app-id "$LEGACY_HEALTH_APP_ID" \
+            --branch-name "$branch" \
+            --job-type RELEASE \
+            --job-reason 'Retire legacy Health domains to canonical Foundation properties' \
+            --query 'jobSummary.jobId' \
+            --output text)"
+          test -n "$job_id"
+
+          build_status=''
+          for _ in $(seq 1 120); do
+            build_status="$(aws amplify get-job \
+              --app-id "$LEGACY_HEALTH_APP_ID" \
+              --branch-name "$branch" \
+              --job-id "$job_id" \
+              --query 'job.summary.status' \
+              --output text)"
+            case "$build_status" in
+              SUCCEED) break ;;
+              FAILED|CANCELLED) echo "Amplify build ended: $build_status" >&2; exit 1 ;;
+            esac
+            sleep 10
+          done
+          test "$build_status" = 'SUCCEED'
+
+          for host in sozorockhealth.com www.sozorockhealth.com; do
+            verified=0
+            for _ in $(seq 1 60); do
+              headers="$(curl --silent --show-error --head --max-time 20 "https://${host}/" || true)"
+              status="$(awk '/^HTTP\// {code=$2} END {print code}' <<<"$headers")"
+              location="$(awk 'BEGIN{IGNORECASE=1} /^location:/ {sub(/\r$/, ""); sub(/^location:[[:space:]]*/, ""); value=$0} END {print value}' <<<"$headers")"
+              if [[ "$status" = '308' && "$location" = 'https://health.sozorockfoundation.org/' ]]; then
+                verified=1
+                break
+              fi
+              sleep 10
+            done
+            test "$verified" = '1'
+          done
+
+          cb_headers="$(curl --silent --show-error --head --max-time 20 'https://sozorockhealth.com/cb-cap')"
+          cb_status="$(awk '/^HTTP\// {code=$2} END {print code}' <<<"$cb_headers")"
+          cb_location="$(awk 'BEGIN{IGNORECASE=1} /^location:/ {sub(/\r$/, ""); sub(/^location:[[:space:]]*/, ""); value=$0} END {print value}' <<<"$cb_headers")"
+          test "$cb_status" = '308'
+          test "$cb_location" = 'https://cbcap.sozorockfoundation.org/'
+
+          echo "Legacy Health domains verified after Amplify job ${job_id}." >> "$GITHUB_STEP_SUMMARY"
+          echo "job_id=$job_id" >> "$GITHUB_OUTPUT"
+
+      - name: Verify Foundation deployment role received required recovery capability
+        uses: aws-actions/configure-aws-credentials@e6de054238d6b7531b4efff3b6587d9aade6a06c # v6.2.3
+        with:
+          role-to-assume: ${{ env.FOUNDATION_DEPLOY_ROLE }}
+          role-session-name: FoundationRecoveryVerify-${{ github.run_id }}
+          aws-region: ${{ env.AWS_REGION }}
+          retry-max-attempts: 3
+
+      - name: Prove Foundation role and dispatch fail-closed apex cutover
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(aws sts get-caller-identity --query Account --output text)" = "$ACCOUNT_ID"
+          aws acm list-certificates --certificate-statuses ISSUED PENDING_VALIDATION >/dev/null
+
+          cat > "$RUNNER_TEMP/recovery-probe.json" <<'JSON'
+          {"version":"2.0","rawPath":"/recovery-probe","rawQueryString":"source=recovery","requestContext":{"http":{"method":"GET","path":"/recovery-probe"}}}
+          JSON
+          aws lambda invoke \
+            --function-name "$PARENT_FUNCTION_NAME" \
+            --cli-binary-format raw-in-base64-out \
+            --payload "file://$RUNNER_TEMP/recovery-probe.json" \
+            "$RUNNER_TEMP/recovery-probe-response.json" >/dev/null
+          test -s "$RUNNER_TEMP/recovery-probe-response.json"
+
+          curl --fail-with-body --silent --show-error \
+            -X POST \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer ${GH_TOKEN}" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/workflows/production-domain-diagnostics.yml/dispatches" \
+            -d '{"ref":"main"}' >/dev/null
+
+          echo 'Apex cutover workflow dispatched after recovery prerequisites were proven.' >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Publish recovery receipt
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          HEALTH_JOB: ${{ steps.health.outputs.job_id }}
+        shell: bash
+        run: |
+          receipt="$RUNNER_TEMP/production-recovery-receipt.md"
+          {
+            echo '## Production recovery bridge receipt'
+            echo
+            echo "Run: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+            echo "Commit: \`${GITHUB_SHA}\`"
+            echo
+            echo '- Temporary AI Lab recovery role assumption: completed before any mutation.'
+            echo '- Foundation ACM and verifier permissions: applied with additive policy only.'
+            echo '- Foundation edge model role: restricted to GPT-5.6 Sol Mantle inference with short-term bearer-token use.'
+            echo "- Legacy Health Amplify release job: \`${HEALTH_JOB:-not-completed}\`."
+            echo '- Apex cutover: dispatched only after ACM inspection and exact Lambda invocation succeeded.'
+            echo
+            echo 'The temporary cross-repository trust must be removed after the apex and retired Health live checks both pass.'
+          } > "$receipt"
+          gh issue comment "$RECOVERY_ISSUE" --repo "$GITHUB_REPOSITORY" --body-file "$receipt"

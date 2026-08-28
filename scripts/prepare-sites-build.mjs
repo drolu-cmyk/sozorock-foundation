@@ -33,7 +33,7 @@ const permanentRoutes = [
 ];
 
 for (const file of [index, worker, hosting]) {
-  if (!existsSync(file)) throw new Error("Missing Sites build input: " + file);
+  if (!existsSync(file)) throw new Error("Missing production build input: " + file);
 }
 
 mkdirSync(path.join(dist, "server"), { recursive: true });
@@ -74,6 +74,7 @@ function routeHtml(route) {
   let html = replaceTitle(baseHtml, seo.title);
   html = upsertCanonical(html, seo.canonicalUrl);
   html = upsertMeta(html, "name", "description", seo.description);
+  html = upsertMeta(html, "name", "keywords", seo.keywords);
   html = upsertMeta(html, "name", "robots", seo.robots);
   html = upsertMeta(html, "property", "og:site_name", "The SozoRock Foundation");
   html = upsertMeta(html, "property", "og:locale", "en_US");
@@ -88,6 +89,7 @@ function routeHtml(route) {
   html = upsertMeta(html, "property", "og:image:height", "630");
   html = upsertMeta(html, "property", "og:image:alt", seo.imageAlt);
   html = upsertMeta(html, "name", "twitter:card", "summary_large_image");
+  html = upsertMeta(html, "name", "twitter:domain", "sozorockfoundation.org");
   html = upsertMeta(html, "name", "twitter:site", "@srockfoundation");
   html = upsertMeta(html, "name", "twitter:creator", "@srockfoundation");
   html = upsertMeta(html, "name", "twitter:title", seo.title);
@@ -123,13 +125,12 @@ notFoundHtml = upsertMeta(notFoundHtml, "name", "robots", "noindex, nofollow, no
 notFoundHtml = notFoundHtml.replace(/<link\s+rel="canonical"[^>]*>\s*/u, "");
 writeFileSync(path.join(dist, "client", "404.html"), notFoundHtml);
 
-// Sites' edge dispatcher resolves a clean GET path against static HTML before
-// the worker fallback. Emitting route.html entry files keeps copied links and
-// browser refreshes on their permanent path instead of redirecting to `/`.
+// CloudFront rewrites clean routes to these crawler-ready entries. The same
+// files preserve the compatibility worker contract for alternate previews.
 for (const route of permanentRoutes) {
   const routeFile = path.join(dist, "client", `${route.slice(1)}.html`);
   mkdirSync(path.dirname(routeFile), { recursive: true });
   writeFileSync(routeFile, routeHtml(route));
 }
 
-console.log(`Prepared Sites build with ${permanentRoutes.length} permanent HTML entries.`);
+console.log(`Prepared CloudFront build with ${permanentRoutes.length} crawler-ready route entries and the dynamic React runtime.`);

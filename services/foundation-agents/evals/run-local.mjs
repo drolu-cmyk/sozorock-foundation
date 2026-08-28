@@ -4,13 +4,14 @@ import { fileURLToPath } from "node:url";
 import { run } from "@openai/agents";
 import { evalGrader } from "../src/agents.mjs";
 import { executeGraph, graphs } from "../src/graph.mjs";
+import { modelAuthConfigured } from "../src/model-auth.mjs";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const casesPath = resolve(here, "cases.jsonl");
 const resultsPath = resolve(here, "results/latest.json");
 
-if (!process.env.OPENAI_API_KEY) {
-  console.error("OPENAI_API_KEY is required for live agent evals.");
+if (!modelAuthConfigured()) {
+  console.error("An approved OpenAI-compatible model identity is required for live agent evals.");
   process.exit(2);
 }
 
@@ -37,12 +38,20 @@ for (const testCase of cases) {
     });
     const graph = graphs[testCase.graphId];
     const nodesSeen = new Set(result.outputs.map((entry) => entry.node));
+    const routerOutput = graph.routerNode
+      ? result.outputs.find((entry) => entry.node === graph.routerNode)?.output
+      : null;
+    const expectedNodes = graph.routerNode
+      ? [graph.routerNode, graph.routes?.[routerOutput?.route], graph.responseNode, "evaluator"].filter(Boolean)
+      : graph.nodes;
     const structuralChecks = {
       terminalStatus: ["review_required", "escalated"].includes(result.status),
-      allBaselineNodesRan: graph.nodes.every((node) => nodesSeen.has(node)),
-      orchestratorRan: nodesSeen.has("orchestrator"),
+      allBaselineNodesRan: expectedNodes.every((node) => nodesSeen.has(node)),
+      plannerOrRouterRan: nodesSeen.has(graph.routerNode || "orchestrator"),
       evaluatorRan: nodesSeen.has("evaluator"),
-      finalPresent: typeof result.final === "string" && result.final.trim().length > 0,
+      finalPresent: typeof result.final === "string"
+        ? result.final.trim().length > 0
+        : Boolean(result.final && typeof result.final === "object" && Object.keys(result.final).length > 0),
       surfaceMatches: result.surface === graph.surface,
       revisionBounded: result.revisionCount >= 0 && result.revisionCount <= 1,
       evaluationStructured:

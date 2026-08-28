@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { campaigns, platforms } from "./siteData";
 import { Link } from "./router";
 import { SectionHeading } from "./components";
+import { FoundationNavigator } from "./FoundationNavigator";
 
 function CampaignSpotlight() {
   const [active, setActive] = useState(0);
@@ -144,6 +145,7 @@ export function HomePage() {
           </div>
         </div>
       </section>
+      <FoundationNavigator />
       <CampaignSpotlight />
       <PlatformOverview />
       <ActionRoutes />
