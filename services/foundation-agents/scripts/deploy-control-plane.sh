@@ -282,6 +282,11 @@ JSON
         graph_decision="$(jq -r '.decision' "$work/signed-run.json")"
         [[ "$graph_status" = 'review_required' || "$graph_status" = 'escalated' ]]
         [[ "$graph_decision" = 'pass' || "$graph_decision" = 'revise' || "$graph_decision" = 'escalate' ]]
+      else
+        failure_category="$(jq -r '.failure.category // "unknown"' "$work/signed-run.json" 2>/dev/null || echo unknown)"
+        failure_status="$(jq -r '.failure.providerStatus // "unknown"' "$work/signed-run.json" 2>/dev/null || echo unknown)"
+        failure_code="$(jq -r '.failure.providerCode // "unknown"' "$work/signed-run.json" 2>/dev/null || echo unknown)"
+        echo "Signed graph smoke failed safely: HTTP ${signed_run_status}; category=${failure_category}; provider_status=${failure_status}; provider_code=${failure_code}." >&2
       fi
     fi
   fi

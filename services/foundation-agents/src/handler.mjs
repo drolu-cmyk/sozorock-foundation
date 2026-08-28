@@ -75,6 +75,22 @@ function containsPrivateVisitorMaterial(question) {
   );
 }
 
+function modelFailureClass(error) {
+  const status = Number(error?.status);
+  const rawCode = typeof error?.code === "string" ? error.code : typeof error?.type === "string" ? error.type : "";
+  const providerCode = /^[a-z0-9_.-]{1,80}$/iu.test(rawCode) ? rawCode : null;
+  const message = error instanceof Error ? error.message : "";
+  let category = "unknown";
+  if (status === 401) category = "authentication";
+  else if (status === 403) category = "model_or_project_access";
+  else if (status === 429 && /quota|credit|balance|spend/iu.test(message)) category = "quota";
+  else if (status === 429) category = "rate_limit";
+  else if (status >= 500) category = "provider_service";
+  else if (/fetch|network|socket|connect|timed?\s*out|dns/iu.test(message)) category = "transport";
+  else if (status >= 400) category = "invalid_request";
+  return { category, providerStatus: Number.isInteger(status) ? status : null, providerCode };
+}
+
 async function handlePublicNavigator(event) {
   const headers = publicHeaders(event);
   const origin = eventHeader(event, "origin");
@@ -220,6 +236,6 @@ export async function handler(event) {
     if (error instanceof SyntaxError) return response(400, { error: "invalid_json" });
     if (error instanceof Error && error.message === "payload_too_large") return response(413, { error: "payload_too_large" });
     console.error("foundation-agent-lambda-run-failed", error instanceof Error ? error.message : "unknown_error");
-    return response(500, { error: "agent_run_failed" });
+    return response(500, { error: "agent_run_failed", failure: modelFailureClass(error) });
   }
 }
