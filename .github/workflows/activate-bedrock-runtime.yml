@@ -46,7 +46,8 @@ jobs:
               "Action":"bedrock:InvokeModel",
               "Resource":[
                 "arn:aws:bedrock:${AWS_REGION}::foundation-model/openai.gpt-oss-20b-1:0",
-                "arn:aws:bedrock:${AWS_REGION}::foundation-model/openai.gpt-oss-120b-1:0"
+                "arn:aws:bedrock:${AWS_REGION}::foundation-model/openai.gpt-oss-120b-1:0",
+                "arn:aws:bedrock:${AWS_REGION}:${ACCOUNT_ID}:project/default"
               ]
             },
             {
@@ -72,10 +73,11 @@ jobs:
             --policy-name SozoRockFoundationAgentModelInference \
             --query PolicyDocument \
             --output json)"
-          jq -e --arg region "$AWS_REGION" '
+          jq -e --arg region "$AWS_REGION" --arg account "$ACCOUNT_ID" '
             [.Statement[] | select(.Action == "bedrock:InvokeModel")][0].Resource == [
               "arn:aws:bedrock:" + $region + "::foundation-model/openai.gpt-oss-20b-1:0",
-              "arn:aws:bedrock:" + $region + "::foundation-model/openai.gpt-oss-120b-1:0"
+              "arn:aws:bedrock:" + $region + "::foundation-model/openai.gpt-oss-120b-1:0",
+              "arn:aws:bedrock:" + $region + ":" + $account + ":project/default"
             ] and
             [.Statement[] | select(.Action == "bedrock:CallWithBearerToken")][0].Condition.StringEquals["bedrock:BearerTokenType"] == "SHORT_TERM" and
             ([.Statement[].Action] | all(. == "bedrock:InvokeModel" or . == "bedrock:CallWithBearerToken"))
@@ -86,6 +88,6 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
-          body='Bedrock runtime endpoint authority is active for the Foundation Lambda. The role is restricted to GPT-OSS 20B/120B model ARNs and short-term `bedrock:CallWithBearerToken`; Mantle project permissions were removed.'
+          body='Bedrock runtime endpoint authority is active for the Foundation Lambda. The role is restricted to GPT-OSS 20B/120B model ARNs, the account default runtime project required by the OpenAI-compatible endpoint, and short-term `bedrock:CallWithBearerToken`; Mantle permissions were removed.'
           gh issue comment "$RECEIPT_ISSUE" --repo "$GITHUB_REPOSITORY" --body "$body"
           printf '%s\n' "$body" >> "$GITHUB_STEP_SUMMARY"
