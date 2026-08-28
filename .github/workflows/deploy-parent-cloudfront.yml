@@ -13,7 +13,6 @@ on:
       - scripts/bootstrap-parent-aws.sh
       - scripts/validate-aws-release.mjs
       - infra/cloudformation/parent-cloudfront.yml
-      - services/foundation-agents/**
       - .github/workflows/deploy-parent-cloudfront.yml
   workflow_dispatch:
 
