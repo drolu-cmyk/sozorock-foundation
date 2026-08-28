@@ -70,16 +70,16 @@ jobs:
         run: |
           set -euo pipefail
           subject='Release www.sozorockfoundation.org from inaccessible enabled CloudFront source'
-          existing="$(aws support describe-cases --include-resolved-cases false --language en --output json 2>"$RUNNER_TEMP/support-error.txt" || true)"
+          existing="$(aws support describe-cases --no-include-resolved-cases --language en --output json 2>"$RUNNER_TEMP/support-error.txt" || true)"
           if [[ -n "$existing" ]]; then
             case_id="$(jq -r --arg subject "$subject" '.cases[]? | select(.subject == $subject) | .caseId' <<<"$existing" | head -n1)"
           else
             case_id=''
           fi
           if [[ -z "$case_id" ]]; then
-            services="$(aws support describe-services --service-code-list amazon-cloudfront --language en --output json)"
+            services="$(aws support describe-services --service-code-list amazon-cloudfront --language en --output json 2>"$RUNNER_TEMP/support-error.txt")"
             category_code="$(jq -r '[.services[0].categories[]? | select((.name + " " + .code) | test("domain|alternate|distribution"; "i"))][0].code // .services[0].categories[0].code // "other"' <<<"$services")"
-            conflicts="$(aws cloudfront list-conflicting-aliases --distribution-id "$TARGET_DISTRIBUTION_ID" --alias "$CANONICAL_HOST" --output json)"
+            conflicts="$(aws cloudfront list-conflicting-aliases --distribution-id "$TARGET_DISTRIBUTION_ID" --alias "$CANONICAL_HOST" --output json 2>"$RUNNER_TEMP/support-error.txt")"
             source_distribution="$(jq -r --arg target "$TARGET_DISTRIBUTION_ID" '[.ConflictingAliasesList.Items[]? | select(.DistributionId != $target)][0].DistributionId // "not disclosed"' <<<"$conflicts")"
             body="Please move or release the alternate domain name ${CANONICAL_HOST} to CloudFront distribution ${TARGET_DISTRIBUTION_ID} in AWS account ${ACCOUNT_ID}. The current source distribution (${source_distribution}) is enabled in another account and is no longer accessible through the original Sites project. CloudFront ownership TXT verification is present and the target has a valid certificate. AssociateAlias returns IllegalUpdate because the inaccessible cross-account source is enabled. AWS documentation directs this state to Support. The Foundation authorizes the move and needs the exact hostname released without changing apex or mail DNS."
             case_id="$(aws support create-case \
