@@ -25,6 +25,12 @@ function bedrockRequested() {
   );
 }
 
+export function bedrockBaseURLForModel(model, awsRegion) {
+  return model.includes("gpt-oss")
+    ? `https://bedrock-runtime.${awsRegion}.amazonaws.com/openai/v1`
+    : `https://bedrock-mantle.${awsRegion}.api.aws/openai/v1`;
+}
+
 function bedrockConfig() {
   if (!bedrockRequested()) return null;
   const awsRegion = process.env.AWS_REGION?.trim();
@@ -32,7 +38,7 @@ function bedrockConfig() {
   const model = process.env.OPENAI_AGENT_MODEL?.trim() || "";
   return {
     awsRegion,
-    baseURL: `https://bedrock-mantle.${awsRegion}.api.aws${model.includes("gpt-oss") ? "/v1" : "/openai/v1"}`,
+    baseURL: bedrockBaseURLForModel(model, awsRegion),
   };
 }
 
@@ -119,11 +125,7 @@ export async function probeBedrockModel(model) {
     throw new Error("Amazon Bedrock model probing requires the Bedrock runtime.");
   }
   await ensureModelAuthConfigured();
-  const config = bedrockConfig();
-  const probeClient = model.includes("gpt-oss")
-    ? new OpenAI({ apiKey: bedrockApiKey, baseURL: `https://bedrock-mantle.${config.awsRegion}.api.aws/v1` })
-    : bedrockClient;
-  const result = await probeClient.responses.create({
+  const result = await bedrockClient.responses.create({
     model,
     input: "Reply with OK.",
     max_output_tokens: 16,

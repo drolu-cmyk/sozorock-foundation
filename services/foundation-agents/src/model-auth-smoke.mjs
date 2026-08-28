@@ -1,5 +1,14 @@
 import assert from "node:assert/strict";
-import { modelApiMode, modelAuthConfigured, modelAuthMode } from "./model-auth.mjs";
+import { bedrockBaseURLForModel, modelApiMode, modelAuthConfigured, modelAuthMode } from "./model-auth.mjs";
+
+assert.equal(
+  bedrockBaseURLForModel("openai.gpt-oss-20b", "us-east-1"),
+  "https://bedrock-runtime.us-east-1.amazonaws.com/openai/v1"
+);
+assert.equal(
+  bedrockBaseURLForModel("openai.gpt-5.6-sol", "us-east-1"),
+  "https://bedrock-mantle.us-east-1.api.aws/openai/v1"
+);
 
 const keys = [
   "FOUNDATION_MODEL_PROVIDER",

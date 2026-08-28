@@ -58,22 +58,18 @@ jobs:
             {
               "Sid":"FoundationAgentApprovedInferenceOnly",
               "Effect":"Allow",
-              "Action":"bedrock-mantle:CreateInference",
-              "Resource":"arn:aws:bedrock-mantle:${AWS_REGION}:${ACCOUNT_ID}:project/*",
-              "Condition":{"StringEquals":{"bedrock-mantle:Model":["openai.gpt-oss-120b","openai.gpt-oss-20b"]}}
-            },
-            {
-              "Sid":"FoundationAgentProjectReadOnly",
-              "Effect":"Allow",
-              "Action":["bedrock-mantle:GetProject","bedrock-mantle:ListProjects"],
-              "Resource":"*"
+              "Action":"bedrock:InvokeModel",
+              "Resource":[
+                "arn:aws:bedrock:${AWS_REGION}::foundation-model/openai.gpt-oss-20b-1:0",
+                "arn:aws:bedrock:${AWS_REGION}::foundation-model/openai.gpt-oss-120b-1:0"
+              ]
             },
             {
               "Sid":"FoundationAgentShortTermTokenOnly",
               "Effect":"Allow",
-              "Action":"bedrock-mantle:CallWithBearerToken",
+              "Action":"bedrock:CallWithBearerToken",
               "Resource":"*",
-              "Condition":{"StringEquals":{"bedrock-mantle:BearerTokenType":"SHORT_TERM"}}
+              "Condition":{"StringEquals":{"bedrock:BearerTokenType":"SHORT_TERM"}}
             }
           ]}
           EOF
