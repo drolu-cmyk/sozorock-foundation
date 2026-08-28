@@ -22,6 +22,7 @@ env:
   PARENT_LAMBDA_ROLE_NAME: SozoRockFoundationParentLambdaRole
   PARENT_FUNCTION_NAME: SozoRockFoundationParentOrigin
   PARENT_API_ID: 2b6srfl202
+  APEX_HOST: sozorockfoundation.org
   LEGACY_HEALTH_APP_ID: d3uqnxmsmefokf
   LEGACY_HEALTH_DOMAIN: sozorockhealth.com
   RECOVERY_ISSUE: '84'
@@ -55,11 +56,11 @@ jobs:
           cat >/tmp/parent-agent-model-policy.json <<EOF
           {"Version":"2012-10-17","Statement":[
             {
-              "Sid":"FoundationAgentSolInferenceOnly",
+              "Sid":"FoundationAgentTerraInferenceOnly",
               "Effect":"Allow",
               "Action":"bedrock-mantle:CreateInference",
               "Resource":"arn:aws:bedrock-mantle:${AWS_REGION}:${ACCOUNT_ID}:project/*",
-              "Condition":{"StringEquals":{"bedrock-mantle:Model":"openai.gpt-5.6-sol"}}
+              "Condition":{"StringEquals":{"bedrock-mantle:Model":"openai.gpt-5.6-terra"}}
             },
             {
               "Sid":"FoundationAgentProjectReadOnly",
@@ -128,6 +129,17 @@ jobs:
                 "arn:aws:execute-api:${AWS_REGION}:${ACCOUNT_ID}:${PARENT_API_ID}/*/GET/internal/health",
                 "arn:aws:execute-api:${AWS_REGION}:${ACCOUNT_ID}:${PARENT_API_ID}/*/GET/internal/v1/graphs",
                 "arn:aws:execute-api:${AWS_REGION}:${ACCOUNT_ID}:${PARENT_API_ID}/*/POST/internal/v1/run"
+              ]
+            },
+            {
+              "Sid":"MaintainOnlyFoundationApexApiDomain",
+              "Effect":"Allow",
+              "Action":["apigateway:GET","apigateway:POST","apigateway:PATCH"],
+              "Resource":[
+                "arn:aws:apigateway:${AWS_REGION}::/domainnames",
+                "arn:aws:apigateway:${AWS_REGION}::/domainnames/${APEX_HOST}",
+                "arn:aws:apigateway:${AWS_REGION}::/domainnames/${APEX_HOST}/apimappings",
+                "arn:aws:apigateway:${AWS_REGION}::/domainnames/${APEX_HOST}/apimappings/*"
               ]
             }
           ]}
@@ -295,7 +307,7 @@ jobs:
             echo
             echo '- Temporary AI Lab recovery role assumption: completed before any mutation.'
             echo '- Foundation ACM and verifier permissions: applied with additive policy only.'
-            echo '- Foundation edge model role: restricted to GPT-5.6 Sol Mantle inference with short-term bearer-token use.'
+            echo '- Foundation edge model role: restricted to GPT-5.6 Terra Mantle inference with short-term bearer-token use.'
             echo "- Retired Health Amplify state: \`${HEALTH_STATE:-not-checked}\`."
             echo "- Legacy Health Amplify release job: \`${HEALTH_JOB:-not-completed}\`."
             echo "- Apex cutover dispatched after ACM inspection and exact Lambda invocation: \`${CUTOVER_DISPATCHED:-false}\`."
