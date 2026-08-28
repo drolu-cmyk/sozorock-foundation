@@ -29,7 +29,7 @@ function bedrockConfig() {
   if (!awsRegion) return null;
   return {
     awsRegion,
-    baseURL: `https://bedrock-mantle.${awsRegion}.api.aws/openai/v1`,
+    baseURL: `https://bedrock-mantle.${awsRegion}.api.aws/v1`,
   };
 }
 
