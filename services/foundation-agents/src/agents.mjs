@@ -7,18 +7,18 @@ const foundationProductionEdge =
 const explicitBedrockRuntime = process.env.FOUNDATION_MODEL_PROVIDER === "bedrock";
 const configuredModel = process.env.OPENAI_AGENT_MODEL;
 const configuredRuntimeModel = foundationProductionEdge || explicitBedrockRuntime
-  ? configuredModel?.startsWith("openai.")
-    ? configuredModel
-    : `openai.${configuredModel || "gpt-5.6-sol"}`
+  ? configuredModel || "openai.gpt-5.6-sol"
   : configuredModel || "gpt-5.6-sol";
 const model = foundationProductionEdge || explicitBedrockRuntime
   ? bedrockRuntimeModelId(configuredRuntimeModel)
   : configuredRuntimeModel;
 const modelSettings = foundationProductionEdge || explicitBedrockRuntime
-  ? {
-      maxTokens: configuredRuntimeModel === "openai.gpt-5.6-sol" ? 320 : 96,
-      reasoning: { effort: "low" },
-    }
+  ? configuredRuntimeModel.startsWith("openai.")
+    ? {
+        maxTokens: configuredRuntimeModel === "openai.gpt-5.6-sol" ? 320 : 96,
+        reasoning: { effort: "low" },
+      }
+    : { maxTokens: 320 }
   : undefined;
 const sharedRules = `You are an internal SozoRock specialist. Work only from supplied evidence and clearly identified source material. Never invent achievements, partners, funding, adoption, student outcomes, publication status, citations, dates, metrics, or institutional relationships. Distinguish facts from recommendations. Do not publish, deploy, send, delete, authorize, or change external systems. Produce a reviewable internal result for the next graph node.`;
 

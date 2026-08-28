@@ -26,9 +26,13 @@ function bedrockRequested() {
 }
 
 export function bedrockBaseURLForModel(model, awsRegion) {
-  return model.includes("gpt-oss")
-    ? `https://bedrock-runtime.${awsRegion}.amazonaws.com/openai/v1`
-    : `https://bedrock-mantle.${awsRegion}.api.aws/openai/v1`;
+  if (model === "openai.gpt-5.6-sol") {
+    return `https://bedrock-mantle.${awsRegion}.api.aws/openai/v1`;
+  }
+  if (model.includes("gpt-oss")) {
+    return `https://bedrock-runtime.${awsRegion}.amazonaws.com/openai/v1`;
+  }
+  return `https://bedrock-runtime.${awsRegion}.amazonaws.com/v1`;
 }
 
 export function bedrockRuntimeModelId(model) {

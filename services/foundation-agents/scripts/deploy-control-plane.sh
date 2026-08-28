@@ -136,9 +136,9 @@ selected_model=''
 selected_model_region=''
 for model_region in us-east-2 us-east-1 us-west-2; do
   if [[ "$model_region" = 'us-west-2' ]]; then
-    candidates=(openai.gpt-oss-120b openai.gpt-oss-20b)
+    candidates=(us.anthropic.claude-sonnet-4-6 openai.gpt-oss-120b openai.gpt-oss-20b)
   else
-    candidates=(openai.gpt-5.6-sol openai.gpt-oss-120b openai.gpt-oss-20b)
+    candidates=(openai.gpt-5.6-sol us.anthropic.claude-sonnet-4-6 openai.gpt-oss-120b openai.gpt-oss-20b)
   fi
   for candidate in "${candidates[@]}"; do
     jq --arg model "$candidate" --arg region "$model_region" \

@@ -115,7 +115,7 @@ jobs:
           test "${{ steps.deploy.outputs.auth_mode }}" = 'bedrock_short_term'
           selected_model='${{ steps.deploy.outputs.selected_model }}'
           model_api_mode='${{ steps.deploy.outputs.model_api_mode }}'
-          [[ "$selected_model" = 'openai.gpt-5.6-sol' || "$selected_model" = 'openai.gpt-oss-120b' || "$selected_model" = 'openai.gpt-oss-20b' ]]
+          [[ "$selected_model" = 'openai.gpt-5.6-sol' || "$selected_model" = 'us.anthropic.claude-sonnet-4-6' || "$selected_model" = 'openai.gpt-oss-120b' || "$selected_model" = 'openai.gpt-oss-20b' ]]
           if [[ "$selected_model" = 'openai.gpt-5.6-sol' ]]; then
             test "$model_api_mode" = 'responses'
           else

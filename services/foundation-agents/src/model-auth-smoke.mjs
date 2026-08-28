@@ -16,11 +16,17 @@ assert.equal(
   bedrockBaseURLForModel("openai.gpt-5.6-sol", "us-east-1"),
   "https://bedrock-mantle.us-east-1.api.aws/openai/v1"
 );
+assert.equal(
+  bedrockBaseURLForModel("us.anthropic.claude-sonnet-4-6", "us-east-1"),
+  "https://bedrock-runtime.us-east-1.amazonaws.com/v1"
+);
 assert.equal(bedrockRuntimeModelId("openai.gpt-oss-20b"), "openai.gpt-oss-20b-1:0");
 assert.equal(bedrockRuntimeModelId("openai.gpt-oss-120b"), "openai.gpt-oss-120b-1:0");
 assert.equal(bedrockRuntimeModelId("openai.gpt-5.6-sol"), "openai.gpt-5.6-sol");
+assert.equal(bedrockRuntimeModelId("us.anthropic.claude-sonnet-4-6"), "us.anthropic.claude-sonnet-4-6");
 assert.equal(bedrockApiModeForModel("openai.gpt-5.6-sol"), "responses");
 assert.equal(bedrockApiModeForModel("openai.gpt-oss-20b"), "chat_completions");
+assert.equal(bedrockApiModeForModel("us.anthropic.claude-sonnet-4-6"), "chat_completions");
 
 const keys = [
   "FOUNDATION_MODEL_PROVIDER",

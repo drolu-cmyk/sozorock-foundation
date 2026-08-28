@@ -47,12 +47,18 @@ jobs:
               "Resource":[
                 "arn:aws:bedrock:${AWS_REGION}::foundation-model/openai.gpt-oss-20b-1:0",
                 "arn:aws:bedrock:${AWS_REGION}::foundation-model/openai.gpt-oss-120b-1:0",
+                "arn:aws:bedrock:${AWS_REGION}::foundation-model/anthropic.claude-sonnet-4-6",
+                "arn:aws:bedrock:${AWS_REGION}:${ACCOUNT_ID}:inference-profile/us.anthropic.claude-sonnet-4-6",
                 "arn:aws:bedrock:${AWS_REGION}:${ACCOUNT_ID}:project/default",
                 "arn:aws:bedrock:us-east-2::foundation-model/openai.gpt-oss-20b-1:0",
                 "arn:aws:bedrock:us-east-2::foundation-model/openai.gpt-oss-120b-1:0",
+                "arn:aws:bedrock:us-east-2::foundation-model/anthropic.claude-sonnet-4-6",
+                "arn:aws:bedrock:us-east-2:${ACCOUNT_ID}:inference-profile/us.anthropic.claude-sonnet-4-6",
                 "arn:aws:bedrock:us-east-2:${ACCOUNT_ID}:project/default",
                 "arn:aws:bedrock:us-west-2::foundation-model/openai.gpt-oss-20b-1:0",
                 "arn:aws:bedrock:us-west-2::foundation-model/openai.gpt-oss-120b-1:0",
+                "arn:aws:bedrock:us-west-2::foundation-model/anthropic.claude-sonnet-4-6",
+                "arn:aws:bedrock:us-west-2:${ACCOUNT_ID}:inference-profile/us.anthropic.claude-sonnet-4-6",
                 "arn:aws:bedrock:us-west-2:${ACCOUNT_ID}:project/default"
               ]
             },
@@ -99,12 +105,18 @@ jobs:
             [.Statement[] | select(.Action == "bedrock:InvokeModel")][0].Resource == [
               "arn:aws:bedrock:" + $region + "::foundation-model/openai.gpt-oss-20b-1:0",
               "arn:aws:bedrock:" + $region + "::foundation-model/openai.gpt-oss-120b-1:0",
+              "arn:aws:bedrock:" + $region + "::foundation-model/anthropic.claude-sonnet-4-6",
+              "arn:aws:bedrock:" + $region + ":" + $account + ":inference-profile/us.anthropic.claude-sonnet-4-6",
               "arn:aws:bedrock:" + $region + ":" + $account + ":project/default",
               "arn:aws:bedrock:us-east-2::foundation-model/openai.gpt-oss-20b-1:0",
               "arn:aws:bedrock:us-east-2::foundation-model/openai.gpt-oss-120b-1:0",
+              "arn:aws:bedrock:us-east-2::foundation-model/anthropic.claude-sonnet-4-6",
+              "arn:aws:bedrock:us-east-2:" + $account + ":inference-profile/us.anthropic.claude-sonnet-4-6",
               "arn:aws:bedrock:us-east-2:" + $account + ":project/default",
               "arn:aws:bedrock:us-west-2::foundation-model/openai.gpt-oss-20b-1:0",
               "arn:aws:bedrock:us-west-2::foundation-model/openai.gpt-oss-120b-1:0",
+              "arn:aws:bedrock:us-west-2::foundation-model/anthropic.claude-sonnet-4-6",
+              "arn:aws:bedrock:us-west-2:" + $account + ":inference-profile/us.anthropic.claude-sonnet-4-6",
               "arn:aws:bedrock:us-west-2:" + $account + ":project/default"
             ] and
             [.Statement[] | select(.Action == "bedrock:CallWithBearerToken")][0].Condition.StringEquals["bedrock:BearerTokenType"] == "SHORT_TERM" and
@@ -120,6 +132,6 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
-          body='Bedrock model authority is active for the Foundation Lambda. The role is restricted to GPT-OSS 20B/120B model ARNs and account-default projects in the approved US failover regions, plus short-term `bedrock:CallWithBearerToken`; this supports the documented GPT-5.6 Sol Responses endpoint with GPT-OSS Runtime fallback.'
+          body='Bedrock model authority is active for the Foundation Lambda. The role is restricted to GPT-OSS 20B/120B and Claude Sonnet 4.6 model/profile ARNs in the approved US failover regions, account-default projects, and short-term Bedrock credentials. GPT-5.6 Sol remains preferred, with Claude Sonnet 4.6 and GPT-OSS Runtime fallbacks.'
           gh issue comment "$RECEIPT_ISSUE" --repo "$GITHUB_REPOSITORY" --body "$body"
           printf '%s\n' "$body" >> "$GITHUB_STEP_SUMMARY"

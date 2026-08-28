@@ -175,7 +175,7 @@ jobs:
 
           The Foundation apex domain, canonical `www`, parent contact form, and parent publication-access verification path passed live production checks.
 
-          Temporary Foundation access to the AI Lab deploy role and the temporary recovery IAM add-on were removed. The GPT-5.6 Sol model-inference policy remains on the private runtime, and the Foundation deploy role now retains only an exact three-route `execute-api:Invoke` boundary so every future agent deployment can prove a real signed model-backed graph smoke.
+          Temporary Foundation access to the AI Lab deploy role and the temporary recovery IAM add-on were removed. The approved Bedrock model-inference policy remains on the private runtime, and the Foundation deploy role now retains only an exact three-route `execute-api:Invoke` boundary so every future agent deployment can prove a real signed model-backed graph smoke.
           EOF
           gh issue comment "$RECOVERY_ISSUE" --repo "$GITHUB_REPOSITORY" --body-file "$RUNNER_TEMP/final-recovery.md"
           gh issue close "$RECOVERY_ISSUE" --repo "$GITHUB_REPOSITORY" --reason completed
