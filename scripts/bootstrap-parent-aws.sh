@@ -46,7 +46,7 @@ jq -n --arg account "$account_id" --arg bucket "$bucket_name" --arg stack "$stac
     {Effect:"Allow",Action:"iam:PassRole",Resource:("arn:aws:iam::"+$account+":role/"+$execution),Condition:{StringEquals:{"iam:PassedToService":"cloudformation.amazonaws.com"}}},
     {Effect:"Allow",Action:["s3:ListBucket","s3:GetBucketLocation"],Resource:("arn:aws:s3:::"+$bucket)},
     {Effect:"Allow",Action:["s3:PutObject","s3:DeleteObject","s3:GetObject"],Resource:("arn:aws:s3:::"+$bucket+"/*")},
-    {Effect:"Allow",Action:["cloudfront:AssociateAlias","cloudfront:CreateInvalidation","cloudfront:GetDistribution","cloudfront:GetDistributionConfig","cloudfront:GetInvalidation","cloudfront:ListDistributions","cloudfront:UpdateDistribution"],Resource:"*"},
+    {Effect:"Allow",Action:["cloudfront:AssociateAlias","cloudfront:CreateInvalidation","cloudfront:GetDistribution","cloudfront:GetDistributionConfig","cloudfront:GetInvalidation","cloudfront:ListConflictingAliases","cloudfront:ListDistributions","cloudfront:UpdateDistribution"],Resource:"*"},
     {Effect:"Allow",Action:["apigateway:GET"],Resource:["arn:aws:apigateway:us-east-1::/apis","arn:aws:apigateway:us-east-1::/apis/*"]},
     {Effect:"Allow",Action:["route53:ListResourceRecordSets","route53:ChangeResourceRecordSets","route53:GetChange"],Resource:["arn:aws:route53:::hostedzone/Z07905293AANZWGYZ84F3","arn:aws:route53:::change/*"]}
   ]

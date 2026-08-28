@@ -29,7 +29,7 @@ function bedrockConfig() {
   if (!awsRegion) return null;
   return {
     awsRegion,
-    baseURL: `https://bedrock-mantle.${awsRegion}.api.aws/v1`,
+    baseURL: `https://bedrock-mantle.${awsRegion}.api.aws/openai/v1`,
   };
 }
 
@@ -44,7 +44,7 @@ export function modelAuthConfigured() {
 }
 
 export function modelApiMode() {
-  return modelAuthMode() === "bedrock_short_term" ? "chat_completions" : "responses";
+  return "responses";
 }
 
 export async function ensureModelAuthConfigured() {
@@ -71,7 +71,7 @@ export async function ensureModelAuthConfigured() {
     if (!token) throw new Error("Amazon Bedrock did not return a short-term API key.");
     const client = new OpenAI({ apiKey: token, baseURL: config.baseURL });
     setDefaultOpenAIClient(client);
-    setOpenAIAPI("chat_completions");
+    setOpenAIAPI("responses");
     setTracingDisabled(true);
     configuredMode = mode;
     return mode;

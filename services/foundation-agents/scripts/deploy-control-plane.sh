@@ -119,7 +119,7 @@ snapshot_route 'OPTIONS /public/v1/navigate' public-options "$routes_before"
 
 # AWS_REGION is injected by Lambda as a reserved runtime variable.
 jq -n \
-  --arg model 'gpt-5.6-sol' \
+  --arg model 'openai.gpt-5.6-terra' \
   --arg key "${OPENAI_API_KEY:-}" \
   --arg provider "${OPENAI_IDENTITY_PROVIDER_ID:-}" \
   --arg service "${OPENAI_SERVICE_ACCOUNT_ID:-}" \
@@ -265,7 +265,7 @@ if curl --help all 2>/dev/null | grep -q -- '--aws-sigv4'; then
     model_api_mode="$(jq -r '.modelApiMode // "unknown"' "$work/signed-health.json")"
 
     if [[ "$model_configured" = 'true' ]]; then
-      test "$model_api_mode" = 'chat_completions'
+      test "$model_api_mode" = 'responses'
       cat > "$work/run-payload.json" <<'JSON'
 {"graphId":"foundationSiteAssurance","input":{"task":"Review a bounded synthetic deployment change.","evidence":{"repository":"sozorock-foundation","liveVerification":"not supplied","constraint":"Do not claim production completion without live evidence."}},"context":{"source":"deployment-smoke"}}
 JSON

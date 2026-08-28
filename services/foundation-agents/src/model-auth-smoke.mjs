@@ -37,7 +37,7 @@ assert.equal(modelAuthConfigured(), false);
 process.env.FOUNDATION_MODEL_PROVIDER = "bedrock";
 assert.equal(modelAuthConfigured(), true);
 assert.equal(modelAuthMode(), "bedrock_short_term");
-assert.equal(modelApiMode(), "chat_completions");
+assert.equal(modelApiMode(), "responses");
 delete process.env.FOUNDATION_MODEL_PROVIDER;
 
 process.env.AWS_LAMBDA_FUNCTION_NAME = "UnrelatedFunction";
@@ -47,7 +47,7 @@ assert.equal(modelAuthMode(), null);
 process.env.AWS_LAMBDA_FUNCTION_NAME = "SozoRockFoundationParentOrigin";
 assert.equal(modelAuthConfigured(), true);
 assert.equal(modelAuthMode(), "bedrock_short_term");
-assert.equal(modelApiMode(), "chat_completions");
+assert.equal(modelApiMode(), "responses");
 
 delete process.env.AWS_REGION;
 assert.equal(modelAuthConfigured(), false);

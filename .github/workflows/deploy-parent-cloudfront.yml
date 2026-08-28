@@ -284,7 +284,12 @@ jobs:
           }
           trap finish_alias_move EXIT
 
-          if [[ -n "$WWW_SOURCE_ID" && "$WWW_SOURCE_ID" != "$distribution_id" ]]; then
+          conflict_count="$(aws cloudfront list-conflicting-aliases \
+            --distribution-id "$distribution_id" \
+            --alias "$CANONICAL_HOST" \
+            --output json \
+            | jq --arg target "$distribution_id" '[.ConflictingAliasesList.Items[]? | select(.DistributionId != $target)] | length')"
+          if [[ "$conflict_count" -gt 0 ]]; then
             aws cloudfront associate-alias --alias "$CANONICAL_HOST" --target-distribution-id "$distribution_id"
             moved=1
             aws cloudfront wait distribution-deployed --id "$distribution_id"
