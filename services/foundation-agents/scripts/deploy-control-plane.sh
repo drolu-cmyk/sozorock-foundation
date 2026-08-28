@@ -149,19 +149,25 @@ for model_region in us-east-2 us-east-1 us-west-2; do
       --environment "file://$work/lambda-env-probe.json" >/dev/null
     aws lambda wait function-updated --function-name "$FUNCTION_NAME"
     jq -n --arg model "$candidate" '{operation:"deployment:model-probe",model:$model}' > "$work/model-probe-payload.json"
-    aws lambda invoke \
+    probe_function_error="$(aws lambda invoke \
       --function-name "$FUNCTION_NAME" \
       --cli-binary-format raw-in-base64-out \
       --payload "fileb://$work/model-probe-payload.json" \
-      "$work/model-probe-response.json" >/dev/null
+      --query FunctionError \
+      --output text \
+      "$work/model-probe-response.json")"
     probe_status="$(jq -r '.statusCode // 500' "$work/model-probe-response.json")"
     if [[ "$probe_status" = '200' ]] && jq -e '.body | fromjson | .available == true' "$work/model-probe-response.json" >/dev/null; then
       selected_model="$candidate"
       selected_model_region="$model_region"
       break 2
     fi
-    probe_code="$(jq -r '.body | fromjson | .failure.providerCode // "unknown"' "$work/model-probe-response.json" 2>/dev/null || echo unknown)"
-    probe_detail="$(jq -r '.body | fromjson | .failure.providerDetail // "not supplied"' "$work/model-probe-response.json" 2>/dev/null || echo 'not supplied')"
+    probe_code="$(jq -r '.body | fromjson | .failure.providerCode // .errorType // "unknown"' "$work/model-probe-response.json" 2>/dev/null || jq -r '.errorType // "unknown"' "$work/model-probe-response.json")"
+    probe_detail="$(jq -r '.body | fromjson | .failure.providerDetail // .errorMessage // "not supplied"' "$work/model-probe-response.json" 2>/dev/null || jq -r '.errorMessage // "not supplied"' "$work/model-probe-response.json")"
+    probe_detail="$(sed -E 's/(bearer|api[_ -]?key|authorization|token)[=: ]+[^ ,;]+/\1=[redacted]/Ig' <<<"$probe_detail" | tr '\r\n\t' ' ' | cut -c1-300)"
+    if [[ "$probe_function_error" != 'None' ]]; then
+      probe_code="lambda_${probe_function_error}:${probe_code}"
+    fi
     echo "Bedrock model probe rejected ${candidate} in ${model_region}: provider_code=${probe_code}; detail=${probe_detail}." >&2
   done
 done

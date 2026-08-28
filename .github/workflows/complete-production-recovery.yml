@@ -157,6 +157,40 @@ jobs:
               ]
             },
             {
+              "Sid":"InitializeOnlyClaudeSonnetFoundationAccess",
+              "Effect":"Allow",
+              "Action":[
+                "bedrock:GetUseCaseForModelAccess",
+                "bedrock:PutUseCaseForModelAccess",
+                "bedrock:GetFoundationModelAvailability"
+              ],
+              "Resource":"*"
+            },
+            {
+              "Sid":"ProbeOnlyClaudeSonnetFoundationAccess",
+              "Effect":"Allow",
+              "Action":"bedrock:InvokeModel",
+              "Resource":[
+                "arn:aws:bedrock:${AWS_REGION}::foundation-model/anthropic.claude-sonnet-4-6",
+                "arn:aws:bedrock:${AWS_REGION}:${ACCOUNT_ID}:inference-profile/us.anthropic.claude-sonnet-4-6",
+                "arn:aws:bedrock:us-east-2::foundation-model/anthropic.claude-sonnet-4-6",
+                "arn:aws:bedrock:us-west-2::foundation-model/anthropic.claude-sonnet-4-6"
+              ]
+            },
+            {
+              "Sid":"SubmitOnlyClaudeSonnetMarketplaceSubscription",
+              "Effect":"Allow",
+              "Action":"aws-marketplace:Subscribe",
+              "Resource":"*",
+              "Condition":{"ForAnyValue:StringEquals":{"aws-marketplace:ProductId":["prod-ffvjxvh4ltq64"]}}
+            },
+            {
+              "Sid":"VerifyTemporaryMarketplaceSubscription",
+              "Effect":"Allow",
+              "Action":["aws-marketplace:ViewSubscriptions","aws-marketplace:Unsubscribe"],
+              "Resource":"*"
+            },
+            {
               "Sid":"MaintainOnlyFoundationApexApiDomain",
               "Effect":"Allow",
               "Action":["apigateway:GET","apigateway:POST","apigateway:PATCH"],
@@ -184,6 +218,48 @@ jobs:
           aws-region: ${{ env.AWS_REGION }}
           retry-max-attempts: 3
           unset-current-credentials: true
+
+      - name: Initialize documented Claude Sonnet access for the Foundation account
+        id: claude
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(aws sts get-caller-identity --query Account --output text)" = "$ACCOUNT_ID"
+          cat > "$RUNNER_TEMP/anthropic-use-case.json" <<'JSON'
+          {
+            "companyName": "The SozoRock Foundation",
+            "companyWebsite": "https://www.sozorockfoundation.org",
+            "intendedUsers": "2",
+            "industryOption": "Education",
+            "otherIndustryOption": "Nonprofit education and public-interest technology",
+            "useCases": "Internal bounded website assurance and content-review agents, plus privacy-preserving public website navigation. Human review gates apply. The system does not provide clinical diagnosis or make automated consequential decisions."
+          }
+          JSON
+          form_data="$(base64 -w0 "$RUNNER_TEMP/anthropic-use-case.json")"
+          aws bedrock put-use-case-for-model-access --form-data "$form_data" >/dev/null
+
+          model_ready=0
+          for attempt in $(seq 1 30); do
+            if aws bedrock-runtime converse \
+              --model-id 'us.anthropic.claude-sonnet-4-6' \
+              --messages '[{"role":"user","content":[{"text":"Reply with OK."}]}]' \
+              --inference-config '{"maxTokens":16,"temperature":0}' \
+              --output json \
+              >"$RUNNER_TEMP/claude-access-probe.json" \
+              2>"$RUNNER_TEMP/claude-access-error.txt"; then
+              jq -e '.output.message.content | length > 0' "$RUNNER_TEMP/claude-access-probe.json" >/dev/null
+              model_ready=1
+              break
+            fi
+            if ! grep -Eqi 'AccessDenied|subscription|agreement|entitlement|in progress|try again' "$RUNNER_TEMP/claude-access-error.txt"; then
+              sed -E 's/(bearer|api[_ -]?key|authorization|token)[=: ]+[^ ,;]+/\1=[redacted]/Ig' "$RUNNER_TEMP/claude-access-error.txt" >&2
+              exit 1
+            fi
+            sleep 10
+          done
+          test "$model_ready" = '1'
+          echo 'ready=true' >> "$GITHUB_OUTPUT"
+          echo 'Claude Sonnet 4.6 account access initialized and verified through the US cross-region profile.' >> "$GITHUB_STEP_SUMMARY"
 
       - name: Rebuild retired Health application from canonical redirect source
         id: health
@@ -333,6 +409,7 @@ jobs:
             echo '- Temporary AI Lab recovery role assumption: completed before any mutation.'
             echo '- Foundation ACM and verifier permissions: applied with additive policy only.'
             echo '- Foundation edge model role: restricted to the approved Bedrock model set with short-term bearer-token use.'
+            echo "- Claude Sonnet 4.6 account access initialized and verified: \`${{ steps.claude.outputs.ready || 'false' }}\`."
             echo "- Retired Health Amplify state: \`${HEALTH_STATE:-not-checked}\`."
             echo "- Legacy Health Amplify release job: \`${HEALTH_JOB:-not-completed}\`."
             echo "- Apex cutover dispatched after ACM inspection and exact Lambda invocation: \`${CUTOVER_DISPATCHED:-false}\`."
