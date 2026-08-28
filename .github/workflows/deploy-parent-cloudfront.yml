@@ -28,7 +28,6 @@ concurrency:
 env:
   AWS_REGION: us-east-1
   ACCOUNT_ID: '791860731989'
-  BOOTSTRAP_ROLE_ARN: arn:aws:iam::791860731989:role/GitHubActionsSozorockAiLabDeployRole
   DEPLOY_ROLE_ARN: arn:aws:iam::791860731989:role/GitHubActionsSozorockFoundationSiteDeployRole
   EXECUTION_ROLE_ARN: arn:aws:iam::791860731989:role/SozoRockFoundationParentCloudFormationRole
   STACK_NAME: sozorock-foundation-parent-cloudfront
@@ -68,18 +67,7 @@ jobs:
           npm audit --omit=dev --audit-level=high
           bash -n scripts/bootstrap-parent-aws.sh
 
-      - name: Assume the bounded bootstrap authority
-        uses: aws-actions/configure-aws-credentials@e6de054238d6b7531b4efff3b6587d9aade6a06c
-        with:
-          role-to-assume: ${{ env.BOOTSTRAP_ROLE_ARN }}
-          role-session-name: FoundationCloudFrontBootstrap-${{ github.run_id }}
-          aws-region: ${{ env.AWS_REGION }}
-          unset-current-credentials: true
-
-      - name: Establish narrow repeatable deployment authority
-        run: bash scripts/bootstrap-parent-aws.sh
-
-      - name: Switch to the Foundation deployment role
+      - name: Assume the permanent bounded Foundation deployment role
         uses: aws-actions/configure-aws-credentials@e6de054238d6b7531b4efff3b6587d9aade6a06c
         with:
           role-to-assume: ${{ env.DEPLOY_ROLE_ARN }}
