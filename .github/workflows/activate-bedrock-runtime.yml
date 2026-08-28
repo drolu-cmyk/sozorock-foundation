@@ -1,0 +1,91 @@
+name: Activate Bedrock runtime for Foundation agents
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/activate-bedrock-runtime.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+  issues: write
+
+env:
+  AWS_REGION: us-east-1
+  ACCOUNT_ID: '791860731989'
+  RECOVERY_ROLE_ARN: arn:aws:iam::791860731989:role/GitHubActionsSozorockAiLabDeployRole
+  PARENT_LAMBDA_ROLE_NAME: SozoRockFoundationParentLambdaRole
+  RECEIPT_ISSUE: '58'
+
+jobs:
+  activate:
+    if: github.repository == 'drolu-cmyk/sozorock-foundation' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Assume the bounded recovery authority
+        uses: aws-actions/configure-aws-credentials@e6de054238d6b7531b4efff3b6587d9aade6a06c
+        with:
+          role-to-assume: ${{ env.RECOVERY_ROLE_ARN }}
+          role-session-name: FoundationBedrockRuntime-${{ github.run_id }}
+          aws-region: ${{ env.AWS_REGION }}
+          retry-max-attempts: 3
+
+      - name: Restrict the Lambda role to approved runtime models and short-term tokens
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(aws sts get-caller-identity --query Account --output text)" = "$ACCOUNT_ID"
+          cat > "$RUNNER_TEMP/model-policy.json" <<EOF
+          {"Version":"2012-10-17","Statement":[
+            {
+              "Sid":"FoundationAgentApprovedRuntimeModelsOnly",
+              "Effect":"Allow",
+              "Action":"bedrock:InvokeModel",
+              "Resource":[
+                "arn:aws:bedrock:${AWS_REGION}::foundation-model/openai.gpt-oss-20b-1:0",
+                "arn:aws:bedrock:${AWS_REGION}::foundation-model/openai.gpt-oss-120b-1:0"
+              ]
+            },
+            {
+              "Sid":"FoundationAgentShortTermRuntimeTokenOnly",
+              "Effect":"Allow",
+              "Action":"bedrock:CallWithBearerToken",
+              "Resource":"*",
+              "Condition":{"StringEquals":{"bedrock:BearerTokenType":"SHORT_TERM"}}
+            }
+          ]}
+          EOF
+          aws iam put-role-policy \
+            --role-name "$PARENT_LAMBDA_ROLE_NAME" \
+            --policy-name SozoRockFoundationAgentModelInference \
+            --policy-document "file://$RUNNER_TEMP/model-policy.json"
+
+      - name: Verify the exact durable policy
+        shell: bash
+        run: |
+          set -euo pipefail
+          policy="$(aws iam get-role-policy \
+            --role-name "$PARENT_LAMBDA_ROLE_NAME" \
+            --policy-name SozoRockFoundationAgentModelInference \
+            --query PolicyDocument \
+            --output json)"
+          jq -e --arg region "$AWS_REGION" '
+            [.Statement[] | select(.Action == "bedrock:InvokeModel")][0].Resource == [
+              "arn:aws:bedrock:" + $region + "::foundation-model/openai.gpt-oss-20b-1:0",
+              "arn:aws:bedrock:" + $region + "::foundation-model/openai.gpt-oss-120b-1:0"
+            ] and
+            [.Statement[] | select(.Action == "bedrock:CallWithBearerToken")][0].Condition.StringEquals["bedrock:BearerTokenType"] == "SHORT_TERM" and
+            ([.Statement[].Action] | all(. == "bedrock:InvokeModel" or . == "bedrock:CallWithBearerToken"))
+          ' <<<"$policy" >/dev/null
+
+      - name: Publish activation receipt
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          body='Bedrock runtime endpoint authority is active for the Foundation Lambda. The role is restricted to GPT-OSS 20B/120B model ARNs and short-term `bedrock:CallWithBearerToken`; Mantle project permissions were removed.'
+          gh issue comment "$RECEIPT_ISSUE" --repo "$GITHUB_REPOSITORY" --body "$body"
+          printf '%s\n' "$body" >> "$GITHUB_STEP_SUMMARY"
