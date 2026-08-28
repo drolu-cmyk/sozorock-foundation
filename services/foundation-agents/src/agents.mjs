@@ -15,7 +15,7 @@ const model = foundationProductionEdge || explicitBedrockRuntime
 const modelSettings = foundationProductionEdge || explicitBedrockRuntime
   ? configuredRuntimeModel.startsWith("openai.")
     ? {
-        maxTokens: configuredRuntimeModel === "openai.gpt-5.6-sol" ? 320 : 96,
+        maxTokens: configuredRuntimeModel === "openai.gpt-5.6-sol" ? 320 : 512,
         reasoning: { effort: "low" },
       }
     : { maxTokens: 320 }
