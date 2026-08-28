@@ -1,0 +1,47 @@
+name: Retry Bedrock agent activation
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '23 * * * *'
+
+permissions:
+  actions: write
+  contents: read
+  issues: read
+
+concurrency:
+  group: foundation-bedrock-activation-retry
+  cancel-in-progress: false
+
+jobs:
+  retry:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Dispatch only while activation is outstanding
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          state="$(gh api "repos/${GITHUB_REPOSITORY}/issues/58" --jq '.state')"
+          if [[ "$state" != 'open' ]]; then
+            echo 'Foundation Bedrock activation is already complete.'
+            exit 0
+          fi
+
+          active="$(gh run list \
+            --repo "$GITHUB_REPOSITORY" \
+            --workflow deploy-foundation-agent-control-plane.yml \
+            --limit 20 \
+            --json status \
+            --jq '[.[] | select(.status == "in_progress" or .status == "queued" or .status == "waiting")] | length')"
+          if [[ "$active" != '0' ]]; then
+            echo 'A Foundation agent deployment is already active.'
+            exit 0
+          fi
+
+          gh workflow run deploy-foundation-agent-control-plane.yml \
+            --repo "$GITHUB_REPOSITORY" \
+            --ref main
+          echo 'Dispatched a bounded Foundation Bedrock activation retry.'
