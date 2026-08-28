@@ -183,7 +183,7 @@ export async function handler(event) {
   if (event?.operation === "deployment:model-probe") {
     if (!modelAuthConfigured()) return response(503, { error: "model_service_not_configured" });
     const model = typeof event?.model === "string" ? event.model : "";
-    if (!["openai.gpt-5.5", "openai.gpt-5.4", "openai.gpt-5.6-luna"].includes(model)) {
+    if (!["openai.gpt-oss-120b", "openai.gpt-oss-20b"].includes(model)) {
       return response(400, { error: "model_not_approved" });
     }
     try {

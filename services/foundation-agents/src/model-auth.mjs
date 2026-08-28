@@ -7,6 +7,7 @@ const foundationEdgeFunction = "SozoRockFoundationParentOrigin";
 let configuredMode = null;
 let bedrockTokenProvider = null;
 let bedrockClient = null;
+let bedrockApiKey = null;
 
 function wifConfig() {
   const identityProviderId = process.env.OPENAI_IDENTITY_PROVIDER_ID?.trim();
@@ -28,9 +29,10 @@ function bedrockConfig() {
   if (!bedrockRequested()) return null;
   const awsRegion = process.env.AWS_REGION?.trim();
   if (!awsRegion) return null;
+  const model = process.env.OPENAI_AGENT_MODEL?.trim() || "";
   return {
     awsRegion,
-    baseURL: `https://bedrock-mantle.${awsRegion}.api.aws/openai/v1`,
+    baseURL: `https://bedrock-mantle.${awsRegion}.api.aws${model.includes("gpt-oss") ? "/v1" : "/openai/v1"}`,
   };
 }
 
@@ -70,6 +72,7 @@ export async function ensureModelAuthConfigured() {
     }
     const token = await bedrockTokenProvider();
     if (!token) throw new Error("Amazon Bedrock did not return a short-term API key.");
+    bedrockApiKey = token;
     bedrockClient = new OpenAI({ apiKey: token, baseURL: config.baseURL });
     setDefaultOpenAIClient(bedrockClient);
     setOpenAIAPI("responses");
@@ -116,7 +119,11 @@ export async function probeBedrockModel(model) {
     throw new Error("Amazon Bedrock model probing requires the Bedrock runtime.");
   }
   await ensureModelAuthConfigured();
-  const result = await bedrockClient.responses.create({
+  const config = bedrockConfig();
+  const probeClient = model.includes("gpt-oss")
+    ? new OpenAI({ apiKey: bedrockApiKey, baseURL: `https://bedrock-mantle.${config.awsRegion}.api.aws/v1` })
+    : bedrockClient;
+  const result = await probeClient.responses.create({
     model,
     input: "Reply with OK.",
     max_output_tokens: 16,
