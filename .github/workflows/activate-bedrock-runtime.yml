@@ -132,6 +132,6 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
-          body='Bedrock model authority is active for the Foundation Lambda. The role is restricted to GPT-OSS 20B/120B and Claude Sonnet 4.6 model/profile ARNs in the approved US failover regions, account-default projects, and short-term Bedrock credentials. GPT-5.6 Sol remains preferred, with Claude Sonnet 4.6 and GPT-OSS Runtime fallbacks.'
+          body='Bedrock model authority is active for the Foundation Lambda. The role is restricted to GPT-OSS 20B/120B and Claude Sonnet 4.6 model/profile ARNs in the approved US failover regions, account-default projects, and short-term Bedrock credentials. GPT-5.6 Sol remains preferred, with Claude Sonnet 4.6 Runtime and GPT-OSS Mantle fallbacks.'
           gh issue comment "$RECEIPT_ISSUE" --repo "$GITHUB_REPOSITORY" --body "$body"
           printf '%s\n' "$body" >> "$GITHUB_STEP_SUMMARY"
