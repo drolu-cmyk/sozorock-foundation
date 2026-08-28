@@ -31,6 +31,12 @@ export function bedrockBaseURLForModel(model, awsRegion) {
     : `https://bedrock-mantle.${awsRegion}.api.aws/openai/v1`;
 }
 
+export function bedrockRuntimeModelId(model) {
+  if (model === "openai.gpt-oss-20b") return "openai.gpt-oss-20b-1:0";
+  if (model === "openai.gpt-oss-120b") return "openai.gpt-oss-120b-1:0";
+  return model;
+}
+
 function bedrockConfig() {
   if (!bedrockRequested()) return null;
   const awsRegion = process.env.AWS_REGION?.trim();
@@ -126,7 +132,7 @@ export async function probeBedrockModel(model) {
   }
   await ensureModelAuthConfigured();
   const result = await bedrockClient.responses.create({
-    model,
+    model: bedrockRuntimeModelId(model),
     input: "Reply with OK.",
     max_output_tokens: 16,
   });

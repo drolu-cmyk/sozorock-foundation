@@ -1,15 +1,19 @@
 import { Agent } from "@openai/agents";
 import { z } from "zod";
+import { bedrockRuntimeModelId } from "./model-auth.mjs";
 
 const foundationProductionEdge =
   process.env.AWS_LAMBDA_FUNCTION_NAME === "SozoRockFoundationParentOrigin";
 const explicitBedrockRuntime = process.env.FOUNDATION_MODEL_PROVIDER === "bedrock";
 const configuredModel = process.env.OPENAI_AGENT_MODEL;
-const model = foundationProductionEdge || explicitBedrockRuntime
+const configuredRuntimeModel = foundationProductionEdge || explicitBedrockRuntime
   ? configuredModel?.startsWith("openai.")
     ? configuredModel
     : `openai.${configuredModel || "gpt-oss-20b"}`
   : configuredModel || "gpt-5.6-sol";
+const model = foundationProductionEdge || explicitBedrockRuntime
+  ? bedrockRuntimeModelId(configuredRuntimeModel)
+  : configuredRuntimeModel;
 const modelSettings = foundationProductionEdge || explicitBedrockRuntime
   ? { maxTokens: 600, reasoning: { effort: "low" } }
   : undefined;
