@@ -32,8 +32,6 @@ export function bedrockBaseURLForModel(model, awsRegion) {
 }
 
 export function bedrockRuntimeModelId(model) {
-  if (model === "openai.gpt-oss-20b") return "openai.gpt-oss-20b-1:0";
-  if (model === "openai.gpt-oss-120b") return "openai.gpt-oss-120b-1:0";
   return model;
 }
 

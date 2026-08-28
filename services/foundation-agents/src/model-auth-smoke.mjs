@@ -15,8 +15,8 @@ assert.equal(
   bedrockBaseURLForModel("openai.gpt-5.6-sol", "us-east-1"),
   "https://bedrock-mantle.us-east-1.api.aws/openai/v1"
 );
-assert.equal(bedrockRuntimeModelId("openai.gpt-oss-20b"), "openai.gpt-oss-20b-1:0");
-assert.equal(bedrockRuntimeModelId("openai.gpt-oss-120b"), "openai.gpt-oss-120b-1:0");
+assert.equal(bedrockRuntimeModelId("openai.gpt-oss-20b"), "openai.gpt-oss-20b");
+assert.equal(bedrockRuntimeModelId("openai.gpt-oss-120b"), "openai.gpt-oss-120b");
 assert.equal(bedrockRuntimeModelId("openai.gpt-5.6-sol"), "openai.gpt-5.6-sol");
 
 const keys = [
