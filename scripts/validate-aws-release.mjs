@@ -45,6 +45,7 @@ assert.match(template, /IntegrationUri: !Sub 'https:\/\/\$\{Distribution\.Domain
 assert.match(template, /CanonicalBridgeApiId/u);
 assert.match(workflow, /get-domain-name --domain-name "\$CANONICAL_HOST"/u);
 assert.match(workflow, /update-api-mapping/u);
+assert.match(await readFile(new URL("scripts/bootstrap-parent-aws.sh", root), "utf8"), /apigateway:TagResource/u);
 assert.match(workflow, /<title>Platforms \| The SozoRock Foundation<\/title>/u);
 assert.match(recoveryWorkflow, /ProveOnlyFoundationAgentInternalApi/u);
 assert.match(recoveryWorkflow, /PARENT_API_ID: 2b6srfl202/u);
