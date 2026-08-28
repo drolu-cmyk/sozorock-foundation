@@ -10,6 +10,9 @@ const model = foundationProductionEdge || explicitBedrockRuntime
     ? configuredModel
     : `openai.${configuredModel || "gpt-oss-20b"}`
   : configuredModel || "gpt-5.6-sol";
+const modelSettings = foundationProductionEdge || explicitBedrockRuntime
+  ? { maxTokens: 1400, reasoning: { effort: "low" } }
+  : undefined;
 const sharedRules = `You are an internal SozoRock specialist. Work only from supplied evidence and clearly identified source material. Never invent achievements, partners, funding, adoption, student outcomes, publication status, citations, dates, metrics, or institutional relationships. Distinguish facts from recommendations. Do not publish, deploy, send, delete, authorize, or change external systems. Produce a reviewable internal result for the next graph node.`;
 
 export const orchestrationPlanSchema = z
@@ -63,6 +66,7 @@ function specialist(name, purpose) {
   return new Agent({
     name,
     model,
+    modelSettings,
     instructions: `${sharedRules}\n\nYour specialist responsibility: ${purpose}`,
   });
 }
@@ -70,6 +74,7 @@ function specialist(name, purpose) {
 const orchestrator = new Agent({
   name: "Foundation Orchestrator",
   model,
+  modelSettings,
   outputType: orchestrationPlanSchema,
   instructions: `${sharedRules}\n\nYou are the Foundation-level orchestration planner. Read the supplied task, evidence, graph name, and operational context. Define the precise objective, risk level, focus areas, and concrete escalation triggers for the specialists that follow. You do not replace required specialists and you do not authorize external actions. humanApprovalRequired must remain true for publication, deployment, external communication, credentials/completion decisions, access control, or any other high-impact action.`,
 });
@@ -77,6 +82,7 @@ const orchestrator = new Agent({
 const evaluator = new Agent({
   name: "Graph Evaluation Agent",
   model,
+  modelSettings,
   outputType: evaluationDecisionSchema,
   instructions: `${sharedRules}\n\nEvaluate the preceding graph outputs for factual grounding, internal consistency, usefulness, safety boundaries, permanent-route constraints, duplication, and whether another bounded specialist iteration is justified. Return exactly one decision: pass, revise, or escalate. Use revise only when a specific specialist can correct the problem with the supplied evidence. When revising, revisionTarget must be the exact specialist node identifier named in the graph context. Use escalate when evidence is missing, conflicting in a way that cannot be resolved from supplied sources, a high-impact human decision is required, or another revision would be unsafe or speculative. A pass means the internal candidate is coherent enough for human review; it never means published, deployed, approved, certified, or externally released.`,
 });
@@ -86,17 +92,19 @@ const publicRules = `You are part of the public SozoRock website navigator. Use 
 const navigatorRouter = new Agent({
   name: "Public Navigator Router",
   model,
+  modelSettings,
   outputType: navigatorRouteSchema,
   instructions: `${publicRules}\n\nClassify the visitor's website-navigation intent. Choose programs for Foundation platforms and initiatives, publications for publications/insights/events, engagement for partnership/support/about/standards, and out_of_scope for anything else. Do not answer the visitor yet.`,
 });
 
 function publicSpecialist(name, purpose) {
-  return new Agent({ name, model, instructions: `${publicRules}\n\nYour bounded responsibility: ${purpose}` });
+  return new Agent({ name, model, modelSettings, instructions: `${publicRules}\n\nYour bounded responsibility: ${purpose}` });
 }
 
 const navigatorResponder = new Agent({
   name: "Public Navigator Response Verifier",
   model,
+  modelSettings,
   outputType: navigatorAnswerSchema,
   instructions: `${publicRules}\n\nProduce the final visitor-facing answer after checking the routed specialist's work against the approved knowledge. Use only the allowed linkKeys listed in the schema. Choose a fixed boundary when privacy, medical, emergency, or out-of-scope handling is needed; otherwise use none. Never mention agents, graphs, models, internal review, routing, or implementation details.`,
 });
@@ -179,6 +187,7 @@ export const agents = Object.freeze({
 export const evalGrader = new Agent({
   name: "Foundation Agent Eval Grader",
   model,
+  modelSettings,
   outputType: evalGradeSchema,
   instructions: `You grade an internal SozoRock agent workflow against an explicit expected behavior. Judge substance, not writing style. Fail the case if the workflow invents facts, ignores supplied constraints, changes a permanent publication route, treats a single learner as population evidence, claims an external action occurred without proof, fails to surface an evidence conflict, or otherwise violates the expected behavior. Return a concise structured grade only.`,
 });

@@ -35,6 +35,7 @@ export const graphs = Object.freeze({
     surface: "foundation",
     description: "Review a website change across product, UX, accessibility, security, and release quality.",
     nodes: ["orchestrator", "productReviewer", "uxReviewer", "accessibilityReviewer", "securityReviewer", "evaluator"],
+    parallelAfterOrchestrator: true,
     candidateNode: "securityReviewer",
   },
   aiLabLearnerLoop: {
@@ -155,20 +156,34 @@ export async function executeGraph({
   let iteration = 0;
 
   const initialNodes = graph.routerNode ? [graph.routerNode] : graph.nodes.filter((node) => node !== "evaluator");
-  for (const nodeId of initialNodes) {
-    const nodeResult = await runNode({
+  const runInitialNode = (nodeId, priorOutputs = outputs) =>
+    runNode({
       graphId,
       graph,
       nodeId,
       originalInput: input,
-      outputs,
+      outputs: priorOutputs,
       context: modelContext,
       maxTurns: turnLimit,
       runId,
       iteration,
       evaluationFeedback: null,
     });
-    outputs.push(nodeResult);
+
+  if (graph.parallelAfterOrchestrator && !graph.routerNode) {
+    const [orchestratorNode, ...specialistNodes] = initialNodes;
+    const orchestratorResult = await runInitialNode(orchestratorNode);
+    outputs.push(orchestratorResult);
+    const sharedOutputs = [...outputs];
+    const specialistResults = await Promise.all(
+      specialistNodes.map((nodeId) => runInitialNode(nodeId, sharedOutputs))
+    );
+    outputs.push(...specialistResults);
+  } else {
+    for (const nodeId of initialNodes) {
+      const nodeResult = await runInitialNode(nodeId);
+      outputs.push(nodeResult);
+    }
   }
 
   if (graph.routerNode) {

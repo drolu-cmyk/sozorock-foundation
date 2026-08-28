@@ -44,6 +44,7 @@ assert.equal(graphs.aiLabLearnerLoop.surface, "ai-lab");
 assert.equal(graphs.foundationContentRefresh.surface, "foundation");
 assert.equal(graphs.publicationRelease.candidateNode, "distributionEditor");
 assert.equal(graphs.foundationSiteAssurance.candidateNode, "securityReviewer");
+assert.equal(graphs.foundationSiteAssurance.parallelAfterOrchestrator, true);
 assert.equal(graphs.aiLabLearnerLoop.candidateNode, "projectReviewer");
 
 console.log(`Validated ${requiredGraphs.length} adaptive agent graphs.`);
