@@ -72,8 +72,8 @@ jobs:
             --header 'Content-Type: application/json' \
             --data '{"name":"Foundation Release Check","email":"success@simulator.amazonses.com","organization":"The SozoRock Foundation","inquiryType":"Support research and publications","role":"Foundation or funder","stateOrCounty":"Albany, New York","message":"Synthetic production verification for the parent Foundation inquiry route and Health storage path.","website":"","consent":true}' \
             "$origin/api/contact")"
-          test "$contact_status" = '200'
-          jq -e '.message | type == "string" and length > 0' "$RUNNER_TEMP/parent-contact.json" >/dev/null
+          test "$contact_status" = '202'
+          jq -e '.accepted == true and (.message | type == "string" and length > 0)' "$RUNNER_TEMP/parent-contact.json" >/dev/null
 
           access_status="$(curl --proto '=https' --tlsv1.2 --silent --show-error --output "$RUNNER_TEMP/parent-access.json" --write-out '%{http_code}' \
             --request POST \
@@ -81,8 +81,12 @@ jobs:
             --header 'Content-Type: application/json' \
             --data '{"firstName":"Foundation","lastName":"Release","email":"success@simulator.amazonses.com","organization":"The SozoRock Foundation","sector":"Foundation or funder","cityOrRegion":"Albany","state":"New York","country":"United States","reason":"Synthetic production verification for parent publication access and email delivery.","website":"","deliveryConsent":true,"updatesConsent":false}' \
             "$origin/api/publications/access/hsa-v1-2026")"
-          test "$access_status" = '200'
-          jq -e '.message == "Check your email for a verification link. It expires in 30 minutes."' "$RUNNER_TEMP/parent-access.json" >/dev/null
+          test "$access_status" = '202'
+          jq -e '
+            .accepted == true and
+            .verificationSent == true and
+            (.message | startswith("Check your email for a verification link. It expires in 30 minutes."))
+          ' "$RUNNER_TEMP/parent-access.json" >/dev/null
       - name: Assume temporary AI Lab recovery role one final time
         if: steps.gate.outputs.run == 'true'
         uses: aws-actions/configure-aws-credentials@e6de054238d6b7531b4efff3b6587d9aade6a06c # v6.2.3
