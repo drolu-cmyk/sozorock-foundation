@@ -56,11 +56,11 @@ jobs:
           cat >/tmp/parent-agent-model-policy.json <<EOF
           {"Version":"2012-10-17","Statement":[
             {
-              "Sid":"FoundationAgentTerraInferenceOnly",
+              "Sid":"FoundationAgentApprovedInferenceOnly",
               "Effect":"Allow",
               "Action":"bedrock-mantle:CreateInference",
               "Resource":"arn:aws:bedrock-mantle:${AWS_REGION}:${ACCOUNT_ID}:project/*",
-              "Condition":{"StringEquals":{"bedrock-mantle:Model":"openai.gpt-5.6-terra"}}
+              "Condition":{"StringEquals":{"bedrock-mantle:Model":["openai.gpt-5.5","openai.gpt-5.4","openai.gpt-5.6-luna"]}}
             },
             {
               "Sid":"FoundationAgentProjectReadOnly",
@@ -307,7 +307,7 @@ jobs:
             echo
             echo '- Temporary AI Lab recovery role assumption: completed before any mutation.'
             echo '- Foundation ACM and verifier permissions: applied with additive policy only.'
-            echo '- Foundation edge model role: restricted to GPT-5.6 Terra Mantle inference with short-term bearer-token use.'
+            echo '- Foundation edge model role: restricted to the approved Bedrock model set with short-term bearer-token use.'
             echo "- Retired Health Amplify state: \`${HEALTH_STATE:-not-checked}\`."
             echo "- Legacy Health Amplify release job: \`${HEALTH_JOB:-not-completed}\`."
             echo "- Apex cutover dispatched after ACM inspection and exact Lambda invocation: \`${CUTOVER_DISPATCHED:-false}\`."
