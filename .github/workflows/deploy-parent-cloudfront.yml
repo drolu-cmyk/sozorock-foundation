@@ -160,7 +160,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          aws cloudformation deploy \
+          if ! aws cloudformation deploy \
             --stack-name "$STACK_NAME" \
             --template-file infra/cloudformation/parent-cloudfront.yml \
             --role-arn "$EXECUTION_ROLE_ARN" \
@@ -171,7 +171,14 @@ jobs:
               SiteBucketName="$BUCKET_NAME" \
               AgentApiDomain='${{ steps.agent_api.outputs.agent_api_domain }}' \
               EnableAliases='${{ steps.release_state.outputs.enable_aliases }}' \
-            --no-fail-on-empty-changeset
+            --no-fail-on-empty-changeset; then
+            aws cloudformation describe-stack-events \
+              --stack-name "$STACK_NAME" \
+              --max-items 40 \
+              --query 'StackEvents[?ResourceStatus==`CREATE_FAILED` || ResourceStatus==`UPDATE_FAILED`].[Timestamp,LogicalResourceId,ResourceType,ResourceStatusReason]' \
+              --output table || true
+            exit 1
+          fi
 
       - name: Publish the exact verified build to private S3
         shell: bash
