@@ -60,7 +60,7 @@ jobs:
               "Effect":"Allow",
               "Action":"bedrock-mantle:CreateInference",
               "Resource":"arn:aws:bedrock-mantle:${AWS_REGION}:${ACCOUNT_ID}:project/*",
-              "Condition":{"StringEquals":{"bedrock-mantle:Model":["openai.gpt-5.5","openai.gpt-5.4","openai.gpt-5.6-luna"]}}
+              "Condition":{"StringEquals":{"bedrock-mantle:Model":["openai.gpt-oss-120b","openai.gpt-oss-20b"]}}
             },
             {
               "Sid":"FoundationAgentProjectReadOnly",
