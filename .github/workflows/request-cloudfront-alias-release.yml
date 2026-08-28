@@ -63,6 +63,24 @@ jobs:
           unset-current-credentials: true
           retry-max-attempts: 3
 
+      - name: Wait for the narrow AWS Support permission to propagate
+        shell: bash
+        run: |
+          set -euo pipefail
+          for attempt in $(seq 1 12); do
+            if aws support describe-services \
+              --service-code-list amazon-cloudfront \
+              --language en \
+              --output json \
+              > "$RUNNER_TEMP/support-services.json" \
+              2> "$RUNNER_TEMP/support-error.txt"; then
+              break
+            fi
+            test "$attempt" -lt 12
+            sleep 5
+          done
+          test "$(jq -r '.services[0].code // ""' "$RUNNER_TEMP/support-services.json")" = 'amazon-cloudfront'
+
       - name: Open or reuse the CloudFront alias-release case
         id: support
         continue-on-error: true
@@ -77,7 +95,7 @@ jobs:
             case_id=''
           fi
           if [[ -z "$case_id" ]]; then
-            services="$(aws support describe-services --service-code-list amazon-cloudfront --language en --output json 2>"$RUNNER_TEMP/support-error.txt")"
+            services="$(<"$RUNNER_TEMP/support-services.json")"
             category_code="$(jq -r '[.services[0].categories[]? | select((.name + " " + .code) | test("domain|alternate|distribution"; "i"))][0].code // .services[0].categories[0].code // "other"' <<<"$services")"
             conflicts="$(aws cloudfront list-conflicting-aliases --distribution-id "$TARGET_DISTRIBUTION_ID" --alias "$CANONICAL_HOST" --output json 2>"$RUNNER_TEMP/support-error.txt")"
             source_distribution="$(jq -r --arg target "$TARGET_DISTRIBUTION_ID" '[.ConflictingAliasesList.Items[]? | select(.DistributionId != $target)][0].DistributionId // "not disclosed"' <<<"$conflicts")"
