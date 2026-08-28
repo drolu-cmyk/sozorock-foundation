@@ -1,6 +1,12 @@
 import { randomUUID } from "node:crypto";
 import { run } from "@openai/agents";
-import { agents } from "./agents.mjs";
+import {
+  agents,
+  evaluationDecisionSchema,
+  navigatorAnswerSchema,
+  navigatorRouteSchema,
+  orchestrationPlanSchema,
+} from "./agents.mjs";
 import { ensureModelAuthConfigured, modelAuthConfigured } from "./model-auth.mjs";
 import { publicKnowledgeSnapshot } from "./public-knowledge.mjs";
 
@@ -106,6 +112,24 @@ function resolvedRunId(context) {
   return randomUUID();
 }
 
+const structuredNodeSchemas = Object.freeze({
+  orchestrator: orchestrationPlanSchema,
+  evaluator: evaluationDecisionSchema,
+  navigatorRouter: navigatorRouteSchema,
+  navigatorResponder: navigatorAnswerSchema,
+});
+
+function validatedNodeOutput(nodeId, value) {
+  const schema = structuredNodeSchemas[nodeId];
+  if (!schema || typeof value !== "string") return value;
+  const fenced = value.trim().match(/^```(?:json)?\s*([\s\S]*?)\s*```$/iu)?.[1];
+  const candidate = (fenced || value).trim();
+  const start = candidate.indexOf("{");
+  const end = candidate.lastIndexOf("}");
+  if (start < 0 || end < start) throw new Error(`Agent ${nodeId} did not return a JSON object.`);
+  return schema.parse(JSON.parse(candidate.slice(start, end + 1)));
+}
+
 async function runNode({ graphId, graph, nodeId, originalInput, outputs, context, maxTurns, runId, iteration, evaluationFeedback }) {
   const agent = agents[nodeId];
   if (!agent) throw new Error(`Graph ${graphId} references unknown agent ${nodeId}.`);
@@ -130,7 +154,7 @@ async function runNode({ graphId, graph, nodeId, originalInput, outputs, context
   return {
     node: nodeId,
     iteration,
-    output: result.finalOutput ?? "",
+    output: validatedNodeOutput(nodeId, result.finalOutput ?? ""),
     responseId: result.lastResponseId ?? null,
   };
 }
