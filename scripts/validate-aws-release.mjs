@@ -5,6 +5,8 @@ import { access, readFile } from "node:fs/promises";
 const root = new URL("../", import.meta.url);
 const template = await readFile(new URL("infra/cloudformation/parent-cloudfront.yml", root), "utf8");
 const workflow = await readFile(new URL(".github/workflows/deploy-parent-cloudfront.yml", root), "utf8");
+const recoveryWorkflow = await readFile(new URL(".github/workflows/complete-production-recovery.yml", root), "utf8");
+const recoveryFinalizer = await readFile(new URL(".github/workflows/finalize-production-recovery.yml", root), "utf8");
 
 for (const fragment of [
   "AWS::S3::Bucket",
@@ -36,6 +38,11 @@ assert.match(workflow, /restore_verification_records/u);
 assert.match(workflow, /route53 wait resource-record-sets-changed/u);
 assert.match(workflow, /enable_aliases/u);
 assert.match(workflow, /<title>Platforms \| The SozoRock Foundation<\/title>/u);
+assert.match(recoveryWorkflow, /ProveOnlyFoundationAgentInternalApi/u);
+assert.match(recoveryWorkflow, /PARENT_API_ID: 2b6srfl202/u);
+assert.match(recoveryWorkflow, /\$\{PARENT_API_ID\}\/\*\/POST\/internal\/v1\/run/u);
+assert.match(recoveryWorkflow, /NotFoundException/u);
+assert.doesNotMatch(recoveryFinalizer, /https:\/\/sozorockhealth\.com/u);
 
 const pages = await readFile(new URL("src/Pages.jsx", root), "utf8");
 assert.match(pages, /body\.accepted !== true \|\| body\.verificationSent !== true/u);

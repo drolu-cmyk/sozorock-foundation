@@ -21,6 +21,7 @@ env:
   FOUNDATION_DEPLOY_ROLE_NAME: GitHubActionsSozorockFoundationSiteDeployRole
   PARENT_LAMBDA_ROLE_NAME: SozoRockFoundationParentLambdaRole
   PARENT_FUNCTION_NAME: SozoRockFoundationParentOrigin
+  PARENT_API_ID: 2b6srfl202
   LEGACY_HEALTH_APP_ID: d3uqnxmsmefokf
   LEGACY_HEALTH_DOMAIN: sozorockhealth.com
   RECOVERY_ISSUE: '84'
@@ -118,6 +119,16 @@ jobs:
               "Effect":"Allow",
               "Action":"lambda:InvokeFunction",
               "Resource":"arn:aws:lambda:${AWS_REGION}:${ACCOUNT_ID}:function:${PARENT_FUNCTION_NAME}"
+            },
+            {
+              "Sid":"ProveOnlyFoundationAgentInternalApi",
+              "Effect":"Allow",
+              "Action":"execute-api:Invoke",
+              "Resource":[
+                "arn:aws:execute-api:${AWS_REGION}:${ACCOUNT_ID}:${PARENT_API_ID}/*/GET/internal/health",
+                "arn:aws:execute-api:${AWS_REGION}:${ACCOUNT_ID}:${PARENT_API_ID}/*/GET/internal/v1/graphs",
+                "arn:aws:execute-api:${AWS_REGION}:${ACCOUNT_ID}:${PARENT_API_ID}/*/POST/internal/v1/run"
+              ]
             }
           ]}
           EOF
@@ -142,7 +153,16 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          app="$(aws amplify get-app --app-id "$LEGACY_HEALTH_APP_ID" --output json)"
+          amplify_error="$RUNNER_TEMP/legacy-health-amplify-error.txt"
+          if ! app="$(aws amplify get-app --app-id "$LEGACY_HEALTH_APP_ID" --output json 2>"$amplify_error")"; then
+            if grep -Fq 'NotFoundException' "$amplify_error"; then
+              echo 'The retired Health Amplify app is already absent; Foundation recovery will proceed without mutating an unrelated legacy service.' >> "$GITHUB_STEP_SUMMARY"
+              echo 'state=app-not-found' >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+            cat "$amplify_error" >&2
+            exit 1
+          fi
           repository="$(jq -r '.app.repository // ""' <<<"$app")"
           if [[ "$repository" != *'drolu-cmyk/agentic-ai-sozorock-health'* && "$repository" != *'agentic-ai-sozorock-health'* ]]; then
             echo "Refusing unexpected Amplify repository: $repository" >&2
@@ -223,6 +243,7 @@ jobs:
           test "$cb_location" = 'https://cbcap.sozorockfoundation.org/'
 
           echo "Legacy Health domains verified after Amplify job ${job_id}." >> "$GITHUB_STEP_SUMMARY"
+          echo 'state=redirects-verified' >> "$GITHUB_OUTPUT"
           echo "job_id=$job_id" >> "$GITHUB_OUTPUT"
 
       - name: Prove Foundation role and dispatch fail-closed apex cutover
@@ -261,6 +282,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           HEALTH_JOB: ${{ steps.health.outputs.job_id }}
+          HEALTH_STATE: ${{ steps.health.outputs.state }}
           CUTOVER_DISPATCHED: ${{ steps.cutover.outputs.dispatched }}
         shell: bash
         run: |
@@ -274,9 +296,10 @@ jobs:
             echo '- Temporary AI Lab recovery role assumption: completed before any mutation.'
             echo '- Foundation ACM and verifier permissions: applied with additive policy only.'
             echo '- Foundation edge model role: restricted to GPT-5.6 Sol Mantle inference with short-term bearer-token use.'
+            echo "- Retired Health Amplify state: \`${HEALTH_STATE:-not-checked}\`."
             echo "- Legacy Health Amplify release job: \`${HEALTH_JOB:-not-completed}\`."
             echo "- Apex cutover dispatched after ACM inspection and exact Lambda invocation: \`${CUTOVER_DISPATCHED:-false}\`."
             echo
-            echo 'The temporary cross-repository trust must be removed after the apex and retired Health live checks both pass.'
+            echo 'The temporary cross-repository trust must be removed after the Foundation apex and canonical-host live checks pass.'
           } > "$receipt"
           gh issue comment "$RECOVERY_ISSUE" --repo "$GITHUB_REPOSITORY" --body-file "$receipt"

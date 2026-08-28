@@ -44,7 +44,7 @@ jobs:
             echo 'run=false' >> "$GITHUB_OUTPUT"
             echo 'Deployment receipt is already closed; no AWS finalization is required.' >> "$GITHUB_STEP_SUMMARY"
           fi
-      - name: Prove canonical and retired-domain behavior
+      - name: Prove canonical Foundation domain behavior
         if: steps.gate.outputs.run == 'true'
         shell: bash
         run: |
@@ -58,9 +58,6 @@ jobs:
             test "$location" = "$expected"
           }
           check_redirect 'https://sozorockfoundation.org/recovery-proof?source=finalize' 'https://www.sozorockfoundation.org/recovery-proof?source=finalize'
-          check_redirect 'https://sozorockhealth.com/' 'https://health.sozorockfoundation.org/'
-          check_redirect 'https://www.sozorockhealth.com/' 'https://health.sozorockfoundation.org/'
-          check_redirect 'https://sozorockhealth.com/cb-cap' 'https://cbcap.sozorockfoundation.org/'
           curl --proto '=https' --tlsv1.2 --fail --silent --show-error 'https://www.sozorockfoundation.org/' >/dev/null
       - name: Prove parent contact and publication access end to end
         if: steps.gate.outputs.run == 'true'
@@ -176,7 +173,7 @@ jobs:
           cat > "$RUNNER_TEMP/final-recovery.md" <<EOF
           ## Foundation production recovery complete
 
-          The apex domain, canonical `www`, retired Health domains, CB-CAP legacy path, parent contact form, and parent publication-access verification path passed live production checks.
+          The Foundation apex domain, canonical `www`, parent contact form, and parent publication-access verification path passed live production checks.
 
           Temporary Foundation access to the AI Lab deploy role and the temporary recovery IAM add-on were removed. The GPT-5.6 Sol model-inference policy remains on the private runtime, and the Foundation deploy role now retains only an exact three-route `execute-api:Invoke` boundary so every future agent deployment can prove a real signed model-backed graph smoke.
           EOF
