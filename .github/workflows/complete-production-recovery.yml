@@ -236,7 +236,22 @@ jobs:
           }
           JSON
           form_data="$(base64 -w0 "$RUNNER_TEMP/anthropic-use-case.json")"
-          aws bedrock put-use-case-for-model-access --form-data "$form_data" >/dev/null
+          use_case_ready=0
+          for attempt in $(seq 1 18); do
+            if aws bedrock put-use-case-for-model-access --form-data "$form_data" >/dev/null 2>"$RUNNER_TEMP/anthropic-use-case-error.txt"; then
+              use_case_ready=1
+              break
+            fi
+            if ! grep -Fq 'AccessDeniedException' "$RUNNER_TEMP/anthropic-use-case-error.txt"; then
+              cat "$RUNNER_TEMP/anthropic-use-case-error.txt" >&2
+              exit 1
+            fi
+            sleep 5
+          done
+          if [[ "$use_case_ready" != '1' ]]; then
+            cat "$RUNNER_TEMP/anthropic-use-case-error.txt" >&2
+            exit 1
+          fi
 
           model_ready=0
           for attempt in $(seq 1 30); do
