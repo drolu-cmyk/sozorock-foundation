@@ -1,6 +1,7 @@
 name: Finalize Foundation production recovery
 
 on:
+  workflow_dispatch:
   workflow_run:
     workflows: ["Production domain diagnostics"]
     types: [completed]
@@ -26,7 +27,7 @@ env:
 
 jobs:
   finalize:
-    if: github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main'
+    if: github.event_name == 'workflow_dispatch' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main')
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -136,7 +137,20 @@ jobs:
           fi
 
           model_policy="$(aws iam get-role-policy --role-name "$PARENT_LAMBDA_ROLE_NAME" --policy-name SozoRockFoundationAgentModelInference --query 'PolicyDocument' --output json)"
-          jq -e 'any(.Statement[]; .Sid == "FoundationAgentSolInferenceOnly")' <<<"$model_policy" >/dev/null
+          jq -e '
+            any(.Statement[];
+              .Sid == "FoundationAgentApprovedRuntimeModelsOnly" and
+              .Action == "bedrock:InvokeModel") and
+            any(.Statement[];
+              .Sid == "FoundationAgentApprovedMantleInferenceOnly" and
+              .Action == "bedrock-mantle:CreateInference") and
+            any(.Statement[];
+              .Sid == "FoundationAgentShortTermRuntimeTokenOnly" and
+              .Condition.StringEquals["bedrock:BearerTokenType"] == "SHORT_TERM") and
+            any(.Statement[];
+              .Sid == "FoundationAgentShortTermMantleTokenOnly" and
+              .Condition.StringEquals["bedrock-mantle:BearerTokenType"] == "SHORT_TERM")
+          ' <<<"$model_policy" >/dev/null
 
           cat > "$RUNNER_TEMP/ai-lab-normal-trust.json" <<'JSON'
           {

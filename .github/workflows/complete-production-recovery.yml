@@ -267,14 +267,22 @@ jobs:
               break
             fi
             if ! grep -Eqi 'AccessDenied|subscription|agreement|entitlement|in progress|try again' "$RUNNER_TEMP/claude-access-error.txt"; then
+              if grep -Eqi 'ThrottlingException.*Too many tokens per day' "$RUNNER_TEMP/claude-access-error.txt"; then
+                model_ready='quota-limited'
+                break
+              fi
               sed -E 's/(bearer|api[_ -]?key|authorization|token)[=: ]+[^ ,;]+/\1=[redacted]/Ig' "$RUNNER_TEMP/claude-access-error.txt" >&2
               exit 1
             fi
             sleep 10
           done
-          test "$model_ready" = '1'
-          echo 'ready=true' >> "$GITHUB_OUTPUT"
-          echo 'Claude Sonnet 4.6 account access initialized and verified through the US cross-region profile.' >> "$GITHUB_STEP_SUMMARY"
+          [[ "$model_ready" = '1' || "$model_ready" = 'quota-limited' ]]
+          echo "ready=${model_ready}" >> "$GITHUB_OUTPUT"
+          if [[ "$model_ready" = '1' ]]; then
+            echo 'Claude Sonnet 4.6 account access initialized and verified through the US cross-region profile.' >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo 'Claude Sonnet 4.6 account access initialized; the Runtime profile is currently daily-quota limited, while the production GPT-OSS Mantle fallback remains independently verified.' >> "$GITHUB_STEP_SUMMARY"
+          fi
 
       - name: Rebuild retired Health application from canonical redirect source
         id: health

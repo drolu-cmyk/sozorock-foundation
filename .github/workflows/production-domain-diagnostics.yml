@@ -8,6 +8,7 @@ on:
   workflow_dispatch:
 
 permissions:
+  actions: write
   contents: read
   issues: write
   id-token: write
@@ -321,3 +322,17 @@ jobs:
           test "${{ steps.aws.outcome }}" = 'success'
           test "${{ steps.cutover.outcome }}" = 'success'
           test "${{ steps.cutover.outputs.apex_verified }}" = 'true'
+
+      - name: Dispatch recovery finalization after verified diagnostics
+        if: success()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh api \
+            --method POST \
+            -H 'Accept: application/vnd.github+json' \
+            "repos/${GITHUB_REPOSITORY}/actions/workflows/finalize-production-recovery.yml/dispatches" \
+            -f ref=main
+          echo 'Recovery finalization dispatched after verified production diagnostics.' >> "$GITHUB_STEP_SUMMARY"
