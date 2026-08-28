@@ -111,11 +111,15 @@ export async function ensureModelAuthConfigured() {
   return mode;
 }
 
-export async function listAvailableBedrockModels() {
+export async function probeBedrockModel(model) {
   if (modelAuthMode() !== "bedrock_short_term") {
-    throw new Error("Amazon Bedrock model discovery requires the Bedrock runtime.");
+    throw new Error("Amazon Bedrock model probing requires the Bedrock runtime.");
   }
   await ensureModelAuthConfigured();
-  const page = await bedrockClient.models.list();
-  return [...new Set(page.data.map((entry) => entry.id).filter((id) => typeof id === "string"))].sort();
+  const result = await bedrockClient.responses.create({
+    model,
+    input: "Reply with OK.",
+    max_output_tokens: 16,
+  });
+  return Boolean(result.id);
 }

@@ -30,8 +30,8 @@ assert.equal(JSON.parse(health.body).modelConfigured, false);
 assert.equal(JSON.parse(health.body).modelApiMode, "responses");
 assert.equal(health.headers["cache-control"], "no-store");
 
-const catalogWithoutModel = await handler({ operation: "deployment:model-catalog" });
-assert.equal(catalogWithoutModel.statusCode, 503);
+const probeWithoutModel = await handler({ operation: "deployment:model-probe", model: "openai.gpt-5.4" });
+assert.equal(probeWithoutModel.statusCode, 503);
 
 const index = await handler(event("GET", "/internal/v1/graphs"));
 assert.equal(index.statusCode, 200);

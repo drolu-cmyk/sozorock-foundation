@@ -1,7 +1,7 @@
 import { Buffer } from "node:buffer";
 import { containsForbiddenMaterial, isPlainObject, maxRequestBytes } from "./boundary.mjs";
 import { executeGraph, graphs } from "./graph.mjs";
-import { listAvailableBedrockModels, modelApiMode, modelAuthConfigured, modelAuthMode } from "./model-auth.mjs";
+import { modelApiMode, modelAuthConfigured, modelAuthMode, probeBedrockModel } from "./model-auth.mjs";
 import { normalizePublicAnswer } from "./public-knowledge.mjs";
 
 const canonicalOrigin = "https://www.sozorockfoundation.org";
@@ -180,12 +180,16 @@ function requestBody(event) {
 }
 
 export async function handler(event) {
-  if (event?.operation === "deployment:model-catalog") {
+  if (event?.operation === "deployment:model-probe") {
     if (!modelAuthConfigured()) return response(503, { error: "model_service_not_configured" });
+    const model = typeof event?.model === "string" ? event.model : "";
+    if (!["openai.gpt-5.5", "openai.gpt-5.4", "openai.gpt-5.6-luna"].includes(model)) {
+      return response(400, { error: "model_not_approved" });
+    }
     try {
-      return response(200, { models: await listAvailableBedrockModels() });
+      return response(200, { model, available: await probeBedrockModel(model) });
     } catch (error) {
-      return response(502, { error: "model_catalog_failed", failure: modelFailureClass(error) });
+      return response(502, { error: "model_probe_failed", failure: modelFailureClass(error) });
     }
   }
 

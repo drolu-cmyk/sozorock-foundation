@@ -131,26 +131,22 @@ aws lambda update-function-code --function-name "$FUNCTION_NAME" --zip-file "fil
 function_changed=1
 aws lambda wait function-updated --function-name "$FUNCTION_NAME"
 
-cat > "$work/model-catalog-payload.json" <<'JSON'
-{"operation":"deployment:model-catalog"}
-JSON
-catalog_function_error="$(aws lambda invoke \
-  --function-name "$FUNCTION_NAME" \
-  --cli-binary-format raw-in-base64-out \
-  --payload "fileb://$work/model-catalog-payload.json" \
-  --query 'FunctionError' \
-  --output text \
-  "$work/model-catalog-response.json")"
-test "$catalog_function_error" = 'None'
-test "$(jq -r '.statusCode' "$work/model-catalog-response.json")" = '200'
-jq -e '.body | fromjson | .models | type == "array" and length > 0' "$work/model-catalog-response.json" >/dev/null
-
 selected_model=''
 for candidate in openai.gpt-5.5 openai.gpt-5.4 openai.gpt-5.6-luna; do
-  if jq -e --arg candidate "$candidate" '.body | fromjson | .models | index($candidate)' "$work/model-catalog-response.json" >/dev/null; then
+  jq -n --arg model "$candidate" '{operation:"deployment:model-probe",model:$model}' > "$work/model-probe-payload.json"
+  aws lambda invoke \
+    --function-name "$FUNCTION_NAME" \
+    --cli-binary-format raw-in-base64-out \
+    --payload "fileb://$work/model-probe-payload.json" \
+    "$work/model-probe-response.json" >/dev/null
+  probe_status="$(jq -r '.statusCode // 500' "$work/model-probe-response.json")"
+  if [[ "$probe_status" = '200' ]] && jq -e '.body | fromjson | .available == true' "$work/model-probe-response.json" >/dev/null; then
     selected_model="$candidate"
     break
   fi
+  probe_code="$(jq -r '.body | fromjson | .failure.providerCode // "unknown"' "$work/model-probe-response.json" 2>/dev/null || echo unknown)"
+  probe_detail="$(jq -r '.body | fromjson | .failure.providerDetail // "not supplied"' "$work/model-probe-response.json" 2>/dev/null || echo 'not supplied')"
+  echo "Bedrock model probe rejected ${candidate}: provider_code=${probe_code}; detail=${probe_detail}." >&2
 done
 test -n "$selected_model"
 jq --arg model "$selected_model" '.Variables.OPENAI_AGENT_MODEL = $model' "$work/lambda-env.json" > "$work/lambda-env-selected.json"
