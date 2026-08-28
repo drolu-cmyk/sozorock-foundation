@@ -37,6 +37,10 @@ export function bedrockRuntimeModelId(model) {
   return model;
 }
 
+export function bedrockApiModeForModel(model) {
+  return model === "openai.gpt-5.6-sol" ? "responses" : "chat_completions";
+}
+
 function bedrockConfig() {
   if (!bedrockRequested()) return null;
   const awsRegion = process.env.BEDROCK_MODEL_REGION?.trim() || process.env.AWS_REGION?.trim();
@@ -59,7 +63,8 @@ export function modelAuthConfigured() {
 }
 
 export function modelApiMode() {
-  return modelAuthMode() === "bedrock_short_term" ? "chat_completions" : "responses";
+  if (modelAuthMode() !== "bedrock_short_term") return "responses";
+  return bedrockApiModeForModel(process.env.OPENAI_AGENT_MODEL?.trim() || "");
 }
 
 export async function ensureModelAuthConfigured() {
@@ -87,7 +92,7 @@ export async function ensureModelAuthConfigured() {
     bedrockApiKey = token;
     bedrockClient = new OpenAI({ apiKey: token, baseURL: config.baseURL });
     setDefaultOpenAIClient(bedrockClient);
-    setOpenAIAPI("chat_completions");
+    setOpenAIAPI(modelApiMode());
     setTracingDisabled(true);
     configuredMode = mode;
     return mode;
@@ -131,6 +136,14 @@ export async function probeBedrockModel(model) {
     throw new Error("Amazon Bedrock model probing requires the Bedrock runtime.");
   }
   await ensureModelAuthConfigured();
+  if (bedrockApiModeForModel(model) === "responses") {
+    const result = await bedrockClient.responses.create({
+      model: bedrockRuntimeModelId(model),
+      input: "Reply with OK.",
+      max_output_tokens: 16,
+    });
+    return Boolean(result.id || result.output?.length);
+  }
   const result = await bedrockClient.chat.completions.create({
     model: bedrockRuntimeModelId(model),
     messages: [{ role: "user", content: "Reply with OK." }],

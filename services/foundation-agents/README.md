@@ -49,9 +49,9 @@ The execution graph is not the institutional knowledge graph. Public navigation 
 
 ## Model authentication
 
-Production uses Amazon Bedrock's OpenAI-compatible Chat Completions API in a bounded approved US region. Deployment runs a tiny real Chat Completions probe and selects the first available model from the approved set (`openai.gpt-oss-120b`, then `openai.gpt-oss-20b`) before the six-agent canary. GPT-OSS runs on the Bedrock runtime `/openai/v1/chat/completions` endpoint so structured agent output stays on the native Bedrock runtime rather than Mantle. OpenAI-compatible requests use Bedrock's versioned runtime model identifiers, while IAM remains restricted to the corresponding foundation-model ARNs and the account default runtime project. The runtime retains the same agent graph, bounded revisions, and evaluator gates. The exact production Lambda derives a short-term Bedrock API key from its IAM role using `@aws/bedrock-token-generator`. The key is generated for a graph run, is never persisted or logged, and expires with the underlying AWS session. The Lambda role is restricted to the two approved model ARNs and `SHORT_TERM` bearer-token use.
+Production uses the documented OpenAI-compatible APIs on Amazon Bedrock in a bounded approved US region. Deployment first probes `openai.gpt-5.6-sol` through the Responses-only Bedrock Mantle endpoint, then falls back to `openai.gpt-oss-120b` or `openai.gpt-oss-20b` through Bedrock Runtime Chat Completions if necessary. The runtime selects the matching Agents SDK transport before the six-agent canary. IAM remains restricted to the corresponding foundation-model ARNs, the account-default runtime projects, and short-term bearer-token use. The runtime retains the same agent graph, bounded revisions, and evaluator gates. The exact production Lambda derives a short-term Bedrock API key from its IAM role using `@aws/bedrock-token-generator`. The key is generated for a graph run, is never persisted or logged, and expires with the underlying AWS session.
 
-The deployer probes `us-east-2`, `us-west-2`, and `us-east-1` in that order and pins the first healthy regional endpoint. This bounded US-region failover avoids coupling production activation to a depleted per-region daily token quota while preserving the same approved models and IAM constraints.
+The deployer probes GPT-5.6 Sol in `us-east-2` and `us-east-1`, with GPT-OSS fallbacks across `us-east-2`, `us-east-1`, and `us-west-2`, and pins the first healthy regional endpoint. This bounded US-region failover avoids coupling production activation to one model's regional quota while preserving the approved models and IAM constraints.
 
 The site-assurance graph fans product, UX, accessibility, and security reviews out concurrently after the orchestrator, then converges them at the evaluator. Production model turns use low reasoning effort and a 96-token canary-safe ceiling. This retains specialist independence and all six review nodes while keeping latency, token quota, and cost inside bounded execution limits.
 
@@ -86,7 +86,7 @@ The production fallback to Bedrock is scoped to the exact Lambda name `SozoRockF
 Optional local runtime settings:
 
 ```text
-OPENAI_AGENT_MODEL=openai.gpt-oss-20b
+OPENAI_AGENT_MODEL=openai.gpt-5.6-sol
 PORT=8788
 FOUNDATION_AGENT_SERVICE_TOKEN=<local-service-only secret>
 TRUST_PROXY_HEADERS=false

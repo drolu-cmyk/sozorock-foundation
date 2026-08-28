@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import {
+  bedrockApiModeForModel,
   bedrockBaseURLForModel,
   bedrockRuntimeModelId,
   modelApiMode,
@@ -18,6 +19,8 @@ assert.equal(
 assert.equal(bedrockRuntimeModelId("openai.gpt-oss-20b"), "openai.gpt-oss-20b-1:0");
 assert.equal(bedrockRuntimeModelId("openai.gpt-oss-120b"), "openai.gpt-oss-120b-1:0");
 assert.equal(bedrockRuntimeModelId("openai.gpt-5.6-sol"), "openai.gpt-5.6-sol");
+assert.equal(bedrockApiModeForModel("openai.gpt-5.6-sol"), "responses");
+assert.equal(bedrockApiModeForModel("openai.gpt-oss-20b"), "chat_completions");
 
 const keys = [
   "FOUNDATION_MODEL_PROVIDER",
@@ -25,6 +28,7 @@ const keys = [
   "OPENAI_IDENTITY_PROVIDER_ID",
   "OPENAI_SERVICE_ACCOUNT_ID",
   "OPENAI_WIF_AUDIENCE",
+  "OPENAI_AGENT_MODEL",
   "AWS_LAMBDA_FUNCTION_NAME",
   "AWS_REGION",
   "BEDROCK_MODEL_REGION",
@@ -54,19 +58,22 @@ delete process.env.OPENAI_SERVICE_ACCOUNT_ID;
 assert.equal(modelAuthConfigured(), false);
 
 process.env.FOUNDATION_MODEL_PROVIDER = "bedrock";
+process.env.OPENAI_AGENT_MODEL = "openai.gpt-oss-20b";
 assert.equal(modelAuthConfigured(), true);
 assert.equal(modelAuthMode(), "bedrock_short_term");
 assert.equal(modelApiMode(), "chat_completions");
 delete process.env.FOUNDATION_MODEL_PROVIDER;
+delete process.env.OPENAI_AGENT_MODEL;
 
 process.env.AWS_LAMBDA_FUNCTION_NAME = "UnrelatedFunction";
 assert.equal(modelAuthConfigured(), false);
 assert.equal(modelAuthMode(), null);
 
 process.env.AWS_LAMBDA_FUNCTION_NAME = "SozoRockFoundationParentOrigin";
+process.env.OPENAI_AGENT_MODEL = "openai.gpt-5.6-sol";
 assert.equal(modelAuthConfigured(), true);
 assert.equal(modelAuthMode(), "bedrock_short_term");
-assert.equal(modelApiMode(), "chat_completions");
+assert.equal(modelApiMode(), "responses");
 
 process.env.BEDROCK_MODEL_REGION = "us-east-2";
 assert.equal(modelAuthConfigured(), true);

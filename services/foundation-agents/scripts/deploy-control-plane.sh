@@ -119,7 +119,7 @@ snapshot_route 'OPTIONS /public/v1/navigate' public-options "$routes_before"
 
 # AWS_REGION is injected by Lambda as a reserved runtime variable.
 jq -n \
-  --arg model 'openai.gpt-oss-20b' \
+  --arg model 'openai.gpt-5.6-sol' \
   --arg key "${OPENAI_API_KEY:-}" \
   --arg provider "${OPENAI_IDENTITY_PROVIDER_ID:-}" \
   --arg service "${OPENAI_SERVICE_ACCOUNT_ID:-}" \
@@ -134,8 +134,13 @@ aws lambda wait function-updated --function-name "$FUNCTION_NAME"
 
 selected_model=''
 selected_model_region=''
-for model_region in us-east-2 us-west-2 us-east-1; do
-  for candidate in openai.gpt-oss-120b openai.gpt-oss-20b; do
+for model_region in us-east-2 us-east-1 us-west-2; do
+  if [[ "$model_region" = 'us-west-2' ]]; then
+    candidates=(openai.gpt-oss-120b openai.gpt-oss-20b)
+  else
+    candidates=(openai.gpt-5.6-sol openai.gpt-oss-120b openai.gpt-oss-20b)
+  fi
+  for candidate in "${candidates[@]}"; do
     jq --arg model "$candidate" --arg region "$model_region" \
       '.Variables.OPENAI_AGENT_MODEL = $model | .Variables.BEDROCK_MODEL_REGION = $region' \
       "$work/lambda-env.json" > "$work/lambda-env-probe.json"
@@ -305,8 +310,12 @@ if curl --help all 2>/dev/null | grep -q -- '--aws-sigv4'; then
     health_model="$(jq -r '.model // "unknown"' "$work/signed-health.json")"
 
     if [[ "$model_configured" = 'true' ]]; then
-      test "$model_api_mode" = 'chat_completions'
       test "$health_model" = "$selected_model"
+      if [[ "$selected_model" = 'openai.gpt-5.6-sol' ]]; then
+        test "$model_api_mode" = 'responses'
+      else
+        test "$model_api_mode" = 'chat_completions'
+      fi
       cat > "$work/run-payload.json" <<'JSON'
 {"operation":"deployment:agent-canary"}
 JSON
