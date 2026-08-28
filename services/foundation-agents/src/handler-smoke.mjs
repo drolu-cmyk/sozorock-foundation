@@ -33,6 +33,9 @@ assert.equal(health.headers["cache-control"], "no-store");
 const probeWithoutModel = await handler({ operation: "deployment:model-probe", model: "openai.gpt-oss-120b" });
 assert.equal(probeWithoutModel.statusCode, 503);
 
+const graphSmokeWithoutModel = await handler({ operation: "deployment:graph-smoke" });
+assert.equal(graphSmokeWithoutModel.statusCode, 503);
+
 const index = await handler(event("GET", "/internal/v1/graphs"));
 assert.equal(index.statusCode, 200);
 assert.equal(Object.keys(JSON.parse(index.body).graphs).length, 6);

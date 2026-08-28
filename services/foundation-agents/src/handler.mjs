@@ -193,6 +193,28 @@ export async function handler(event) {
     }
   }
 
+  if (event?.operation === "deployment:graph-smoke") {
+    if (!modelAuthConfigured()) return response(503, { error: "model_service_not_configured" });
+    try {
+      const result = await executeGraph({
+        graphId: "foundationSiteAssurance",
+        input: {
+          task: "Review a bounded synthetic deployment change.",
+          evidence: {
+            repository: "sozorock-foundation",
+            liveVerification: "not supplied",
+            constraint: "Do not claim production completion without live evidence.",
+          },
+        },
+        context: { source: "deployment-smoke" },
+        maxRevisionCycles: 0,
+      });
+      return response(200, result);
+    } catch (error) {
+      return response(500, { error: "agent_run_failed", failure: modelFailureClass(error) });
+    }
+  }
+
   const method = requestMethod(event);
   const path = requestPath(event);
 

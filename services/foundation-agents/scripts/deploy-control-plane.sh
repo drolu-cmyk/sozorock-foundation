@@ -160,7 +160,7 @@ aws lambda update-function-configuration \
   --runtime nodejs22.x \
   --handler src/handler.handler \
   --memory-size 1024 \
-  --timeout 120 \
+  --timeout 600 \
   --environment "file://$work/lambda-env.json" >/dev/null
 aws lambda wait function-updated --function-name "$FUNCTION_NAME"
 
@@ -294,31 +294,28 @@ if curl --help all 2>/dev/null | grep -q -- '--aws-sigv4'; then
       test "$model_api_mode" = 'responses'
       test "$health_model" = "$selected_model"
       cat > "$work/run-payload.json" <<'JSON'
-{"graphId":"foundationSiteAssurance","input":{"task":"Review a bounded synthetic deployment change.","evidence":{"repository":"sozorock-foundation","liveVerification":"not supplied","constraint":"Do not claim production completion without live evidence."}},"context":{"source":"deployment-smoke"}}
+{"operation":"deployment:graph-smoke"}
 JSON
-      signed_run_status="$(curl --silent --show-error \
-        --output "$work/signed-run.json" \
-        --max-time 180 \
-        --write-out '%{http_code}' \
-        --request POST \
-        --aws-sigv4 "aws:amz:${AWS_REGION}:execute-api" \
-        --user "${AWS_ACCESS_KEY_ID}:${AWS_SECRET_ACCESS_KEY}" \
-        -H "x-amz-security-token: ${AWS_SESSION_TOKEN}" \
-        -H 'content-type: application/json' \
-        --data-binary "@$work/run-payload.json" \
-        "${api_endpoint}/internal/v1/run" || true)"
-      if [[ "$signed_run_status" = '200' ]]; then
-        graph_status="$(jq -r '.status' "$work/signed-run.json")"
-        graph_decision="$(jq -r '.decision' "$work/signed-run.json")"
+      graph_function_error="$(aws lambda invoke \
+        --function-name "$FUNCTION_NAME" \
+        --cli-binary-format raw-in-base64-out \
+        --cli-read-timeout 0 \
+        --payload "fileb://$work/run-payload.json" \
+        --query 'FunctionError' \
+        --output text \
+        "$work/signed-run.json")"
+      if [[ "$graph_function_error" = 'None' && "$(jq -r '.statusCode' "$work/signed-run.json")" = '200' ]]; then
+        graph_status="$(jq -r '.body | fromjson | .status' "$work/signed-run.json")"
+        graph_decision="$(jq -r '.body | fromjson | .decision' "$work/signed-run.json")"
         [[ "$graph_status" = 'review_required' || "$graph_status" = 'escalated' ]]
         [[ "$graph_decision" = 'pass' || "$graph_decision" = 'revise' || "$graph_decision" = 'escalate' ]]
       else
-        failure_category="$(jq -r '.failure.category // "unknown"' "$work/signed-run.json" 2>/dev/null || echo unknown)"
-        failure_status="$(jq -r '.failure.providerStatus // "unknown"' "$work/signed-run.json" 2>/dev/null || echo unknown)"
-        failure_code="$(jq -r '.failure.providerCode // "unknown"' "$work/signed-run.json" 2>/dev/null || echo unknown)"
-        failure_param="$(jq -r '.failure.providerParam // "unknown"' "$work/signed-run.json" 2>/dev/null || echo unknown)"
-        failure_detail="$(jq -r '.failure.providerDetail // "not supplied"' "$work/signed-run.json" 2>/dev/null || echo 'not supplied')"
-        echo "Signed graph smoke failed safely: HTTP ${signed_run_status}; category=${failure_category}; provider_status=${failure_status}; provider_code=${failure_code}; provider_param=${failure_param}; detail=${failure_detail}." >&2
+        failure_category="$(jq -r '.body | fromjson | .failure.category // "unknown"' "$work/signed-run.json" 2>/dev/null || echo unknown)"
+        failure_status="$(jq -r '.body | fromjson | .failure.providerStatus // "unknown"' "$work/signed-run.json" 2>/dev/null || echo unknown)"
+        failure_code="$(jq -r '.body | fromjson | .failure.providerCode // "unknown"' "$work/signed-run.json" 2>/dev/null || echo unknown)"
+        failure_param="$(jq -r '.body | fromjson | .failure.providerParam // "unknown"' "$work/signed-run.json" 2>/dev/null || echo unknown)"
+        failure_detail="$(jq -r '.body | fromjson | .failure.providerDetail // "not supplied"' "$work/signed-run.json" 2>/dev/null || echo 'not supplied')"
+        echo "Authenticated direct graph smoke failed safely: category=${failure_category}; provider_status=${failure_status}; provider_code=${failure_code}; provider_param=${failure_param}; detail=${failure_detail}." >&2
       fi
     fi
   fi

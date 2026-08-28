@@ -100,7 +100,7 @@ jobs:
           signed_route='${{ steps.deploy.outputs.signed_route_verified }}'
           graph_status='${{ steps.deploy.outputs.graph_status }}'
           graph_decision='${{ steps.deploy.outputs.graph_decision }}'
-          body="Agent control-plane run \`${GITHUB_RUN_ID}\`: secure infrastructure deployment **${outcome}**. Canonical redirect and unsigned 403 protection are required before infrastructure remains deployed. Model configured: **${configured:-unknown}**; selected model: \`${selected_model:-unknown}\`; auth mode: \`${auth_mode:-none}\`; model API: \`${api_mode:-unknown}\`; deploy-role signed internal probe: \`${signed_route:-not-run}\`; graph smoke status: \`${graph_status:-not-run}\`; decision: \`${graph_decision:-not-run}\`. No secret values are included in this receipt."
+          body="Agent control-plane run \`${GITHUB_RUN_ID}\`: secure infrastructure deployment **${outcome}**. Canonical redirect and unsigned 403 protection are required before infrastructure remains deployed. Model configured: **${configured:-unknown}**; selected model: \`${selected_model:-unknown}\`; auth mode: \`${auth_mode:-none}\`; model API: \`${api_mode:-unknown}\`; deploy-role signed internal route: \`${signed_route:-not-run}\`; authenticated direct graph smoke status: \`${graph_status:-not-run}\`; decision: \`${graph_decision:-not-run}\`. No secret values are included in this receipt."
           gh issue comment "$RECEIPT_ISSUE" --repo "$GITHUB_REPOSITORY" --body "$body"
           printf '%s\n' "$body" >> "$GITHUB_STEP_SUMMARY"
 
@@ -133,7 +133,7 @@ jobs:
           cat > "$RUNNER_TEMP/activation-complete.md" <<EOF
           ## Foundation agent activation complete
 
-          \`${selected_model}\` is active through short-term Amazon Bedrock credentials and the Bedrock OpenAI-compatible Responses API on the private AWS-IAM-protected Foundation control plane. The production deployment passed canonical redirect verification, unsigned 403 protection, the signed internal route check, and a real model-backed bounded graph smoke ending in \`${graph_status}\` with decision \`${graph_decision}\`.
+          \`${selected_model}\` is active through short-term Amazon Bedrock credentials and the Bedrock OpenAI-compatible Responses API on the private AWS-IAM-protected Foundation control plane. The production deployment passed canonical redirect verification, unsigned 403 protection, the signed internal route check, and an authenticated direct real model-backed bounded graph smoke ending in \`${graph_status}\` with decision \`${graph_decision}\`.
 
           No long-lived model credential is stored in the Foundation runtime.
           EOF
