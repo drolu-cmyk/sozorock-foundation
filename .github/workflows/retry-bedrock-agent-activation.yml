@@ -1,6 +1,10 @@
 name: Retry Bedrock agent activation
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/retry-bedrock-agent-activation.yml
   workflow_dispatch:
   schedule:
     - cron: '23 * * * *'
