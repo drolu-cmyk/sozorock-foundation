@@ -143,13 +143,13 @@ jobs:
           model_policy="$(aws iam get-role-policy --role-name "$PARENT_LAMBDA_ROLE_NAME" --policy-name SozoRockFoundationAgentModelInference --query 'PolicyDocument' --output json)"
           jq -e '
             any(.Statement[];
-              .Sid == "FoundationAgentApprovedRuntimeModelsOnly" and
+              (.Sid == "FoundationAgentApprovedRuntimeModelsOnly" or .Sid == "FoundationAgentApprovedInferenceOnly") and
               .Action == "bedrock:InvokeModel") and
             any(.Statement[];
               .Sid == "FoundationAgentApprovedMantleInferenceOnly" and
               .Action == "bedrock-mantle:CreateInference") and
             any(.Statement[];
-              .Sid == "FoundationAgentShortTermRuntimeTokenOnly" and
+              (.Sid == "FoundationAgentShortTermRuntimeTokenOnly" or .Sid == "FoundationAgentShortTermTokenOnly") and
               .Condition.StringEquals["bedrock:BearerTokenType"] == "SHORT_TERM") and
             any(.Statement[];
               .Sid == "FoundationAgentShortTermMantleTokenOnly" and
