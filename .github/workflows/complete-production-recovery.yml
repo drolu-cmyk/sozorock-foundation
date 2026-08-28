@@ -29,7 +29,7 @@ jobs:
   recover:
     if: github.repository == 'drolu-cmyk/sozorock-foundation' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
-    timeout-minutes: 35
+    timeout-minutes: 50
     steps:
       - name: Check out main
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -96,6 +96,24 @@ jobs:
             {"Sid":"InspectFoundationCertificates","Effect":"Allow","Action":"acm:ListCertificates","Resource":"*"},
             {"Sid":"ReadFoundationCertificates","Effect":"Allow","Action":["acm:DescribeCertificate","acm:GetCertificate","acm:ListTagsForCertificate"],"Resource":"arn:aws:acm:${AWS_REGION}:${ACCOUNT_ID}:certificate/*"},
             {
+              "Sid":"InspectOnlyLegacyHealthAmplifyApp",
+              "Effect":"Allow",
+              "Action":["amplify:GetApp","amplify:ListBranches"],
+              "Resource":"arn:aws:amplify:${AWS_REGION}:${ACCOUNT_ID}:apps/${LEGACY_HEALTH_APP_ID}"
+            },
+            {
+              "Sid":"MaintainOnlyLegacyHealthDomain",
+              "Effect":"Allow",
+              "Action":["amplify:GetDomainAssociation","amplify:UpdateDomainAssociation"],
+              "Resource":"arn:aws:amplify:${AWS_REGION}:${ACCOUNT_ID}:apps/${LEGACY_HEALTH_APP_ID}/domains/${LEGACY_HEALTH_DOMAIN}"
+            },
+            {
+              "Sid":"ReleaseOnlyLegacyHealthBranches",
+              "Effect":"Allow",
+              "Action":["amplify:StartJob","amplify:GetJob"],
+              "Resource":"arn:aws:amplify:${AWS_REGION}:${ACCOUNT_ID}:apps/${LEGACY_HEALTH_APP_ID}/branches/*/jobs/*"
+            },
+            {
               "Sid":"VerifyOnlyCombinedFoundationEdge",
               "Effect":"Allow",
               "Action":"lambda:InvokeFunction",
@@ -109,6 +127,15 @@ jobs:
             --policy-document file:///tmp/foundation-recovery-policy.json
 
           echo 'Foundation recovery and model-inference prerequisites applied.' >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Switch to bounded Foundation recovery role
+        uses: aws-actions/configure-aws-credentials@e6de054238d6b7531b4efff3b6587d9aade6a06c # v6.2.3
+        with:
+          role-to-assume: ${{ env.FOUNDATION_DEPLOY_ROLE }}
+          role-session-name: FoundationRecoveryVerify-${{ github.run_id }}
+          aws-region: ${{ env.AWS_REGION }}
+          retry-max-attempts: 3
+          unset-current-credentials: true
 
       - name: Rebuild retired Health application from canonical redirect source
         id: health
@@ -198,15 +225,8 @@ jobs:
           echo "Legacy Health domains verified after Amplify job ${job_id}." >> "$GITHUB_STEP_SUMMARY"
           echo "job_id=$job_id" >> "$GITHUB_OUTPUT"
 
-      - name: Verify Foundation deployment role received required recovery capability
-        uses: aws-actions/configure-aws-credentials@e6de054238d6b7531b4efff3b6587d9aade6a06c # v6.2.3
-        with:
-          role-to-assume: ${{ env.FOUNDATION_DEPLOY_ROLE }}
-          role-session-name: FoundationRecoveryVerify-${{ github.run_id }}
-          aws-region: ${{ env.AWS_REGION }}
-          retry-max-attempts: 3
-
       - name: Prove Foundation role and dispatch fail-closed apex cutover
+        id: cutover
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
@@ -233,6 +253,7 @@ jobs:
             "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/workflows/production-domain-diagnostics.yml/dispatches" \
             -d '{"ref":"main"}' >/dev/null
 
+          echo 'dispatched=true' >> "$GITHUB_OUTPUT"
           echo 'Apex cutover workflow dispatched after recovery prerequisites were proven.' >> "$GITHUB_STEP_SUMMARY"
 
       - name: Publish recovery receipt
@@ -240,6 +261,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           HEALTH_JOB: ${{ steps.health.outputs.job_id }}
+          CUTOVER_DISPATCHED: ${{ steps.cutover.outputs.dispatched }}
         shell: bash
         run: |
           receipt="$RUNNER_TEMP/production-recovery-receipt.md"
@@ -253,7 +275,7 @@ jobs:
             echo '- Foundation ACM and verifier permissions: applied with additive policy only.'
             echo '- Foundation edge model role: restricted to GPT-5.6 Sol Mantle inference with short-term bearer-token use.'
             echo "- Legacy Health Amplify release job: \`${HEALTH_JOB:-not-completed}\`."
-            echo '- Apex cutover: dispatched only after ACM inspection and exact Lambda invocation succeeded.'
+            echo "- Apex cutover dispatched after ACM inspection and exact Lambda invocation: \`${CUTOVER_DISPATCHED:-false}\`."
             echo
             echo 'The temporary cross-repository trust must be removed after the apex and retired Health live checks both pass.'
           } > "$receipt"
