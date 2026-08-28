@@ -353,6 +353,13 @@ test("emits the files required by CloudFront plus the compatibility worker packa
   }
 });
 
+test("emits a search-safe crawler 404 document", async () => {
+  const html = await readFile(new URL("../dist/client/404.html", import.meta.url), "utf8");
+  assert.match(html, /<title>Page not found \| The SozoRock Foundation<\/title>/u);
+  assert.match(html, /<meta name="robots" content="noindex, follow, noarchive"/u);
+  assert.doesNotMatch(html, /<link rel="canonical"/u);
+});
+
 test("emits unique canonical SEO metadata and valid schema for every indexable route", async () => {
   const titles = new Set();
   for (const pathname of APP_ROUTES) {

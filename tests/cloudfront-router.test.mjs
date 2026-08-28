@@ -61,5 +61,5 @@ test("CloudFront maps only the public navigator path to the unsigned agent route
   assert.equal(request("/api/navigator").uri, "/public/v1/navigate");
   assert.equal(request("/api/navigator/private").uri, "/api/navigator/private");
   assert.match(template, /PathPattern: \/api\/navigator[\s\S]*TargetOriginId: foundation-agent-api/u);
-  assert.match(template, /Aliases: !If[\s\S]*\[!Ref ApexDomain, !Ref CanonicalDomain\]/u);
+  assert.match(template, /Aliases: !If[\s\S]*\[!Ref CanonicalDomain\]/u);
 });

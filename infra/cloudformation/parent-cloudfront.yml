@@ -206,7 +206,7 @@ Resources:
       DistributionConfig:
         Aliases: !If
           - UseAliases
-          - [!Ref ApexDomain, !Ref CanonicalDomain]
+          - [!Ref CanonicalDomain]
           - !Ref AWS::NoValue
         Comment: Dynamic SozoRock Foundation parent website and navigator
         DefaultCacheBehavior:

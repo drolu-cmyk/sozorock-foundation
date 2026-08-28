@@ -27,6 +27,7 @@ assert.equal(redirect.headers.location, "https://www.sozorockfoundation.org/publ
 const health = await handler(event("GET", "/internal/health"));
 assert.equal(health.statusCode, 200);
 assert.equal(JSON.parse(health.body).modelConfigured, false);
+assert.equal(JSON.parse(health.body).modelApiMode, "responses");
 assert.equal(health.headers["cache-control"], "no-store");
 
 const index = await handler(event("GET", "/internal/v1/graphs"));

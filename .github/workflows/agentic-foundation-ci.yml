@@ -43,7 +43,7 @@ jobs:
 
       - name: Install agent runtime dependencies
         working-directory: services/foundation-agents
-        run: npm install --ignore-scripts --no-audit --no-fund
+        run: npm ci --ignore-scripts --no-audit --no-fund
 
       - name: Validate agent graph structure
         working-directory: services/foundation-agents

@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { modelAuthConfigured, modelAuthMode } from "./model-auth.mjs";
+import { modelApiMode, modelAuthConfigured, modelAuthMode } from "./model-auth.mjs";
 
 const keys = [
   "FOUNDATION_MODEL_PROVIDER",
@@ -15,10 +15,12 @@ const saved = Object.fromEntries(keys.map((key) => [key, process.env[key]]));
 for (const key of keys) delete process.env[key];
 assert.equal(modelAuthConfigured(), false);
 assert.equal(modelAuthMode(), null);
+assert.equal(modelApiMode(), "responses");
 
 process.env.OPENAI_API_KEY = "test-only-not-a-real-key";
 assert.equal(modelAuthConfigured(), true);
 assert.equal(modelAuthMode(), "api_key");
+assert.equal(modelApiMode(), "responses");
 delete process.env.OPENAI_API_KEY;
 
 process.env.OPENAI_IDENTITY_PROVIDER_ID = "wip_test";
@@ -27,6 +29,7 @@ process.env.OPENAI_WIF_AUDIENCE = "https://api.openai.com/v1";
 process.env.AWS_REGION = "us-east-1";
 assert.equal(modelAuthConfigured(), true);
 assert.equal(modelAuthMode(), "aws_wif");
+assert.equal(modelApiMode(), "responses");
 
 delete process.env.OPENAI_SERVICE_ACCOUNT_ID;
 assert.equal(modelAuthConfigured(), false);
@@ -34,6 +37,7 @@ assert.equal(modelAuthConfigured(), false);
 process.env.FOUNDATION_MODEL_PROVIDER = "bedrock";
 assert.equal(modelAuthConfigured(), true);
 assert.equal(modelAuthMode(), "bedrock_short_term");
+assert.equal(modelApiMode(), "chat_completions");
 delete process.env.FOUNDATION_MODEL_PROVIDER;
 
 process.env.AWS_LAMBDA_FUNCTION_NAME = "UnrelatedFunction";
@@ -43,6 +47,7 @@ assert.equal(modelAuthMode(), null);
 process.env.AWS_LAMBDA_FUNCTION_NAME = "SozoRockFoundationParentOrigin";
 assert.equal(modelAuthConfigured(), true);
 assert.equal(modelAuthMode(), "bedrock_short_term");
+assert.equal(modelApiMode(), "chat_completions");
 
 delete process.env.AWS_REGION;
 assert.equal(modelAuthConfigured(), false);

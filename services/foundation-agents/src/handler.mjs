@@ -1,7 +1,7 @@
 import { Buffer } from "node:buffer";
 import { containsForbiddenMaterial, isPlainObject, maxRequestBytes } from "./boundary.mjs";
 import { executeGraph, graphs } from "./graph.mjs";
-import { modelAuthConfigured, modelAuthMode } from "./model-auth.mjs";
+import { modelApiMode, modelAuthConfigured, modelAuthMode } from "./model-auth.mjs";
 import { normalizePublicAnswer } from "./public-knowledge.mjs";
 
 const canonicalOrigin = "https://www.sozorockfoundation.org";
@@ -198,6 +198,7 @@ export async function handler(event) {
       service: "foundation-agents",
       modelConfigured: modelAuthConfigured(),
       modelAuthMode: modelAuthMode(),
+      modelApiMode: modelApiMode(),
       surface: "internal",
     });
   }

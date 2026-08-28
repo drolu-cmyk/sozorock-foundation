@@ -49,7 +49,7 @@ The execution graph is not the institutional knowledge graph. Public navigation 
 
 ## Model authentication
 
-Production uses Amazon Bedrock's OpenAI-compatible Responses API with `openai.gpt-5.6-sol` in `us-east-1`. The exact production Lambda derives a short-term Bedrock API key from its IAM role using `@aws/bedrock-token-generator`. The key is generated for a graph run, is never persisted or logged, and expires with the underlying AWS session. The Lambda role is restricted to GPT-5.6 Sol inference and `SHORT_TERM` bearer-token use.
+Production uses Amazon Bedrock's OpenAI-compatible Chat Completions API with `openai.gpt-5.6-sol` in `us-east-1`. That Bedrock model does not expose the Responses API, so the Agents SDK is explicitly switched to Chat Completions while retaining the same agent graph, structured outputs, bounded revisions, and evaluator gates. The exact production Lambda derives a short-term Bedrock API key from its IAM role using `@aws/bedrock-token-generator`. The key is generated for a graph run, is never persisted or logged, and expires with the underlying AWS session. The Lambda role is restricted to GPT-5.6 Sol inference and `SHORT_TERM` bearer-token use.
 
 The runtime keeps two controlled alternatives for non-production environments:
 

@@ -241,6 +241,7 @@ else
   auth_mode='none'
 fi
 signed_route_verified='false'
+model_api_mode='unknown'
 graph_status='not-run'
 graph_decision='not-run'
 
@@ -261,8 +262,10 @@ if curl --help all 2>/dev/null | grep -q -- '--aws-sigv4'; then
     signed_route_verified='true'
     model_configured="$(jq -r '.modelConfigured' "$work/signed-health.json")"
     auth_mode="$(jq -r '.modelAuthMode // "none"' "$work/signed-health.json")"
+    model_api_mode="$(jq -r '.modelApiMode // "unknown"' "$work/signed-health.json")"
 
     if [[ "$model_configured" = 'true' ]]; then
+      test "$model_api_mode" = 'chat_completions'
       cat > "$work/run-payload.json" <<'JSON'
 {"graphId":"foundationSiteAssurance","input":{"task":"Review a bounded synthetic deployment change.","evidence":{"repository":"sozorock-foundation","liveVerification":"not supplied","constraint":"Do not claim production completion without live evidence."}},"context":{"source":"deployment-smoke"}}
 JSON
@@ -299,6 +302,7 @@ if [[ -n "${GITHUB_OUTPUT:-}" ]]; then
   echo "api_endpoint=$api_endpoint" >> "$GITHUB_OUTPUT"
   echo "public_navigator_endpoint=${api_endpoint}/public/v1/navigate" >> "$GITHUB_OUTPUT"
   echo "auth_mode=$auth_mode" >> "$GITHUB_OUTPUT"
+  echo "model_api_mode=$model_api_mode" >> "$GITHUB_OUTPUT"
   echo "model_configured=$model_configured" >> "$GITHUB_OUTPUT"
   echo "signed_route_verified=$signed_route_verified" >> "$GITHUB_OUTPUT"
   echo "graph_status=$graph_status" >> "$GITHUB_OUTPUT"

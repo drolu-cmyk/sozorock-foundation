@@ -1,6 +1,6 @@
 import { getTokenProvider } from "@aws/bedrock-token-generator";
 import { GetWebIdentityTokenCommand, STSClient } from "@aws-sdk/client-sts";
-import { setDefaultOpenAIClient, setTracingDisabled } from "@openai/agents";
+import { setDefaultOpenAIClient, setOpenAIAPI, setTracingDisabled } from "@openai/agents";
 import OpenAI from "openai";
 
 const foundationEdgeFunction = "SozoRockFoundationParentOrigin";
@@ -43,6 +43,10 @@ export function modelAuthConfigured() {
   return modelAuthMode() !== null;
 }
 
+export function modelApiMode() {
+  return modelAuthMode() === "bedrock_short_term" ? "chat_completions" : "responses";
+}
+
 export async function ensureModelAuthConfigured() {
   const mode = modelAuthMode();
   if (!mode) {
@@ -50,6 +54,7 @@ export async function ensureModelAuthConfigured() {
   }
 
   if (mode === "api_key") {
+    setOpenAIAPI("responses");
     configuredMode = mode;
     return mode;
   }
@@ -66,6 +71,7 @@ export async function ensureModelAuthConfigured() {
     if (!token) throw new Error("Amazon Bedrock did not return a short-term API key.");
     const client = new OpenAI({ apiKey: token, baseURL: config.baseURL });
     setDefaultOpenAIClient(client);
+    setOpenAIAPI("chat_completions");
     setTracingDisabled(true);
     configuredMode = mode;
     return mode;
@@ -98,6 +104,7 @@ export async function ensureModelAuthConfigured() {
     },
   });
   setDefaultOpenAIClient(client);
+  setOpenAIAPI("responses");
   setTracingDisabled(true);
   configuredMode = mode;
   return mode;

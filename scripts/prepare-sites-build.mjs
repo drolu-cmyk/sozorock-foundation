@@ -120,8 +120,8 @@ function routeHtml(route) {
 
 writeFileSync(index, routeHtml("/"));
 
-let notFoundHtml = routeHtml("/");
-notFoundHtml = upsertMeta(notFoundHtml, "name", "robots", "noindex, nofollow, noarchive");
+let notFoundHtml = routeHtml("/__not-found");
+notFoundHtml = upsertMeta(notFoundHtml, "name", "robots", "noindex, follow, noarchive");
 notFoundHtml = notFoundHtml.replace(/<link\s+rel="canonical"[^>]*>\s*/u, "");
 writeFileSync(path.join(dist, "client", "404.html"), notFoundHtml);
 

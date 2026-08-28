@@ -23,7 +23,7 @@ Canonical production host: `https://www.sozorockfoundation.org`
 
 ## Search intent map
 
-Search intent is expressed through visible headings, titles, descriptions, internal links, and structured data. A `meta keywords` tag is intentionally not used because Google ignores it.
+Search intent is expressed through visible headings, titles, descriptions, internal links, and structured data. Supplemental `meta keywords` are present for non-Google consumers; they are not treated as a Google ranking signal.
 
 | Canonical route | Primary search intent |
 |---|---|

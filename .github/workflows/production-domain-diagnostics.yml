@@ -211,7 +211,11 @@ jobs:
           domain_ready=0
           for _ in $(seq 1 120); do
             domain_json="$(aws apigatewayv2 get-domain-name --domain-name "$APEX_HOST" --output json 2>/dev/null || true)"
-            domain_status="$(jq -r '.DomainNameConfigurations[0].DomainNameStatus // ""' <<<"${domain_json:-{}}")"
+            if [[ -n "$domain_json" ]]; then
+              domain_status="$(jq -r '.DomainNameConfigurations[0].DomainNameStatus // ""' <<<"$domain_json")"
+            else
+              domain_status=''
+            fi
             if [[ "$domain_status" = 'AVAILABLE' ]]; then
               domain_ready=1
               break

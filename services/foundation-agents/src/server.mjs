@@ -1,7 +1,7 @@
 import http from "node:http";
 import { authorizedHeader, containsForbiddenMaterial, isPlainObject, maxRequestBytes, maxRequestsPerMinute } from "./boundary.mjs";
 import { executeGraph, graphs } from "./graph.mjs";
-import { modelAuthConfigured, modelAuthMode } from "./model-auth.mjs";
+import { modelApiMode, modelAuthConfigured, modelAuthMode } from "./model-auth.mjs";
 
 const port = Number(process.env.PORT || 8788);
 const trustProxyHeaders = process.env.TRUST_PROXY_HEADERS === "true";
@@ -96,6 +96,7 @@ const server = http.createServer(async (request, response) => {
       service: "foundation-agents",
       modelConfigured: modelAuthConfigured(),
       modelAuthMode: modelAuthMode(),
+      modelApiMode: modelApiMode(),
     });
   }
 
