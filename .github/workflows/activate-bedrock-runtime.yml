@@ -47,7 +47,13 @@ jobs:
               "Resource":[
                 "arn:aws:bedrock:${AWS_REGION}::foundation-model/openai.gpt-oss-20b-1:0",
                 "arn:aws:bedrock:${AWS_REGION}::foundation-model/openai.gpt-oss-120b-1:0",
-                "arn:aws:bedrock:${AWS_REGION}:${ACCOUNT_ID}:project/default"
+                "arn:aws:bedrock:${AWS_REGION}:${ACCOUNT_ID}:project/default",
+                "arn:aws:bedrock:us-east-2::foundation-model/openai.gpt-oss-20b-1:0",
+                "arn:aws:bedrock:us-east-2::foundation-model/openai.gpt-oss-120b-1:0",
+                "arn:aws:bedrock:us-east-2:${ACCOUNT_ID}:project/default",
+                "arn:aws:bedrock:us-west-2::foundation-model/openai.gpt-oss-20b-1:0",
+                "arn:aws:bedrock:us-west-2::foundation-model/openai.gpt-oss-120b-1:0",
+                "arn:aws:bedrock:us-west-2:${ACCOUNT_ID}:project/default"
               ]
             },
             {
@@ -77,7 +83,13 @@ jobs:
             [.Statement[] | select(.Action == "bedrock:InvokeModel")][0].Resource == [
               "arn:aws:bedrock:" + $region + "::foundation-model/openai.gpt-oss-20b-1:0",
               "arn:aws:bedrock:" + $region + "::foundation-model/openai.gpt-oss-120b-1:0",
-              "arn:aws:bedrock:" + $region + ":" + $account + ":project/default"
+              "arn:aws:bedrock:" + $region + ":" + $account + ":project/default",
+              "arn:aws:bedrock:us-east-2::foundation-model/openai.gpt-oss-20b-1:0",
+              "arn:aws:bedrock:us-east-2::foundation-model/openai.gpt-oss-120b-1:0",
+              "arn:aws:bedrock:us-east-2:" + $account + ":project/default",
+              "arn:aws:bedrock:us-west-2::foundation-model/openai.gpt-oss-20b-1:0",
+              "arn:aws:bedrock:us-west-2::foundation-model/openai.gpt-oss-120b-1:0",
+              "arn:aws:bedrock:us-west-2:" + $account + ":project/default"
             ] and
             [.Statement[] | select(.Action == "bedrock:CallWithBearerToken")][0].Condition.StringEquals["bedrock:BearerTokenType"] == "SHORT_TERM" and
             ([.Statement[].Action] | all(. == "bedrock:InvokeModel" or . == "bedrock:CallWithBearerToken"))
@@ -88,6 +100,6 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
-          body='Bedrock runtime endpoint authority is active for the Foundation Lambda. The role is restricted to GPT-OSS 20B/120B model ARNs, the account default runtime project required by the OpenAI-compatible endpoint, and short-term `bedrock:CallWithBearerToken`; Mantle permissions were removed.'
+          body='Bedrock runtime endpoint authority is active for the Foundation Lambda. The role is restricted to GPT-OSS 20B/120B model ARNs and account-default runtime projects in the three approved US failover regions, plus short-term `bedrock:CallWithBearerToken`; Mantle permissions were removed.'
           gh issue comment "$RECEIPT_ISSUE" --repo "$GITHUB_REPOSITORY" --body "$body"
           printf '%s\n' "$body" >> "$GITHUB_STEP_SUMMARY"
