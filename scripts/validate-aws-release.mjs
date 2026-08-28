@@ -14,7 +14,6 @@ for (const fragment of [
   "AWS::CloudFront::OriginAccessControl",
   "AWS::CertificateManager::Certificate",
   "AWS::ApiGatewayV2::Api",
-  "AWS::ApiGatewayV2::DomainName",
   "AWS::ApiGatewayV2::Integration",
   "health.sozorockfoundation.org",
   "sozorockfoundation.org",
@@ -43,7 +42,9 @@ assert.match(workflow, /bridge_mode/u);
 assert.match(workflow, /AWS canonical bridge backed by CloudFront/u);
 assert.match(template, /IntegrationType: HTTP_PROXY/u);
 assert.match(template, /IntegrationUri: !Sub 'https:\/\/\$\{Distribution\.DomainName\}\/\{proxy\}'/u);
-assert.match(template, /CanonicalBridgeHostedZoneId/u);
+assert.match(template, /CanonicalBridgeApiId/u);
+assert.match(workflow, /get-domain-name --domain-name "\$CANONICAL_HOST"/u);
+assert.match(workflow, /update-api-mapping/u);
 assert.match(workflow, /<title>Platforms \| The SozoRock Foundation<\/title>/u);
 assert.match(recoveryWorkflow, /ProveOnlyFoundationAgentInternalApi/u);
 assert.match(recoveryWorkflow, /PARENT_API_ID: 2b6srfl202/u);

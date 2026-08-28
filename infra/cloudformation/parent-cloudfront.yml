@@ -378,25 +378,6 @@ Resources:
       Description: Production canonical-host bridge
       StageName: '$default'
 
-  CanonicalBridgeDomain:
-    Type: AWS::ApiGatewayV2::DomainName
-    Condition: UseCanonicalBridge
-    Properties:
-      DomainName: !Ref CanonicalDomain
-      DomainNameConfigurations:
-        - CertificateArn: !Ref SiteCertificate
-          EndpointType: REGIONAL
-          SecurityPolicy: TLS_1_2
-
-  CanonicalBridgeMapping:
-    Type: AWS::ApiGatewayV2::ApiMapping
-    Condition: UseCanonicalBridge
-    DependsOn: CanonicalBridgeStage
-    Properties:
-      ApiId: !Ref CanonicalBridgeApi
-      DomainName: !Ref CanonicalBridgeDomain
-      Stage: !Ref CanonicalBridgeStage
-
   SiteBucketPolicy:
     Type: AWS::S3::BucketPolicy
     Properties:
@@ -415,12 +396,9 @@ Resources:
                 AWS:SourceArn: !Sub 'arn:${AWS::Partition}:cloudfront::${AWS::AccountId}:distribution/${Distribution}'
 
 Outputs:
-  CanonicalBridgeDomainName:
+  CanonicalBridgeApiId:
     Condition: UseCanonicalBridge
-    Value: !GetAtt CanonicalBridgeDomain.RegionalDomainName
-  CanonicalBridgeHostedZoneId:
-    Condition: UseCanonicalBridge
-    Value: !GetAtt CanonicalBridgeDomain.RegionalHostedZoneId
+    Value: !Ref CanonicalBridgeApi
   CertificateArn:
     Value: !Ref SiteCertificate
   DistributionDomainName:

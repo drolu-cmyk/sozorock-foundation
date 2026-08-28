@@ -194,18 +194,40 @@ jobs:
           set -euo pipefail
           distribution_id="$(aws cloudformation describe-stacks --stack-name "$STACK_NAME" --query 'Stacks[0].Outputs[?OutputKey==`DistributionId`].OutputValue' --output text)"
           distribution_domain="$(aws cloudformation describe-stacks --stack-name "$STACK_NAME" --query 'Stacks[0].Outputs[?OutputKey==`DistributionDomainName`].OutputValue' --output text)"
-          bridge_domain="$(aws cloudformation describe-stacks --stack-name "$STACK_NAME" --query 'Stacks[0].Outputs[?OutputKey==`CanonicalBridgeDomainName`].OutputValue' --output text)"
-          bridge_zone="$(aws cloudformation describe-stacks --stack-name "$STACK_NAME" --query 'Stacks[0].Outputs[?OutputKey==`CanonicalBridgeHostedZoneId`].OutputValue' --output text)"
+          bridge_domain=''
+          bridge_zone=''
           test -n "$distribution_id"
           test -n "$distribution_domain"
+          if [[ '${{ steps.release_state.outputs.bridge_mode }}' = 'true' ]]; then
+            bridge_api_id="$(aws cloudformation describe-stacks --stack-name "$STACK_NAME" --query 'Stacks[0].Outputs[?OutputKey==`CanonicalBridgeApiId`].OutputValue' --output text)"
+            test -n "$bridge_api_id"
+            bridge_domain_json="$(aws apigatewayv2 get-domain-name --domain-name "$CANONICAL_HOST" --output json)"
+            bridge_domain="$(jq -r '.DomainNameConfigurations[0].ApiGatewayDomainName // ""' <<<"$bridge_domain_json")"
+            bridge_zone="$(jq -r '.DomainNameConfigurations[0].HostedZoneId // ""' <<<"$bridge_domain_json")"
+            bridge_status="$(jq -r '.DomainNameConfigurations[0].DomainNameStatus // ""' <<<"$bridge_domain_json")"
+            test -n "$bridge_domain"
+            test -n "$bridge_zone"
+            test "$bridge_status" = 'AVAILABLE'
+
+            mappings="$(aws apigatewayv2 get-api-mappings --domain-name "$CANONICAL_HOST" --output json)"
+            root_mapping_id="$(jq -r '[.Items[]? | select((.ApiMappingKey // "") == "") | .ApiMappingId][0] // ""' <<<"$mappings")"
+            if [[ -n "$root_mapping_id" ]]; then
+              aws apigatewayv2 update-api-mapping \
+                --domain-name "$CANONICAL_HOST" \
+                --api-mapping-id "$root_mapping_id" \
+                --api-id "$bridge_api_id" \
+                --stage '$default' >/dev/null
+            else
+              aws apigatewayv2 create-api-mapping \
+                --domain-name "$CANONICAL_HOST" \
+                --api-id "$bridge_api_id" \
+                --stage '$default' >/dev/null
+            fi
+          fi
           echo "distribution_id=$distribution_id" >> "$GITHUB_OUTPUT"
           echo "distribution_domain=$distribution_domain" >> "$GITHUB_OUTPUT"
           echo "bridge_domain=$bridge_domain" >> "$GITHUB_OUTPUT"
           echo "bridge_zone=$bridge_zone" >> "$GITHUB_OUTPUT"
-          if [[ '${{ steps.release_state.outputs.bridge_mode }}' = 'true' ]]; then
-            test -n "$bridge_domain"
-            test -n "$bridge_zone"
-          fi
           aws cloudfront wait distribution-deployed --id "$distribution_id"
           aws cloudfront create-invalidation --distribution-id "$distribution_id" --paths '/*' >/dev/null
           for attempt in $(seq 1 30); do
