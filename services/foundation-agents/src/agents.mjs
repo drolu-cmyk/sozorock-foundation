@@ -15,7 +15,7 @@ const model = foundationProductionEdge || explicitBedrockRuntime
   ? bedrockRuntimeModelId(configuredRuntimeModel)
   : configuredRuntimeModel;
 const modelSettings = foundationProductionEdge || explicitBedrockRuntime
-  ? { maxTokens: 600, reasoning: { effort: "low" } }
+  ? { maxTokens: 96, reasoning: { effort: "low" } }
   : undefined;
 const sharedRules = `You are an internal SozoRock specialist. Work only from supplied evidence and clearly identified source material. Never invent achievements, partners, funding, adoption, student outcomes, publication status, citations, dates, metrics, or institutional relationships. Distinguish facts from recommendations. Do not publish, deploy, send, delete, authorize, or change external systems. Produce a reviewable internal result for the next graph node.`;
 

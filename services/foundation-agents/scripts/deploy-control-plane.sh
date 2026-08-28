@@ -135,7 +135,7 @@ aws lambda wait function-updated --function-name "$FUNCTION_NAME"
 selected_model=''
 selected_model_region=''
 for model_region in us-east-2 us-west-2 us-east-1; do
-  for candidate in openai.gpt-oss-20b openai.gpt-oss-120b; do
+  for candidate in openai.gpt-oss-120b openai.gpt-oss-20b; do
     jq --arg model "$candidate" --arg region "$model_region" \
       '.Variables.OPENAI_AGENT_MODEL = $model | .Variables.BEDROCK_MODEL_REGION = $region' \
       "$work/lambda-env.json" > "$work/lambda-env-probe.json"
