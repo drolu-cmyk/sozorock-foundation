@@ -53,6 +53,8 @@ Production uses Amazon Bedrock's OpenAI-compatible Responses API in `us-east-1`.
 
 The site-assurance graph fans product, UX, accessibility, and security reviews out concurrently after the orchestrator, then converges them at the evaluator. Production model turns use low reasoning effort and a 600-token ceiling. This retains specialist independence and all six review nodes while keeping latency and cost inside bounded execution limits.
 
+The public website guide is deliberately deterministic over the versioned approved route map, so visitor navigation never waits on a long-running model graph or inherits provider latency. Bedrock remains the private control plane for model-backed Foundation graphs. Production deployment proves every site-assurance agent with one concurrent six-agent canary; staged graph workflows remain review workloads behind AWS IAM.
+
 The runtime keeps two controlled alternatives for non-production environments:
 
 API-key mode:

@@ -36,6 +36,9 @@ assert.equal(probeWithoutModel.statusCode, 503);
 const graphSmokeWithoutModel = await handler({ operation: "deployment:graph-smoke" });
 assert.equal(graphSmokeWithoutModel.statusCode, 503);
 
+const agentCanaryWithoutModel = await handler({ operation: "deployment:agent-canary" });
+assert.equal(agentCanaryWithoutModel.statusCode, 503);
+
 const index = await handler(event("GET", "/internal/v1/graphs"));
 assert.equal(index.statusCode, 200);
 assert.equal(Object.keys(JSON.parse(index.body).graphs).length, 6);
@@ -52,6 +55,10 @@ const rejectedOrigin = await handler({
   headers: { origin: "https://example.com" },
 });
 assert.equal(rejectedOrigin.statusCode, 403);
+
+const publicGuide = await handler(event("POST", "/public/v1/navigate", { question: "Where are the publications?" }));
+assert.equal(publicGuide.statusCode, 200);
+assert.equal(JSON.parse(publicGuide.body).links[0].key, "publications");
 
 const runWithoutModel = await handler(
   event("POST", "/internal/v1/run", { graphId: "foundationSiteAssurance", input: { task: "test" } })

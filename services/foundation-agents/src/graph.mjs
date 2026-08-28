@@ -306,3 +306,39 @@ export async function executeGraph({
     final: candidate,
   };
 }
+
+export async function executeGraphCanary({ graphId, input, context = {} }) {
+  const graph = graphs[graphId];
+  if (!graph) throw new Error(`Unknown graph: ${graphId}`);
+  if (!modelAuthConfigured()) throw new Error("OpenAI model authentication is required by the Foundation agent runtime.");
+  await ensureModelAuthConfigured();
+
+  const runId = resolvedRunId(context);
+  const outputs = await Promise.all(
+    graph.nodes.map((nodeId) =>
+      runNode({
+        graphId,
+        graph,
+        nodeId,
+        originalInput: input,
+        outputs: [],
+        context,
+        maxTurns: 1,
+        runId,
+        iteration: 0,
+        evaluationFeedback: null,
+      })
+    )
+  );
+  const evaluation = latestOutput(outputs, "evaluator");
+  if (!isEvaluationDecision(evaluation)) throw new Error(`Graph ${graphId} evaluator canary returned an invalid decision.`);
+
+  return {
+    graphId,
+    runId,
+    status: evaluation.decision === "escalate" ? "escalated" : "review_required",
+    decision: evaluation.decision,
+    nodeCount: outputs.length,
+    nodes: outputs.map(({ node }) => node),
+  };
+}

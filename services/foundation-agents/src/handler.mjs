@@ -1,8 +1,8 @@
 import { Buffer } from "node:buffer";
 import { containsForbiddenMaterial, isPlainObject, maxRequestBytes } from "./boundary.mjs";
-import { executeGraph, graphs } from "./graph.mjs";
+import { executeGraph, executeGraphCanary, graphs } from "./graph.mjs";
 import { modelApiMode, modelAuthConfigured, modelAuthMode, probeBedrockModel } from "./model-auth.mjs";
-import { normalizePublicAnswer } from "./public-knowledge.mjs";
+import { resolvePublicNavigation } from "./public-knowledge.mjs";
 
 const canonicalOrigin = "https://www.sozorockfoundation.org";
 const securityHeaders = {
@@ -101,8 +101,6 @@ async function handlePublicNavigator(event) {
   const origin = eventHeader(event, "origin");
   if (origin && !publicOrigins.has(origin)) return response(403, { error: "origin_not_allowed" }, headers);
   if (publicRateLimited(event)) return response(429, { error: "rate_limited" }, { ...headers, "retry-after": "60" });
-  if (!modelAuthConfigured()) return response(503, { error: "navigator_temporarily_unavailable" }, headers);
-
   try {
     const body = requestBody(event);
     const question = typeof body?.question === "string" ? body.question.trim() : "";
@@ -116,16 +114,9 @@ async function handlePublicNavigator(event) {
       }, headers);
     }
 
-    const result = await executeGraph({
-      graphId: "publicNavigator",
-      input: { question },
-      context: { source: "public-website" },
-      maxTurns: 3,
-      maxRevisionCycles: 0,
-    });
-    const answer = normalizePublicAnswer(result.final);
-    console.log("foundation-public-navigator-complete", JSON.stringify({ runId: result.runId, decision: result.decision }));
-    return response(200, { ...answer, runId: result.runId }, headers);
+    const answer = resolvePublicNavigation(question);
+    console.log("foundation-public-navigator-complete", JSON.stringify({ knowledgeVersion: answer.knowledgeVersion }));
+    return response(200, answer, headers);
   } catch (error) {
     if (error instanceof SyntaxError) return response(400, { error: "invalid_json" }, headers);
     if (error instanceof Error && error.message === "payload_too_large") return response(413, { error: "payload_too_large" }, headers);
@@ -212,6 +203,22 @@ export async function handler(event) {
       return response(200, result);
     } catch (error) {
       return response(500, { error: "agent_run_failed", failure: modelFailureClass(error) });
+    }
+  }
+
+  if (event?.operation === "deployment:agent-canary") {
+    if (!modelAuthConfigured()) return response(503, { error: "model_service_not_configured" });
+    try {
+      return response(200, await executeGraphCanary({
+        graphId: "foundationSiteAssurance",
+        input: {
+          task: "Run a bounded synthetic production canary.",
+          evidence: { liveVerification: "not supplied", constraint: "Do not claim production completion." },
+        },
+        context: { source: "deployment-canary" },
+      }));
+    } catch (error) {
+      return response(500, { error: "agent_canary_failed", failure: modelFailureClass(error) });
     }
   }
 

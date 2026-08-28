@@ -294,7 +294,7 @@ if curl --help all 2>/dev/null | grep -q -- '--aws-sigv4'; then
       test "$model_api_mode" = 'responses'
       test "$health_model" = "$selected_model"
       cat > "$work/run-payload.json" <<'JSON'
-{"operation":"deployment:graph-smoke"}
+{"operation":"deployment:agent-canary"}
 JSON
       graph_function_error="$(aws lambda invoke \
         --function-name "$FUNCTION_NAME" \
@@ -315,7 +315,7 @@ JSON
         failure_code="$(jq -r '.body | fromjson | .failure.providerCode // "unknown"' "$work/signed-run.json" 2>/dev/null || echo unknown)"
         failure_param="$(jq -r '.body | fromjson | .failure.providerParam // "unknown"' "$work/signed-run.json" 2>/dev/null || echo unknown)"
         failure_detail="$(jq -r '.body | fromjson | .failure.providerDetail // "not supplied"' "$work/signed-run.json" 2>/dev/null || echo 'not supplied')"
-        echo "Authenticated direct graph smoke failed safely: category=${failure_category}; provider_status=${failure_status}; provider_code=${failure_code}; provider_param=${failure_param}; detail=${failure_detail}." >&2
+        echo "Authenticated direct six-agent canary failed safely: category=${failure_category}; provider_status=${failure_status}; provider_code=${failure_code}; provider_param=${failure_param}; detail=${failure_detail}." >&2
       fi
     fi
   fi
