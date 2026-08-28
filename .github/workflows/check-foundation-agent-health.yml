@@ -65,6 +65,9 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
-          body="Signed Foundation agent health passed. Model: `${{ steps.health.outputs.model }}`; authentication: `${{ steps.health.outputs.auth }}`; API: `${{ steps.health.outputs.api }}`. No secret values were read or logged."
+          printf -v body 'Signed Foundation agent health passed. Model: `%s`; authentication: `%s`; API: `%s`. No secret values were read or logged.' \
+            '${{ steps.health.outputs.model }}' \
+            '${{ steps.health.outputs.auth }}' \
+            '${{ steps.health.outputs.api }}'
           gh issue comment "$RECEIPT_ISSUE" --repo "$GITHUB_REPOSITORY" --body "$body"
           printf '%s\n' "$body" >> "$GITHUB_STEP_SUMMARY"
