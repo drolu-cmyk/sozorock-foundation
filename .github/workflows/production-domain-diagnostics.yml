@@ -330,6 +330,8 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          # Dispatch from the same verified main revision so finalization uses
+          # the current production response and IAM policy contracts.
           gh api \
             --method POST \
             -H 'Accept: application/vnd.github+json' \
