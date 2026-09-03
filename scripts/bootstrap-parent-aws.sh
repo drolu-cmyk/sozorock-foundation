@@ -6,6 +6,7 @@ foundation_role="GitHubActionsSozorockFoundationSiteDeployRole"
 execution_role="SozoRockFoundationParentCloudFormationRole"
 stack_name="sozorock-foundation-parent-cloudfront"
 bucket_name="sozorock-foundation-parent-cloudfront-prod-${account_id}"
+hosted_zone_id="Z07905293AANZWGYZ84F3"
 
 test "$(aws sts get-caller-identity --query Account --output text)" = "$account_id"
 
@@ -26,14 +27,16 @@ else
   aws iam create-role --role-name "$execution_role" --assume-role-policy-document "file://$trust_file" >/dev/null
 fi
 
-jq -n --arg account "$account_id" --arg bucket "$bucket_name" '{
+jq -n --arg account "$account_id" --arg bucket "$bucket_name" --arg zone "$hosted_zone_id" '{
   Version:"2012-10-17",
   Statement:[
     {Effect:"Allow",Action:["s3:CreateBucket","s3:DeleteBucket","s3:GetBucketPolicy","s3:PutBucketPolicy","s3:DeleteBucketPolicy","s3:GetBucketVersioning","s3:PutBucketVersioning","s3:GetBucketPublicAccessBlock","s3:PutBucketPublicAccessBlock","s3:GetEncryptionConfiguration","s3:PutEncryptionConfiguration","s3:GetBucketOwnershipControls","s3:PutBucketOwnershipControls"],Resource:("arn:aws:s3:::"+$bucket)},
     {Effect:"Allow",Action:["cloudfront:CreateDistribution","cloudfront:GetDistribution","cloudfront:GetDistributionConfig","cloudfront:UpdateDistribution","cloudfront:DeleteDistribution","cloudfront:CreateOriginAccessControl","cloudfront:GetOriginAccessControl","cloudfront:UpdateOriginAccessControl","cloudfront:DeleteOriginAccessControl","cloudfront:CreateFunction","cloudfront:DescribeFunction","cloudfront:GetFunction","cloudfront:UpdateFunction","cloudfront:PublishFunction","cloudfront:DeleteFunction","cloudfront:CreateResponseHeadersPolicy","cloudfront:GetResponseHeadersPolicy","cloudfront:UpdateResponseHeadersPolicy","cloudfront:DeleteResponseHeadersPolicy","cloudfront:TagResource","cloudfront:UntagResource","cloudfront:ListTagsForResource"],Resource:"*"},
     {Effect:"Allow",Action:["apigateway:GET","apigateway:POST","apigateway:PUT","apigateway:PATCH","apigateway:DELETE","apigateway:TagResource","apigateway:UntagResource"],Resource:["arn:aws:apigateway:us-east-1::/apis","arn:aws:apigateway:us-east-1::/apis/*","arn:aws:apigateway:us-east-1::/domainnames","arn:aws:apigateway:us-east-1::/domainnames/www.sozorockfoundation.org","arn:aws:apigateway:us-east-1::/domainnames/www.sozorockfoundation.org/*","arn:aws:apigateway:us-east-1::/tags/*"]},
     {Effect:"Allow",Action:["acm:RequestCertificate","acm:DescribeCertificate","acm:DeleteCertificate","acm:AddTagsToCertificate","acm:RemoveTagsFromCertificate","acm:ListTagsForCertificate"],Resource:"*"},
-    {Effect:"Allow",Action:["route53:GetHostedZone","route53:ListHostedZonesByName","route53:ListResourceRecordSets","route53:ChangeResourceRecordSets","route53:GetChange"],Resource:"*"},
+    {Effect:"Allow",Action:["route53:GetHostedZone","route53:ListResourceRecordSets","route53:ChangeResourceRecordSets"],Resource:("arn:aws:route53:::hostedzone/"+$zone)},
+    {Effect:"Allow",Action:"route53:GetChange",Resource:"arn:aws:route53:::change/*"},
+    {Effect:"Allow",Action:"route53:ListHostedZonesByName",Resource:"*"},
     {Effect:"Allow",Action:["cloudwatch:GetMetricData","cloudwatch:GetMetricStatistics","cloudwatch:ListMetrics"],Resource:"*"}
   ]
 }' > "$execution_policy"
