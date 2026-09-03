@@ -54,7 +54,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          npm prune --omit=dev --ignore-scripts
+          npm prune --omit=dev --ignore-scripts --no-audit --no-fund
           rm -f "$RUNNER_TEMP/foundation-agents.zip"
           zip -qr "$RUNNER_TEMP/foundation-agents.zip" src node_modules package.json
           size="$(stat -c '%s' "$RUNNER_TEMP/foundation-agents.zip")"
