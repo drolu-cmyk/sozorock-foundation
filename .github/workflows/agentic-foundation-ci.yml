@@ -23,6 +23,13 @@ jobs:
           node-version: 22
           cache: npm
 
+      - name: Block vulnerable dependency changes
+        if: github.event_name == 'pull_request'
+        uses: actions/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294 # v5.0.0
+        with:
+          fail-on-severity: high
+          fail-on-scopes: runtime
+
       - name: Install parent site dependencies
         run: npm ci
 
@@ -36,7 +43,7 @@ jobs:
         run: npm run test:aws
 
       - name: Audit production dependencies
-        run: npm audit --omit=dev --audit-level=high
+        run: bash scripts/audit-npm-production.sh
 
       - name: Validate AWS bootstrap shell
         run: bash -n scripts/bootstrap-parent-aws.sh
@@ -51,7 +58,7 @@ jobs:
 
       - name: Audit agent runtime dependencies
         working-directory: services/foundation-agents
-        run: npm audit --omit=dev --audit-level=high
+        run: bash ../../scripts/audit-npm-production.sh
 
       - name: Validate agent deployment shell
         run: bash -n services/foundation-agents/scripts/deploy-control-plane.sh

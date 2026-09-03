@@ -17,6 +17,7 @@ integration_created=0
 integration_id=""
 api_id=""
 stage_name=""
+canary_permission_added=0
 
 snapshot_route() {
   local route_key="$1"
@@ -56,6 +57,13 @@ restore_route() {
 }
 
 rollback() {
+  if [[ "$canary_permission_added" = '1' ]]; then
+    aws lambda remove-permission \
+      --function-name "$FUNCTION_NAME" \
+      --statement-id FoundationAgentsDeployCanaryInvoke >/dev/null 2>&1 || true
+    canary_permission_added=0
+  fi
+
   if [[ "$deployment_verified" = '1' ]]; then
     return 0
   fi
@@ -110,10 +118,24 @@ function_arn="$(jq -r '.Configuration.FunctionArn' "$work/function.json")"
 execution_role="$(jq -r '.Configuration.Role' "$work/function.json")"
 test "$function_arn" = "arn:aws:lambda:${AWS_REGION}:${ACCOUNT_ID}:function:${FUNCTION_NAME}"
 test "$execution_role" = "arn:aws:iam::${ACCOUNT_ID}:role/SozoRockFoundationParentLambdaRole"
+test "${AWS_ROLE_TO_ASSUME:-}" = "arn:aws:iam::${ACCOUNT_ID}:role/GitHubActionsSozorockFoundationSiteDeployRole"
 code_location="$(jq -r '.Code.Location' "$work/function.json")"
 test -n "$code_location"
 curl --fail --silent --show-error --location "$code_location" --output "$work/original-code.zip"
 test -s "$work/original-code.zip"
+
+# The deployment role deliberately has no persistent InvokeFunction grant. Give
+# that exact role a function-scoped resource-policy grant only while the model
+# probes and authenticated six-agent canary run, then remove it on every exit.
+aws lambda remove-permission \
+  --function-name "$FUNCTION_NAME" \
+  --statement-id FoundationAgentsDeployCanaryInvoke >/dev/null 2>&1 || true
+canary_permission_added=1
+aws lambda add-permission \
+  --function-name "$FUNCTION_NAME" \
+  --statement-id FoundationAgentsDeployCanaryInvoke \
+  --action lambda:InvokeFunction \
+  --principal "$AWS_ROLE_TO_ASSUME" >/dev/null
 
 api_id="$(aws apigatewayv2 get-apis --output json | jq -r --arg name "$API_NAME" '.Items[]? | select(.Name == $name) | .ApiId' | head -n1)"
 test -n "$api_id"
