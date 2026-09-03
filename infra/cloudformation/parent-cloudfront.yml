@@ -85,7 +85,10 @@ Resources:
             statusCode: statusCode,
             headers: {
               location: { value: location },
-              'cache-control': { value: cacheControl }
+              'cache-control': { value: cacheControl },
+              'referrer-policy': { value: 'no-referrer' },
+              'strict-transport-security': { value: 'max-age=31536000; includeSubDomains; preload' },
+              'x-content-type-options': { value: 'nosniff' }
             }
           };
         }

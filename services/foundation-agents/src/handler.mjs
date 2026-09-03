@@ -10,6 +10,7 @@ const securityHeaders = {
   "content-security-policy": "default-src 'none'; frame-ancestors 'none'",
   "content-type": "application/json; charset=utf-8",
   "referrer-policy": "no-referrer",
+  "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
   "x-content-type-options": "nosniff",
   "x-frame-options": "DENY",
 };
@@ -134,6 +135,7 @@ function redirect(event) {
       "cache-control": "public, max-age=300",
       location: `${canonicalOrigin}${path}${query}`,
       "referrer-policy": "no-referrer",
+      "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
       "x-content-type-options": "nosniff",
     },
     body: "",

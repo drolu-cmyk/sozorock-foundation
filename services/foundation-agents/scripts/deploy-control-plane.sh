@@ -11,10 +11,12 @@ work="${RUNNER_TEMP:-/tmp}/foundation-agent-deploy"
 mkdir -p "$work"
 function_changed=0
 routes_changed=0
+stage_changed=0
 deployment_verified=0
 integration_created=0
 integration_id=""
 api_id=""
+stage_name=""
 
 snapshot_route() {
   local route_key="$1"
@@ -72,6 +74,14 @@ rollback() {
     fi
   fi
 
+  if [[ -n "$api_id" && -n "$stage_name" && "$stage_changed" = '1' && -s "$work/original-stage.json" ]]; then
+    jq '.RouteSettings // {}' "$work/original-stage.json" > "$work/original-route-settings.json"
+    aws apigatewayv2 update-stage \
+      --api-id "$api_id" \
+      --stage-name "$stage_name" \
+      --route-settings "file://$work/original-route-settings.json" >/dev/null 2>&1 || true
+  fi
+
   if [[ "$function_changed" = '1' && -s "$work/original-code.zip" && -s "$work/original-config.json" ]]; then
     aws lambda update-function-code --function-name "$FUNCTION_NAME" --zip-file "fileb://$work/original-code.zip" >/dev/null 2>&1 || return 0
     aws lambda wait function-updated --function-name "$FUNCTION_NAME" >/dev/null 2>&1 || true
@@ -109,6 +119,9 @@ api_id="$(aws apigatewayv2 get-apis --output json | jq -r --arg name "$API_NAME"
 test -n "$api_id"
 api_endpoint="$(aws apigatewayv2 get-api --api-id "$api_id" --query ApiEndpoint --output text)"
 test -n "$api_endpoint"
+stage_name="$(aws apigatewayv2 get-stages --api-id "$api_id" --output json | jq -r --arg name '$default' '.Items[]? | select(.StageName == $name) | .StageName' | head -n1)"
+test "$stage_name" = '$default'
+aws apigatewayv2 get-stage --api-id "$api_id" --stage-name "$stage_name" --output json > "$work/original-stage.json"
 
 routes_before="$(aws apigatewayv2 get-routes --api-id "$api_id" --output json)"
 snapshot_route 'GET /internal/health' health "$routes_before"
@@ -222,6 +235,19 @@ upsert_route 'POST /public/v1/navigate' NONE
 upsert_route 'OPTIONS /public/v1/navigate' NONE
 routes_changed=1
 
+# API Gateway enforces this shared token bucket across Lambda execution
+# environments. The existing per-client Lambda limiter remains defense in depth.
+jq '(.RouteSettings // {}) | .["POST /public/v1/navigate"] = {
+  "DetailedMetricsEnabled": false,
+  "ThrottlingBurstLimit": 6,
+  "ThrottlingRateLimit": 1
+}' "$work/original-stage.json" > "$work/route-settings.json"
+aws apigatewayv2 update-stage \
+  --api-id "$api_id" \
+  --stage-name "$stage_name" \
+  --route-settings "file://$work/route-settings.json" >/dev/null
+stage_changed=1
+
 aws lambda remove-permission --function-name "$FUNCTION_NAME" --statement-id FoundationAgentsInternalApiInvoke >/dev/null 2>&1 || true
 aws lambda add-permission \
   --function-name "$FUNCTION_NAME" \
@@ -251,6 +277,12 @@ for key in 'POST /public/v1/navigate' 'OPTIONS /public/v1/navigate'; do
   test "$auth" = 'NONE'
   test "$target" = "integrations/${integration_id}"
 done
+
+stage_after="$(aws apigatewayv2 get-stage --api-id "$api_id" --stage-name "$stage_name" --output json)"
+jq -e '
+  .RouteSettings["POST /public/v1/navigate"].ThrottlingBurstLimit == 6 and
+  .RouteSettings["POST /public/v1/navigate"].ThrottlingRateLimit == 1
+' <<<"$stage_after" >/dev/null
 
 # Prove the deployed Lambda through the API endpoint rather than requiring the
 # deploy role to have direct lambda:InvokeFunction permission.

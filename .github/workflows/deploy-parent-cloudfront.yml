@@ -75,6 +75,53 @@ jobs:
           aws-region: ${{ env.AWS_REGION }}
           unset-current-credentials: true
 
+      - name: Enforce the Google Workspace mail-authentication baseline
+        shell: bash
+        run: |
+          set -euo pipefail
+          records="$(aws route53 list-resource-record-sets --hosted-zone-id "$HOSTED_ZONE_ID" --output json)"
+
+          # Google Workspace is the sole mail host. Refuse to change TXT records
+          # unless the live MX record still points exclusively to Google.
+          jq -e --arg apex "${APEX_HOST}." '
+            [.ResourceRecordSets[] | select(.Name == $apex and .Type == "MX")][0].ResourceRecords as $mx
+            | ($mx | length) > 0
+            and all($mx[]; .Value | test("(^|[[:space:]])smtp\\.google\\.com\\.$"; "i"))
+          ' <<<"$records" >/dev/null
+
+          jq --arg apex "${APEX_HOST}." '
+            ([.ResourceRecordSets[] | select(.Name == $apex and .Type == "TXT")][0].ResourceRecords // [])
+            | map(select((.Value | ascii_downcase | contains("v=spf1")) | not))
+            + [{Value:"\"v=spf1 include:_spf.google.com ~all\""}]
+          ' <<<"$records" > "$RUNNER_TEMP/apex-txt-values.json"
+
+          jq -n \
+            --arg apex "${APEX_HOST}." \
+            --arg dmarc "_dmarc.${APEX_HOST}." \
+            --slurpfile apexValues "$RUNNER_TEMP/apex-txt-values.json" \
+            '{Comment:"Establish the SozoRock Foundation Google Workspace authentication baseline",Changes:[
+              {Action:"UPSERT",ResourceRecordSet:{Name:$apex,Type:"TXT",TTL:300,ResourceRecords:$apexValues[0]}},
+              {Action:"UPSERT",ResourceRecordSet:{Name:$dmarc,Type:"TXT",TTL:300,ResourceRecords:[
+                {Value:"\"v=DMARC1; p=none; pct=100; adkim=r; aspf=r\""}
+              ]}}
+            ]}' > "$RUNNER_TEMP/google-workspace-auth.json"
+
+          change_id="$(aws route53 change-resource-record-sets \
+            --hosted-zone-id "$HOSTED_ZONE_ID" \
+            --change-batch "file://$RUNNER_TEMP/google-workspace-auth.json" \
+            --query ChangeInfo.Id --output text)"
+          aws route53 wait resource-record-sets-changed --id "$change_id"
+
+          verified="$(aws route53 list-resource-record-sets --hosted-zone-id "$HOSTED_ZONE_ID" --output json)"
+          jq -e --arg apex "${APEX_HOST}." --arg dmarc "_dmarc.${APEX_HOST}." '
+            ([.ResourceRecordSets[] | select(.Name == $apex and .Type == "TXT")][0].ResourceRecords
+              | map(.Value | gsub("^\\\"|\\\"$"; ""))
+              | map(select(startswith("v=spf1")))) == ["v=spf1 include:_spf.google.com ~all"]
+            and
+            ([.ResourceRecordSets[] | select(.Name == $dmarc and .Type == "TXT")][0].ResourceRecords
+              | map(.Value | gsub("^\\\"|\\\"$"; ""))) == ["v=DMARC1; p=none; pct=100; adkim=r; aspf=r"]
+          ' <<<"$verified" >/dev/null
+
       - name: Resolve the Foundation navigator origin
         id: agent_api
         shell: bash
@@ -469,7 +516,7 @@ jobs:
         shell: bash
         run: |
           if [[ '${{ steps.dns.outputs.verified }}' = 'true' ]]; then
-            result='SUCCESS — canonical www is live through ${{ steps.dns.outputs.mode }} and Google Workspace MX/TXT records are unchanged. The apex redirect is verified by the separate fail-closed canonical-domain workflow.'
+            result='SUCCESS — canonical www is live through ${{ steps.dns.outputs.mode }} and the Google Workspace MX/SPF/DMARC baseline is preserved. The apex redirect is verified by the fail-closed canonical-domain Lambda.'
           else
             result='FAILURE — AWS cutover did not verify; the workflow retained or restored the prior web DNS.'
           fi

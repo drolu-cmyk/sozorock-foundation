@@ -23,12 +23,14 @@ for (const key of Object.keys(saved)) delete process.env[key];
 const redirect = await handler(event("GET", "/publication/rrg-v1-2025", undefined, "source=apex-cutover"));
 assert.equal(redirect.statusCode, 308);
 assert.equal(redirect.headers.location, "https://www.sozorockfoundation.org/publication/rrg-v1-2025?source=apex-cutover");
+assert.equal(redirect.headers["strict-transport-security"], "max-age=31536000; includeSubDomains; preload");
 
 const health = await handler(event("GET", "/internal/health"));
 assert.equal(health.statusCode, 200);
 assert.equal(JSON.parse(health.body).modelConfigured, false);
 assert.equal(JSON.parse(health.body).modelApiMode, "responses");
 assert.equal(health.headers["cache-control"], "no-store");
+assert.equal(health.headers["strict-transport-security"], "max-age=31536000; includeSubDomains; preload");
 
 const probeWithoutModel = await handler({ operation: "deployment:model-probe", model: "openai.gpt-oss-120b" });
 assert.equal(probeWithoutModel.statusCode, 503);

@@ -54,6 +54,6 @@ Direct legacy file URLs redirect to that access route. The current Health verifi
 
 The Partner and Support forms submit real consent-based inquiries through the established SozoRock Health intake service. Contact replies use `contact@sozorockfoundation.org`. HSA publication access uses the established verification service and sends from `publications@sozorockfoundation.org`; required delivery consent and optional updates consent remain separate. CloudFront exposes these services and the website guide at bounded same-origin `/api/*` paths without caching requests or responses.
 
-Google Workspace remains the domain's email authority. The AWS deployment never changes MX or TXT records and compares those record sets before and after every DNS cutover.
+Google Workspace remains the domain's sole email authority. The AWS deployment refuses to continue unless every apex MX value is Google's `smtp.google.com`, preserves unrelated TXT values, and idempotently enforces the Google-only SPF record plus a monitoring-mode DMARC record before deployment. It snapshots all MX/TXT records after that baseline is established and proves the web cutover does not alter them. DKIM key generation and activation remain an explicit Google Admin operation because the private key must never enter this repository.
 
 No DOI is displayed or embedded until a registered DOI is supplied. Adding a DOI later requires only the publication metadata field; the permanent route does not change.

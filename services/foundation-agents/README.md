@@ -30,7 +30,7 @@ The production control plane reuses the Foundation-owned `SozoRockFoundationPare
 - Every Lambda request outside the declared internal and public navigator routes returns HTTP 308 to `https://www.sozorockfoundation.org`, preserving path and query.
 - Internal agent routes are `GET /internal/health`, `GET /internal/v1/graphs`, and `POST /internal/v1/run`.
 - API Gateway configures all three internal routes with `AWS_IAM`. Unauthenticated network access must return 403 before Lambda execution.
-- `POST /public/v1/navigate` is the only unsigned model route. It is read-only, origin checked, payload limited, sensitive-material rejecting, per-client and per-runtime rate limited, and response normalized before CloudFront returns it from same-origin `/api/navigator`. `OPTIONS` exists only for the same route.
+- `POST /public/v1/navigate` is the only unsigned model route. It is read-only, origin checked, payload limited, sensitive-material rejecting, per-client and per-runtime rate limited, and response normalized before CloudFront returns it from same-origin `/api/navigator`. API Gateway also applies a distributed one-request-per-second rate with a six-request burst to the route. `OPTIONS` exists only for the same route.
 - The deployment script snapshots Lambda code/configuration and all five declared routes before mutation. If redirect or route verification fails, the prior Lambda and route state is restored.
 - The internal API has no visitor-facing custom domain and is not linked from the public website. CloudFront proxies only the exact public navigator route; all internal paths stay outside the distribution.
 
