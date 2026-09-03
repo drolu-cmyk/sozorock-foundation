@@ -18,6 +18,8 @@ assert.deepEqual(workflowFiles, [
 assert.doesNotMatch(workflowText, /^\s*schedule:/mu);
 assert.doesNotMatch(workflowText, /GitHubActionsSozorockAiLabDeployRole/u);
 assert.doesNotMatch(workflowText, /uses:\s+[^\s]+@v\d+(?:\s|$)/u);
+assert.match(workflowText, /actions\/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294/u);
+assert.match(workflowText, /audit-npm-production\.sh/u);
 
 for (const fragment of [
   "AWS::S3::Bucket",
@@ -63,6 +65,9 @@ assert.match(await readFile(new URL("scripts/bootstrap-parent-aws.sh", root), "u
 assert.match(workflow, /<title>Platforms \| The SozoRock Foundation<\/title>/u);
 assert.match(agentDeployScript, /ThrottlingBurstLimit/u);
 assert.match(agentDeployScript, /ThrottlingRateLimit/u);
+assert.match(agentDeployScript, /FoundationAgentsDeployCanaryInvoke/u);
+assert.match(agentDeployScript, /--principal "\$AWS_ROLE_TO_ASSUME"/u);
+assert.match(agentDeployScript, /canary_permission_added=0/u);
 
 const pages = await readFile(new URL("src/Pages.jsx", root), "utf8");
 assert.match(pages, /body\.accepted !== true \|\| body\.verificationSent !== true/u);

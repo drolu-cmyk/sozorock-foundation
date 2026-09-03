@@ -64,7 +64,7 @@ jobs:
           npm run build
           npm run test:sites
           npm run test:aws
-          npm audit --omit=dev --audit-level=high
+          bash scripts/audit-npm-production.sh
           bash -n scripts/bootstrap-parent-aws.sh
 
       - name: Assume the permanent bounded Foundation deployment role
