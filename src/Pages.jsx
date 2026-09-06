@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { CbcapEvidence, EngagementForm, PageHero, PublicationCard, SectionHeading, StandardsStrip } from "./components";
 import { insights, leaders, partnerRoutes, platforms, publications } from "./siteData";
 import { Link } from "./router";
+import { PlatformFilms } from "./PlatformFilms";
 
 export function PlatformsPage() {
   return (
@@ -17,6 +18,7 @@ export function PlatformsPage() {
           ))}
         </div>
       </section>
+      <PlatformFilms />
     </>
   );
 }

@@ -18,6 +18,17 @@
   --font-display: "Instrument Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
   --font-body: "Source Sans 3", "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
+.platform-films { background: var(--pale); }
+.platform-films-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(24px, 5vw, 72px); align-items: start; }
+.film-selector { display: flex; flex-wrap: wrap; gap: 8px; }
+.film-selector button { min-height: 44px; padding: 10px 15px; background: transparent; border: 1px solid var(--cobalt); border-radius: 4px; font: inherit; color: var(--navy); cursor: pointer; }
+.film-selector button[aria-pressed="true"] { background: var(--navy); color: var(--white); }
+.film-transcript { margin-top: 40px; max-width: 48ch; }
+.film-transcript h3 { font-size: clamp(26px, 3vw, 38px); line-height: 1.15; letter-spacing: -.03em; }
+.film-transcript p { line-height: 1.6; }
+.film-duration { font-size: 13px; }
+.platform-films video { display: block; width: 100%; max-width: 560px; aspect-ratio: 1; background: var(--navy); }
+@media (max-width: 700px) { .platform-films-grid { grid-template-columns: 1fr; } .film-transcript { margin-top: 24px; } }
 
 * { box-sizing: border-box; }
 
