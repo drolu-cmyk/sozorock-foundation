@@ -14,7 +14,11 @@ assert.deepEqual(workflowFiles, [
   "agentic-foundation-ci.yml",
   "deploy-foundation-agent-control-plane.yml",
   "deploy-parent-cloudfront.yml",
+  "render-platform-films.yml",
 ]);
+const filmWorkflow = await readFile(new URL("render-platform-films.yml", workflowDirectory), "utf8");
+assert.match(filmWorkflow, /permissions:\n  contents: read\n/u);
+assert.doesNotMatch(filmWorkflow, /id-token:|secrets\.|configure-aws-credentials|aws s3|aws cloudformation/u);
 assert.doesNotMatch(workflowText, /^\s*schedule:/mu);
 assert.doesNotMatch(workflowText, /GitHubActionsSozorockAiLabDeployRole/u);
 assert.doesNotMatch(workflowText, /uses:\s+[^\s]+@v\d+(?:\s|$)/u);
