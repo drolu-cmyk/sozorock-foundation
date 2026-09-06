@@ -22,7 +22,7 @@ for attempt in $(seq 1 "$attempts"); do
     exit 0
   fi
 
-  if ! grep -Eqi 'Service Unavailable|Bad Gateway|Gateway Timeout|Too Many Requests|EAI_AGAIN|ECONNRESET|ECONNREFUSED|ETIMEDOUT|audit endpoint returned an error|[[:space:]](429|50[0234])[[:space:]]' "$output"; then
+  if ! grep -Eqi 'Service Unavailable|Bad Gateway|Gateway Timeout|Too Many Requests|EAI_AGAIN|ECONNRESET|ECONNREFUSED|ETIMEDOUT|[[:space:]](429|50[0234])[[:space:]]' "$output"; then
     exit "$status"
   fi
 
@@ -33,6 +33,6 @@ for attempt in $(seq 1 "$attempts"); do
     continue
   fi
 
-  echo '::warning::npm audit service remained unavailable. GitHub Dependency Review and Dependabot remain the blocking vulnerability controls.' >&2
-  exit 0
+  echo '::error::npm audit did not complete. Release blocked until a vulnerability result is available.' >&2
+  exit "$status"
 done

@@ -18,6 +18,7 @@ integration_id=""
 api_id=""
 stage_name=""
 canary_permission_added=0
+source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/remove-canary-permission.sh"
 
 snapshot_route() {
   local route_key="$1"
@@ -57,15 +58,18 @@ restore_route() {
 }
 
 rollback() {
+  local exit_status=$?
+  trap - EXIT
   if [[ "$canary_permission_added" = '1' ]]; then
-    aws lambda remove-permission \
-      --function-name "$FUNCTION_NAME" \
-      --statement-id FoundationAgentsDeployCanaryInvoke >/dev/null 2>&1 || true
-    canary_permission_added=0
+    if remove_canary_permission; then
+      canary_permission_added=0
+    else
+      exit_status=1
+    fi
   fi
 
   if [[ "$deployment_verified" = '1' ]]; then
-    return 0
+    exit "$exit_status"
   fi
   echo 'Agent control-plane verification failed; restoring previous runtime state.' >&2
 
@@ -91,7 +95,7 @@ rollback() {
   fi
 
   if [[ "$function_changed" = '1' && -s "$work/original-code.zip" && -s "$work/original-config.json" ]]; then
-    aws lambda update-function-code --function-name "$FUNCTION_NAME" --zip-file "fileb://$work/original-code.zip" >/dev/null 2>&1 || return 0
+    aws lambda update-function-code --function-name "$FUNCTION_NAME" --zip-file "fileb://$work/original-code.zip" >/dev/null 2>&1 || exit 1
     aws lambda wait function-updated --function-name "$FUNCTION_NAME" >/dev/null 2>&1 || true
     jq '{Variables:(.Environment.Variables // {})}' "$work/original-config.json" > "$work/original-env.json"
     local runtime handler memory timeout
@@ -108,6 +112,7 @@ rollback() {
       --environment "file://$work/original-env.json" >/dev/null 2>&1 || true
     aws lambda wait function-updated --function-name "$FUNCTION_NAME" >/dev/null 2>&1 || true
   fi
+  exit "${exit_status:-1}"
 }
 trap rollback EXIT
 
@@ -127,9 +132,7 @@ test -s "$work/original-code.zip"
 # The deployment role deliberately has no persistent InvokeFunction grant. Give
 # that exact role a function-scoped resource-policy grant only while the model
 # probes and authenticated six-agent canary run, then remove it on every exit.
-aws lambda remove-permission \
-  --function-name "$FUNCTION_NAME" \
-  --statement-id FoundationAgentsDeployCanaryInvoke >/dev/null 2>&1 || true
+remove_canary_permission
 canary_permission_added=1
 aws lambda add-permission \
   --function-name "$FUNCTION_NAME" \
