@@ -1,59 +1,33 @@
-# The SozoRock Foundation parent site
+# The SozoRock Foundation
 
-The canonical repository source for `www.sozorockfoundation.org` and `sozorockfoundation.org`. The public website runs on AWS CloudFront with a private S3 origin, route-specific crawler HTML, a dynamic React experience, and a same-origin autonomous navigator backed by the Foundation agent control plane. The apex permanently redirects to canonical `www` URLs while preserving paths and queries.
+The SozoRock Foundation builds platforms for better health and public systems through health access, publications, and applied learning.
 
-## Run locally
+## Platforms
 
-```bash
-npm install
-npm run dev
-```
+- **SozoRock Health** connects community access initiatives with public place evidence.
+- **SozoRock Global Institute** brings together publications, insights, and convening.
+- **SozoRock AI Lab** supports applied learning for everyday use of technology.
 
-Production build and verification:
+## Website
 
-```bash
+Visit [The SozoRock Foundation](https://www.sozorockfoundation.org/) to learn about its platforms, read publications, or discuss a partnership.
+
+## Development
+
+This website uses React and Vite. Install dependencies with `npm ci`, then start the development server with `npm run dev`.
+
+Before submitting a change, run:
+
+```sh
 npm run build
 npm run test:sites
 npm run test:aws
 ```
 
-## Architecture and production source
+## Security
 
-The site uses React and Vite with a lightweight History API router. The build emits route-specific HTML so copied links, search crawlers, and browser refreshes retain each permanent path. It includes distinct views for Platforms, Publications, Insights, Events, About, Leadership, Partner, Support, Standards, the three platform detail pages, and the three DOI-facing publication routes.
+Use the reporting process in [SECURITY.md](SECURITY.md) for security concerns. Keep credentials, personal information, and operational records out of public issues and pull requests.
 
-CloudFront owns both public hostnames and routes same-origin APIs to bounded origins: contact and verified-publication access go to the established Health service, while `/api/navigator` goes only to the Foundation agent API's public graph. Internal agent routes remain IAM-protected and inaccessible through the distribution. The release workflow verifies the isolated distribution, moves both aliases, updates only web A/AAAA records, preserves Google Workspace MX/TXT records, and rolls back failed cutovers.
+## Copyright
 
-The homepage includes a rotating, pausable initiative feature with keyboard-operable tabs and a compact “Ask SozoRock” website guide. The guide uses a routed, read-only agent graph to orient visitors to approved platforms, publications, events, partnership, support, and standards routes. Motion is intentionally restrained and respects `prefers-reduced-motion`.
-
-## Source-backed content
-
-Content and approved imagery were grounded in the Foundation’s current parent site, supplied files, leadership page, and live platform sites:
-
-- `health.sozorockfoundation.org`
-- `health.sozorockfoundation.org/explore`
-- `ai-lab.sozorockfoundation.org`
-- `cbcap.sozorockfoundation.org`
-
-The visual system uses the parent Foundation’s deep navy and blue palette. It does not use gradients or generated hero artwork.
-
-## Permanent publication routes
-
-These routes remain distinct and unchanged:
-
-- `/publication/hsa-v1-2026`
-- `/publication/rrg-v1-2025`
-- `/publication/rebs-v1-2025`
-
-These records remain public and indexable. Downloadable HSA files are released through a separate verified-access route:
-
-- `/publication/hsa-v1-2026/access`
-
-Direct legacy file URLs redirect to that access route. The current Health verification service sends the verification link from `publications@sozorockfoundation.org`.
-
-## Form behavior
-
-The Partner and Support forms submit real consent-based inquiries through the established SozoRock Health intake service. Contact replies use `contact@sozorockfoundation.org`. HSA publication access uses the established verification service and sends from `publications@sozorockfoundation.org`; required delivery consent and optional updates consent remain separate. CloudFront exposes these services and the website guide at bounded same-origin `/api/*` paths without caching requests or responses.
-
-Google Workspace remains the domain's sole email authority. The AWS deployment refuses to continue unless every apex MX value is Google's `smtp.google.com`, preserves unrelated TXT values, and idempotently enforces the Google-only SPF record plus a monitoring-mode DMARC record before deployment. It snapshots all MX/TXT records after that baseline is established and proves the web cutover does not alter them. DKIM key generation and activation remain an explicit Google Admin operation because the private key must never enter this repository.
-
-No DOI is displayed or embedded until a registered DOI is supplied. Adding a DOI later requires only the publication metadata field; the permanent route does not change.
+Copyright © 2026 The SozoRock Foundation, Inc. All rights reserved.
