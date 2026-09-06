@@ -237,7 +237,6 @@ export function getSeoForPath(inputPathname = "/") {
         width: 236,
         height: 48,
       },
-      email: "contact@sozorockfoundation.org",
       nonprofitStatus: "https://schema.org/Nonprofit501c3",
       taxID: "39-4736725",
       slogan: "Access. Assurance. Intelligence.",
