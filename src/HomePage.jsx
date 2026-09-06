@@ -139,15 +139,15 @@ export function HomePage() {
           <div className="home-hero-aside">
             <p className="home-hero-lede">We build platforms for better health and public systems.</p>
             <div className="button-row">
-              <Link href="/platforms" className="button button-light">Explore the work</Link>
+              <Link href="/platforms" className="button button-light">Our platforms</Link>
               <Link href="/partner" className="button button-outline-light">Partner with us</Link>
             </div>
           </div>
         </div>
       </section>
-      <FoundationNavigator />
       <CampaignSpotlight />
       <PlatformOverview />
+      <FoundationNavigator />
       <ActionRoutes />
     </>
   );
