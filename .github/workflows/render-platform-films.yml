@@ -1,0 +1,42 @@
+name: Render platform introductions
+
+on:
+  pull_request:
+    paths: ['media/overview/**', '.github/workflows/render-platform-films.yml']
+  push:
+    branches: [main]
+    paths: ['media/overview/**', '.github/workflows/render-platform-films.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: media/overview
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: media/overview/package-lock.json
+      - run: npm ci
+      - run: npm exec tsc -- --noEmit
+      - name: Render four public introductions
+        run: |
+          set -euo pipefail
+          for film in Foundation Health PlaceIntelligence CBCAP; do
+            npm exec remotion -- render src/index.tsx "$film" "out/$film.mp4" --concurrency=2
+            npm exec remotion -- still src/index.tsx "$film" "out/$film.png" --frame=120
+          done
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: sozorock-platform-introductions
+          path: media/overview/out/
+          if-no-files-found: error
+          retention-days: 30
