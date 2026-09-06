@@ -108,7 +108,7 @@ export function Footer() {
           <strong>Engage</strong>
           <Link href="/partner">Partner</Link>
           <Link href="/support">Support</Link>
-          <Link href="mailto:contact@sozorockfoundation.org">Contact</Link>
+          <Link href="/partner">Contact</Link>
         </nav>
       </div>
       <div className="shell footer-legal">

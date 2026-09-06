@@ -370,7 +370,7 @@ export function PublicationAccessPage({ publication }) {
           <p className="eyebrow">Verification sent</p>
           <h1 ref={confirmationRef} tabIndex="-1">Check your email.</h1>
           <p>{message}</p>
-          <p>The link from <strong>publications@sozorockfoundation.org</strong> expires in 30 minutes. If it does not arrive, check your spam folder or submit the form again.</p>
+          <p>Your publication access link expires in 30 minutes. If it does not arrive, check your spam folder or submit the form again.</p>
           <div className="button-row">
             <Link href={publication.path} className="button button-primary">Return to the publication</Link>
             <button type="button" className="button button-secondary" onClick={() => { setStatus("idle"); setMessage(""); }}>Send another link</button>
@@ -455,7 +455,7 @@ export function AboutPage() {
       <PageHero eyebrow="The Foundation" title="About SozoRock" copy="Research, community implementation, and applied learning across three institutional platforms." />
       <section className="section" id="mission"><div className="shell split-copy"><div><p className="eyebrow">Mission</p><h2>Build platforms that help systems work better.</h2></div><div><p>The Foundation develops public-interest research, practical access models, systems intelligence, convening, and applied learning. Rural communities remain an important application area without defining the full institutional scope.</p><p>Health. Access. Equity. Governance. Assurance. Systems. Intelligence. Applied learning.</p></div></div></section>
       <section className="section soft-section"><div className="shell split-copy"><div><p className="eyebrow">Leadership</p><h2>Institutional responsibility, clearly assigned.</h2></div><div><p>Meet the team responsible for global health partnerships, global affairs, health education, and strategic initiatives.</p><Link href="/leadership" className="text-link">Meet the leadership team</Link></div></div></section>
-      <section className="section" id="contact"><div className="shell contact-panel"><div><p className="eyebrow">Contact</p><h2>Start with the question.</h2><p>For publications, events, partnerships, or institutional inquiries:</p></div><a href="mailto:contact@sozorockfoundation.org" className="button button-primary">contact@sozorockfoundation.org</a></div></section>
+      <section className="section" id="contact"><div className="shell contact-panel"><div><p className="eyebrow">Contact</p><h2>Start with the question.</h2><p>For publications, events, partnerships, or institutional inquiries:</p></div><Link href="/partner" className="button button-primary">Send an inquiry</Link></div></section>
     </>
   );
 }
@@ -513,7 +513,7 @@ function PolicyPage({ title, summary, children }) {
   return (
     <>
       <PageHero eyebrow="Legal and policy" title={title} copy={summary} compact />
-      <section className="section policy-page"><div className="shell policy-layout"><aside><p className="eyebrow">Last updated</p><p>August 23, 2026</p><p>Questions may be sent to <a href="mailto:contact@sozorockfoundation.org">contact@sozorockfoundation.org</a>.</p></aside><div className="policy-copy">{children}</div></div></section>
+      <section className="section policy-page"><div className="shell policy-layout"><aside><p className="eyebrow">Last updated</p><p>August 23, 2026</p><p>Send questions through our <Link href="/partner">inquiry form</Link>.</p></aside><div className="policy-copy">{children}</div></div></section>
     </>
   );
 }
