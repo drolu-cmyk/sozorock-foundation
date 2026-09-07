@@ -215,7 +215,7 @@ Resources:
             Override: true
           ReferrerPolicy:
             ReferrerPolicy: strict-origin-when-cross-origin
-            Override: true
+            Override: false
           StrictTransportSecurity:
             AccessControlMaxAgeSec: 31536000
             IncludeSubdomains: true
