@@ -19,7 +19,6 @@ on:
 permissions:
   contents: read
   id-token: write
-  issues: write
 
 concurrency:
   group: sozorock-foundation-parent-cloudfront
@@ -37,7 +36,6 @@ env:
   CANONICAL_HOST: www.sozorockfoundation.org
   AGENT_API_NAME: SozoRockFoundationParentSite
   CLOUDFRONT_ZONE_ID: Z2FDTNDATAQYW2
-  RECEIPT_ISSUE: '15'
 
 jobs:
   deploy:
@@ -48,7 +46,7 @@ jobs:
       - name: Check out exact main commit
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
-          ref: main
+          ref: ${{ github.sha }}
           persist-credentials: false
 
       - name: Set up Node
@@ -75,52 +73,8 @@ jobs:
           aws-region: ${{ env.AWS_REGION }}
           unset-current-credentials: true
 
-      - name: Enforce the Google Workspace mail-authentication baseline
-        shell: bash
-        run: |
-          set -euo pipefail
-          records="$(aws route53 list-resource-record-sets --hosted-zone-id "$HOSTED_ZONE_ID" --output json)"
-
-          # Google Workspace is the sole mail host. Refuse to change TXT records
-          # unless the live MX record still points exclusively to Google.
-          jq -e --arg apex "${APEX_HOST}." '
-            [.ResourceRecordSets[] | select(.Name == $apex and .Type == "MX")][0].ResourceRecords as $mx
-            | ($mx | length) > 0
-            and all($mx[]; .Value | test("(^|[[:space:]])smtp\\.google\\.com\\.$"; "i"))
-          ' <<<"$records" >/dev/null
-
-          jq --arg apex "${APEX_HOST}." '
-            ([.ResourceRecordSets[] | select(.Name == $apex and .Type == "TXT")][0].ResourceRecords // [])
-            | map(select((.Value | ascii_downcase | contains("v=spf1")) | not))
-            + [{Value:"\"v=spf1 include:_spf.google.com ~all\""}]
-          ' <<<"$records" > "$RUNNER_TEMP/apex-txt-values.json"
-
-          jq -n \
-            --arg apex "${APEX_HOST}." \
-            --arg dmarc "_dmarc.${APEX_HOST}." \
-            --slurpfile apexValues "$RUNNER_TEMP/apex-txt-values.json" \
-            '{Comment:"Establish the SozoRock Foundation Google Workspace authentication baseline",Changes:[
-              {Action:"UPSERT",ResourceRecordSet:{Name:$apex,Type:"TXT",TTL:300,ResourceRecords:$apexValues[0]}},
-              {Action:"UPSERT",ResourceRecordSet:{Name:$dmarc,Type:"TXT",TTL:300,ResourceRecords:[
-                {Value:"\"v=DMARC1; p=none; pct=100; adkim=r; aspf=r\""}
-              ]}}
-            ]}' > "$RUNNER_TEMP/google-workspace-auth.json"
-
-          change_id="$(aws route53 change-resource-record-sets \
-            --hosted-zone-id "$HOSTED_ZONE_ID" \
-            --change-batch "file://$RUNNER_TEMP/google-workspace-auth.json" \
-            --query ChangeInfo.Id --output text)"
-          aws route53 wait resource-record-sets-changed --id "$change_id"
-
-          verified="$(aws route53 list-resource-record-sets --hosted-zone-id "$HOSTED_ZONE_ID" --output json)"
-          jq -e --arg apex "${APEX_HOST}." --arg dmarc "_dmarc.${APEX_HOST}." '
-            ([.ResourceRecordSets[] | select(.Name == $apex and .Type == "TXT")][0].ResourceRecords
-              | map(.Value | gsub("^\\\"|\\\"$"; ""))
-              | map(select(startswith("v=spf1")))) == ["v=spf1 include:_spf.google.com ~all"]
-            and
-            ([.ResourceRecordSets[] | select(.Name == $dmarc and .Type == "TXT")][0].ResourceRecords
-              | map(.Value | gsub("^\\\"|\\\"$"; ""))) == ["v=DMARC1; p=none; pct=100; adkim=r; aspf=r"]
-          ' <<<"$verified" >/dev/null
+      # Mail authentication is administered independently of website releases.
+      # Preserve existing SPF, DKIM and DMARC policies, including stricter policies.
 
       - name: Resolve the Foundation navigator origin
         id: agent_api
@@ -219,8 +173,9 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          # Upload dependencies before HTML; retain hashed assets for open clients.
+          aws s3 sync dist/client/assets/ "s3://${BUCKET_NAME}/assets/" --cache-control 'public,max-age=31536000,immutable'
           aws s3 sync dist/client/ "s3://${BUCKET_NAME}/" --delete --exclude 'assets/*' --cache-control 'public,max-age=300,must-revalidate'
-          aws s3 sync dist/client/assets/ "s3://${BUCKET_NAME}/assets/" --delete --cache-control 'public,max-age=31536000,immutable'
 
       - name: Resolve and verify the isolated target
         id: target
@@ -511,8 +466,6 @@ jobs:
 
       - name: Publish production receipt
         if: always()
-        env:
-          GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
           if [[ '${{ steps.dns.outputs.verified }}' = 'true' ]]; then
@@ -521,7 +474,6 @@ jobs:
             result='FAILURE — AWS cutover did not verify; the workflow retained or restored the prior web DNS.'
           fi
           body="## AWS parent-site migration receipt\n\n**${result}**\n\nRun: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}\nCommit: \`${GITHUB_SHA}\`\nDistribution: \`${{ steps.target.outputs.distribution_id || 'not-created' }}\`"
-          gh issue comment "$RECEIPT_ISSUE" --repo "$GITHUB_REPOSITORY" --body "$body"
           printf '%b\n' "$body" >> "$GITHUB_STEP_SUMMARY"
 
       - name: Require verified live deployment
