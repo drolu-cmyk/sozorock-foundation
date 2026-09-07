@@ -119,7 +119,7 @@ export function EngagementForm({ kind }) {
       const body = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(body.error || "We could not send this inquiry right now.");
       setStatus("sent");
-      setMessage(body.message || "Thank you. Your inquiry has been received.");
+      setMessage("Thank you. The Foundation will respond using the contact details you provided.");
       form.reset();
     } catch (error) {
       setStatus("error");
