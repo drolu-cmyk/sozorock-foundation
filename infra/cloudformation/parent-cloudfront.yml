@@ -191,7 +191,8 @@ Resources:
             '/publication/hsa-v1-2026/access': true,
             '/publication/rrg-v1-2025': true,
             '/publication/rrg-v1-2025/access': true,
-            '/publication/rebs-v1-2025': true
+            '/publication/rebs-v1-2025': true,
+            '/publication/rebs-v1-2025/access': true
           };
           if (uri === '/') request.uri = '/index.html';
           else if (routes[uri]) request.uri = uri + '.html';
