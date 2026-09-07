@@ -118,6 +118,25 @@ Resources:
             return response(308, 'https://www.sozorockfoundation.org' + uri + suffix, 'public, max-age=86400');
           }
 
+          // Validate the visitor's origin before the upstream service Origin
+          // header is substituted by CloudFront's origin configuration.
+          if (uri.indexOf('/api/') === 0 && request.method && request.method !== 'GET' && request.method !== 'HEAD') {
+            var visitorOrigin = request.headers.origin && request.headers.origin.value;
+            if (visitorOrigin !== 'https://www.sozorockfoundation.org' && visitorOrigin !== 'https://sozorockfoundation.org') {
+              return {
+                statusCode: 403,
+                statusDescription: 'Forbidden',
+                headers: {
+                  'content-type': { value: 'application/json; charset=utf-8' },
+                  'cache-control': { value: 'private, no-store' },
+                  'referrer-policy': { value: 'no-referrer' },
+                  'x-content-type-options': { value: 'nosniff' }
+                },
+                body: JSON.stringify({ error: 'Request origin was not accepted.' })
+              };
+            }
+          }
+
           var privateFiles = {
             '/publications/hsa-volume-1-2026.pdf': '/publication/hsa-v1-2026/access',
             '/publications/hsa-volume-1-2026.bib': '/publication/hsa-v1-2026/access',
