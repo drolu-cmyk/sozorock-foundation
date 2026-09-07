@@ -2,12 +2,11 @@ import { useEffect, useRef, useState } from "react";
 import { CbcapEvidence, EngagementForm, PageHero, PublicationCard, SectionHeading, StandardsStrip } from "./components";
 import { insights, leaders, partnerRoutes, platforms, publications } from "./siteData";
 import { Link } from "./router";
-import { PlatformFilms } from "./PlatformFilms";
 
 export function PlatformsPage() {
   return (
     <>
-      <PageHero eyebrow="Work" title="Platforms" copy="Institute creates insight. Health turns it into access. AI Lab builds capability." />
+      <PageHero eyebrow="Work" title="Platforms" copy="Research, health access, county evidence and applied AI. Explore the work and find where to begin." />
       <section className="section platform-detail-list">
         <div className="shell">
           {platforms.map((platform) => (
@@ -18,7 +17,6 @@ export function PlatformsPage() {
           ))}
         </div>
       </section>
-      <PlatformFilms />
     </>
   );
 }
@@ -31,7 +29,7 @@ export function InstitutePage() {
       </PageHero>
       <section className="section">
         <div className="shell">
-          <SectionHeading eyebrow="Research architecture" title="Publications establish the lanes. Insight keeps them current." />
+          <SectionHeading eyebrow="Research" title="Evidence worth examining." />
           <div className="publication-cards">{publications.map((publication) => <PublicationCard publication={publication} key={publication.slug} />)}</div>
         </div>
       </section>
@@ -97,7 +95,7 @@ export function PublicationsPage() {
       <section className="section" id="doi">
         <div className="shell">
           <div className="publication-cards publication-cards-stack">{publications.map((publication) => <PublicationCard publication={publication} key={publication.slug} />)}</div>
-          <div className="doi-note"><strong>Permanent landing pages</strong><p>Each publication keeps its own DOI-facing route, citation information, scope, and access path. These URLs are not redirected to a generic publications page.</p></div>
+          <div className="doi-note"><strong>Read. Reference. Apply.</strong><p>Explore each publication’s argument, evidence and limitations. Find citation details and access the full text.</p></div>
         </div>
       </section>
       <StandardsStrip />
@@ -116,7 +114,7 @@ export function PublicationPage({ publication }) {
     ["ISBN", publication.isbn],
     ["Language", publication.language],
     ["Extent", publication.pages],
-    ["Permanent route", publication.path],
+
   ].filter(([, value]) => value);
   const relatedPublications = publications.filter((item) => item.slug !== publication.slug);
 
@@ -169,14 +167,14 @@ export function PublicationPage({ publication }) {
             <dl className="publication-meta">
               <div><dt>Author</dt><dd>{publication.author}</dd></div>
               <div><dt>Published</dt><dd>{publication.date}</dd></div>
-              {publication.isbn ? <div><dt>ISBN</dt><dd>{publication.isbn}</dd></div> : <div><dt>Landing page</dt><dd><code>{publication.path}</code></dd></div>}
+              {publication.isbn ? <div><dt>ISBN</dt><dd>{publication.isbn}</dd></div> : <div><dt>DOI</dt><dd><a href={`https://doi.org/${publication.doi}`}>{publication.doi}</a></dd></div>}
             </dl>
             <div className="button-row">
-              {publication.accessPath ? <Link href={publication.accessPath} className="button button-primary">Request publication</Link> : <a href={publication.external} className="button button-primary">Access the publication</a>}
+              {publication.accessPath ? <Link href={publication.accessPath} className="button button-primary">Get the publication</Link> : <a href={publication.external} className="button button-primary">Access the publication</a>}
               {publication.accessPath && <a href={publication.external} className="button button-secondary">Publication overview</a>}
               <Link href="/standards" className="button button-secondary">Publication standards</Link>
             </div>
-            {publication.accessPath && <p className="access-note">Public-interest access is free. Email verification protects the publication and helps us understand who the work serves.</p>}
+            {publication.accessPath && <p className="access-note">Free PDF access. Verify your email to receive the publication. Updates are optional.</p>}
           </div>
         </div>
       </section>
@@ -388,14 +386,14 @@ export function PublicationAccessPage({ publication }) {
         <div className="access-intro">
           <p className="eyebrow">Publication access</p>
           <h1>Request {publication.title}, {publication.volume}</h1>
-          <p>Complete this short form. We will send a one-time verification link to your email address.</p>
+          <p>Get the full publication at no cost. Enter your details and verify your email to access the PDF.</p>
           <dl className="access-summary">
             <div><dt>Access</dt><dd>Free</dd></div>
             <div><dt>Verification</dt><dd>Email link</dd></div>
             <div><dt>Link validity</dt><dd>30 minutes</dd></div>
           </dl>
           <p className="access-boundary">Do not include health or medical information.</p>
-          <Link href={publication.path} className="text-link">Return to the publication record</Link>
+          <Link href={publication.path} className="text-link">About this publication</Link>
         </div>
         <form className="publication-access-form" onSubmit={submitAccess} noValidate aria-describedby="access-privacy access-status">
           <div className="field-row">
@@ -410,12 +408,12 @@ export function PublicationAccessPage({ publication }) {
             <label htmlFor="access-state">State, province, or territory<input id="access-state" name="state" required autoComplete="address-level1" aria-invalid={Boolean(errors.state)} aria-describedby={errors.state ? "access-state-error" : undefined} />{errorFor("state")}</label>
           </div>
           <label htmlFor="access-country">Country<input id="access-country" name="country" required autoComplete="country-name" defaultValue="United States" aria-invalid={Boolean(errors.country)} aria-describedby={errors.country ? "access-country-error" : undefined} />{errorFor("country")}</label>
-          <label htmlFor="access-reason">Reason for interest<textarea id="access-reason" name="reason" required rows="4" minLength="20" maxLength="800" aria-invalid={Boolean(errors.reason)} aria-describedby={`access-reason-hint${errors.reason ? " access-reason-error" : ""}`} /><span className="field-hint" id="access-reason-hint">Use at least three meaningful words and 20 characters. Do not include health or medical information.</span>{errorFor("reason")}</label>
+          <label htmlFor="access-reason">Reason for interest<textarea id="access-reason" name="reason" required rows="4" minLength="20" maxLength="800" aria-invalid={Boolean(errors.reason)} aria-describedby={`access-reason-hint${errors.reason ? " access-reason-error" : ""}`} /><span className="field-hint" id="access-reason-hint">Tell us how this research relates to your work or interests (20–800 characters). Please leave out health or medical information.</span>{errorFor("reason")}</label>
           <div className="access-honeypot" aria-hidden="true"><label>Website<input name="website" tabIndex="-1" autoComplete="off" /></label></div>
           <label className="check-field" htmlFor="access-delivery-consent"><input id="access-delivery-consent" name="deliveryConsent" type="checkbox" value="yes" required aria-invalid={Boolean(errors.deliveryConsent)} aria-describedby={errors.deliveryConsent ? "access-deliveryConsent-error" : undefined} /><span>I agree that The SozoRock Foundation, Inc. may email me the verification and access link for this publication.{errorFor("deliveryConsent")}</span></label>
           <label className="check-field" htmlFor="access-updates-consent"><input id="access-updates-consent" name="updatesConsent" type="checkbox" value="yes" /><span>Optional: Send me future publication updates. This is not required for access.</span></label>
           <p id="access-privacy" className="access-privacy">We use this information to provide and understand publication access. See our <Link href="/privacy">Privacy Notice</Link>.</p>
-          <button type="submit" className="button button-primary access-submit" disabled={status === "sending"}>{status === "sending" ? "Sending verification…" : "Email my verification link"}</button>
+          <button type="submit" className="button button-primary access-submit" disabled={status === "sending"}>{status === "sending" ? "Sending verification…" : "Send my access link"}</button>
           <p id="access-status" className={`access-status ${status === "error" ? "is-error" : ""}`} role="status" aria-live="polite">{message}</p>
         </form>
       </div>
@@ -442,11 +440,11 @@ export function EventsPage() {
       <PageHero eyebrow="Ideas" title="Events" copy="Firesides, roundtables, and briefings connect evidence with people who can test and apply it." />
       <section className="section" id="upcoming">
         <div className="shell event-grid">
-          <article className="event-status"><p className="eyebrow">Upcoming events</p><h2>No public event date is currently posted.</h2><p>The calendar will show confirmed dates, formats, hosts, locations, and registration details when available.</p><Link href="/partner" className="text-link">Express interest in an event</Link></article>
+          <article className="event-status"><p className="eyebrow">Upcoming events</p><h2>Join a focused conversation.</h2><p>Contact us about a briefing or roundtable on a publication or question relevant to your organization.</p><Link href="/partner" className="text-link">Express interest in an event</Link></article>
           <div className="event-formats"><article id="firesides"><h3>Firesides</h3><p>Focused conversations around a publication, emerging question, or implementation challenge.</p></article><article id="roundtables"><h3>Roundtables</h3><p>Working sessions for public agencies, health systems, universities, libraries, and community institutions.</p></article><article><h3>Briefings</h3><p>Decision-ready presentations shaped for a specific audience and question.</p></article></div>
         </div>
       </section>
-      <section className="section soft-section" id="past"><div className="shell split-copy"><div><p className="eyebrow">Past events</p><h2>A durable record of convening.</h2></div><div><p>Confirmed past events will retain their topics, speakers, hosts, materials, and available recordings. Records will appear here as they become available.</p><Link href="/partner" className="text-link">Plan a convening</Link></div></div></section>
+
     </>
   );
 }
@@ -454,8 +452,8 @@ export function EventsPage() {
 export function AboutPage() {
   return (
     <>
-      <PageHero eyebrow="The Foundation" title="About SozoRock" copy="Research, community implementation, and applied learning across three institutional platforms." />
-      <section className="section" id="mission"><div className="shell split-copy"><div><p className="eyebrow">Mission</p><h2>Build platforms that help systems work better.</h2></div><div><p>The Foundation develops public-interest research, practical access models, systems intelligence, convening, and applied learning. Rural communities remain an important application area without defining the full institutional scope.</p><p>Health. Access. Equity. Governance. Assurance. Systems. Intelligence. Applied learning.</p></div></div></section>
+      <PageHero eyebrow="The Foundation" title="About SozoRock" copy="We develop research, health-access initiatives and practical learning to help people and institutions act." />
+      <section className="section" id="mission"><div className="shell split-copy"><div><p className="eyebrow">Mission</p><h2>Turn evidence into practical action.</h2></div><div><p>Our work connects research with the people who can use it: communities, practitioners, educators and institutions. We examine barriers to care, develop county-level evidence and build practical AI capability.</p><p>Rural communities are a central focus of our research into access, equity and public decision-making.</p></div></div></section>
       <section className="section soft-section"><div className="shell split-copy"><div><p className="eyebrow">Leadership</p><h2>Institutional responsibility, clearly assigned.</h2></div><div><p>Meet the team responsible for global health partnerships, global affairs, health education, and strategic initiatives.</p><Link href="/leadership" className="text-link">Meet the leadership team</Link></div></div></section>
       <section className="section" id="contact"><div className="shell contact-panel"><div><p className="eyebrow">Contact</p><h2>Start with the question.</h2><p>For publications, events, partnerships, or institutional inquiries:</p></div><Link href="/partner" className="button button-primary">Send an inquiry</Link></div></section>
     </>
@@ -469,6 +467,10 @@ export function LeadershipPage() {
       <section className="section"><div className="shell"><div className="leader-grid">{leaders.map((leader) => <article key={leader.name}><div className="leader-image"><img src={leader.image} alt={leader.name} /></div><div><h2>{leader.name}</h2><p className="leader-title">{leader.title}</p><p>{leader.bio}</p></div></article>)}</div></div></section>
     </>
   );
+}
+
+export function ContactPage() {
+  return <><PageHero eyebrow="Contact" title="Let’s put ideas to work." copy="Talk with us about research, community initiatives or applied learning." /><section className="section form-section"><div className="shell form-layout"><div><h2>What would you like to explore?</h2><p>Tell us the question, the people it concerns and the outcome you have in mind.</p><p>For partnership and support opportunities, visit <Link href="/partner" className="text-link">Partner</Link> or <Link href="/support" className="text-link">Support our work</Link>.</p></div><EngagementForm kind="Contact" /></div></section></>;
 }
 
 export function PartnerPage() {
@@ -515,7 +517,7 @@ function PolicyPage({ title, summary, children }) {
   return (
     <>
       <PageHero eyebrow="Legal and policy" title={title} copy={summary} compact />
-      <section className="section policy-page"><div className="shell policy-layout"><aside><p className="eyebrow">Last updated</p><p>August 23, 2026</p><p>Send questions through our <Link href="/partner">inquiry form</Link>.</p></aside><div className="policy-copy">{children}</div></div></section>
+      <section className="section policy-page"><div className="shell policy-layout"><aside><p className="eyebrow">Last updated</p><p>September 7, 2026</p><p>Send questions through our <Link href="/contact">contact form</Link>.</p></aside><div className="policy-copy">{children}</div></div></section>
     </>
   );
 }
@@ -558,7 +560,7 @@ export function TermsPage() {
       <section><h2>Permitted use</h2><p>You may use the website lawfully and may cite or link to public pages. Publication-specific copyright, permissions, licenses, and citation instructions control reuse of publication files. Do not interfere with the service, bypass access controls, misrepresent Foundation affiliation, or use Foundation marks without permission.</p></section>
       <section><h2>External services</h2><p>Links to external sites and Foundation platforms are provided for context and convenience. Their content, availability, and privacy practices may be governed by separate terms and notices.</p></section>
       <section><h2>Availability and changes</h2><p>We work to keep information accurate and services available but do not promise uninterrupted operation or that every item is complete or current. We may correct, update, suspend, or remove material while preserving appropriate publication and corrections records.</p></section>
-      <section><h2>Foundation identity</h2><p>© 2026 The SozoRock Foundation, Inc. SozoRock® is a registered trademark of SozoRock Tech Inc., used under license by The SozoRock Foundation.</p></section>
+      <section><h2>Foundation identity</h2><p>© {new Date().getFullYear()} The SozoRock Foundation, Inc. Publication-specific notices identify ownership and permitted use.</p></section>
     </PolicyPage>
   );
 }

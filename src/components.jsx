@@ -75,7 +75,7 @@ export function PublicationCard({ publication }) {
         <h2><Link href={publication.path}>{publication.title}</Link></h2>
         <p>{publication.tagline}</p>
         <p className="publication-byline">{publication.volume} · {publication.author} · {publication.date}</p>
-        <Link href={publication.path} className="text-link">Open publication record</Link>
+        <Link href={publication.path} className="text-link">Explore the publication</Link>
       </div>
     </article>
   );

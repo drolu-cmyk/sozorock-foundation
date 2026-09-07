@@ -81,7 +81,7 @@ test("serves existing static assets without a fallback", async () => {
   assert.deepEqual(calls, ["/assets/app.js"]);
 });
 
-test("renders the app shell with a true 404 for an unknown route", async () => {
+test("renders the prerendered error document with a true 404 for an unknown route", async () => {
   const calls = [];
   const response = await worker.fetch(
     new Request("https://example.test/flow/step-two?source=share", {
@@ -92,8 +92,8 @@ test("renders the app shell with a true 404 for an unknown route", async () => {
         fetch: async (request) => {
           const url = new URL(request.url);
           calls.push(url.pathname + url.search);
-          return new Response(url.pathname === "/index.html" ? "app" : "missing", {
-            status: url.pathname === "/index.html" ? 200 : 404,
+          return new Response(url.pathname === "/404.html" ? "error page" : "missing", {
+            status: url.pathname === "/404.html" ? 200 : 404,
           });
         },
       },
@@ -102,7 +102,8 @@ test("renders the app shell with a true 404 for an unknown route", async () => {
 
   assert.equal(response.status, 404);
   assert.equal(response.headers.get("x-robots-tag"), "noindex, nofollow, noarchive");
-  assert.deepEqual(calls, ["/flow/step-two?source=share", "/index.html"]);
+  assert.deepEqual(calls, ["/flow/step-two?source=share", "/404.html"]);
+  assert.equal(await response.text(), "error page");
 });
 
 test("does not turn missing API or write requests into the app shell", async () => {
@@ -377,10 +378,10 @@ test("emits unique canonical SEO metadata and valid schema for every indexable r
     assert.match(html, /<meta property="og:title"/u, `${pathname} Open Graph title`);
     assert.match(html, /<meta name="twitter:card" content="summary_large_image"/u, `${pathname} X card`);
     assert.match(html, /<meta name="twitter:domain" content="sozorockfoundation\.org"/u, `${pathname} X domain`);
-    assert.match(html, /<meta name="sozorock-release" content="cloudfront-agentic-seo-2026-08-28"/u, `${pathname} release marker`);
+    assert.match(html, /<meta name="sozorock-release" content="foundation-editorial-2026-09-07"/u, `${pathname} release marker`);
     assert.ok(schemaText, `${pathname} schema`);
     assert.doesNotThrow(() => JSON.parse(schemaText), `${pathname} valid JSON-LD`);
-    if (pathname !== "/publication/hsa-v1-2026/access") {
+    if (!pathname.endsWith("/access")) {
       assert.ok(!titles.has(title), `${pathname} unique title`);
       titles.add(title);
     }
@@ -394,7 +395,7 @@ test("ships crawl controls, sitemap, favicon, and social images", async () => {
   assert.match(robots, /Sitemap: https:\/\/www\.sozorockfoundation\.org\/sitemap\.xml/u);
   assert.doesNotMatch(sitemap, /publication\/hsa-v1-2026\/access/u);
   for (const pathname of APP_ROUTES) {
-    if (pathname === "/publication/hsa-v1-2026/access") continue;
+    if (pathname.endsWith("/access")) continue;
     assert.match(sitemap, new RegExp(`<loc>https://www\\.sozorockfoundation\\.org${pathname === "/" ? "/" : pathname}</loc>`, "u"), pathname);
   }
   for (const file of [

@@ -3,6 +3,8 @@ const APEX_HOSTNAME = "sozorockfoundation.org";
 const CANONICAL_HOSTNAME = "www.sozorockfoundation.org";
 const MAX_REQUEST_BYTES = 16_384;
 const ACCESS_ROUTES = new Map([
+  ["rrg-v1-2025", "rethinking-rural-governance-volume-1"],
+  ["rebs-v1-2025", "rural-equity-blueprint-volume-1"],
   ["hsa-v1-2026", "health-systems-assurance-volume-1"],
 ]);
 const PRIVATE_PUBLICATION_FILES = new Map([
@@ -23,6 +25,7 @@ export const APP_ROUTES = new Set([
   "/leadership",
   "/partner",
   "/support",
+  "/contact",
   "/standards",
   "/privacy",
   "/accessibility",
@@ -31,7 +34,9 @@ export const APP_ROUTES = new Set([
   "/publication/hsa-v1-2026",
   "/publication/hsa-v1-2026/access",
   "/publication/rrg-v1-2025",
+  "/publication/rrg-v1-2025/access",
   "/publication/rebs-v1-2025",
+  "/publication/rebs-v1-2025/access",
 ]);
 export const LEGACY_ROUTES = new Map([
   ["/work", "/platforms"],
@@ -150,7 +155,7 @@ function validateAccessPayload(input) {
   if (!isMeaningfulShortText(payload.cityOrRegion)) return { error: "Enter a valid city or region." };
   if (!isMeaningfulShortText(payload.state)) return { error: "Enter a valid state, province, or territory." };
   if (!isMeaningfulShortText(payload.country)) return { error: "Enter a valid country." };
-  if (!isMeaningfulReason(payload.reason)) return { error: "Use at least three meaningful words (20–800 characters) for your reason for interest." };
+  if (!isMeaningfulReason(payload.reason)) return { error: "Use at least three meaningful words (20ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“800 characters) for your reason for interest." };
   if (!payload.deliveryConsent) return { error: "Consent is required to send the verification link." };
   return { payload };
 }
@@ -224,7 +229,7 @@ function validateContactPayload(input) {
   if (!CONTACT_INQUIRY_TYPES.has(payload.inquiryType)) return { error: "Select a valid area of interest." };
   if (!CONTACT_ROLES.has(payload.role)) return { error: "Select a valid organization or role." };
   if (!isMeaningfulShortText(payload.stateOrCounty)) return { error: "Enter a valid city, state, or region." };
-  if (!isMeaningfulMessage(payload.message)) return { error: "Describe the outcome in at least three meaningful words (20–1,200 characters)." };
+  if (!isMeaningfulMessage(payload.message)) return { error: "Describe the outcome in at least three meaningful words (20ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“1,200 characters)." };
   if (!payload.consent) return { error: "Confirm that we may use this information to respond." };
   return { payload };
 }
@@ -434,6 +439,6 @@ export default {
       return response;
     }
 
-    return serveHtml(request, env, "/", { status: 404, noindex: true });
+    return serveHtml(request, env, "/404", { status: 404, noindex: true });
   },
 };

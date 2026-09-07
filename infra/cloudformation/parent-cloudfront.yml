@@ -137,8 +137,10 @@ Resources:
             return response(308, uri.replace(/\/+$/, '') + suffix, 'public, max-age=3600');
           }
 
-          if (uri === '/api/publications/access/hsa-v1-2026') {
-            request.uri = '/api/publications/access/health-systems-assurance-volume-1';
+          var accessSlugs = { 'hsa-v1-2026': 'health-systems-assurance-volume-1', 'rrg-v1-2025': 'rethinking-rural-governance-volume-1', 'rebs-v1-2025': 'rural-equity-blueprint-volume-1' };
+          var accessKey = uri.slice('/api/publications/access/'.length);
+          if (uri.indexOf('/api/publications/access/') === 0 && accessSlugs[accessKey]) {
+            request.uri = '/api/publications/access/' + accessSlugs[accessKey];
             return request;
           }
           if (uri === '/api/navigator') {
@@ -160,6 +162,7 @@ Resources:
             '/leadership': true,
             '/partner': true,
             '/support': true,
+            '/contact': true,
             '/standards': true,
             '/privacy': true,
             '/accessibility': true,
@@ -168,6 +171,7 @@ Resources:
             '/publication/hsa-v1-2026': true,
             '/publication/hsa-v1-2026/access': true,
             '/publication/rrg-v1-2025': true,
+            '/publication/rrg-v1-2025/access': true,
             '/publication/rebs-v1-2025': true
           };
           if (uri === '/') request.uri = '/index.html';

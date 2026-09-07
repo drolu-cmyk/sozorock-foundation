@@ -2,19 +2,20 @@ import { leaders, publications } from "./siteData.js";
 
 export const SITE_ORIGIN = "https://www.sozorockfoundation.org";
 export const SITE_NAME = "The SozoRock Foundation";
-export const DEFAULT_SOCIAL_IMAGE = `${SITE_ORIGIN}/media/sozorock-social-card.png`;
+export const DEFAULT_SOCIAL_IMAGE = `${SITE_ORIGIN}/media/foundation-editorial-social.png`;
 export const ORGANIZATION_ID = `${SITE_ORIGIN}/#organization`;
 export const WEBSITE_ID = `${SITE_ORIGIN}/#website`;
 
 const routeSeo = {
+  "/contact": { title: "Contact the Foundation | SozoRock", description: "Discuss research, community initiatives and applied learning with The SozoRock Foundation. Start a partnership or ask about our work.", pageType: "ContactPage" },
   "/": {
     title: "The SozoRock Foundation | Health Access, Systems & AI",
-    description: "The SozoRock Foundation advances health access, public systems, evidence-based assurance, and responsible applied AI through research and implementation.",
+    description: "Research, health access and applied AI—bringing evidence into practical use. Explore the initiatives and publications of The SozoRock Foundation.",
     pageType: "WebPage",
   },
   "/platforms": {
     title: "Platforms | The SozoRock Foundation",
-    description: "Explore SozoRock Global Institute, SozoRock Health, and SozoRock AI Lab—three platforms connecting evidence, access, and applied learning.",
+    description: "Explore SozoRock Health, CB-CAP, the Global Institute and AI Lab: research, county evidence, health access and practical AI learning.",
     pageType: "CollectionPage",
   },
   "/platforms/institute": {
@@ -55,7 +56,7 @@ const routeSeo = {
   "/leadership": {
     title: "Leadership | The SozoRock Foundation",
     description: "Meet the leaders accountable for The SozoRock Foundation's global health partnerships, global affairs, health education, and strategic initiatives.",
-    pageType: "ProfilePage",
+    pageType: "AboutPage",
   },
   "/partner": {
     title: "Partner | The SozoRock Foundation",
@@ -110,7 +111,8 @@ const routeKeywords = {
 };
 
 const breadcrumbNames = {
-  platforms: "Platforms",
+  contact: "Contact",
+  platforms: "Work",
   institute: "SozoRock Global Institute",
   health: "SozoRock Health",
   "ai-lab": "SozoRock AI Lab",
@@ -176,9 +178,7 @@ function publicationSchema(publication, canonicalUrl) {
     publisher: { "@id": ORGANIZATION_ID },
     datePublished: publication.dateMachine || publication.date,
     inLanguage: publication.languageCode || "en-US",
-    isbn: publication.isbn,
     pagination: publication.pages,
-    edition: publication.edition,
     url: canonicalUrl,
     mainEntityOfPage: { "@id": `${canonicalUrl}/#webpage` },
     image: `${SITE_ORIGIN}${publication.cover}`,
@@ -237,8 +237,6 @@ export function getSeoForPath(inputPathname = "/") {
         width: 236,
         height: 48,
       },
-      nonprofitStatus: "https://schema.org/Nonprofit501c3",
-      taxID: "39-4736725",
       slogan: "Access. Assurance. Intelligence.",
       publishingPrinciples: `${SITE_ORIGIN}/standards`,
       ethicsPolicy: `${SITE_ORIGIN}/standards`,
@@ -272,7 +270,7 @@ export function getSeoForPath(inputPathname = "/") {
       about: { "@id": ORGANIZATION_ID },
       breadcrumb: breadcrumb ? { "@id": breadcrumb["@id"] } : undefined,
       inLanguage: "en-US",
-      primaryImageOfPage: { "@type": "ImageObject", url: image, width: 1200, height: 630 },
+      primaryImageOfPage: { "@type": "ImageObject", url: image, width: publication ? 1200 : 1731, height: publication ? 630 : 909 },
       mainEntity: publication ? { "@id": `${canonicalUrl}/#report` } : undefined,
     },
     breadcrumb,
@@ -293,6 +291,7 @@ export function getSeoForPath(inputPathname = "/") {
 
   return {
     pathname,
+    isNotFound: !publication && !accessPublication && !routeSeo[pathname],
     title: base.title,
     description: base.description,
     keywords: keywords.join(", "),
@@ -300,6 +299,8 @@ export function getSeoForPath(inputPathname = "/") {
     robots: base.robots || "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
     ogType: base.ogType || "website",
     image,
+    imageWidth: publication ? 1200 : 1731,
+    imageHeight: publication ? 630 : 909,
     imageAlt: publication ? `${publication.title}, ${publication.volume} publication preview` : "The SozoRock Foundation — Access. Assurance. Intelligence.",
     schema: { "@context": "https://schema.org", "@graph": graph },
     publication,
