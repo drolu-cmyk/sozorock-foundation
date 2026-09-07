@@ -1,0 +1,31 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "PreventSonnet46Usage",
+      "Effect": "Deny",
+      "Action": [
+        "bedrock:InvokeModel",
+        "bedrock:InvokeModelWithResponseStream",
+        "bedrock:CreateModelInvocationJob"
+      ],
+      "Resource": [
+        "arn:aws:bedrock:*::foundation-model/anthropic.claude-sonnet-4-6*",
+        "arn:aws:bedrock:*:*:inference-profile/*anthropic.claude-sonnet-4-6*"
+      ]
+    },
+    {
+      "Sid": "PreventSonnet46Resubscription",
+      "Effect": "Deny",
+      "Action": "aws-marketplace:Subscribe",
+      "Resource": "*",
+      "Condition": {
+        "ForAnyValue:StringEquals": {
+          "aws-marketplace:ProductId": [
+            "prod-ffvjxvh4ltq64"
+          ]
+        }
+      }
+    }
+  ]
+}

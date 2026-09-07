@@ -1,6 +1,9 @@
 #!/usr/bin/env node
 import { copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
+import { createServer } from "vite";
+import { createElement } from "react";
+import { renderToString } from "react-dom/server";
 import { fileURLToPath } from "node:url";
 import { getSeoForPath } from "../src/seo.js";
 
@@ -10,6 +13,7 @@ const index = path.join(dist, "client", "index.html");
 const worker = path.join(root, "worker", "index.js");
 const hosting = path.join(root, ".openai", "hosting.json");
 const permanentRoutes = [
+  "/contact",
   "/platforms",
   "/platforms/institute",
   "/platforms/health",
@@ -29,7 +33,9 @@ const permanentRoutes = [
   "/publication/hsa-v1-2026",
   "/publication/hsa-v1-2026/access",
   "/publication/rrg-v1-2025",
+  "/publication/rrg-v1-2025/access",
   "/publication/rebs-v1-2025",
+  "/publication/rebs-v1-2025/access",
 ];
 
 for (const file of [index, worker, hosting]) {
@@ -42,6 +48,8 @@ copyFileSync(worker, path.join(dist, "server", "index.js"));
 copyFileSync(hosting, path.join(dist, ".openai", "hosting.json"));
 
 const baseHtml = readFileSync(index, "utf8");
+const renderServer = await createServer({ server: { middlewareMode: true, warmup: { clientFiles: [] }, watch: null }, optimizeDeps: { noDiscovery: true, include: [] }, appType: "custom" });
+const { App } = await renderServer.ssrLoadModule("/src/App.jsx");
 
 function escapeAttribute(value) {
   return String(value)
@@ -72,6 +80,7 @@ function upsertCanonical(html, href) {
 function routeHtml(route) {
   const seo = getSeoForPath(route);
   let html = replaceTitle(baseHtml, seo.title);
+  html = html.replace('<div id="root"></div>', () => `<div id="root">${renderToString(createElement(App, { initialPath: route }))}</div>`);
   html = upsertCanonical(html, seo.canonicalUrl);
   html = upsertMeta(html, "name", "description", seo.description);
   html = upsertMeta(html, "name", "keywords", seo.keywords);
@@ -85,8 +94,8 @@ function routeHtml(route) {
   html = upsertMeta(html, "property", "og:image", seo.image);
   html = upsertMeta(html, "property", "og:image:secure_url", seo.image);
   html = upsertMeta(html, "property", "og:image:type", "image/png");
-  html = upsertMeta(html, "property", "og:image:width", "1200");
-  html = upsertMeta(html, "property", "og:image:height", "630");
+  html = upsertMeta(html, "property", "og:image:width", String(seo.imageWidth));
+  html = upsertMeta(html, "property", "og:image:height", String(seo.imageHeight));
   html = upsertMeta(html, "property", "og:image:alt", seo.imageAlt);
   html = upsertMeta(html, "name", "twitter:card", "summary_large_image");
   html = upsertMeta(html, "name", "twitter:domain", "sozorockfoundation.org");
@@ -134,3 +143,5 @@ for (const route of permanentRoutes) {
 }
 
 console.log(`Prepared CloudFront build with ${permanentRoutes.length} crawler-ready route entries and the dynamic React runtime.`);
+
+await renderServer.close();

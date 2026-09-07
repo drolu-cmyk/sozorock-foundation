@@ -118,6 +118,25 @@ Resources:
             return response(308, 'https://www.sozorockfoundation.org' + uri + suffix, 'public, max-age=86400');
           }
 
+          // Validate the visitor's origin before the upstream service Origin
+          // header is substituted by CloudFront's origin configuration.
+          if (uri.indexOf('/api/') === 0 && request.method && request.method !== 'GET' && request.method !== 'HEAD') {
+            var visitorOrigin = request.headers.origin && request.headers.origin.value;
+            if (visitorOrigin !== 'https://www.sozorockfoundation.org' && visitorOrigin !== 'https://sozorockfoundation.org') {
+              return {
+                statusCode: 403,
+                statusDescription: 'Forbidden',
+                headers: {
+                  'content-type': { value: 'application/json; charset=utf-8' },
+                  'cache-control': { value: 'private, no-store' },
+                  'referrer-policy': { value: 'no-referrer' },
+                  'x-content-type-options': { value: 'nosniff' }
+                },
+                body: JSON.stringify({ error: 'Request origin was not accepted.' })
+              };
+            }
+          }
+
           var privateFiles = {
             '/publications/hsa-volume-1-2026.pdf': '/publication/hsa-v1-2026/access',
             '/publications/hsa-volume-1-2026.bib': '/publication/hsa-v1-2026/access',
@@ -137,8 +156,10 @@ Resources:
             return response(308, uri.replace(/\/+$/, '') + suffix, 'public, max-age=3600');
           }
 
-          if (uri === '/api/publications/access/hsa-v1-2026') {
-            request.uri = '/api/publications/access/health-systems-assurance-volume-1';
+          var accessSlugs = { 'hsa-v1-2026': 'health-systems-assurance-volume-1', 'rrg-v1-2025': 'rethinking-rural-governance-volume-1', 'rebs-v1-2025': 'rural-equity-blueprint-volume-1' };
+          var accessKey = uri.slice('/api/publications/access/'.length);
+          if (uri.indexOf('/api/publications/access/') === 0 && accessSlugs[accessKey]) {
+            request.uri = '/api/publications/access/' + accessSlugs[accessKey];
             return request;
           }
           if (uri === '/api/navigator') {
@@ -160,6 +181,7 @@ Resources:
             '/leadership': true,
             '/partner': true,
             '/support': true,
+            '/contact': true,
             '/standards': true,
             '/privacy': true,
             '/accessibility': true,
@@ -168,6 +190,7 @@ Resources:
             '/publication/hsa-v1-2026': true,
             '/publication/hsa-v1-2026/access': true,
             '/publication/rrg-v1-2025': true,
+            '/publication/rrg-v1-2025/access': true,
             '/publication/rebs-v1-2025': true
           };
           if (uri === '/') request.uri = '/index.html';
@@ -192,7 +215,7 @@ Resources:
             Override: true
           ReferrerPolicy:
             ReferrerPolicy: strict-origin-when-cross-origin
-            Override: true
+            Override: false
           StrictTransportSecurity:
             AccessControlMaxAgeSec: 31536000
             IncludeSubdomains: true

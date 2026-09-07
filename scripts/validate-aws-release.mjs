@@ -48,8 +48,6 @@ assert.match(template, /HeaderValue: https:\/\/health\.sozorockfoundation\.org\/
 assert.match(template, /TargetOriginId: health-publications/u);
 assert.match(template, /TargetOriginId: health-contact/u);
 assert.doesNotMatch(workflow, /SMTP\.GOOGLE\.COM[^\n]*DELETE/iu);
-assert.match(workflow, /v=spf1 include:_spf\.google\.com ~all/u);
-assert.match(workflow, /v=DMARC1; p=none; pct=100; adkim=r; aspf=r/u);
 assert.match(workflow, /mail-records-before/u);
 assert.match(workflow, /rollback_dns/u);
 assert.match(workflow, /associate-alias/u);
@@ -82,3 +80,8 @@ await access(new URL("dist/client/.well-known/security.txt", root));
 await access(new URL(".github/CODEOWNERS", root));
 await access(new URL("SECURITY.md", root));
 console.log("AWS release contract is valid.");
+
+assert.match(workflow, /ref: \$\{\{ github\.sha \}\}/u);
+assert.doesNotMatch(workflow, /google-workspace-auth\.json|Action:"UPSERT"[^\n]*DMARC/u);
+assert.doesNotMatch(workflow, /issues: write|gh issue comment/u);
+assert.doesNotMatch(workflow, /s3 sync dist\/client\/assets\/[^\n]*--delete/u);

@@ -36,6 +36,7 @@ export const navigation = [
 ];
 
 export const platforms = [
+  { slug: "cbcap", name: "CB-CAP", line: "County evidence for local action.", detail: "County-level evidence helps communities frame local questions and understand the systems behind them.", href: "https://cbcap.sozorockfoundation.org/", action: "Explore CB-CAP", tone: "cobalt" },
   {
     slug: "institute",
     name: "SozoRock Global Institute",
@@ -100,6 +101,12 @@ export const publications = [
   },
   {
     slug: "rrg-v1-2025",
+    doi: "10.65473/rrg-v1-2025",
+    publisher: "The SozoRock Foundation, Inc.",
+    dateMachine: "2025",
+    languageCode: "en-US",
+    accessPath: "/publication/rrg-v1-2025/access",
+    accessServiceSlug: "rethinking-rural-governance-volume-1",
     path: "/publication/rrg-v1-2025",
     title: "Rethinking Rural Governance",
     volume: "Volume 1",
@@ -115,6 +122,12 @@ export const publications = [
   },
   {
     slug: "rebs-v1-2025",
+    doi: "10.65473/rebs-v1-2025",
+    publisher: "The SozoRock Foundation, Inc.",
+    dateMachine: "2025",
+    languageCode: "en-US",
+    accessPath: "/publication/rebs-v1-2025/access",
+    accessServiceSlug: "rural-equity-blueprint-volume-1",
     path: "/publication/rebs-v1-2025",
     title: "Rural Equity Blueprint Series",
     volume: "Volume 1",

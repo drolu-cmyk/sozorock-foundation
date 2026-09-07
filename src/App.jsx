@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { HomePage } from "./HomePage";
 import {
   AboutPage,
+  ContactPage,
   AccessibilityPage,
   AiLabPage,
   EventsPage,
@@ -41,6 +42,7 @@ function RouteView({ pathname }) {
   if (pathname === "/events") return <EventsPage />;
   if (pathname === "/about") return <AboutPage />;
   if (pathname === "/leadership") return <LeadershipPage />;
+  if (pathname === "/contact") return <ContactPage />;
   if (pathname === "/partner") return <PartnerPage />;
   if (pathname === "/support") return <SupportPage />;
   if (pathname === "/standards") return <StandardsPage />;
@@ -51,8 +53,8 @@ function RouteView({ pathname }) {
   return <NotFoundPage />;
 }
 
-export function App() {
-  const { pathname } = useCurrentPath();
+export function App({ initialPath }) {
+  const { pathname } = useCurrentPath(initialPath);
   const seo = getSeoForPath(pathname);
 
   useEffect(() => {
@@ -72,12 +74,14 @@ export function App() {
     };
 
     let canonical = document.head.querySelector('link[rel="canonical"]');
-    if (!canonical) {
+    if (seo.isNotFound) {
+      canonical?.remove();
+    } else if (!canonical) {
       canonical = document.createElement("link");
       canonical.setAttribute("rel", "canonical");
       document.head.appendChild(canonical);
     }
-    canonical.setAttribute("href", seo.canonicalUrl);
+    if (!seo.isNotFound) canonical.setAttribute("href", seo.canonicalUrl);
 
     setMeta("description", seo.description);
     setMeta("keywords", seo.keywords);
@@ -91,8 +95,8 @@ export function App() {
     setMeta("og:image", seo.image, "property");
     setMeta("og:image:secure_url", seo.image, "property");
     setMeta("og:image:type", "image/png", "property");
-    setMeta("og:image:width", "1200", "property");
-    setMeta("og:image:height", "630", "property");
+    setMeta("og:image:width", String(seo.imageWidth), "property");
+    setMeta("og:image:height", String(seo.imageHeight), "property");
     setMeta("og:image:alt", seo.imageAlt, "property");
     setMeta("twitter:card", "summary_large_image");
     setMeta("twitter:domain", "sozorockfoundation.org");
@@ -129,7 +133,7 @@ export function App() {
   return (
     <div className="site-frame">
       <Header pathname={pathname} />
-      <main id="main-content" key={pathname} className="page-view">
+      <main id="main-content" key={pathname} className="page-view" tabIndex={-1}>
         <RouteView pathname={pathname} />
       </main>
       <Footer />

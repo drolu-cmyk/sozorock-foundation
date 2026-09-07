@@ -1,66 +1,37 @@
-# SozoRock Foundation design QA
+# Foundation visual acceptance
 
-## Comparison target
+final result: passed
 
-- McKinsey Global Institute: `https://www.mckinsey.com/mgi/overview`
-- Brookings: `https://www.brookings.edu/`
-- P&G US: `https://us.pg.com/`
-- SozoRock AGENTS.md requirements and the user's supplied defect screenshots
+Verified September 7, 2026 against the approved user attachment and the rendered production build.
 
-All live reference and implementation captures were reviewed together at the same 1363 × 936 browser viewport. The comparison focused on information hierarchy, editorial rhythm, current-story prominence, motion control, navigation density, typography, neutral background treatment, and footer/legal organization.
+- Source visual truth: outputs/prompt-2/approved-foundation-direction.png.
+- Implementation: outputs/prompt-2/home-desktop-viewport.png.
+- Both images: 1536 x 1024 pixels, CSS viewport 1536 x 1024, device scale 1. Both show the homepage with Health expanded, at scroll zero. No density resampling.
+- Source and implementation were opened together in a single comparison input. Full-view text, imagery and controls were legible; no separate cropped comparison was necessary.
 
-## Initial issues
+## Findings and correction
 
-- The 620 px parent hero delayed the current initiative and created unnecessary dead space.
-- Inner-page 330 px title fields made the site feel templated and slow.
-- Instrument Sans across every text role flattened hierarchy and reduced long-copy readability.
-- The cool gray paper color felt closer to a generic product interface than an institutional editorial surface.
-- The initiative feature used a solid color block that read more like a card than a premium editorial campaign.
-- Partner and Support routes formed brochure-like grids.
-- Dropdown behavior could close during pointer activation.
-- Legal text was 11 px with low contrast and footer links were not semantically grouped.
-- The AI Lab article and its visual panel shared the same class name, turning the full feature navy and suppressing the copy contrast.
-- Leadership names inherited display tracking that was too tight for credentials.
-- Obsolete screenshot-related selectors remained in the style sheet.
+P2, corrected: the earlier implementation stacked initiative summaries below each heading, moving the engagement strip below the first viewport. Desktop rows now place summaries alongside names; the revised screenshot restores the compact editorial work field. Four products remain visible, as explicitly required by the user. Earlier evidence: the first desktop capture in this session; revised evidence: home-desktop-viewport.png and browser-qa.json.
 
-## Final implementation
+## Required fidelity surfaces
 
-- Compact top navigation: Work, Ideas, About, Partner, Support.
-- Click and keyboard dropdown activation with Escape dismissal.
-- Instrument Sans display system paired with Source Sans 3 body text.
-- Approved navy/cobalt/royal palette with warm paper `#f3f1ed`; no gradients.
-- 536 px homepage hero and 276 px desktop inner-page title field.
-- Premium white initiative spread with real HSA cover, real Health photography, and type-led AI Lab treatment.
-- AI Lab copy now remains on the same white editorial surface as the other initiatives, with navy confined to the signal panel.
-- Rule-based platform, partner, support, standards, insight, and event layouts.
-- Grouped institutional footer with U.S. Section 501(c)(3), EIN, deductibility, copyright, and SozoRock® licensing language.
-- LinkedIn was replaced by X in the social navigation.
-- Separate Leadership page with four profiles and exact approved Dr. Oluwabiyi Adeyemo title.
-- Preserved DOI landing routes and cautious HSA framing.
-- Completed the HSA permanent record with confirmed ISBN, edition, publisher, publication place, evidence cutoff, 42-page PDF, suggested citation, BibTeX, RIS, copyright, limitations, and related Volume 1 records. No DOI is displayed or emitted until one is supplied.
+- Typography: self-hosted Instrument Sans, strong two-line opening, compact stacked wordmark, restrained headings. Headline wrapping matches the reference. The source font is not identified; the implementation is an intentionally selected licensed match, not a claim of font identity.
+- Spacing: asymmetric work and publication composition, thin row dividers, generous cobalt opening and pale engagement strip. The fourth product and accessible legal footer increase document height intentionally. The stepped hero edge was simplified to a straight boundary; this is minor P3 fidelity polish, without a usability consequence.
+- Color: cobalt, white, navy and pale blue match the approved direction. No blue-purple gradient or cream foundation. Contrast is evaluated separately by automated accessibility checks.
+- Imagery: actual Health Systems Assurance cover is retained, with its authentic typography and publication details. Phosphor arrows are interface icons. Editable institutional wordmark text remains sharp at each viewport.
+- Copy: approved opening retained; concise Health boundaries clarify its non-clinical role. CB-CAP is present. Product descriptions and engagement copy are original, with no invented endorsements or outcomes.
 
-## Fidelity and interaction checks
+## Functional and responsive evidence
 
-- Fonts load in browser and computed styles confirm the two-family hierarchy.
-- Key color combinations exceed WCAG AA contrast for their intended text sizes.
-- Motion has pause/play, direct tab selection, arrow-key movement, and reduced-motion support.
-- Computed browser styles confirm navy text on the AI Lab copy panel and white text on the navy signal panel.
-- The HSA record has one `h1`, no duplicate IDs, no broken images, no horizontal overflow, working citation copying, a canonical URL, citation metadata, JSON-LD report metadata, and no `citation_doi` field.
-- The packaged PDF matches the supplied publication byte-for-byte; PDF, BibTeX, and RIS files are present in the production build.
-- Work menu opens with Enter and closes with Escape.
-- 16 routes have one `h1`, no duplicate IDs, no missing images, and no desktop horizontal overflow.
-- Build, CloudFront router, compatibility-worker, and SEO tests pass.
-- No site-generated console error was observed.
+92 route/viewport combinations at 1536, 768, 390 and 320 CSS pixels passed overflow, image loading, encoding, route status and browser error checks. Mobile menu, Escape, CB-CAP disclosure/destination and reduced motion passed. Automated WCAG checks on eight representative routes found no violations; this is not a complete assistive-technology certification. Publication delivery remains a separate release gate pending the user's Google credential and live end-to-end verification.
 
-## Website guide extension · 2026-08-28
+## Checklist
 
-- Compared the current live homepage and updated preview together at the same desktop browser state. The original hero, navigation, campaign, platform index, engagement routes, and footer retain their established layout, typography, palette, rule treatment, and assets.
-- The new Website guide sits as one restrained white editorial band between the hero and campaign. It uses the existing shell, display/body type pairing, cobalt link treatment, square geometry, and horizontal rules; it introduces no new visual language, gradient, icon, or generated asset.
-- The guide's primary example-question flow fills the labelled input, the submit control returns to its enabled state, and the unavailable-service error is announced in the existing status region.
-- The input has an explicit label, length limits, sensitive-information warning, keyboard-operable example prompts, visible focus treatment, live loading/error/result announcements, and reduced-motion inheritance.
-- The live campaign and preview campaign were captured at different points in the existing rotating feature; that expected content-state difference is unrelated to the guide extension.
-- Production build, route packaging, worker tests, AWS release-contract validation, agent graph smoke tests, and shell syntax validation pass.
+- [x] Compare source and production build at matching viewport and state.
+- [x] Correct the material desktop density difference and recapture.
+- [x] Verify mobile layout and product navigation.
+- [x] Preserve Crossref publication destinations.
+- [ ] Complete live publication email, link verification and private PDF delivery.
+- [ ] Verify the final production deployment.
 
-## Final result
-
-passed
+Visual acceptance does not assert that deployment or email delivery is complete.
