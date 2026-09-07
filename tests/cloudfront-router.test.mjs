@@ -29,8 +29,12 @@ test("CloudFront permanently canonicalizes the apex and preserves path/query", (
   assert.equal(result.headers.location.value, "https://www.sozorockfoundation.org/platforms?source=apex");
 });
 
-test("CloudFront rewrites every clean production route to its prebuilt HTML", () => {
-  for (const route of ["/", "/platforms", "/publication/hsa-v1-2026/access", "/terms"]) {
+test("CloudFront rewrites every clean production route to its prebuilt HTML", async () => {
+  const buildScript = await readFile(new URL("../scripts/prepare-sites-build.mjs", import.meta.url), "utf8");
+  const routeList = buildScript.match(/const permanentRoutes = (\[[\s\S]*?\]);/u)?.[1];
+  assert.ok(routeList, "production build declares its permanent routes");
+  const builtRoutes = JSON.parse(routeList.replace(/,\s*\]/u, "]"));
+  for (const route of ["/", ...builtRoutes]) {
     const result = request(route);
     assert.equal(result.uri, route === "/" ? "/index.html" : `${route}.html`);
   }
