@@ -228,17 +228,21 @@ jobs:
           done
           curl --proto '=https' --tlsv1.2 --fail --silent --show-error "https://${distribution_domain}/platforms" | grep -Fq '<title>Platforms | The SozoRock Foundation</title>'
           api_status="$(curl --proto '=https' --tlsv1.2 --silent --show-error --output "$RUNNER_TEMP/api-preflight.json" --write-out '%{http_code}' \
-            --request POST --header 'Content-Type: application/json' --data '{"email":"invalid"}' \
+            --request POST --header "Origin: https://${CANONICAL_HOST}" --header 'Content-Type: application/json' --data '{"email":"invalid"}' \
             "https://${distribution_domain}/api/contact")"
           test "$api_status" = '400'
           publication_status="$(curl --proto '=https' --tlsv1.2 --silent --show-error --output "$RUNNER_TEMP/publication-preflight.json" --write-out '%{http_code}' \
-            --request POST --header 'Content-Type: application/json' --data '{"email":"invalid"}' \
+            --request POST --header "Origin: https://${CANONICAL_HOST}" --header 'Content-Type: application/json' --data '{"email":"invalid"}' \
             "https://${distribution_domain}/api/publications/access/hsa-v1-2026")"
           test "$publication_status" = '400'
+          hostile_status="$(curl --proto '=https' --tlsv1.2 --silent --show-error --output /dev/null --write-out '%{http_code}' \
+            --request POST --header 'Origin: https://attacker.invalid' --header 'Content-Type: application/json' --data '{}' \
+            "https://${distribution_domain}/api/publications/access/hsa-v1-2026")"
+          test "$hostile_status" = '403'
           navigator_status=''
           for attempt in $(seq 1 40); do
             navigator_status="$(curl --proto '=https' --tlsv1.2 --silent --show-error --output "$RUNNER_TEMP/navigator-preflight.json" --write-out '%{http_code}' \
-              --request POST --header 'Content-Type: application/json' --data '{"question":"x"}' \
+              --request POST --header "Origin: https://${CANONICAL_HOST}" --header 'Content-Type: application/json' --data '{"question":"x"}' \
               "https://${distribution_domain}/api/navigator")"
             [[ "$navigator_status" = '400' ]] && break
             test "$attempt" -lt 40
