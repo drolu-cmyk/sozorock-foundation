@@ -286,7 +286,7 @@ function isMeaningfulReason(value) {
   const text = String(value || "").trim();
   const words = text.split(/\s+/u).filter((word) => normalizedCharacters(word).length >= 2);
   const characters = normalizedCharacters(text);
-  return text.length >= 20 && text.length <= 800 && words.length >= 3 && new Set(characters).size >= 6 && !/(.)\1{3,}/iu.test(text);
+  return text.length >= 30 && text.length <= 800 && words.length >= 3 && new Set(characters).size >= 6 && !/(.)\1{3,}/iu.test(text);
 }
 
 export function PublicationAccessPage({ publication }) {
@@ -330,7 +330,7 @@ export function PublicationAccessPage({ publication }) {
     if (!isMeaningfulShortText(payload.cityOrRegion)) nextErrors.cityOrRegion = "Enter a valid city or region";
     if (!isMeaningfulShortText(payload.state)) nextErrors.state = "Enter a valid state, province, or territory";
     if (!isMeaningfulShortText(payload.country)) nextErrors.country = "Enter a valid country";
-    if (!isMeaningfulReason(payload.reason)) nextErrors.reason = "Use at least three meaningful words (20–800 characters)";
+    if (!isMeaningfulReason(payload.reason)) nextErrors.reason = "Use at least three meaningful words (30–800 characters)";
     if (!payload.deliveryConsent) nextErrors.deliveryConsent = "Consent is required to send the verification link";
     if (Object.keys(nextErrors).length) {
       setErrors(nextErrors);
@@ -408,7 +408,7 @@ export function PublicationAccessPage({ publication }) {
             <label htmlFor="access-state">State, province, or territory<input id="access-state" name="state" required autoComplete="address-level1" aria-invalid={Boolean(errors.state)} aria-describedby={errors.state ? "access-state-error" : undefined} />{errorFor("state")}</label>
           </div>
           <label htmlFor="access-country">Country<input id="access-country" name="country" required autoComplete="country-name" defaultValue="United States" aria-invalid={Boolean(errors.country)} aria-describedby={errors.country ? "access-country-error" : undefined} />{errorFor("country")}</label>
-          <label htmlFor="access-reason">Reason for interest<textarea id="access-reason" name="reason" required rows="4" minLength="20" maxLength="800" aria-invalid={Boolean(errors.reason)} aria-describedby={`access-reason-hint${errors.reason ? " access-reason-error" : ""}`} /><span className="field-hint" id="access-reason-hint">Tell us how this research relates to your work or interests (20–800 characters). Please leave out health or medical information.</span>{errorFor("reason")}</label>
+          <label htmlFor="access-reason">Reason for interest<textarea id="access-reason" name="reason" required rows="4" minLength="30" maxLength="800" aria-invalid={Boolean(errors.reason)} aria-describedby={`access-reason-hint${errors.reason ? " access-reason-error" : ""}`} /><span className="field-hint" id="access-reason-hint">Tell us how this research relates to your work or interests (30–800 characters). Please leave out health or medical information.</span>{errorFor("reason")}</label>
           <div className="access-honeypot" aria-hidden="true"><label>Website<input name="website" tabIndex="-1" autoComplete="off" /></label></div>
           <label className="check-field" htmlFor="access-delivery-consent"><input id="access-delivery-consent" name="deliveryConsent" type="checkbox" value="yes" required aria-invalid={Boolean(errors.deliveryConsent)} aria-describedby={errors.deliveryConsent ? "access-deliveryConsent-error" : undefined} /><span>I agree that The SozoRock Foundation, Inc. may email me the verification and access link for this publication.{errorFor("deliveryConsent")}</span></label>
           <label className="check-field" htmlFor="access-updates-consent"><input id="access-updates-consent" name="updatesConsent" type="checkbox" value="yes" /><span>Optional: Send me future publication updates. This is not required for access.</span></label>

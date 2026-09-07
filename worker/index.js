@@ -123,7 +123,7 @@ function isMeaningfulReason(value) {
   const text = String(value || "").trim();
   const words = text.split(/\s+/u).filter((word) => normalizedCharacters(word).length >= 2);
   const characters = normalizedCharacters(text);
-  return text.length >= 20 && text.length <= 800 && words.length >= 3 && new Set(characters).size >= 6 && !/(.)\1{3,}/iu.test(text);
+  return text.length >= 30 && text.length <= 800 && words.length >= 3 && new Set(characters).size >= 6 && !/(.)\1{3,}/iu.test(text);
 }
 
 function isMeaningfulMessage(value) {
@@ -155,7 +155,7 @@ function validateAccessPayload(input) {
   if (!isMeaningfulShortText(payload.cityOrRegion)) return { error: "Enter a valid city or region." };
   if (!isMeaningfulShortText(payload.state)) return { error: "Enter a valid state, province, or territory." };
   if (!isMeaningfulShortText(payload.country)) return { error: "Enter a valid country." };
-  if (!isMeaningfulReason(payload.reason)) return { error: "Use at least three meaningful words (20ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“800 characters) for your reason for interest." };
+  if (!isMeaningfulReason(payload.reason)) return { error: "Use at least three meaningful words (30-800 characters) for your reason for interest." };
   if (!payload.deliveryConsent) return { error: "Consent is required to send the verification link." };
   return { payload };
 }
