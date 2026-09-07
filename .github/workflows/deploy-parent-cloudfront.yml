@@ -353,7 +353,7 @@ jobs:
           aws cloudfront wait distribution-deployed --id '${{ steps.target.outputs.distribution_id }}'
           target_ip="$(getent ahostsv4 '${{ steps.target.outputs.distribution_domain }}' | awk 'NR==1 {print $1}')"
           test -n "$target_ip"
-          curl --proto '=https' --tlsv1.2 --fail --silent --show-error --resolve "${CANONICAL_HOST}:443:${target_ip}" "https://${CANONICAL_HOST}/platforms" | grep -Fq 'Three platforms'
+          curl --proto '=https' --tlsv1.2 --fail --silent --show-error --resolve "${CANONICAL_HOST}:443:${target_ip}" "https://${CANONICAL_HOST}/platforms" | grep -Fq '<title>Platforms | The SozoRock Foundation</title>'
           complete=1
           touch "$RUNNER_TEMP/foundation-aliases-moved"
 
@@ -366,7 +366,7 @@ jobs:
           set -euo pipefail
           target_ip="$(getent ahostsv4 "$DISTRIBUTION_DOMAIN" | awk 'NR==1 {print $1}')"
           test -n "$target_ip"
-          curl --proto '=https' --tlsv1.2 --fail --silent --show-error --resolve "${CANONICAL_HOST}:443:${target_ip}" "https://${CANONICAL_HOST}/platforms" | grep -Fq 'Three platforms'
+          curl --proto '=https' --tlsv1.2 --fail --silent --show-error --resolve "${CANONICAL_HOST}:443:${target_ip}" "https://${CANONICAL_HOST}/platforms" | grep -Fq '<title>Platforms | The SozoRock Foundation</title>'
 
       - name: Atomically cut over DNS with automatic rollback
         id: dns
@@ -461,7 +461,7 @@ jobs:
             > "$RUNNER_TEMP/mail-records-after.json"
           cmp "$RUNNER_TEMP/mail-records-before.json" "$RUNNER_TEMP/mail-records-after.json"
           navigator_status="$(curl --proto '=https' --tlsv1.2 --silent --show-error --output "$RUNNER_TEMP/navigator-live.json" --write-out '%{http_code}' \
-            --request POST --header 'Content-Type: application/json' --data '{"question":"x"}' \
+            --request POST --header "Origin: https://${CANONICAL_HOST}" --header 'Content-Type: application/json' --data '{"question":"x"}' \
             "https://${CANONICAL_HOST}/api/navigator")"
           test "$navigator_status" = '400'
           verified=1
