@@ -6,7 +6,7 @@ export const navigation = [
     summary: "What SozoRock operates",
     items: [
       { label: "SozoRock Global Institute", href: "/platforms/institute", meta: "Insight, publications, and convening" },
-      { label: "SozoRock Health", href: "/platforms/health", meta: "Access, navigation, and community evidence" },
+      { label: "SozoRock Health", href: "/platforms/health", meta: "Systems for health access" },
       { label: "SozoRock AI Lab", href: "/platforms/ai-lab", meta: "Applied learning for modern work" },
     ],
   },
@@ -49,8 +49,8 @@ export const platforms = [
   {
     slug: "health",
     name: "SozoRock Health",
-    line: "Access, navigation, and community evidence.",
-    detail: "A non-clinical layer that helps people move from uncertainty to a practical next step while licensed care stays with licensed providers.",
+    line: "Building the systems that make health access possible.",
+    detail: "Community access, place-based intelligence, digital assurance and workforce capacity to help institutions build more accountable health systems.",
     href: "/platforms/health",
     action: "Explore SozoRock Health",
     tone: "navy",
@@ -159,9 +159,9 @@ export const campaigns = [
   {
     key: "health",
     label: "SozoRock Health",
-    title: "A clearer path to care that already exists.",
-    copy: "Non-clinical access, navigation, and community evidence while licensed care stays with licensed providers.",
-    detail: "Hubs · Health Access Day · Community evidence",
+    title: "Care can exist. Access still takes a system.",
+    copy: "Connecting community access, place-based intelligence, digital assurance and workforce capacity.",
+    detail: "Systems for health access",
     href: "/platforms/health",
     action: "Explore SozoRock Health",
     image: "/media/health-access.webp",
@@ -186,8 +186,8 @@ export const campaigns = [
 export const insights = [
   {
     type: "Field update",
-    title: "A clearer path to care that already exists",
-    summary: "How a non-clinical access layer can help people begin while providers retain clinical care, records, consent, and follow-up.",
+    title: "Building the systems that make health access possible",
+    summary: "Explore SozoRock Health's work in community access, evidence, digital readiness and workforce capacity.",
     href: "https://health.sozorockfoundation.org/",
     source: "SozoRock Health",
   },

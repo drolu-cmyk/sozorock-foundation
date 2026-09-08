@@ -4,7 +4,7 @@ import { Link } from "./router";
 
 const work = [
   { id: "cbcap", name: "CB-CAP", summary: "County evidence for local action.", copy: "Explore county-level evidence to frame local questions, understand context and support accountable decisions.", href: "https://cbcap.sozorockfoundation.org/", action: "Explore CB-CAP" },
-  { id: "health", name: "SozoRock Health", summary: "A practical path to licensed care.", copy: "We develop non-clinical navigation and place-based evidence to help people and communities understand barriers to care.", href: "https://health.sozorockfoundation.org/", action: "Explore Health" },
+  { id: "health", name: "SozoRock Health", summary: "Building the systems that make health access possible.", copy: "Community access, place-based intelligence, digital assurance and workforce capacity for more accountable health systems.", href: "https://health.sozorockfoundation.org/", action: "Explore Health" },
   { id: "institute", name: "SozoRock Global Institute", summary: "Research that sharpens public decisions.", copy: "Publications and focused discussions examine health systems assurance, rural governance and equity.", href: "/platforms/institute", action: "Explore the Institute" },
   { id: "ai", name: "SozoRock AI Lab", summary: "Practical AI. Accountable human judgment.", copy: "No-cost learning helps people apply AI to real work, verify the results and use them responsibly.", href: "https://ai-lab.sozorockfoundation.org/", action: "Explore the AI Lab" },
 ];

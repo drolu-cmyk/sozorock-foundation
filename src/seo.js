@@ -24,8 +24,8 @@ const routeSeo = {
     pageType: "WebPage",
   },
   "/platforms/health": {
-    title: "SozoRock Health | Health Access & Place Intelligence",
-    description: "SozoRock Health develops non-clinical access, navigation, place intelligence, and community evidence while licensed care remains with providers.",
+    title: "SozoRock Health | Systems for Health Access",
+    description: "Community access, place-based intelligence, digital assurance and workforce capacity. Discover SozoRock Health, an initiative of The SozoRock Foundation.",
     pageType: "WebPage",
   },
   "/platforms/ai-lab": {
