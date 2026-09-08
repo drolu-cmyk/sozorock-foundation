@@ -16,7 +16,7 @@ assert.deepEqual(workflowFiles, [
   "deploy-parent-cloudfront.yml",
   "render-platform-films.yml",
 ]);
-const filmWorkflow = await readFile(new URL("render-platform-films.yml", workflowDirectory), "utf8");
+const filmWorkflow = (await readFile(new URL("render-platform-films.yml", workflowDirectory), "utf8")).replaceAll("\r\n", "\n");
 assert.match(filmWorkflow, /permissions:\n  contents: read\n/u);
 assert.doesNotMatch(filmWorkflow, /id-token:|secrets\.|configure-aws-credentials|aws s3|aws cloudformation/u);
 assert.doesNotMatch(workflowText, /^\s*schedule:/mu);

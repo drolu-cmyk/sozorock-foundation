@@ -5,6 +5,18 @@ import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { spawnSync } from 'node:child_process';
 
+const bash = process.platform === 'win32' ? 'C:/Program Files/Git/bin/bash.exe' : 'bash';
+const shellPath = (value) => process.platform === 'win32'
+  ? value.replaceAll('\\', '/').replace(/^([A-Za-z]):/, (_, drive) => `/${drive.toLowerCase()}`)
+  : value;
+
+function runShell(command, dir, environment) {
+  return spawnSync(bash, ['-c', `export PATH="$FIXTURE_PATH:$PATH"; ${command}`], {
+    env: { ...process.env, ...environment, FIXTURE_PATH: shellPath(dir) },
+    encoding: 'utf8',
+  });
+}
+
 function sandbox(run) {
   const dir = mkdtempSync(join(tmpdir(), 'release-security-'));
   const executable = (name, body) => writeFileSync(join(dir, name), `#!/usr/bin/env bash\n${body}\n`, { mode: 0o755 });
@@ -20,9 +32,9 @@ for (const [label, message, code, calls] of [
 ]) {
   test(`production audit handles ${label}`, () => sandbox((dir, executable) => {
     executable('npm', `echo call >> "$CALLS"\nprintf '%s\\n' "$MESSAGE"\nexit "$CODE"`);
-    const result = spawnSync('bash', [resolve('scripts/audit-npm-production.sh')], {
-      env: { ...process.env, PATH: `${dir}:${process.env.PATH}`, CALLS: join(dir, 'calls'), MESSAGE: message, CODE: String(code) },
-      encoding: 'utf8',
+    const result = runShell('bash "$SCRIPT"', dir, {
+      SCRIPT: shellPath(resolve('scripts/audit-npm-production.sh')),
+      CALLS: shellPath(join(dir, 'calls')), MESSAGE: message, CODE: String(code),
     });
     assert.equal(result.status, code, result.stderr);
     assert.equal(readFileSync(join(dir, 'calls'), 'utf8').trim().split('\n').length, calls);
@@ -41,9 +53,8 @@ case "$MODE" in
 esac
 exit 254`);
     const helper = resolve('services/foundation-agents/scripts/remove-canary-permission.sh');
-    const result = spawnSync('bash', ['-c', 'source "$HELPER"; remove_canary_permission'], {
-      env: { ...process.env, PATH: `${dir}:${process.env.PATH}`, HELPER: helper, FUNCTION_NAME: 'test-function', MODE: mode, CALLS: join(dir, 'calls') },
-      encoding: 'utf8',
+    const result = runShell('source "$HELPER"; remove_canary_permission', dir, {
+      HELPER: shellPath(helper), FUNCTION_NAME: 'test-function', MODE: mode, CALLS: shellPath(join(dir, 'calls')),
     });
     assert.equal(result.status, expected, result.stderr);
   }));
