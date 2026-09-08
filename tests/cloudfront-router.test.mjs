@@ -3,7 +3,7 @@ import { readFile } from "node:fs/promises";
 import test from "node:test";
 import vm from "node:vm";
 
-const template = await readFile(new URL("../infra/cloudformation/parent-cloudfront.yml", import.meta.url), "utf8");
+const template = (await readFile(new URL("../infra/cloudformation/parent-cloudfront.yml", import.meta.url), "utf8")).replaceAll("\r\n", "\n");
 const marker = "      FunctionCode: |\n";
 const start = template.indexOf(marker);
 assert.notEqual(start, -1);

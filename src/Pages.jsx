@@ -45,24 +45,24 @@ export function InstitutePage() {
 
 export function HealthPage() {
   const healthPrograms = [
-    ["Health Equity Hubs", "Library, community, and home formats that create a trusted non-clinical starting point."],
-    ["Health Access Day", "Evidence-shaped local activation with institutions, educators, and licensed professionals working within their roles."],
-    ["Place Intelligence", "Public evidence about geography, source, date, comparison, and limits before drawing a conclusion."],
-    ["CB-CAP", "De-identified county systems intelligence for local questions, accountable owners, and transparent planning."],
+    ["Community access", "Health Equity Hubs, Health Access Day and practical support around reaching care."],
+    ["Evidence and intelligence", "Place Intelligence and CB-CAP connect county evidence with its sources, dates and limits."],
+    ["Digital readiness and assurance", "Practical readiness, cybersecurity and evidence-based assurance for digital health systems."],
+    ["Workforce capacity", "Education and partnership pathways informed by the capabilities a community needs."],
   ];
   return (
     <>
-      <PageHero eyebrow="Platform" title="SozoRock Health" copy="Access, navigation, and community evidence—without becoming a clinic, provider, or telehealth platform.">
+      <PageHero eyebrow="Initiative" title="SozoRock Health" copy="Community access. Place-based intelligence. Digital assurance. Workforce capacity.">
         <div className="button-row"><a href="https://health.sozorockfoundation.org/" className="button button-light">Open SozoRock Health</a><a href="https://health.sozorockfoundation.org/explore" className="button button-outline-light">Explore a place</a></div>
       </PageHero>
       <section className="section media-story">
         <div className="shell media-story-grid">
           <div className="media-frame"><img src="/media/health-access.webp" alt="Two people use a tablet together in a community library" /></div>
-          <div><p className="eyebrow">The access layer</p><h2>A clearer path to care that already exists.</h2><p>SozoRock helps people move from uncertainty to a practical next step while providers retain their clinical platforms, records, consent, medical judgment, treatment, and follow-up.</p><p className="boundary">Not a clinic. Not a provider. Not a telehealth platform.</p></div>
+          <div><p className="eyebrow">Systems for health access</p><h2>Care can exist. Access still takes a system.</h2><p>SozoRock Health develops practical models, evidence and capabilities to help communities and institutions address barriers to care.</p><p className="boundary">SozoRock Health does not diagnose, treat or prescribe, and does not replace a licensed practitioner. It is not a clinic, provider or telehealth platform.</p></div>
         </div>
       </section>
       <section className="section soft-section">
-        <div className="shell"><SectionHeading eyebrow="Work" title="Access where people already are." /><div className="work-list">{healthPrograms.map(([title, copy]) => <article key={title}><h3>{title}</h3><p>{copy}</p></article>)}</div></div>
+        <div className="shell"><SectionHeading eyebrow="Work" title="One purpose. Connected capabilities." /><div className="work-list">{healthPrograms.map(([title, copy]) => <article key={title}><h3>{title}</h3><p>{copy}</p></article>)}</div></div>
       </section>
       <CbcapEvidence />
     </>
