@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { HomePage } from "./HomePage";
+import { AiSocietyPage } from "./AiSocietyPage";
 import {
   AboutPage,
   ContactPage,
@@ -33,6 +34,7 @@ function RouteView({ pathname }) {
   if (accessPublication) return <PublicationAccessPage publication={accessPublication} />;
   if (publication) return <PublicationPage publication={publication} />;
   if (pathname === "/") return <HomePage />;
+  if (pathname === "/ai-society") return <AiSocietyPage />;
   if (pathname === "/platforms") return <PlatformsPage />;
   if (pathname === "/platforms/institute") return <InstitutePage />;
   if (pathname === "/platforms/health") return <HealthPage />;

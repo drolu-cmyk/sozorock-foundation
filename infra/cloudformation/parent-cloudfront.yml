@@ -169,6 +169,7 @@ Resources:
           if (uri.indexOf('/api/') === 0) return request;
 
           var routes = {
+            '/ai-society': true,
             '/': true,
             '/platforms': true,
             '/platforms/institute': true,
