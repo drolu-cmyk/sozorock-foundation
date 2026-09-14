@@ -198,3 +198,16 @@ input[type=checkbox] { min-height:0; }
   .policy-layout { grid-template-columns:1fr; gap:24px; }
 }
 @media(prefers-reduced-motion:reduce) { html { scroll-behavior:auto; } .initiative-row svg { transition:none; } }
+
+/* Scoped institutional discovery and leadership background alignment. */
+.society-home-context { display:grid; grid-template-columns:125px minmax(0,1fr); gap:64px; padding:8px 0 32px; }
+.society-home-context > .eyebrow { padding-top:5px; }
+.society-home-context > div > p { font-size:16px; max-width:80ch; }
+.society-home-context .editorial-link { margin-top:6px; }
+.society-work-context { margin-top:28px; }
+.leader-image img[src="/leadership/anthony-abraham.jpg"] { filter:brightness(1.04); mix-blend-mode:multiply; }
+@media(max-width:899px) { .society-home-context { grid-template-columns:1fr; gap:10px; } }
+
+.society-inline-link { color:var(--cobalt); text-decoration:underline; text-underline-offset:3px; }
+
+.society-institute-context { margin-top:24px; }

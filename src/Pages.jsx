@@ -15,6 +15,7 @@ export function PlatformsPage() {
               <div><p>{platform.detail}</p><Link href={platform.href} className="text-link">{platform.action}</Link></div>
             </article>
           ))}
+          <p className="society-work-context">Across the Global Institute and AI Lab, <Link href="/ai-society" className="society-inline-link">AI &amp; Society</Link> is an emerging area of work on participation, evaluation and public accountability.</p>
         </div>
       </section>
     </>
@@ -36,7 +37,7 @@ export function InstitutePage() {
       <section className="section soft-section">
         <div className="shell split-copy">
           <div><p className="eyebrow">Convene</p><h2>Firesides, roundtables, and briefings.</h2></div>
-          <div><p>Small, focused formats connect a publication or field question with researchers, practitioners, agencies, academic partners, and community institutions.</p><Link href="/events" className="text-link">Explore events</Link></div>
+          <div><p>Small, focused formats connect a publication or field question with researchers, practitioners, agencies, academic partners, and community institutions.</p><Link href="/events" className="text-link">Explore events</Link><p className="society-institute-context">Our emerging <Link href="/ai-society" className="society-inline-link">AI &amp; Society</Link> research asks how human agency, accountability and governance can shape consequential institutional decisions about AI.</p></div>
         </div>
       </section>
     </>
@@ -453,7 +454,7 @@ export function AboutPage() {
   return (
     <>
       <PageHero eyebrow="The Foundation" title="About SozoRock" copy="We develop research, health-access initiatives and practical learning to help people and institutions act." />
-      <section className="section" id="mission"><div className="shell split-copy"><div><p className="eyebrow">Mission</p><h2>Turn evidence into practical action.</h2></div><div><p>Our work connects research with the people who can use it: communities, practitioners, educators and institutions. We examine barriers to care, develop county-level evidence and build practical AI capability.</p><p>Rural communities are a central focus of our research into access, equity and public decision-making.</p></div></div></section>
+      <section className="section" id="mission"><div className="shell split-copy"><div><p className="eyebrow">Mission</p><h2>Turn evidence into practical action.</h2></div><div><p>Our work connects research with the people who can use it: communities, practitioners, educators and institutions. We examine barriers to care, develop county-level evidence and build practical AI capability.</p><p>Rural communities are a central focus of our research into access, equity and public decision-making.</p><p>Our emerging <Link href="/ai-society" className="society-inline-link">AI &amp; Society</Link> work examines how AI is governed, evaluated and used, with human judgment, community participation and public accountability at its center.</p></div></div></section>
       <section className="section soft-section"><div className="shell split-copy"><div><p className="eyebrow">Leadership</p><h2>Institutional responsibility, clearly assigned.</h2></div><div><p>Meet the team responsible for global health partnerships, global affairs, health education, and strategic initiatives.</p><Link href="/leadership" className="text-link">Meet the leadership team</Link></div></div></section>
       <section className="section" id="contact"><div className="shell contact-panel"><div><p className="eyebrow">Contact</p><h2>Start with the question.</h2><p>For publications, events, partnerships, or institutional inquiries:</p></div><Link href="/partner" className="button button-primary">Send an inquiry</Link></div></section>
     </>

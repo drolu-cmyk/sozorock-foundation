@@ -13,6 +13,7 @@ const index = path.join(dist, "client", "index.html");
 const worker = path.join(root, "worker", "index.js");
 const hosting = path.join(root, ".openai", "hosting.json");
 const permanentRoutes = [
+  "/ai-society",
   "/contact",
   "/platforms",
   "/platforms/institute",

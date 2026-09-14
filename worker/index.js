@@ -13,6 +13,7 @@ const PRIVATE_PUBLICATION_FILES = new Map([
   ["/publications/hsa-volume-1-2026.ris", "/publication/hsa-v1-2026/access"],
 ]);
 export const APP_ROUTES = new Set([
+  "/ai-society",
   "/",
   "/platforms",
   "/platforms/institute",

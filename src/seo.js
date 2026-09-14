@@ -7,6 +7,11 @@ export const ORGANIZATION_ID = `${SITE_ORIGIN}/#organization`;
 export const WEBSITE_ID = `${SITE_ORIGIN}/#website`;
 
 const routeSeo = {
+  "/ai-society": {
+    title: "AI & Society | The SozoRock Foundation",
+    description: "An emerging area of work examining community participation, human agency, evaluation and accountability in consequential uses of AI.",
+    pageType: "WebPage",
+  },
   "/contact": { title: "Contact the Foundation | SozoRock", description: "Discuss research, community initiatives and applied learning with The SozoRock Foundation. Start a partnership or ask about our work.", pageType: "ContactPage" },
   "/": {
     title: "The SozoRock Foundation | Health Access, Systems & AI",
@@ -20,7 +25,7 @@ const routeSeo = {
   },
   "/platforms/institute": {
     title: "SozoRock Global Institute | Research & Convening",
-    description: "Public-interest research, publications, briefings, firesides, and roundtables across assurance, governance, access, and systems intelligence.",
+    description: "Research, publications and convening across assurance, governance, access and systems intelligence, with emerging questions on AI and society.",
     pageType: "WebPage",
   },
   "/platforms/health": {
@@ -50,7 +55,7 @@ const routeSeo = {
   },
   "/about": {
     title: "About | The SozoRock Foundation",
-    description: "Learn how The SozoRock Foundation connects public-interest research, community implementation, systems intelligence, and applied learning.",
+    description: "Research, health access, public systems and applied learning, with emerging work on human judgment, AI governance and public accountability.",
     pageType: "AboutPage",
   },
   "/leadership": {
@@ -96,6 +101,7 @@ const routeSeo = {
 };
 
 const routeKeywords = {
+  "/ai-society": ["AI and society", "community participation", "human agency", "AI evaluation", "public accountability"],
   "/": ["SozoRock Foundation", "health access", "health systems assurance", "public systems", "responsible AI"],
   "/platforms": ["SozoRock platforms", "Global Institute", "SozoRock Health", "SozoRock AI Lab"],
   "/platforms/institute": ["public-interest research", "systems intelligence", "governance research", "SozoRock Global Institute"],
@@ -111,6 +117,7 @@ const routeKeywords = {
 };
 
 const breadcrumbNames = {
+  "ai-society": "AI & Society",
   contact: "Contact",
   platforms: "Work",
   institute: "SozoRock Global Institute",
