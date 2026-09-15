@@ -6,7 +6,7 @@ import { Link } from "./router";
 export function PlatformsPage() {
   return (
     <>
-      <PageHero eyebrow="Work" title="Platforms" copy="Research, health access, county evidence and applied AI. Explore the work and find where to begin." />
+      <PageHero eyebrow="Work" title="Platforms" copy="Research, rural health access, county evidence and practical AI learning. Explore the work and its current scope." />
       <section className="section platform-detail-list">
         <div className="shell">
           {platforms.map((platform) => (
@@ -181,7 +181,7 @@ export function PublicationPage({ publication }) {
       </section>
       <section className="section publication-body">
         <div className="shell reading-width">
-          <p className="eyebrow">Scope</p><h2>{publication.tagline}</h2><p>{publication.description}</p>
+          <p className="eyebrow">Public overview</p><h2>{publication.tagline}</h2><p>{publication.description}</p><p>Use this overview to assess the topic before requesting the full text. The publication contains the argument and supporting references; a publication identifier does not establish independent peer review.</p>
           {publication.limits && <div className="limits"><strong>Important limitation</strong><p>{publication.limits}</p></div>}
         </div>
       </section>
@@ -215,7 +215,7 @@ export function PublicationPage({ publication }) {
               </div>
               <p className="citation-status" role="status" aria-live="polite">{citationStatus}</p>
               <div className="publication-file-line">
-                <span>{publication.fileLabel}</span>
+                {publication.fileLabel && <span>{publication.fileLabel}</span>}
                 {publication.pages && <span>{publication.pages}</span>}
                 {publication.accessPath && <Link href={publication.accessPath}>Verified email access</Link>}
               </div>
@@ -438,11 +438,11 @@ export function InsightsPage() {
 export function EventsPage() {
   return (
     <>
-      <PageHero eyebrow="Ideas" title="Events" copy="Firesides, roundtables, and briefings connect evidence with people who can test and apply it." />
+      <PageHero eyebrow="Ideas" title="Events" copy="Discussions, roundtables and briefings connect research with people who can examine and apply it." />
       <section className="section" id="upcoming">
         <div className="shell event-grid">
-          <article className="event-status"><p className="eyebrow">Upcoming events</p><h2>Join a focused conversation.</h2><p>Contact us about a briefing or roundtable on a publication or question relevant to your organization.</p><Link href="/partner" className="text-link">Express interest in an event</Link></article>
-          <div className="event-formats"><article id="firesides"><h3>Firesides</h3><p>Focused conversations around a publication, emerging question, or implementation challenge.</p></article><article id="roundtables"><h3>Roundtables</h3><p>Working sessions for public agencies, health systems, universities, libraries, and community institutions.</p></article><article><h3>Briefings</h3><p>Decision-ready presentations shaped for a specific audience and question.</p></article></div>
+          <article className="event-status"><p className="eyebrow">Briefings by inquiry</p><h2>Join a focused conversation.</h2><p>Contact us about a briefing or roundtable on a publication or question relevant to your organization.</p><Link href="/partner" className="text-link">Express interest in an event</Link></article>
+          <div className="event-formats"><article id="firesides"><h3>Facilitated discussions</h3><p>Focused conversations around a publication, emerging question, or implementation challenge.</p></article><article id="roundtables"><h3>Roundtables</h3><p>Working sessions for public agencies, health systems, universities, libraries, and community institutions.</p></article><article><h3>Briefings</h3><p>Decision-ready presentations shaped for a specific audience and question.</p></article></div>
         </div>
       </section>
 
@@ -454,9 +454,9 @@ export function AboutPage() {
   return (
     <>
       <PageHero eyebrow="The Foundation" title="About SozoRock" copy="We develop research, health-access initiatives and practical learning to help people and institutions act." />
-      <section className="section" id="mission"><div className="shell split-copy"><div><p className="eyebrow">Mission</p><h2>Turn evidence into practical action.</h2></div><div><p>Our work connects research with the people who can use it: communities, practitioners, educators and institutions. We examine barriers to care, develop county-level evidence and build practical AI capability.</p><p>Rural communities are a central focus of our research into access, equity and public decision-making.</p><p>Our emerging <Link href="/ai-society" className="society-inline-link">AI &amp; Society</Link> work examines how AI is governed, evaluated and used, with human judgment, community participation and public accountability at its center.</p></div></div></section>
-      <section className="section soft-section"><div className="shell split-copy"><div><p className="eyebrow">Leadership</p><h2>Institutional responsibility, clearly assigned.</h2></div><div><p>Meet the team responsible for global health partnerships, global affairs, health education, and strategic initiatives.</p><Link href="/leadership" className="text-link">Meet the leadership team</Link></div></div></section>
-      <section className="section" id="contact"><div className="shell contact-panel"><div><p className="eyebrow">Contact</p><h2>Start with the question.</h2><p>For publications, events, partnerships, or institutional inquiries:</p></div><Link href="/partner" className="button button-primary">Send an inquiry</Link></div></section>
+      <section className="section" id="mission"><div className="shell split-copy"><div><p className="eyebrow">Mission</p><h2>Turn evidence into practical action.</h2></div><div><p>Our work connects research with the people who can use it: communities, practitioners, educators and institutions. We examine barriers to care, develop county-level evidence and build practical AI capability.</p><p>Rural health is a central focus: understanding local barriers, preparing community access models and examining the evidence behind public decisions.</p><p>Our emerging <Link href="/ai-society" className="society-inline-link">AI &amp; Society</Link> work examines how AI is governed, evaluated and used, with human judgment, community participation and public accountability at its center.</p></div></div></section>
+      <section className="section soft-section"><div className="shell split-copy"><div><p className="eyebrow">Leadership</p><h2>Institutional responsibility, clearly assigned.</h2></div><div><p>Meet the team responsible for partnerships, global affairs, health education and strategic initiatives. These profiles describe program responsibilities; they do not identify governing-board appointments.</p><Link href="/leadership" className="text-link">Meet the leadership team</Link></div></div></section>
+      <section className="section" id="contact"><div className="shell contact-panel"><div><p className="eyebrow">Contact</p><h2>Start with the question.</h2><p>For publications, rural health partnerships, organizational information or other institutional inquiries:</p><p>The SozoRock Foundation, Inc. is the nonprofit organization responsible for this website. Separately incorporated SozoRock businesses are distinct organizations. Ask us about the responsible entity and project roles when discussing a collaboration.</p></div><Link href="/partner" className="button button-primary">Send an inquiry</Link></div></section>
     </>
   );
 }
@@ -471,15 +471,15 @@ export function LeadershipPage() {
 }
 
 export function ContactPage() {
-  return <><PageHero eyebrow="Contact" title="Let’s put ideas to work." copy="Talk with us about research, community initiatives or applied learning." /><section className="section form-section"><div className="shell form-layout"><div><h2>What would you like to explore?</h2><p>Tell us the question, the people it concerns and the outcome you have in mind.</p><p>For partnership and support opportunities, visit <Link href="/partner" className="text-link">Partner</Link> or <Link href="/support" className="text-link">Support our work</Link>.</p></div><EngagementForm kind="Contact" /></div></section></>;
+  return <><PageHero eyebrow="Contact" title="Let’s put ideas to work." copy="Talk with us about rural health, research, community initiatives or applied learning." /><section className="section form-section"><div className="shell form-layout"><div><h2>What would you like to explore?</h2><p>Tell us the question, the people it concerns and the outcome you have in mind.</p><p>For partnership and support opportunities, visit <Link href="/partner" className="text-link">Partner</Link> or <Link href="/support" className="text-link">Support our work</Link>.</p><p>You can also email <a href="mailto:contact@sozorockfoundation.org">contact@sozorockfoundation.org</a>.</p></div><EngagementForm kind="Contact" /></div></section></>;
 }
 
 export function PartnerPage() {
   return (
     <>
-      <PageHero eyebrow="Engage" title="Partner" copy="Briefings, Hubs, Health Access Day, firesides, publications, and applied learning." />
+      <PageHero eyebrow="Engage" title="Partner" copy="Work with us on rural health access, local evidence, research and practical learning." />
       <section className="section"><div className="shell"><div className="partner-route-grid">{partnerRoutes.map((route) => <article key={route.title}><h2>{route.title}</h2><p>{route.copy}</p></article>)}</div></div></section>
-      <section className="section form-section"><div className="shell form-layout"><div><p className="eyebrow">Start a conversation</p><h2>Tell us what you are trying to do.</h2><p>Identify the opportunity, audience, and platform most relevant to your inquiry.</p></div><EngagementForm kind="Partner" /></div></section>
+      <section className="section form-section"><div className="shell form-layout"><div><p className="eyebrow">Start a conversation</p><h2>Tell us what you are trying to do.</h2><p>Tell us the community, access challenge and contribution you have in mind. A first project can define responsibilities, deliverables and measures of progress.</p></div><EngagementForm kind="Partner" /></div></section>
     </>
   );
 }
@@ -488,7 +488,7 @@ export function SupportPage() {
   return (
     <>
       <PageHero eyebrow="Engage" title="Support" copy="Help sustain public-interest research, convening, health programs, and applied learning." />
-      <section className="section"><div className="shell support-options"><article><h2>Public-interest publications</h2><p>Support research production, editorial review, verified access, and dissemination.</p></article><article><h2>Health access</h2><p>Support community readiness, Hub partnerships, Health Access Day, and place evidence.</p></article><article><h2>Applied learning</h2><p>Sponsor practical AI learning for learners, workforce programs, and community organizations.</p></article><article><h2>In-kind support</h2><p>Discuss technology, venue, printing, professional expertise, or program delivery support.</p></article></div></section>
+      <section className="section"><div className="shell support-options"><article><h2>Public-interest publications</h2><p>Support research, editorial review, publication access and dissemination.</p></article><article><h2>Health access</h2><p>Support rural community readiness, Hub partnerships, health education and local evidence.</p></article><article><h2>Applied learning</h2><p>Sponsor practical AI learning for learners, workforce programs, and community organizations.</p></article><article><h2>In-kind support</h2><p>Discuss technology, venue, printing, professional expertise, or program delivery support.</p></article></div></section>
       <section className="section form-section"><div className="shell form-layout"><div><p className="eyebrow">Support inquiry</p><h2>Choose the work you want to strengthen.</h2><p>Start a conversation about donations, sponsorship, publication support, or in-kind contributions.</p></div><EngagementForm kind="Support" /></div></section>
     </>
   );
@@ -497,38 +497,38 @@ export function SupportPage() {
 export function StandardsPage() {
   const standards = [
     ["Independence", "Research conclusions and publication judgments should remain independent of funding or partnership interests."],
-    ["Corrections", "Material errors should be corrected transparently while preserving a clear publication and version record."],
+    ["Corrections", "Report a suspected error to contact@sozorockfoundation.org with the publication or page, location of the error and supporting source. Material corrections should preserve the original publication record and identify what changed."],
     ["Funding", "Relevant funding, sponsorship, and material support should be disclosed with the work they support."],
     ["Authorship", "Authors, contributors, reviewers, and accountable institutional roles should be identified accurately."],
     ["AI use", "AI may support research, design, coding, synthesis, or workflow. Human reviewers remain responsible for evidence, attribution, privacy, limitations, and final publication."],
     ["Citations", "Claims should be linked to source-traceable evidence. Publication records should preserve DOI and citation metadata."],
-    ["Copyright", "Copyright, licenses, permitted reuse, and third-party material should be stated clearly."],
+    ["Copyright", "Check the notice attached to each publication or asset before reuse. A citation does not itself grant permission to reproduce protected material. Send permissions questions or rights concerns to contact@sozorockfoundation.org, identifying the material and intended use."],
     ["Accessibility", "The website and publications should be designed for perceivable, operable, understandable, and robust access."],
   ];
   return (
     <>
-      <PageHero eyebrow="About" title="Standards" copy="Independence, corrections, funding, authorship, AI use, citations, copyright, and accessibility." />
+      <PageHero eyebrow="About" title="Standards" copy="Editorial principles for research and public materials, with routes to raise errors and permissions questions. These principles are not an external certification." />
       <section className="section"><div className="shell standards-list">{standards.map(([title, copy]) => <article id={title.toLowerCase().replaceAll(" ", "-")} key={title}><h2>{title}</h2><p>{copy}</p></article>)}</div></section>
       <section className="section soft-section"><div className="shell split-copy"><div><p className="eyebrow">Public trust</p><h2>Policies that stand on their own.</h2></div><div><p>Foundation-wide privacy, accessibility, nondiscrimination, and website terms work alongside the safeguards required by each platform.</p><div className="policy-links"><Link href="/privacy" className="text-link">Privacy</Link><Link href="/accessibility" className="text-link">Accessibility</Link><Link href="/nondiscrimination" className="text-link">Nondiscrimination</Link><Link href="/terms" className="text-link">Terms</Link></div></div></div></section>
     </>
   );
 }
 
-function PolicyPage({ title, summary, children }) {
+function PolicyPage({ title, summary, children, updated = "September 7, 2026" }) {
   return (
     <>
       <PageHero eyebrow="Legal and policy" title={title} copy={summary} compact />
-      <section className="section policy-page"><div className="shell policy-layout"><aside><p className="eyebrow">Last updated</p><p>September 7, 2026</p><p>Send questions through our <Link href="/contact">contact form</Link>.</p></aside><div className="policy-copy">{children}</div></div></section>
+      <section className="section policy-page"><div className="shell policy-layout"><aside><p className="eyebrow">Last updated</p><p>{updated}</p><p>Send questions through our <Link href="/contact">contact form</Link> or email <a href="mailto:contact@sozorockfoundation.org">contact@sozorockfoundation.org</a>.</p></aside><div className="policy-copy">{children}</div></div></section>
     </>
   );
 }
 
 export function PrivacyPage() {
   return (
-    <PolicyPage title="Privacy Notice" summary="How The SozoRock Foundation, Inc. handles information submitted through this website.">
+    <PolicyPage updated="September 15, 2026" title="Privacy Notice" summary="How The SozoRock Foundation, Inc. handles information submitted through this website.">
       <section><h2>Information we receive</h2><p>We receive information you choose to provide through an inquiry or publication-access form, such as your name, email address, organization or affiliation, location, role, interests, and message. Please do not submit medical, emergency, protected health, financial-account, legal, or other sensitive information.</p></section>
       <section><h2>How we use information</h2><p>We use submitted information to respond to inquiries, provide requested publication access, understand institutional interest, protect the service, and maintain appropriate records. Optional publication-update consent is separate from access and may be withdrawn.</p></section>
-      <section><h2>Service providers and platforms</h2><p>Hosting, security, email delivery, and related service providers may process limited information on our behalf. Publication-access and inquiry submissions use the Foundation&apos;s established SozoRock Health delivery services. Platform-specific services may publish an additional notice.</p><p><a href="https://health.sozorockfoundation.org/privacy" className="text-link">Read the SozoRock Health Privacy Notice</a></p></section>
+      <section><h2>Service providers and platforms</h2><p>Hosting, security, email delivery, and related service providers may process limited information on our behalf. Publication-access and inquiry submissions use the Foundation&apos;s established SozoRock Health delivery services. The Health Privacy Notice explains the delivery service’s technical information, publication-access records, retention and deletion arrangements. Read it alongside this notice when using these forms.</p><p><a href="https://health.sozorockfoundation.org/privacy" className="text-link">Read the SozoRock Health Privacy Notice</a></p></section>
       <section><h2>Choices and contact</h2><p>We do not sell personal information or use this website for behavioral advertising. You may ask about, correct, or request deletion of information you submitted by contacting us. We may retain limited records when reasonably necessary for security, legal, or operational obligations.</p></section>
     </PolicyPage>
   );

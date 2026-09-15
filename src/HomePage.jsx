@@ -3,8 +3,8 @@ import { ArrowRight } from "@phosphor-icons/react";
 import { Link } from "./router";
 
 const work = [
-  { id: "cbcap", name: "CB-CAP", summary: "County evidence for local action.", copy: "Explore county-level evidence to frame local questions, understand context and support accountable decisions.", href: "https://cbcap.sozorockfoundation.org/", action: "Explore CB-CAP" },
-  { id: "health", name: "SozoRock Health", summary: "Building the systems that make health access possible.", copy: "Community access, place-based intelligence, digital assurance and workforce capacity for more accountable health systems.", href: "https://health.sozorockfoundation.org/", action: "Explore Health" },
+  { id: "cbcap", name: "CB-CAP", summary: "County evidence for local action.", copy: "Explore public county evidence and its sources. Institutional planning tools are not yet available in the public preview.", href: "https://cbcap.sozorockfoundation.org/", action: "Explore CB-CAP" },
+  { id: "health", name: "SozoRock Health", summary: "Building the systems that make health access possible.", copy: "Community access models, local evidence and digital readiness to help rural communities address barriers to care.", href: "https://health.sozorockfoundation.org/", action: "Explore Health" },
   { id: "institute", name: "SozoRock Global Institute", summary: "Research that sharpens public decisions.", copy: "Publications and focused discussions examine health systems assurance, rural governance and equity.", href: "/platforms/institute", action: "Explore the Institute" },
   { id: "ai", name: "SozoRock AI Lab", summary: "Practical AI. Accountable human judgment.", copy: "No-cost learning helps people apply AI to real work, verify the results and use them responsibly.", href: "https://ai-lab.sozorockfoundation.org/", action: "Explore the AI Lab" },
 ];
@@ -13,7 +13,7 @@ export function HomePage() {
   return <>
     <section className="foundation-opening" aria-labelledby="foundation-title"><div className="shell opening-layout">
       <div><h1 id="foundation-title">Public ideas.<br />Practical systems.</h1><p className="foundation-thesis">Access. Assurance. Intelligence.</p></div>
-      <p className="opening-description">Research, health access and applied AI—bringing evidence into practical use.</p>
+      <p className="opening-description">Research, rural health access and practical AI learning—bringing evidence into use.</p>
     </div></section>
     <section className="foundation-work" aria-label="Explore our work"><div className="shell work-composition">
       <p className="eyebrow work-label">Explore our work</p>

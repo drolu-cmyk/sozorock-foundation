@@ -86,7 +86,8 @@ export function EngagementForm({ kind }) {
   const [message, setMessage] = useState("");
   const options = kind === "Support"
     ? ["Fund the work", "Support research and publications", "Partner with us"]
-    : ["Partner with us", "CB-CAP inquiry", "Health Equity Hub partnership", "Health Access Day partnership", "Support research and publications", "Bring the model to a community", "Institutional or public-sector inquiry"];
+    : ["Partner with us", "Rural health collaboration", "Research collaboration", "AI Lab learning", "AI & Society", "CB-CAP inquiry", "Health Equity Hub partnership", "Health Access Day partnership", "Support research and publications", "Bring the model to a community", "Institutional or public-sector inquiry"];
+  const inquiryRoutes = { "Rural health collaboration": "Partner with us", "Research collaboration": "Support research and publications", "AI Lab learning": "Partner with us", "AI & Society": "Institutional or public-sector inquiry" };
   const roles = ["Individual or family", "Community organization", "Licensed provider or health organization", "County, state, or public agency", "University or researcher", "Foundation or funder", "Corporate organization", "Other"];
 
   const submit = async (event) => {
@@ -97,7 +98,7 @@ export function EngagementForm({ kind }) {
       name: `${String(data.get("firstName") || "").trim()} ${String(data.get("lastName") || "").trim()}`.trim(),
       email: String(data.get("email") || "").trim(),
       organization: String(data.get("organization") || "").trim(),
-      inquiryType: String(data.get("interest") || ""),
+      inquiryType: inquiryRoutes[String(data.get("interest") || "")] || String(data.get("interest") || ""),
       role: String(data.get("role") || ""),
       stateOrCounty: String(data.get("location") || "").trim(),
       message: String(data.get("message") || "").trim(),
@@ -109,7 +110,7 @@ export function EngagementForm({ kind }) {
     try {
       const servicePayload = {
         ...payload,
-        message: `Organization or affiliation: ${payload.organization}\n\n${payload.message}`,
+        message: `Area of interest: ${String(data.get("interest") || "")}\nOrganization or affiliation: ${payload.organization}\n\n${payload.message}`,
       };
       const response = await fetch("/api/contact", {
         method: "POST",

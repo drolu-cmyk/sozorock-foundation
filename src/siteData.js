@@ -36,12 +36,12 @@ export const navigation = [
 ];
 
 export const platforms = [
-  { slug: "cbcap", name: "CB-CAP", line: "County evidence for local action.", detail: "County-level evidence helps communities frame local questions and understand the systems behind them.", href: "https://cbcap.sozorockfoundation.org/", action: "Explore CB-CAP", tone: "cobalt" },
+  { slug: "cbcap", name: "CB-CAP", line: "County evidence for local action.", detail: "Public preview: explore county evidence and its sources. Institutional planning access is not available in this release.", href: "https://cbcap.sozorockfoundation.org/", action: "Explore CB-CAP", tone: "cobalt" },
   {
     slug: "institute",
     name: "SozoRock Global Institute",
     line: "Insight, publications, and convening.",
-    detail: "The Institute develops public-interest publications, briefings, firesides, roundtables, and policy notes across assurance, governance, access, and systems intelligence.",
+    detail: "Published research examines rural governance, health access and health systems assurance. Briefings and roundtables are available for discussion.",
     href: "/platforms/institute",
     action: "Explore the Institute",
     tone: "cobalt",
@@ -50,7 +50,7 @@ export const platforms = [
     slug: "health",
     name: "SozoRock Health",
     line: "Building the systems that make health access possible.",
-    detail: "Community access, place-based intelligence, digital assurance and workforce capacity to help institutions build more accountable health systems.",
+    detail: "Community access models, local evidence and digital readiness for rural health. Local delivery depends on agreed partner roles and available services.",
     href: "/platforms/health",
     action: "Explore SozoRock Health",
     tone: "navy",
@@ -59,7 +59,7 @@ export const platforms = [
     slug: "ai-lab",
     name: "SozoRock AI Lab",
     line: "Applied learning for modern work.",
-    detail: "No-cost practical learning built around real tasks, human judgment, verification, responsible use, and reviewed implementation.",
+    detail: "No-cost practical learning with a published participant project: learn, make, check and use reviewed work.",
     href: "/platforms/ai-lab",
     action: "Explore the AI Lab",
     tone: "royal",
@@ -118,6 +118,8 @@ export const publications = [
     socialImage: "/media/rrg-social-card.png",
     author: "Dr. Oluwabiyi Adeyemo",
     date: "2025",
+    citation: "Adeyemo, Oluwabiyi. 2025. Rethinking Rural Governance, Volume 1. The SozoRock Foundation, Inc. https://doi.org/10.65473/rrg-v1-2025",
+    limits: "Read this as a proposed governance framework. Its use of Delaware County as a reference case does not establish adoption, independent validation or outcomes in that county or elsewhere.",
     external: "https://health.sozorockfoundation.org/publications/rethinking-rural-governance-volume-1",
   },
   {
@@ -139,6 +141,8 @@ export const publications = [
     socialImage: "/media/rebs-social-card.png",
     author: "Dr. Oluwabiyi Adeyemo",
     date: "2025",
+    citation: "Adeyemo, Oluwabiyi. 2025. Rural Equity Blueprint Series, Volume 1. The SozoRock Foundation, Inc. https://doi.org/10.65473/rebs-v1-2025",
+    limits: "These are proposed access models, not evidence of operating services or measured health outcomes. Local implementation depends on partner agreements, capacity and licensed clinical responsibilities.",
     external: "https://health.sozorockfoundation.org/publications/rural-equity-blueprint-volume-1",
   },
 ];
@@ -242,10 +246,10 @@ export const leaders = [
 ];
 
 export const partnerRoutes = [
-  { title: "Request a briefing", copy: "Discuss assurance, governance, access, place intelligence, or applied learning with your team." },
-  { title: "Host a Health Access Day", copy: "Explore a locally grounded activation shaped by evidence, partner roles, and licensed scope." },
-  { title: "Partner on a Hub", copy: "Consider a library, community, or home access format without turning the host site into a clinic." },
-  { title: "Join a fireside", copy: "Convene a focused conversation around a publication, field question, or implementation challenge." },
-  { title: "Support a publication", copy: "Help sustain public-interest research, production, dissemination, and convening." },
-  { title: "Sponsor applied learning", copy: "Bring practical AI learning to learners, workforce programs, or community organizations." },
+  { title: "Examine rural access", copy: "Start with a county and an access question. Combine public evidence with local partners’ knowledge to identify barriers, evidence gaps and next steps." },
+  { title: "Plan a Health Access Day", copy: "Define the audience, health education goals, local host and follow-up. Agree partner responsibilities and evaluation before delivery; clinical work stays with licensed practitioners." },
+  { title: "Develop a community Hub", copy: "Explore a library, community or home access model. Agree digital readiness, navigation support and provider connections without turning the host into a clinic." },
+  { title: "Evaluate a pilot", copy: "Set a focused question, a baseline and a practical measurement plan. Document participation, access barriers and lessons without presenting a proposed model as proven." },
+  { title: "Contribute to research", copy: "Discuss a research question, method review or publication briefing. Define contributions, funding disclosures and editorial responsibilities before work begins." },
+  { title: "Support practical learning", copy: "Explore AI learning for community organizations and local workforces. Agree the audience, real tasks, review requirements and evidence of learning." },
 ];
