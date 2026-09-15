@@ -39,8 +39,8 @@ export function CbcapEvidence() {
       <div className="shell evidence-inner">
         <div className="evidence-copy">
           <p className="eyebrow">SozoRock Health · CB-CAP</p>
-          <h2 id="evidence-title">See the pattern. Test a response. Build a fundable plan.</h2>
-          <p>Nationwide county systems intelligence connecting public evidence to local questions, accountable owners, transparent planning scenarios, and stakeholder-ready briefs.</p>
+          <h2 id="evidence-title">Examine county evidence in context.</h2>
+          <p>Explore CB-CAP’s public evidence preview, with source dates, definitions and limits. Institutional planning access is not available in this release.</p>
           <a href="https://cbcap.sozorockfoundation.org/" className="button button-light">Open CB-CAP</a>
         </div>
         <div className="evidence-data" aria-label="Verified CB-CAP public data coverage">
@@ -82,6 +82,7 @@ export function PublicationCard({ publication }) {
 }
 
 export function EngagementForm({ kind }) {
+  const participation = kind === "Participation";
   const [status, setStatus] = useState("idle");
   const [message, setMessage] = useState("");
   const options = kind === "Support"
@@ -97,9 +98,9 @@ export function EngagementForm({ kind }) {
     const payload = {
       name: `${String(data.get("firstName") || "").trim()} ${String(data.get("lastName") || "").trim()}`.trim(),
       email: String(data.get("email") || "").trim(),
-      organization: String(data.get("organization") || "").trim(),
-      inquiryType: inquiryRoutes[String(data.get("interest") || "")] || String(data.get("interest") || ""),
-      role: String(data.get("role") || ""),
+      organization: participation ? "Individual participant" : String(data.get("organization") || "").trim(),
+      inquiryType: participation ? "Institutional or public-sector inquiry" : inquiryRoutes[String(data.get("interest") || "")] || String(data.get("interest") || ""),
+      role: participation ? "Individual or family" : String(data.get("role") || ""),
       stateOrCounty: String(data.get("location") || "").trim(),
       message: String(data.get("message") || "").trim(),
       website: String(data.get("website") || ""),
@@ -110,7 +111,9 @@ export function EngagementForm({ kind }) {
     try {
       const servicePayload = {
         ...payload,
-        message: `Area of interest: ${String(data.get("interest") || "")}\nOrganization or affiliation: ${payload.organization}\n\n${payload.message}`,
+        message: participation
+          ? `AI & Society participation interest\nPerspective: ${String(data.get("perspective") || "")}\nFuture deliberation interest: ${String(data.get("futureParticipation") || "Not specified")}\n\n${payload.message}`
+          : `Organization or affiliation: ${payload.organization}\n\nArea of interest: ${String(data.get("interest") || "")}\n\n${payload.message}`,
       };
       const response = await fetch("/api/contact", {
         method: "POST",
@@ -143,15 +146,16 @@ export function EngagementForm({ kind }) {
             <label>Last name<input name="lastName" autoComplete="family-name" required /></label>
           </div>
           <label>Email<input type="email" name="email" autoComplete="email" required /></label>
-          <label>Organization or affiliation<input name="organization" autoComplete="organization" required /></label>
-          <label>Organization or role<select name="role" required defaultValue=""><option value="" disabled>Select an option</option>{roles.map((role) => <option key={role}>{role}</option>)}</select></label>
-          <label>City, state, or region<input name="location" autoComplete="address-level1" required /></label>
-          <label>Area of interest<select name="interest" required defaultValue=""><option value="" disabled>Select an option</option>{options.map((option) => <option key={option}>{option}</option>)}</select></label>
-          <label>What outcome are you working toward?<textarea name="message" rows="5" minLength="20" maxLength="1200" required /></label>
+          {!participation && <label>Organization or affiliation<input name="organization" maxLength="180" autoComplete="organization" required /></label>}
+          {participation ? <label>Your perspective<select name="perspective" required defaultValue=""><option value="" disabled>Select an option</option>{["Student / learner", "Educator", "Worker", "Job seeker", "Employer / workforce professional", "Researcher", "Community organization", "Government / public sector", "Technology practitioner", "Other"].map(role => <option key={role}>{role}</option>)}</select></label> : <label>Organization or role<select name="role" required defaultValue=""><option value="" disabled>Select an option</option>{roles.map((role) => <option key={role}>{role}</option>)}</select></label>}
+          <label>City, state, or region<input name="location" maxLength="160" autoComplete="address-level1" required /></label>
+          {!participation && <label>Area of interest<select name="interest" required defaultValue=""><option value="" disabled>Select an option</option>{options.map((option) => <option key={option}>{option}</option>)}</select></label>}
+          <label>{participation ? "What AI-related question deserves attention?" : "What outcome are you working toward?"}<textarea name="message" rows="5" minLength="20" maxLength="800" required /></label>
+          {participation && <label>Interested in a future Fireside or deliberation? (optional)<select name="futureParticipation" defaultValue=""><option value="">Select an option</option><option>Yes</option><option>I would like more information</option><option>Not at this time</option></select></label>}
           <div className="access-honeypot" aria-hidden="true"><label>Website<input name="website" tabIndex="-1" autoComplete="off" /></label></div>
           <label className="check-field"><input name="consent" type="checkbox" value="yes" required /><span>I agree that The SozoRock Foundation, Inc. may use this information to respond to my inquiry. I have read the <Link href="/privacy">Privacy Notice</Link>.</span></label>
           <p className="form-note" id="engagement-note">Do not submit patient, student, employee, financial, legal, account, or other sensitive information.</p>
-          <button className="button button-primary" type="submit" disabled={status === "sending"}>{status === "sending" ? "Sending…" : `Send ${kind.toLowerCase()} inquiry`}</button>
+          <button className="button button-primary" type="submit" disabled={status === "sending"}>{status === "sending" ? "Sending…" : participation ? "Send expression of interest" : `Send ${kind.toLowerCase()} inquiry`}</button>
           <p id="engagement-status" className={`access-status ${status === "error" ? "is-error" : ""}`} role="status" aria-live="polite">{message}</p>
         </>
       )}

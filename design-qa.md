@@ -1,37 +1,38 @@
-# Foundation visual acceptance
+# Foundation editorial release — visual QA
 
-final result: passed
+Date: September 15, 2026
 
-Verified September 7, 2026 against the approved user attachment and the rendered production build.
+Source visual truth: https://www.sozorockfoundation.org/ before deployment, commit d1914c56d4b345b21bc59dbcea1a52a6e83690b9.
+Implementation: production build served at http://terminal.local:4173/ using the existing worker and prebuilt route HTML. Preview-only API isolation returned 503 and never forwarded submissions.
 
-- Source visual truth: outputs/prompt-2/approved-foundation-direction.png.
-- Implementation: outputs/prompt-2/home-desktop-viewport.png.
-- Both images: 1536 x 1024 pixels, CSS viewport 1536 x 1024, device scale 1. Both show the homepage with Health expanded, at scroll zero. No density resampling.
-- Source and implementation were opened together in a single comparison input. Full-view text, imagery and controls were legible; no separate cropped comparison was necessary.
+## Evidence and comparison
 
-## Findings and correction
+The source homepage and production-build homepage were captured together in one browser comparison output, at 1348 × 926 pixels, same route and initial state. Both captures used the same browser density; no scaling or density normalization was applied. Browser-rendered screenshots are retained in the work-session transcript. No screenshot file paths were exposed by the browser capture tool.
 
-P2, corrected: the earlier implementation stacked initiative summaries below each heading, moving the engagement strip below the first viewport. Desktop rows now place summaries alongside names; the revised screenshot restores the compact editorial work field. Four products remain visible, as explicitly required by the user. Earlier evidence: the first desktop capture in this session; revised evidence: home-desktop-viewport.png and browser-qa.json.
+The comparison preserved Instrument Sans, the cobalt hero, white/navy text, logo, navigation, margins, column proportions, health accordion and HSA feature image. The changed introduction and AI & Society reference are intentional content changes. At this viewport all important header and hero details were readable, so a separate crop was unnecessary.
 
-## Required fidelity surfaces
+Additional browser-rendered evidence: /publications desktop screenshot and DOM link inspection; /leadership full-page screenshot; /events full-page screenshot; /ai-society hero and selected Work scenario screenshots. A preview-only 390 × 844 CSS-pixel iframe showed the actual responsive AI & Society and Publications pages at 1:1 scale inside the desktop browser. This checks narrow layout, not physical mobile hardware.
 
-- Typography: self-hosted Instrument Sans, strong two-line opening, compact stacked wordmark, restrained headings. Headline wrapping matches the reference. The source font is not identified; the implementation is an intentionally selected licensed match, not a claim of font identity.
-- Spacing: asymmetric work and publication composition, thin row dividers, generous cobalt opening and pale engagement strip. The fourth product and accessible legal footer increase document height intentionally. The stepped hero edge was simplified to a straight boundary; this is minor P3 fidelity polish, without a usability consequence.
-- Color: cobalt, white, navy and pale blue match the approved direction. No blue-purple gradient or cream foundation. Contrast is evaluated separately by automated accessibility checks.
-- Imagery: actual Health Systems Assurance cover is retained, with its authentic typography and publication details. Phosphor arrows are interface icons. Editable institutional wordmark text remains sharp at each viewport.
-- Copy: approved opening retained; concise Health boundaries clarify its non-clinical role. CB-CAP is present. Product descriptions and engagement copy are original, with no invented endorsements or outcomes.
+## Fidelity surfaces
 
-## Functional and responsive evidence
+- Typography: existing family, weights and hero system retained. New publication headings and six-question controls use the same typographic language.
+- Spacing/layout: homepage unchanged; publications intentionally use unboxed bibliographic rows. Events retain the existing shell and split-copy layout. AI questions use a two-column scenario/accordion composition that stacks on narrow screens.
+- Colors/tokens: existing cobalt, navy, ice and white; no gradients, new brand colors or generic AI imagery.
+- Images: original portraits and homepage cover retained. Covers intentionally removed from the publication index as requested; individual publication records retain their source assets.
+- Copy: rural-health focus clear; Who Decides?, Firesides and Roundtables marked as developing/proposed. No prospective partners, dates, speakers or outcomes added. Director copy stays within documented roles and published authorship.
 
-92 route/viewport combinations at 1536, 768, 390 and 320 CSS pixels passed overflow, image loading, encoding, route status and browser error checks. Mobile menu, Escape, CB-CAP disclosure/destination and reduced motion passed. Automated WCAG checks on eight representative routes found no violations; this is not a complete assistive-technology certification. Publication delivery remains a separate release gate pending the user's Google credential and live end-to-end verification.
+## Interactions and release checks
 
-## Checklist
+- Learning/Work switch updates the illustrative scenario and all question prompts; selected state exposed with aria-pressed.
+- Participation disclosure opens the labeled consent-based form. A filled synthetic submission to the isolated preview reports delivery failure instead of claiming success.
+- DOI links visually/DOM verified against their series; both DOI resolver URLs returned HTTP 200 to the correct permanent Foundation record.
+- 47 automated tests pass, including participant forwarding to a mocked existing service, exact DOI/route/delivery mappings, no Event schema for proposals, existing publication-verification and SEO checks.
+- Production build and AWS release contract pass.
+- Browser error logs checked: extension metadata errors were observed; the isolated form's expected 503 is intentional. No application render error was observed.
+- No live email was sent. End-to-end inbox receipt is not claimed.
 
-- [x] Compare source and production build at matching viewport and state.
-- [x] Correct the material desktop density difference and recapture.
-- [x] Verify mobile layout and product navigation.
-- [x] Preserve Crossref publication destinations.
-- [ ] Complete live publication email, link verification and private PDF delivery.
-- [ ] Verify the final production deployment.
+## Findings and comparison history
 
-Visual acceptance does not assert that deployment or email delivery is complete.
+No actionable P0/P1/P2 visual differences found in the matched homepage comparison. The new page compositions are intentional, scoped editorial changes. Narrow-screen date/volume separation was retained before final publication capture. No global design or navigation changes were made.
+
+Final result: passed
