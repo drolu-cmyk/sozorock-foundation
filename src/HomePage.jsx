@@ -3,8 +3,8 @@ import { ArrowRight } from "@phosphor-icons/react";
 import { Link } from "./router";
 
 const work = [
-  { id: "cbcap", name: "CB-CAP", summary: "County evidence for local action.", copy: "Explore county-level evidence to frame local questions, understand context and support accountable decisions.", href: "https://cbcap.sozorockfoundation.org/", action: "Explore CB-CAP" },
-  { id: "health", name: "SozoRock Health", summary: "Building the systems that make health access possible.", copy: "Community access, place-based intelligence, digital assurance and workforce capacity for more accountable health systems.", href: "https://health.sozorockfoundation.org/", action: "Explore Health" },
+  { id: "cbcap", name: "CB-CAP", summary: "County evidence for local action.", copy: "Explore public county evidence and its sources. Institutional planning tools are not yet available in the public preview.", href: "https://cbcap.sozorockfoundation.org/", action: "Explore CB-CAP" },
+  { id: "health", name: "SozoRock Health", summary: "Building the systems that make health access possible.", copy: "Community access models, local evidence and digital readiness to help rural communities address barriers to care.", href: "https://health.sozorockfoundation.org/", action: "Explore Health" },
   { id: "institute", name: "SozoRock Global Institute", summary: "Research that sharpens public decisions.", copy: "Publications and focused discussions examine health systems assurance, rural governance and equity.", href: "/platforms/institute", action: "Explore the Institute" },
   { id: "ai", name: "SozoRock AI Lab", summary: "Practical AI. Accountable human judgment.", copy: "No-cost learning helps people apply AI to real work, verify the results and use them responsibly.", href: "https://ai-lab.sozorockfoundation.org/", action: "Explore the AI Lab" },
 ];
@@ -13,7 +13,7 @@ export function HomePage() {
   return <>
     <section className="foundation-opening" aria-labelledby="foundation-title"><div className="shell opening-layout">
       <div><h1 id="foundation-title">Public ideas.<br />Practical systems.</h1><p className="foundation-thesis">Access. Assurance. Intelligence.</p></div>
-      <p className="opening-description">Research, health access and applied AI—bringing evidence into practical use.</p>
+      <p className="opening-description">Research, rural health access and practical AI learning—bringing evidence into use.</p>
     </div></section>
     <section className="foundation-work" aria-label="Explore our work"><div className="shell work-composition">
       <p className="eyebrow work-label">Explore our work</p>
@@ -24,7 +24,7 @@ export function HomePage() {
       </article>)}</div>
       <article className="featured-research"><div className="featured-research-copy"><p className="eyebrow">Featured publication</p><h2><Link href="/publication/hsa-v1-2026">What makes a health system trustworthy?</Link></h2><p>Health Systems Assurance.<br />Volume 1.<br />Dr. Oluwabiyi Adeyemo.</p><Link href="/publication/hsa-v1-2026" className="editorial-link">Explore the publication<ArrowRight size={24} aria-hidden="true" /></Link></div><Link href="/publication/hsa-v1-2026" className="featured-cover" aria-label="Explore Health Systems Assurance, Volume 1"><img src="/media/hsa-cover.webp" width="600" height="780" alt="Health Systems Assurance, Volume 1 book cover" fetchPriority="high" /></Link></article>
     </div></section>
-    <aside className="shell society-home-context" aria-label="AI and society"><p className="eyebrow">AI &amp; Society</p><div><p>Human judgment matters. Who helps set the rules? Our emerging work examines how communities and institutions can shape consequential uses of AI.</p><Link href="/ai-society" className="editorial-link">Explore AI &amp; Society<ArrowRight size={24} aria-hidden="true" /></Link></div></aside>
+    <aside className="shell society-home-context" aria-label="AI and society"><p className="eyebrow">AI &amp; Society</p><div><p>Who decides when AI affects people? AI & Society is developing ways for communities to shape consequential uses of AI, with evidence, human review and a route to challenge decisions.</p><Link href="/ai-society" className="editorial-link">Explore AI &amp; Society<ArrowRight size={24} aria-hidden="true" /></Link></div></aside>
     <section className="foundation-engage"><div className="shell engage-layout"><h2>Bring a question<br />worth working on.</h2><div><Link href="/partner" className="editorial-link">Partner with the Foundation<ArrowRight size={30} aria-hidden="true" /></Link><p>Research partnerships. Community initiatives. Applied learning.</p></div></div></section>
   </>;
 }

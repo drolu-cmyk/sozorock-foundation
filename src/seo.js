@@ -8,14 +8,14 @@ export const WEBSITE_ID = `${SITE_ORIGIN}/#website`;
 
 const routeSeo = {
   "/ai-society": {
-    title: "AI & Society | The SozoRock Foundation",
-    description: "An emerging area of work examining community participation, human agency, evaluation and accountability in consequential uses of AI.",
+    title: "AI & Society | Community Governance & Human Judgment | SozoRock Foundation",
+    description: "How communities can help govern consequential AI: human judgment, evidence and accountability. Explore SozoRock’s developing Who Decides? initiative.",
     pageType: "WebPage",
   },
   "/contact": { title: "Contact the Foundation | SozoRock", description: "Discuss research, community initiatives and applied learning with The SozoRock Foundation. Start a partnership or ask about our work.", pageType: "ContactPage" },
   "/": {
     title: "The SozoRock Foundation | Health Access, Systems & AI",
-    description: "Research, health access and applied AI—bringing evidence into practical use. Explore the initiatives and publications of The SozoRock Foundation.",
+    description: "Research, rural health access and practical AI learning. Explore the initiatives and publications of The SozoRock Foundation.",
     pageType: "WebPage",
   },
   "/platforms": {
@@ -25,7 +25,7 @@ const routeSeo = {
   },
   "/platforms/institute": {
     title: "SozoRock Global Institute | Research & Convening",
-    description: "Research, publications and convening across assurance, governance, access and systems intelligence, with emerging questions on AI and society.",
+    description: "Research on rural governance, health access and digital assurance, with developing formats for public deliberation.",
     pageType: "WebPage",
   },
   "/platforms/health": {
@@ -50,7 +50,7 @@ const routeSeo = {
   },
   "/events": {
     title: "Events | The SozoRock Foundation",
-    description: "Explore SozoRock firesides, roundtables, and briefings connecting public-interest evidence with practitioners and institutions.",
+    description: "Explore proposed SozoRock Firesides and Roundtables on AI, learning, work and community questions. Express interest in future deliberations.",
     pageType: "CollectionPage",
   },
   "/about": {

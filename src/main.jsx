@@ -4,6 +4,7 @@ import { App } from "./App.jsx";
 import "@fontsource-variable/instrument-sans";
 import "./styles.css";
 import "./foundation-system.css";
+import "./editorial.css";
 
 const container = document.getElementById("root");
 const render = container.hasChildNodes() ? (app) => hydrateRoot(container, app) : (app) => createRoot(container).render(app);
