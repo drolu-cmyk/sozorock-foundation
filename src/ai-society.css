@@ -24,12 +24,18 @@
 .society-method > div { flex:1 1 180px; }
 .society-method dt { font-size:22px; font-weight:600; color:var(--cobalt); }
 .society-method dd { margin:10px 0 0; font-size:16px; }
-.society-output-note summary,.society-interest > summary { cursor:pointer; min-height:44px; padding:10px 0; color:var(--cobalt); font-weight:600; }
-.society-output-note p { margin-top:12px; }
+.society-output-note { display:grid; grid-template-columns:minmax(180px,.45fr) minmax(0,1fr); gap:12px 40px; padding:28px 0; border-bottom:1px solid var(--line); }
+.society-output-note .eyebrow { grid-row:1 / span 3; padding-top:5px; }
+.society-output-note h3 { font-size:26px; }
+.society-output-note p:not(.eyebrow) { grid-column:2; }
+.society-output-boundary { color:var(--muted); font-size:14px; }
 .society-event-link { margin-top:28px; }
 .society-event-link .text-link { display:inline; }
 .society-interest { min-width:0; border-top:1px solid var(--line); }
+.society-interest > summary { cursor:pointer; min-height:44px; padding:10px 0; color:var(--cobalt); font-weight:600; }
 .society-interest .engagement-form { margin-top:20px; }
+.society-support-case { padding-top:20px; border-top:1px solid var(--line); }
+.society-support-case strong { color:var(--ink); }
 .society-health-note { padding-block:28px; border-bottom:1px solid var(--line); }
 .society-health-note p { font-size:15px; max-width:85ch; }
 .society-health-note a { color:var(--cobalt); text-decoration:underline; }
@@ -39,6 +45,9 @@
   .society-method-heading { display:block; }
   .society-method-heading p { margin-top:20px; }
   .society-scenario h3 { max-width:35ch; }
+  .society-output-note { grid-template-columns:1fr; gap:10px; }
+  .society-output-note .eyebrow { grid-row:auto; }
+  .society-output-note p:not(.eyebrow) { grid-column:auto; }
 }
 @media(max-width:599px) {
   .society-questions summary { font-size:22px; }
