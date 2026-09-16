@@ -9,7 +9,7 @@ export const WEBSITE_ID = `${SITE_ORIGIN}/#website`;
 const routeSeo = {
   "/ai-society": {
     title: "AI & Society | Community Participation & Human Review | SozoRock",
-    description: "Explore Who Decides?, a developing SozoRock initiative for community questions, documented decision records, human review and institutional response in consequential AI.",
+    description: "Explore Who Decides?, a developing SozoRock initiative for community participation, human review, public decision records and institutional response in AI.",
     pageType: "WebPage",
   },
   "/contact": {
