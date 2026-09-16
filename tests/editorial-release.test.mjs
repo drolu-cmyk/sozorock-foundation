@@ -20,6 +20,17 @@ test('rural series retain their correct DOI, permanent route and delivery mappin
   }
 });
 
+test('homepage rural-health evidence remains source-qualified',()=>{
+  const html=readFileSync('dist/client/index.html','utf8');
+  assert.match(html,/What a rural-health dialogue surfaced\./);
+  assert.match(html,/12,000\+/);
+  assert.match(html,/primary-care clinician/);
+  assert.match(html,/not measured post-program outcomes/i);
+  assert.match(html,/href="\/publication\/rebs-v1-2025"/);
+  assert.ok(!html.includes('SUNY'));
+  assert.ok(!html.includes('post-program results'));
+});
+
 test('proposed convenings emit no scheduled Event schema',()=>{
   for(const route of ['events','ai-society']){
     const html=readFileSync(`dist/client/${route}.html`,'utf8');
