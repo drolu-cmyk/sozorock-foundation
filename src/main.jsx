@@ -5,6 +5,7 @@ import "@fontsource-variable/instrument-sans";
 import "./styles.css";
 import "./foundation-system.css";
 import "./editorial.css";
+import "./homepage-evidence.css";
 
 const container = document.getElementById("root");
 const render = container.hasChildNodes() ? (app) => hydrateRoot(container, app) : (app) => createRoot(container).render(app);
