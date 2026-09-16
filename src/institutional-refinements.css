@@ -37,6 +37,38 @@
   color: var(--muted);
 }
 
+.access-optional-details {
+  padding: 8px 0 20px;
+  border-block: 1px solid var(--line);
+}
+
+.access-optional-details > summary {
+  min-height: 44px;
+  padding: 10px 0;
+  cursor: pointer;
+  color: var(--cobalt);
+  font-weight: 650;
+}
+
+.access-optional-details[open] > summary {
+  margin-bottom: 8px;
+}
+
+.access-optional-details > p {
+  margin: 0 0 20px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.access-optional-details label {
+  display: grid;
+  gap: 8px;
+}
+
+.access-optional-details label + label {
+  margin-top: 20px;
+}
+
 .foundation-footer-bottom > p {
   max-width: 42ch;
 }
