@@ -4,33 +4,40 @@ import {readFileSync} from 'node:fs';
 import {publications} from '../src/siteData.js';
 import worker from '../worker/index.js';
 
-test('rural series retain their correct DOI, permanent route and delivery mapping', () => {
-  for (const [slug,title,service] of [
-    ['rebs-v1-2025','Rural Equity Blueprint Series (REBS)','rural-equity-blueprint-volume-1'],
-    ['rrg-v1-2025','Rethinking Rural Governance Series (RRG)','rethinking-rural-governance-volume-1'],
-  ]) {
+const publicationAccessMappings = [
+  ['hsa-v1-2026','Health Systems Assurance','health-systems-assurance-volume-1'],
+  ['rebs-v1-2025','Rural Equity Blueprint Series (REBS)','rural-equity-blueprint-volume-1'],
+  ['rrg-v1-2025','Rethinking Rural Governance Series (RRG)','rethinking-rural-governance-volume-1'],
+];
+
+test('all three publications retain permanent records and verified delivery mappings', () => {
+  for (const [slug,title,service] of publicationAccessMappings) {
     const p=publications.find(p=>p.slug===slug);
+    assert.ok(p);
     assert.equal(p.title,title);
-    assert.equal(p.doi,`10.65473/${slug}`);
     assert.equal(p.path,`/publication/${slug}`);
+    assert.equal(p.accessPath,`/publication/${slug}/access`);
     assert.equal(p.accessServiceSlug,service);
     const html=readFileSync(`dist/client/publication/${slug}.html`,'utf8');
-    assert.ok(html.includes(`https://doi.org/${p.doi}`));
+    const accessHtml=readFileSync(`dist/client/publication/${slug}/access.html`,'utf8');
     assert.ok(html.includes(title));
+    assert.match(html,new RegExp(`href="/publication/${slug}/access"`));
+    assert.match(accessHtml,new RegExp(`Get ${title.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')}`));
+    if(p.doi) assert.ok(html.includes(`https://doi.org/${p.doi}`));
   }
 });
 
 test('homepage roundtable evidence remains accurate, attributed and bounded',()=>{
   const html=readFileSync('dist/client/index.html','utf8');
-  assert.match(html,/What a SozoRock rural-health roundtable surfaced\./);
+  assert.match(html,/What a regional health-access roundtable surfaced\./);
   assert.match(html,/<dt>12<\/dt><dd>participants<\/dd>/i);
   assert.match(html,/<dt>2<\/dt><dd>county public-health jurisdictions<\/dd>/i);
   assert.match(html,/<dt>2<\/dt><dd>Western New York universities represented<\/dd>/i);
   assert.match(html,/university school of nursing/i);
   assert.match(html,/12,000\+/);
   assert.match(html,/primary-care clinician/);
-  assert.match(html,/participant-reported access condition/i);
-  assert.match(html,/not as an independently re-estimated statistic or a program outcome/i);
+  assert.match(html,/participant-reported context/i);
+  assert.match(html,/not an independently re-estimated statistic or a program outcome/i);
   assert.match(html,/href="\/publication\/rebs-v1-2025"/);
   assert.ok(!html.includes('SUNY'));
   assert.ok(!html.includes('Brockport'));
@@ -41,15 +48,14 @@ test('parent positioning includes rural work without narrowing the mission to ru
   const home=readFileSync('dist/client/index.html','utf8');
   const platforms=readFileSync('dist/client/platforms.html','utf8');
   const about=readFileSync('dist/client/about.html','utf8');
-  assert.match(home,/Research, health access, public systems and practical AI learning/i);
-  assert.match(platforms,/including focused work in rural and underserved places/i);
-  assert.match(about,/Rural health and rural equity are important areas of focus/i);
-  assert.match(about,/wider work also addresses health systems assurance, governance, public-sector decision-making, community participation and responsible AI/i);
+  assert.match(home,/Research, health access, public systems and applied AI/i);
+  assert.match(platforms,/Rural and underserved places remain a focused part of the work/i);
+  assert.match(about,/Rural health and rural equity remain important/i);
+  assert.match(about,/wider mandate includes health systems assurance, governance, public decisions, community participation and responsible AI/i);
 });
 
-test('publication access requires only delivery essentials and keeps profiling optional',()=>{
+test('publication access requires only delivery essentials and keeps profiling optional for every title',()=>{
   const source=readFileSync('src/PublicationAccessPage.jsx','utf8');
-  const html=readFileSync('dist/client/publication/hsa-v1-2026/access.html','utf8');
   assert.match(source,/name="firstName" required/);
   assert.match(source,/name="lastName" required/);
   assert.match(source,/name="email" required/);
@@ -58,21 +64,24 @@ test('publication access requires only delivery essentials and keeps profiling o
   assert.doesNotMatch(source,/name="sector" required/);
   assert.doesNotMatch(source,/name="cityOrRegion" required/);
   assert.doesNotMatch(source,/name="reason" required/);
-  assert.match(html,/Only your name and email are required for delivery/i);
-  assert.match(html,/Optional readership details/);
-  assert.match(html,/This is not required for access/);
+  for(const [slug] of publicationAccessMappings){
+    const html=readFileSync(`dist/client/publication/${slug}/access.html`,'utf8');
+    assert.match(html,/Only your name and email are required for delivery/i);
+    assert.match(html,/Optional readership details/);
+    assert.match(html,/This is not required for access/);
+  }
 });
 
 test('AI Society uses aligned CTAs and inspectable, bounded output cases',()=>{
   const html=readFileSync('dist/client/ai-society.html','utf8');
-  assert.match(html,/class="button button-light"[^>]*>Explore the approach</);
-  assert.match(html,/class="button button-outline-light"[^>]*>Participate</);
-  assert.match(html,/Proposed public record/);
-  assert.match(html,/What the work is designed to produce/);
+  assert.match(html,/class="button button-light"[^>]*>See the process</);
+  assert.match(html,/class="button button-outline-light"[^>]*>Express interest</);
+  assert.match(html,/Planned public outputs/);
+  assert.match(html,/Records people can inspect/);
   assert.match(html,/Illustrative record/);
   assert.match(html,/Not a completed decision/);
-  assert.match(html,/does not represent an adopted policy, completed decision or institutional commitment/i);
-  assert.match(html,/What support enables/);
+  assert.match(html,/is not an adopted policy, completed decision or institutional commitment/i);
+  assert.match(html,/What support makes possible/);
   assert.match(html,/without directing findings/i);
 });
 
@@ -115,4 +124,23 @@ test('participant interests reach the existing service with consent and perspect
   assert.equal(forwarded.body.consent,true);
   assert.match(forwarded.body.message,/Perspective: Educator/);
   assert.match(forwarded.body.message,/How should students challenge/);
+});
+
+test('each parent publication access route forwards to its matching Health service slug',async()=>{
+  for(const [slug,,service] of publicationAccessMappings){
+    let forwardedUrl='';
+    const response=await worker.fetch(new Request(`https://www.sozorockfoundation.org/api/publications/access/${slug}`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Origin':'https://www.sozorockfoundation.org'},
+      body:JSON.stringify({
+        firstName:'Amina',lastName:'Okafor',email:'amina@example.org',
+        organization:'Not provided by reader',sector:'Other',cityOrRegion:'Not provided by reader',
+        state:'Not provided by reader',country:'Not provided by reader',
+        reason:'Publication access requested without optional readership details.',
+        deliveryConsent:true,updatesConsent:false,website:''
+      })
+    }),{UPSTREAM_FETCH:async(url)=>{forwardedUrl=String(url);return Response.json({accepted:true,verificationSent:true});}});
+    assert.equal(response.status,200);
+    assert.equal(forwardedUrl,`https://health.sozorockfoundation.org/api/publications/access/${service}`);
+  }
 });

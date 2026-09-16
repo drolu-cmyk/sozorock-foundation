@@ -8,38 +8,38 @@ export const WEBSITE_ID = `${SITE_ORIGIN}/#website`;
 
 const routeSeo = {
   "/ai-society": {
-    title: "AI & Society | Community Participation & Human Review | SozoRock",
-    description: "Explore Who Decides?, a developing SozoRock initiative for community participation, human review, public decision records and institutional response in AI.",
+    title: "AI & Society | Who Decides? | The SozoRock Foundation",
+    description: "Who Decides? is a developing public process for participation, human review, decision records and institutional response when AI affects learning or work.",
     pageType: "WebPage",
   },
   "/contact": {
     title: "Contact the Foundation | SozoRock",
-    description: "Discuss research, health access, public systems, rural and place-based work, community initiatives, AI & Society and applied learning with SozoRock.",
+    description: "Bring SozoRock a defined question about research, health access, public systems, rural and place-based work, community participation or applied learning.",
     pageType: "ContactPage",
   },
   "/": {
     title: "The SozoRock Foundation | Health Access, Public Systems & AI",
-    description: "Research, health access, public systems and practical AI learning, including focused work in rural and underserved places. Explore SozoRock.",
+    description: "Research, health access, public systems and applied AI—built for decisions, delivery and public scrutiny, including rural and underserved places.",
     pageType: "WebPage",
   },
   "/platforms": {
     title: "Platforms | The SozoRock Foundation",
-    description: "Explore SozoRock Health, CB-CAP, the Global Institute and AI Lab: research, community evidence, health access, public systems and practical AI learning.",
+    description: "Explore SozoRock Health, CB-CAP, the Global Institute and AI Lab: health access, county evidence, public-interest research and applied AI.",
     pageType: "CollectionPage",
   },
   "/platforms/institute": {
     title: "SozoRock Global Institute | Research & Convening",
-    description: "Public-interest research on governance, health access, systems assurance and public decision-making, with focused work on rural institutions and local capacity.",
+    description: "Research on governance, health access, systems assurance and public decisions, including the capacity of rural institutions.",
     pageType: "WebPage",
   },
   "/platforms/health": {
     title: "SozoRock Health | Systems for Health Access",
-    description: "Community access, place-based intelligence, digital assurance and workforce capacity. Discover SozoRock Health, an initiative of The SozoRock Foundation.",
+    description: "Community access, place-based evidence, digital assurance and workforce capacity. Explore SozoRock Health, an initiative of The SozoRock Foundation.",
     pageType: "WebPage",
   },
   "/platforms/ai-lab": {
-    title: "SozoRock AI Lab | Responsible Applied AI Learning",
-    description: "Practical AI learning for real work, centered on human judgment, verification, responsible use and reviewed implementation.",
+    title: "SozoRock AI Lab | Applied AI for Real Work",
+    description: "Task-based AI learning for real work, centered on human judgment, verification, responsible use and reviewed outputs.",
     pageType: "WebPage",
   },
   "/publications": {
@@ -49,17 +49,17 @@ const routeSeo = {
   },
   "/insights": {
     title: "Insights | The SozoRock Foundation",
-    description: "Read field updates, briefings and systems intelligence from SozoRock work in health access, public systems, community evidence and applied AI.",
+    description: "Read field updates and decision-focused analysis on health access, public systems, county evidence and applied AI.",
     pageType: "CollectionPage",
   },
   "/events": {
     title: "Events | The SozoRock Foundation",
-    description: "Explore SozoRock Firesides, Roundtables and briefings on health access, public systems, AI, learning, work and community questions.",
+    description: "Explore SozoRock Firesides, roundtables and briefings that connect lived experience, public evidence and institutional response.",
     pageType: "CollectionPage",
   },
   "/about": {
     title: "About | The SozoRock Foundation",
-    description: "Learn how The SozoRock Foundation connects research, health access, public systems, rural equity, community evidence and practical AI learning.",
+    description: "Learn how SozoRock connects research, health access, public systems, rural equity, community participation and applied AI to decisions and delivery.",
     pageType: "AboutPage",
   },
   "/leadership": {
@@ -69,12 +69,12 @@ const routeSeo = {
   },
   "/partner": {
     title: "Partner | The SozoRock Foundation",
-    description: "Discuss health access, community evidence, public-interest research, public systems, rural and place-based work, AI & Society and practical learning.",
+    description: "Define a decision and discuss a scoped SozoRock engagement in health access, public evidence, research, public systems or applied learning.",
     pageType: "WebPage",
   },
   "/support": {
     title: "Support | The SozoRock Foundation",
-    description: "Support public-interest research, health access, community evidence, AI & Society participation and practical learning.",
+    description: "Support independent research, public access, health-access work, community participation and task-based applied learning.",
     pageType: "WebPage",
   },
   "/standards": {
@@ -106,15 +106,15 @@ const routeSeo = {
 
 const routeKeywords = {
   "/ai-society": ["AI and society", "community participation", "human review", "AI governance", "institutional response", "public accountability"],
-  "/": ["SozoRock Foundation", "health access", "public systems", "health systems assurance", "community evidence", "rural equity", "responsible AI"],
-  "/platforms": ["SozoRock platforms", "Global Institute", "SozoRock Health", "SozoRock AI Lab", "community evidence", "public systems"],
-  "/platforms/institute": ["public-interest research", "systems intelligence", "governance research", "health systems assurance", "rural institutions", "SozoRock Global Institute"],
+  "/": ["SozoRock Foundation", "health access", "public systems", "health systems assurance", "county evidence", "rural equity", "applied AI"],
+  "/platforms": ["SozoRock platforms", "Global Institute", "SozoRock Health", "SozoRock AI Lab", "county evidence", "public systems"],
+  "/platforms/institute": ["public-interest research", "governance research", "health systems assurance", "public decisions", "rural institutions", "SozoRock Global Institute"],
   "/platforms/health": ["health access", "place intelligence", "community health evidence", "rural health", "SozoRock Health"],
-  "/platforms/ai-lab": ["responsible artificial intelligence", "applied AI learning", "AI verification", "human judgment", "SozoRock AI Lab"],
+  "/platforms/ai-lab": ["applied artificial intelligence", "task-based AI learning", "AI verification", "human judgment", "SozoRock AI Lab"],
   "/publications": ["health systems publications", "governance research", "rural governance research", "health equity research", "public-interest reports"],
-  "/insights": ["health access insights", "public systems intelligence", "community evidence", "responsible AI insights"],
-  "/events": ["public-interest briefings", "health systems roundtables", "community deliberation", "AI and society events", "SozoRock events"],
-  "/about": ["SozoRock Foundation mission", "public-interest foundation", "health access", "public systems", "rural equity", "responsible AI"],
+  "/insights": ["health access insights", "public systems", "county evidence", "applied AI insights"],
+  "/events": ["public-interest briefings", "health-access roundtables", "community deliberation", "AI and society events", "SozoRock events"],
+  "/about": ["SozoRock Foundation mission", "public-interest foundation", "health access", "public systems", "rural equity", "applied AI"],
   "/leadership": ["SozoRock Foundation leadership", "global health leadership", "public-interest governance"],
   "/partner": ["partner with SozoRock", "health access partnership", "research partnership", "public systems", "AI and society"],
   "/support": ["support SozoRock Foundation", "support health access", "support public-interest research", "support community participation"],
@@ -226,8 +226,8 @@ export function getSeoForPath(inputPathname = "/") {
       }
     : accessPublication
       ? {
-          title: `Request ${accessPublication.title} | SozoRock`,
-          description: `Request free verified access to ${accessPublication.title}, ${accessPublication.volume}.`,
+          title: `Get ${accessPublication.title} | SozoRock`,
+          description: `Get free verified access to ${accessPublication.title}, ${accessPublication.volume}.`,
           pageType: "WebPage",
           robots: "noindex, nofollow, noarchive",
         }
@@ -267,11 +267,11 @@ export function getSeoForPath(inputPathname = "/") {
         "public systems",
         "governance",
         "systems intelligence",
-        "community evidence",
+        "county evidence",
         "rural health",
         "rural equity",
         "community participation",
-        "responsible applied artificial intelligence",
+        "applied artificial intelligence",
       ],
       sameAs: ["https://x.com/srockfoundation", "https://www.instagram.com/srockfoundation/", "https://www.youtube.com/@srockfoundation"],
     },
