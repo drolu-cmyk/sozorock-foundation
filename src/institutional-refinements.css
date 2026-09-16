@@ -16,8 +16,29 @@
   text-align: center;
 }
 
+.publication-access-form label,
+.engagement-form label {
+  color: var(--ink);
+}
+
+.publication-access-form input:not([type="checkbox"]),
+.publication-access-form select,
+.publication-access-form textarea,
+.engagement-form input:not([type="checkbox"]),
+.engagement-form select,
+.engagement-form textarea {
+  color: var(--ink);
+  background: var(--white);
+}
+
+.field-hint,
+.form-note,
+.access-privacy {
+  color: var(--muted);
+}
+
 .foundation-footer-bottom > p {
-  max-width: 38ch;
+  max-width: 42ch;
 }
 
 .foundation-footer-bottom nav {
@@ -34,12 +55,14 @@
   text-underline-offset: 3px;
 }
 
-.publication-record-data dd {
-  overflow-wrap: anywhere;
+.policy-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 24px;
 }
 
-.media-story-grid .media-frame img[src="/media/health-access-delaware-county.webp"] {
-  object-position: center;
+.publication-record-data dd {
+  overflow-wrap: anywhere;
 }
 
 @media (max-width: 599px) {
@@ -82,5 +105,11 @@
 
   .foundation-footer-bottom nav {
     justify-content: flex-start;
+  }
+}
+
+@media (max-width: 419px) {
+  .page-hero .button-row {
+    grid-template-columns: 1fr;
   }
 }
