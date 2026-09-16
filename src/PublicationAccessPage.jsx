@@ -13,6 +13,15 @@ const optionalSectors = [
   "Other",
 ];
 
+const compatibilityProfile = {
+  organization: "Not provided by reader",
+  sector: "Other",
+  cityOrRegion: "Not provided by reader",
+  state: "Not provided by reader",
+  country: "Not provided by reader",
+  reason: "Publication access requested without optional readership details.",
+};
+
 const placeholderValues = new Set([
   "admin",
   "anonymous",
@@ -99,12 +108,12 @@ export function PublicationAccessPage({ publication }) {
       firstName,
       lastName,
       email,
-      organization,
-      sector,
-      cityOrRegion,
-      state: "",
-      country: "",
-      reason,
+      organization: organization || compatibilityProfile.organization,
+      sector: sector || compatibilityProfile.sector,
+      cityOrRegion: cityOrRegion || compatibilityProfile.cityOrRegion,
+      state: compatibilityProfile.state,
+      country: compatibilityProfile.country,
+      reason: reason || compatibilityProfile.reason,
       website: String(data.get("website") || ""),
       deliveryConsent,
       updatesConsent: data.get("updatesConsent") === "yes",
