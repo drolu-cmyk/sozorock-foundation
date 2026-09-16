@@ -66,9 +66,6 @@ export const platforms = [
   },
 ];
 
-const libraryCataloging = "Regent Joseph E. Bowman Jr Research Library, New York State Library; SUNY library system through Begley Library, SUNY Schenectady County Community College";
-const catalogingNote = "Library cataloging records holdings. It does not imply institutional endorsement, adoption, implementation or partnership.";
-
 export const publications = [
   {
     slug: "hsa-v1-2026",
@@ -124,8 +121,6 @@ export const publications = [
     citation: "Adeyemo, Oluwabiyi. 2025. Rethinking Rural Governance Series (RRG), Volume 1. The SozoRock Foundation, Inc. https://doi.org/10.65473/rrg-v1-2025",
     limits: "Read this as a proposed governance framework. Its use of Delaware County as a reference case does not establish adoption, independent validation or outcomes in that county or elsewhere.",
     external: "https://health.sozorockfoundation.org/publications/rethinking-rural-governance-volume-1",
-    catalogedBy: libraryCataloging,
-    catalogNote: catalogingNote,
   },
   {
     slug: "rebs-v1-2025",
@@ -149,8 +144,6 @@ export const publications = [
     citation: "Adeyemo, Oluwabiyi. 2025. Rural Equity Blueprint Series (REBS), Volume 1. The SozoRock Foundation, Inc. https://doi.org/10.65473/rebs-v1-2025",
     limits: "These are proposed access models, not evidence of operating services or measured health outcomes. Local implementation depends on partner agreements, capacity and licensed clinical responsibilities.",
     external: "https://health.sozorockfoundation.org/publications/rural-equity-blueprint-volume-1",
-    catalogedBy: libraryCataloging,
-    catalogNote: catalogingNote,
   },
 ];
 
@@ -175,8 +168,8 @@ export const campaigns = [
     detail: "Systems for health access",
     href: "/platforms/health",
     action: "Explore SozoRock Health",
-    image: "/media/health-access-delaware-county.webp",
-    alt: "SozoRock Health information and navigation setup in a Delaware County, New York community library",
+    image: "/media/health-access.webp",
+    alt: "Two people use a tablet together in a community library",
     kind: "photo",
   },
   {
