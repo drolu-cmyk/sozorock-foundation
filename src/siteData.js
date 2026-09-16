@@ -41,7 +41,7 @@ export const platforms = [
     slug: "institute",
     name: "SozoRock Global Institute",
     line: "Insight, publications, and convening.",
-    detail: "Published research examines rural governance, health access and health systems assurance. Future briefings and roundtables are being developed.",
+    detail: "Published research examines governance, health access, systems assurance and public-sector capacity, including the realities of rural institutions. Future briefings and roundtables are being developed.",
     href: "/platforms/institute",
     action: "Explore the Institute",
     tone: "cobalt",
@@ -50,7 +50,7 @@ export const platforms = [
     slug: "health",
     name: "SozoRock Health",
     line: "Building the systems that make health access possible.",
-    detail: "Community access models, local evidence and digital readiness for rural health. Local delivery depends on agreed partner roles and available services.",
+    detail: "Community access models, local evidence and digital readiness for communities and institutions, with rural and underserved places among the priorities. Local delivery depends on agreed partner roles and available services.",
     href: "/platforms/health",
     action: "Explore SozoRock Health",
     tone: "navy",
@@ -65,6 +65,9 @@ export const platforms = [
     tone: "royal",
   },
 ];
+
+const libraryCataloging = "Regent Joseph E. Bowman Jr Research Library, New York State Library; SUNY library system through Begley Library, SUNY Schenectady County Community College";
+const catalogingNote = "Library cataloging records holdings. It does not imply institutional endorsement, adoption, implementation or partnership.";
 
 export const publications = [
   {
@@ -112,8 +115,8 @@ export const publications = [
     volume: "Volume 1",
     theme: "Governance and systems",
     tagline: "Systems intelligence for local institutions.",
-    description: "A governance framework for helping rural institutions move from fragmented responses to coordinated decision-making, using Delaware County, New York as a reference case.",
-    metaDescription: "Rethinking Rural Governance, Volume 1 presents a systems framework for coordinated local decision-making, using Delaware County, New York as a reference case.",
+    description: "A governance framework for helping local institutions move from fragmented responses to coordinated decision-making, using rural Delaware County, New York as a reference case.",
+    metaDescription: "Rethinking Rural Governance, Volume 1 presents a systems framework for coordinated local decision-making, using rural Delaware County, New York as a reference case.",
     cover: "/media/rrg-cover.webp",
     socialImage: "/media/rrg-social-card.png",
     author: "Dr. Oluwabiyi Adeyemo",
@@ -121,6 +124,8 @@ export const publications = [
     citation: "Adeyemo, Oluwabiyi. 2025. Rethinking Rural Governance Series (RRG), Volume 1. The SozoRock Foundation, Inc. https://doi.org/10.65473/rrg-v1-2025",
     limits: "Read this as a proposed governance framework. Its use of Delaware County as a reference case does not establish adoption, independent validation or outcomes in that county or elsewhere.",
     external: "https://health.sozorockfoundation.org/publications/rethinking-rural-governance-volume-1",
+    catalogedBy: libraryCataloging,
+    catalogNote: catalogingNote,
   },
   {
     slug: "rebs-v1-2025",
@@ -144,6 +149,8 @@ export const publications = [
     citation: "Adeyemo, Oluwabiyi. 2025. Rural Equity Blueprint Series (REBS), Volume 1. The SozoRock Foundation, Inc. https://doi.org/10.65473/rebs-v1-2025",
     limits: "These are proposed access models, not evidence of operating services or measured health outcomes. Local implementation depends on partner agreements, capacity and licensed clinical responsibilities.",
     external: "https://health.sozorockfoundation.org/publications/rural-equity-blueprint-volume-1",
+    catalogedBy: libraryCataloging,
+    catalogNote: catalogingNote,
   },
 ];
 
@@ -168,8 +175,8 @@ export const campaigns = [
     detail: "Systems for health access",
     href: "/platforms/health",
     action: "Explore SozoRock Health",
-    image: "/media/health-access.webp",
-    alt: "Two people use a tablet together in a community library",
+    image: "/media/health-access-delaware-county.webp",
+    alt: "SozoRock Health information and navigation setup in a Delaware County, New York community library",
     kind: "photo",
   },
   {
@@ -241,15 +248,15 @@ export const leaders = [
     name: "Dr. Oluwabiyi Adeyemo",
     title: "Director of Strategic Initiatives",
     image: "/leadership/dr-oluwabiyi-adeyemo.webp",
-    bio: "Dr. Oluwabiyi Adeyemo leads strategic initiatives across research, policy, technology and program development. He is the author of the Foundation’s publications on health systems assurance, rural governance and rural equity. He connects that research with community access models, CB-CAP, applied learning and the Foundation’s developing AI & Society work.",
+    bio: "Dr. Oluwabiyi Adeyemo leads strategic initiatives across research, policy, technology and program development. He is the author of the Foundation’s publications on health systems assurance, governance and rural equity. He connects that research with community access models, CB-CAP, applied learning and the Foundation’s developing AI & Society work.",
   },
 ];
 
 export const partnerRoutes = [
-  { title: "Examine rural access", copy: "Start with a county and an access question. Combine public evidence with local partners’ knowledge to identify barriers, evidence gaps and next steps." },
-  { title: "Plan a Health Access Day", copy: "Define the audience, health education goals, local host and follow-up. Agree partner responsibilities and evaluation before delivery; clinical work stays with licensed practitioners." },
-  { title: "Develop a community Hub", copy: "Explore a library, community or home access model. Agree digital readiness, navigation support and provider connections without turning the host into a clinic." },
-  { title: "Evaluate a pilot", copy: "Set a focused question, a baseline and a practical measurement plan. Document participation, access barriers and lessons without presenting a proposed model as proven." },
-  { title: "Contribute to research", copy: "Discuss a research question, method review or publication briefing. Define contributions, funding disclosures and editorial responsibilities before work begins." },
-  { title: "Support practical learning", copy: "Explore AI learning for community organizations and local workforces. Agree the audience, real tasks, review requirements and evidence of learning." },
+  { title: "Examine an access challenge", copy: "Start with a place and a defined access question. Combine public evidence with local knowledge to produce an evidence brief, identify gaps and set a practical next-step agenda, including where rural or underserved conditions matter." },
+  { title: "Plan a Health Access Day", copy: "Define the audience, education goals, local host, partner roles, safeguards and follow-up measures before delivery. Clinical work remains with licensed practitioners." },
+  { title: "Develop a community Hub", copy: "Assess a library, community or home access model. Define site readiness, digital support, navigation boundaries and provider connections without turning the host into a clinic." },
+  { title: "Evaluate a pilot", copy: "Set a focused question, baseline, review plan and practical measures. Document participation, barriers and lessons without presenting a proposed model as proven." },
+  { title: "Commission a briefing", copy: "Define a research question, audience and decision. Agree the evidence boundary, contributors, funding disclosures, review process and deliverable before work begins." },
+  { title: "Build practical capability", copy: "Develop applied AI or digital-readiness learning around real tasks. Agree the audience, review requirements, safeguards and evidence of learning." },
 ];
