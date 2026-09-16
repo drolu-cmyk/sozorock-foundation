@@ -32,8 +32,8 @@ This repository is the production parent website for The SozoRock Foundation. Th
 
 - Primary navigation uses direct links. The homepage initiative list supports keyboard-operated disclosure; mobile navigation supports Escape and returns focus to its toggle.
 - Escape closes open menus and dialogs. All core interactions must work by keyboard.
-- Publication-access forms are production flows. They must use the established SozoRock Health verification service, keep marketing consent optional, avoid health or medical information, and never expose publication-file URLs before verification.
-- Publication-access validation must reject placeholder names, repeated-character entries, and low-information reasons on both the client and server. The parent worker must identify the established Health publication-access page as the trusted service origin when forwarding a verified request.
+- Publication-access forms are production flows. They must use the established SozoRock Health verification service, require only delivery essentials, keep readership profiling and marketing consent optional, avoid health or medical information, and never expose publication-file URLs before verification.
+- Publication-access validation must reject placeholder or repeated-character names. Optional readership fields must remain valid when supplied. The parent worker must identify the established Health publication-access page as the trusted service origin when forwarding a verified request.
 - The experience must work at desktop, tablet, and mobile widths.
 - CTA groups within a shared hero must use the same control treatment and align on the same visual baseline.
 
