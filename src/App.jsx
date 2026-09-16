@@ -7,9 +7,9 @@ import {
   InsightsPage,
   LeadershipPage,
   NotFoundPage,
-  PublicationAccessPage,
   PublicationPage,
 } from "./Pages";
+import { PublicationAccessPage } from "./PublicationAccessPage";
 import {
   AccessibilityStatementPage,
   GlobalInstitutePage,
