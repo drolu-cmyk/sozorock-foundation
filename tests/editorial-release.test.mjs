@@ -47,12 +47,31 @@ test('parent positioning includes rural work without narrowing the mission to ru
   assert.match(about,/wider work also addresses health systems assurance, governance, public-sector decision-making, community participation and responsible AI/i);
 });
 
-test('AI Society uses aligned CTAs and visible support and output cases',()=>{
+test('publication access requires only delivery essentials and keeps profiling optional',()=>{
+  const source=readFileSync('src/PublicationAccessPage.jsx','utf8');
+  const html=readFileSync('dist/client/publication/hsa-v1-2026/access.html','utf8');
+  assert.match(source,/name="firstName" required/);
+  assert.match(source,/name="lastName" required/);
+  assert.match(source,/name="email" required/);
+  assert.match(source,/name="deliveryConsent" type="checkbox" value="yes" required/);
+  assert.doesNotMatch(source,/name="organization" required/);
+  assert.doesNotMatch(source,/name="sector" required/);
+  assert.doesNotMatch(source,/name="cityOrRegion" required/);
+  assert.doesNotMatch(source,/name="reason" required/);
+  assert.match(html,/Only your name and email are required for delivery/i);
+  assert.match(html,/Optional readership details/);
+  assert.match(html,/This is not required for access/);
+});
+
+test('AI Society uses aligned CTAs and inspectable, bounded output cases',()=>{
   const html=readFileSync('dist/client/ai-society.html','utf8');
   assert.match(html,/class="button button-light"[^>]*>Explore the approach</);
   assert.match(html,/class="button button-outline-light"[^>]*>Participate</);
   assert.match(html,/Proposed public record/);
   assert.match(html,/What the work is designed to produce/);
+  assert.match(html,/Illustrative record/);
+  assert.match(html,/Not a completed decision/);
+  assert.match(html,/does not represent an adopted policy, completed decision or institutional commitment/i);
   assert.match(html,/What support enables/);
   assert.match(html,/without directing findings/i);
 });
@@ -78,6 +97,7 @@ test('legal routes expose direct institutional notices and footer access',()=>{
   assert.match(home,/href="\/nondiscrimination"/);
   assert.match(home,/Privacy Notice/);
   assert.match(home,/Website Terms/);
+  assert.doesNotMatch(home,/A U\.S\. 501\(c\)\(3\) public charity/);
 });
 
 test('participant interests reach the existing service with consent and perspective intact',async()=>{
