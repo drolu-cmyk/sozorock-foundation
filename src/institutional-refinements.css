@@ -1,0 +1,86 @@
+/* Scoped editorial and responsive refinements. Existing Foundation colors, type and layout remain unchanged. */
+.page-hero .button-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: stretch;
+  width: min(100%, 620px);
+  gap: 16px;
+}
+
+.page-hero .button-row > .button {
+  display: inline-flex;
+  align-self: stretch;
+  justify-content: center;
+  width: 100%;
+  min-height: 48px;
+  text-align: center;
+}
+
+.foundation-footer-bottom > p {
+  max-width: 38ch;
+}
+
+.foundation-footer-bottom nav {
+  justify-content: flex-end;
+}
+
+.policy-copy section + section {
+  margin-top: 38px;
+}
+
+.policy-copy a:not(.text-link) {
+  color: var(--cobalt);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.publication-record-data dd {
+  overflow-wrap: anywhere;
+}
+
+.media-story-grid .media-frame img[src="/media/health-access-delaware-county.webp"] {
+  object-position: center;
+}
+
+@media (max-width: 599px) {
+  .page-hero .button-row {
+    gap: 12px;
+  }
+
+  .page-hero .button-row > .button {
+    min-height: 48px;
+  }
+
+  .evidence-facts {
+    grid-template-columns: 1fr;
+  }
+
+  .evidence-facts > div,
+  .evidence-facts > div:first-child {
+    display: grid;
+    grid-template-columns: 72px minmax(0, 1fr);
+    align-items: center;
+    gap: 14px;
+    padding: 14px 0;
+    border-left: 0;
+    border-top: 1px solid rgba(255, 255, 255, .22);
+  }
+
+  .evidence-facts > div:first-child {
+    padding-top: 0;
+    border-top: 0;
+  }
+
+  .evidence-facts dt {
+    font-size: 42px;
+  }
+
+  .evidence-facts dd {
+    margin: 0;
+    font-size: 13px;
+  }
+
+  .foundation-footer-bottom nav {
+    justify-content: flex-start;
+  }
+}
