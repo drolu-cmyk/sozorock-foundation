@@ -23,9 +23,9 @@ test('rural series retain their correct DOI, permanent route and delivery mappin
 test('homepage roundtable evidence remains accurate, attributed and bounded',()=>{
   const html=readFileSync('dist/client/index.html','utf8');
   assert.match(html,/What a SozoRock rural-health roundtable surfaced\./);
-  assert.match(html,/12[^<]*participants/i);
-  assert.match(html,/2[^<]*county public-health jurisdictions/i);
-  assert.match(html,/2[^<]*Western New York universities represented/i);
+  assert.match(html,/<dt>12<\/dt><dd>participants<\/dd>/i);
+  assert.match(html,/<dt>2<\/dt><dd>county public-health jurisdictions<\/dd>/i);
+  assert.match(html,/<dt>2<\/dt><dd>Western New York universities represented<\/dd>/i);
   assert.match(html,/university school of nursing/i);
   assert.match(html,/12,000\+/);
   assert.match(html,/primary-care clinician/);
