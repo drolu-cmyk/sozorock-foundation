@@ -22,6 +22,11 @@ This repository is the production parent website for The SozoRock Foundation. Th
 - Build real pages for Home, Platforms, Publications, Insights, Events, About, Partner, Support, Standards, platform overviews, and DOI landing pages.
 - Keep the parent homepage broader than publications. Use four clear functions: institutional identity, current initiative, operating platforms, and engagement.
 - Prefer editorial fields, horizontal rules, and asymmetric hierarchy over boxed card grids. Keep the legal footer compact and align the logo to the same optical center as the navigation.
+- Keep rural health and rural equity visible as important areas of focus, but never describe the Foundation's overall mission as rural-only. Parent positioning must also cover health access, public systems, governance, systems assurance, community evidence, participation and practical AI learning.
+- Describe roundtables, participation, partnerships, funding, cataloging and library holdings precisely. Do not turn participation or cataloging into endorsement, implementation, adoption or a continuing institutional commitment.
+- Participant-reported figures may be displayed only with visible attribution and limits. Do not restate them as independently estimated statistics or achieved outcomes.
+- AI & Society should explain the public output, participation pathway, institutional-response pathway and what support enables. Do not name prospective funders, technology providers or partners unless the relationship is verified and approved for publication.
+- Legal and policy pages must use direct institutional language, preserve platform boundaries and avoid promises of certification, absolute security, uninterrupted service or support that has not been arranged.
 
 ## Interaction requirements
 
@@ -30,6 +35,7 @@ This repository is the production parent website for The SozoRock Foundation. Th
 - Publication-access forms are production flows. They must use the established SozoRock Health verification service, keep marketing consent optional, avoid health or medical information, and never expose publication-file URLs before verification.
 - Publication-access validation must reject placeholder names, repeated-character entries, and low-information reasons on both the client and server. The parent worker must identify the established Health publication-access page as the trusted service origin when forwarding a verified request.
 - The experience must work at desktop, tablet, and mobile widths.
+- CTA groups within a shared hero must use the same control treatment and align on the same visual baseline.
 
 ## Production runtime
 
