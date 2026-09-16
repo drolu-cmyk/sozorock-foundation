@@ -64,6 +64,16 @@ export function AiSocietyPage() {
       <div className="society-method-heading"><h2>Participation that produces a public record.</h2><p>The proposed process begins with community questions and keeps decisions open to scrutiny.</p></div>
       <dl className="society-method"><div><dt>Identify</dt><dd>Choose the uses of AI that matter locally.</dd></div><div><dt>Deliberate</dt><dd>Examine evidence, risks and competing interests.</dd></div><div><dt>Recommend</dt><dd>Set community priorities and boundaries.</dd></div><div><dt>Respond</dt><dd>Invite institutions to explain what they can act on—and what they cannot.</dd></div></dl>
       <div className="society-output-note" aria-labelledby="society-output-title"><p className="eyebrow">Proposed public record</p><h3 id="society-output-title">What the work is designed to produce.</h3><p>Community decision records, institutional responses and shared expectations for disclosure, privacy and human review. Future testing could inform methods other communities can use.</p><p className="society-output-boundary">These outputs are proposed. They are not completed results, certifications or institutional commitments.</p></div>
+      <article className="society-sample-record" aria-labelledby="sample-record-title">
+        <div className="society-sample-heading"><p className="eyebrow">Illustrative record · Not a completed decision</p><h3 id="sample-record-title">When an automated tool flags a student’s work.</h3><p>This example shows how a future decision record could make the question, evidence, authority and challenge route visible.</p></div>
+        <dl className="society-record-grid">
+          <div><dt>Question</dt><dd>Should the output open an inquiry, determine a penalty or neither?</dd></div>
+          <div><dt>Evidence required</dt><dd>The student’s work, assignment context, tool limitations and an educator’s independent review.</dd></div>
+          <div><dt>Human authority</dt><dd>A named person with authority under the institution’s published policy—not the tool alone.</dd></div>
+          <div><dt>Route to challenge</dt><dd>Notice of the reasons, access to the evidence and a fresh review by a different qualified person.</dd></div>
+          <div><dt>Institutional response</dt><dd>Not applicable. This illustration does not represent an adopted policy, completed decision or institutional commitment.</dd></div>
+        </dl>
+      </article>
       <p className="society-event-link">Firesides would surface community priorities. Roundtables would connect those priorities with institutional response. <Link href="/events#firesides" className="text-link">Explore the proposed formats</Link></p>
     </div></section>
     <section className="section form-section" id="participate"><div className="shell form-layout">
