@@ -3,10 +3,10 @@ import { ArrowRight } from "@phosphor-icons/react";
 import { Link } from "./router";
 
 const work = [
-  { id: "cbcap", name: "CB-CAP", summary: "County evidence for local action.", copy: "Explore public county evidence and its sources. Institutional planning tools are not yet available in the public preview.", href: "https://cbcap.sozorockfoundation.org/", action: "Explore CB-CAP" },
-  { id: "health", name: "SozoRock Health", summary: "Building the systems that make health access possible.", copy: "Community access models, local evidence and digital readiness help communities and institutions address barriers to care, with particular attention to rural and underserved places.", href: "https://health.sozorockfoundation.org/", action: "Explore Health" },
-  { id: "institute", name: "SozoRock Global Institute", summary: "Research that sharpens public decisions.", copy: "Publications and focused discussions examine health systems assurance, governance, public-sector capacity and rural equity.", href: "/platforms/institute", action: "Explore the Institute" },
-  { id: "ai", name: "SozoRock AI Lab", summary: "Practical AI. Accountable human judgment.", copy: "No-cost learning helps people apply AI to real work, verify the results and use them responsibly.", href: "https://ai-lab.sozorockfoundation.org/", action: "Explore the AI Lab" },
+  { id: "cbcap", name: "CB-CAP", summary: "County evidence, with sources and limits.", copy: "Explore public county evidence, source dates and definitions. Institutional planning tools are not part of the public preview.", href: "https://cbcap.sozorockfoundation.org/", action: "Explore CB-CAP" },
+  { id: "health", name: "SozoRock Health", summary: "Health access takes a system.", copy: "Community access models, local evidence, digital readiness and workforce capacity help institutions address barriers to care, including in rural and underserved places.", href: "https://health.sozorockfoundation.org/", action: "Explore Health" },
+  { id: "institute", name: "SozoRock Global Institute", summary: "Research for public decisions.", copy: "Publications and briefings examine health systems assurance, governance, health access and institutional capacity.", href: "/platforms/institute", action: "Explore the Institute" },
+  { id: "ai", name: "SozoRock AI Lab", summary: "Applied AI for real work.", copy: "No-cost learning helps people build useful work, verify it and use it responsibly.", href: "https://ai-lab.sozorockfoundation.org/", action: "Explore the AI Lab" },
 ];
 
 const roundtableFacts = [
@@ -20,7 +20,7 @@ export function HomePage() {
   return <>
     <section className="foundation-opening" aria-labelledby="foundation-title"><div className="shell opening-layout">
       <div><h1 id="foundation-title">Public ideas.<br />Practical systems.</h1><p className="foundation-thesis">Access. Assurance. Intelligence.</p></div>
-      <p className="opening-description">Research, health access, public systems and practical AI learning—bringing evidence into use.</p>
+      <p className="opening-description">Research, health access, public systems and applied AI—built for decisions, delivery and public scrutiny.</p>
     </div></section>
     <section className="foundation-work" aria-label="Explore our work"><div className="shell work-composition">
       <p className="eyebrow work-label">Explore our work</p>
@@ -34,7 +34,7 @@ export function HomePage() {
     <section className="foundation-evidence" aria-labelledby="roundtable-title"><div className="shell evidence-layout">
       <div className="evidence-intro">
         <p className="eyebrow">SozoRock field engagement · September 2025</p>
-        <h2 id="roundtable-title">What a SozoRock rural-health roundtable surfaced.</h2>
+        <h2 id="roundtable-title">What a regional health-access roundtable surfaced.</h2>
         <p>SozoRock convened the Western New York pre-planning roundtable in partnership with a university school of nursing. Participants included two county public-health jurisdictions, representatives from two universities and a regional community-health organization. The discussion informed the Access Day framework.</p>
         <Link href="/publication/rebs-v1-2025" className="evidence-link">Read Rural Equity Blueprint Series, Volume 1</Link>
       </div>
@@ -49,12 +49,12 @@ export function HomePage() {
             <span className="evidence-ratio-word" aria-hidden="true">for</span>
             <div><strong>12,000+</strong><span>residents</span></div>
           </div>
-          <p id="roundtable-caveat" className="evidence-caveat">A regional public-health director reported serving a population of more than 12,000 residents per primary-care clinician. The figure is presented as a participant-reported access condition documented in the publication—not as an independently re-estimated statistic or a program outcome.</p>
+          <p id="roundtable-caveat" className="evidence-caveat">A regional public-health director reported serving a population of more than 12,000 residents per primary-care clinician. The figure is participant-reported context documented in the publication—not an independently re-estimated statistic or a program outcome.</p>
           <p id="roundtable-source" className="evidence-source">Source: Rural Equity Blueprint Series, Volume 1 (2025), pages 2–4 and 13.</p>
         </figure>
       </div>
     </div></section>
-    <aside className="shell society-home-context" aria-label="AI and society"><p className="eyebrow">AI &amp; Society</p><div><p>Who decides when AI affects people? AI &amp; Society is developing ways for communities to shape consequential uses of AI, with evidence, human review and a route to challenge decisions.</p><Link href="/ai-society" className="editorial-link">Explore AI &amp; Society<ArrowRight size={24} aria-hidden="true" /></Link></div></aside>
+    <aside className="shell society-home-context" aria-label="AI and society"><p className="eyebrow">AI &amp; Society</p><div><p>When AI affects learning or work, people affected should help shape the rules, evidence and route to review.</p><Link href="/ai-society" className="editorial-link">Explore AI &amp; Society<ArrowRight size={24} aria-hidden="true" /></Link></div></aside>
     <section className="foundation-engage"><div className="shell engage-layout"><h2>Bring a question<br />worth working on.</h2><div><Link href="/partner" className="editorial-link">Partner with the Foundation<ArrowRight size={30} aria-hidden="true" /></Link><p>Research. Health access. Public systems. Applied learning.</p></div></div></section>
   </>;
 }
