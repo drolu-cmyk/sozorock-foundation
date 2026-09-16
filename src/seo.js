@@ -142,6 +142,15 @@ const breadcrumbNames = {
   terms: "Website Terms",
 };
 
+function conciseDescription(value) {
+  const text = String(value || "").trim();
+  if (text.length <= 160) return text;
+  const candidate = text.slice(0, 157);
+  const boundary = candidate.lastIndexOf(" ");
+  const end = boundary >= 120 ? boundary : 157;
+  return `${candidate.slice(0, end).replace(/[,:;.\s]+$/u, "")}…`;
+}
+
 function cleanPath(pathname = "/") {
   const value = pathname.split(/[?#]/u)[0] || "/";
   return value.length > 1 ? value.replace(/\/+$/u, "") : "/";
@@ -229,6 +238,7 @@ export function getSeoForPath(inputPathname = "/") {
           robots: "noindex, follow",
         };
 
+  const description = conciseDescription(base.description);
   const image = base.image || DEFAULT_SOCIAL_IMAGE;
   const keywords = publication
     ? [publication.theme, publication.title, "public-interest research", "systems intelligence"].filter(Boolean)
@@ -279,7 +289,7 @@ export function getSeoForPath(inputPathname = "/") {
       "@id": `${canonicalUrl}/#webpage`,
       url: canonicalUrl,
       name: base.title,
-      description: base.description,
+      description,
       keywords: keywords.join(", "),
       isPartOf: { "@id": WEBSITE_ID },
       about: { "@id": ORGANIZATION_ID },
@@ -308,7 +318,7 @@ export function getSeoForPath(inputPathname = "/") {
     pathname,
     isNotFound: !publication && !accessPublication && !routeSeo[pathname],
     title: base.title,
-    description: base.description,
+    description,
     keywords: keywords.join(", "),
     canonicalUrl,
     robots: base.robots || "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
