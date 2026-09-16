@@ -14,7 +14,7 @@ const routeSeo = {
   },
   "/contact": {
     title: "Contact the Foundation | SozoRock",
-    description: "Discuss research, health access, public systems, rural and place-based work, community initiatives, AI & Society or applied learning with The SozoRock Foundation.",
+    description: "Discuss research, health access, public systems, rural and place-based work, community initiatives, AI & Society and applied learning with SozoRock.",
     pageType: "ContactPage",
   },
   "/": {
@@ -69,7 +69,7 @@ const routeSeo = {
   },
   "/partner": {
     title: "Partner | The SozoRock Foundation",
-    description: "Discuss health access, community evidence, public-interest research, public systems, rural and place-based work, AI & Society or practical learning with SozoRock.",
+    description: "Discuss health access, community evidence, public-interest research, public systems, rural and place-based work, AI & Society and practical learning.",
     pageType: "WebPage",
   },
   "/support": {
