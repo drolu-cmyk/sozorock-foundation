@@ -1,0 +1,75 @@
+name: Verify Foundation production homepage
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/verify-foundation-production.yml
+  workflow_run:
+    workflows:
+      - Deploy parent website to AWS CloudFront
+    types:
+      - completed
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: verify-foundation-production
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    if: >-
+      github.event_name != 'workflow_run' ||
+      (github.event.workflow_run.conclusion == 'success' &&
+       github.event.workflow_run.head_branch == 'main')
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Verify release-specific homepage evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          marker='What a rural-health dialogue surfaced.'
+          ratio='12,000+'
+
+          verify_page() {
+            local base_url="$1"
+            local page=''
+            for attempt in $(seq 1 36); do
+              page="$(curl \
+                --proto '=https' \
+                --tlsv1.2 \
+                --fail \
+                --silent \
+                --show-error \
+                --location \
+                --max-redirs 5 \
+                --max-time 20 \
+                --header 'Cache-Control: no-cache' \
+                --header 'Pragma: no-cache' \
+                "${base_url}?release=${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}-${attempt}" || true)"
+              if grep -Fq "$marker" <<<"$page" && grep -Fq "$ratio" <<<"$page"; then
+                return 0
+              fi
+              test "$attempt" -lt 36
+              sleep 10
+            done
+            return 1
+          }
+
+          verify_page 'https://www.sozorockfoundation.org/'
+          verify_page 'https://sozorockfoundation.org/'
+
+          publication="$(curl \
+            --proto '=https' \
+            --tlsv1.2 \
+            --fail \
+            --silent \
+            --show-error \
+            --max-time 20 \
+            --header 'Cache-Control: no-cache' \
+            'https://www.sozorockfoundation.org/publication/rebs-v1-2025')"
+          grep -Fq 'Rural Equity Blueprint Series' <<<"$publication"
