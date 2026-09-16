@@ -20,15 +20,60 @@ test('rural series retain their correct DOI, permanent route and delivery mappin
   }
 });
 
-test('homepage rural-health evidence remains source-qualified',()=>{
+test('homepage roundtable evidence remains accurate, attributed and bounded',()=>{
   const html=readFileSync('dist/client/index.html','utf8');
-  assert.match(html,/What a rural-health dialogue surfaced\./);
+  assert.match(html,/What a SozoRock rural-health roundtable surfaced\./);
+  assert.match(html,/<dt>12<\/dt><dd>participants<\/dd>/i);
+  assert.match(html,/<dt>2<\/dt><dd>county public-health jurisdictions<\/dd>/i);
+  assert.match(html,/<dt>2<\/dt><dd>Western New York universities represented<\/dd>/i);
+  assert.match(html,/university school of nursing/i);
   assert.match(html,/12,000\+/);
   assert.match(html,/primary-care clinician/);
-  assert.match(html,/not measured post-program outcomes/i);
+  assert.match(html,/participant-reported access condition/i);
+  assert.match(html,/not as an independently re-estimated statistic or a program outcome/i);
   assert.match(html,/href="\/publication\/rebs-v1-2025"/);
   assert.ok(!html.includes('SUNY'));
+  assert.ok(!html.includes('Brockport'));
   assert.ok(!html.includes('post-program results'));
+});
+
+test('parent positioning includes rural work without narrowing the mission to rural only',()=>{
+  const home=readFileSync('dist/client/index.html','utf8');
+  const platforms=readFileSync('dist/client/platforms.html','utf8');
+  const about=readFileSync('dist/client/about.html','utf8');
+  assert.match(home,/Research, health access, public systems and practical AI learning/i);
+  assert.match(platforms,/including focused work in rural and underserved places/i);
+  assert.match(about,/Rural health and rural equity are important areas of focus/i);
+  assert.match(about,/wider work also addresses health systems assurance, governance, public-sector decision-making, community participation and responsible AI/i);
+});
+
+test('publication access requires only delivery essentials and keeps profiling optional',()=>{
+  const source=readFileSync('src/PublicationAccessPage.jsx','utf8');
+  const html=readFileSync('dist/client/publication/hsa-v1-2026/access.html','utf8');
+  assert.match(source,/name="firstName" required/);
+  assert.match(source,/name="lastName" required/);
+  assert.match(source,/name="email" required/);
+  assert.match(source,/name="deliveryConsent" type="checkbox" value="yes" required/);
+  assert.doesNotMatch(source,/name="organization" required/);
+  assert.doesNotMatch(source,/name="sector" required/);
+  assert.doesNotMatch(source,/name="cityOrRegion" required/);
+  assert.doesNotMatch(source,/name="reason" required/);
+  assert.match(html,/Only your name and email are required for delivery/i);
+  assert.match(html,/Optional readership details/);
+  assert.match(html,/This is not required for access/);
+});
+
+test('AI Society uses aligned CTAs and inspectable, bounded output cases',()=>{
+  const html=readFileSync('dist/client/ai-society.html','utf8');
+  assert.match(html,/class="button button-light"[^>]*>Explore the approach</);
+  assert.match(html,/class="button button-outline-light"[^>]*>Participate</);
+  assert.match(html,/Proposed public record/);
+  assert.match(html,/What the work is designed to produce/);
+  assert.match(html,/Illustrative record/);
+  assert.match(html,/Not a completed decision/);
+  assert.match(html,/does not represent an adopted policy, completed decision or institutional commitment/i);
+  assert.match(html,/What support enables/);
+  assert.match(html,/without directing findings/i);
 });
 
 test('proposed convenings emit no scheduled Event schema',()=>{
@@ -38,6 +83,21 @@ test('proposed convenings emit no scheduled Event schema',()=>{
     assert.ok(schemas.length);
     assert.ok(!JSON.stringify(schemas).includes('"@type":"Event"'));
   }
+});
+
+test('legal routes expose direct institutional notices and footer access',()=>{
+  const privacy=readFileSync('dist/client/privacy.html','utf8');
+  const accessibility=readFileSync('dist/client/accessibility.html','utf8');
+  const terms=readFileSync('dist/client/terms.html','utf8');
+  const home=readFileSync('dist/client/index.html','utf8');
+  assert.match(privacy,/>Retention</);
+  assert.match(privacy,/No website, email or storage system can be guaranteed to be completely secure/i);
+  assert.match(accessibility,/ongoing design and testing objective, not a claim/i);
+  assert.match(terms,/>Public forms</);
+  assert.match(home,/href="\/nondiscrimination"/);
+  assert.match(home,/Privacy Notice/);
+  assert.match(home,/Website Terms/);
+  assert.doesNotMatch(home,/A U\.S\. 501\(c\)\(3\) public charity/);
 });
 
 test('participant interests reach the existing service with consent and perspective intact',async()=>{

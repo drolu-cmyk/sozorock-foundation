@@ -86,9 +86,9 @@ export function EngagementForm({ kind }) {
   const [status, setStatus] = useState("idle");
   const [message, setMessage] = useState("");
   const options = kind === "Support"
-    ? ["Fund the work", "Support research and publications", "Partner with us"]
-    : ["Partner with us", "Rural health collaboration", "Research collaboration", "AI Lab learning", "AI & Society", "CB-CAP inquiry", "Health Equity Hub partnership", "Health Access Day partnership", "Support research and publications", "Bring the model to a community", "Institutional or public-sector inquiry"];
-  const inquiryRoutes = { "Rural health collaboration": "Partner with us", "Research collaboration": "Support research and publications", "AI Lab learning": "Partner with us", "AI & Society": "Institutional or public-sector inquiry" };
+    ? ["Fund the work", "Support research and publications", "Support AI & Society participation", "Provide in-kind technology or expertise", "Partner with us"]
+    : ["Partner with us", "Health access collaboration", "Research collaboration", "AI Lab learning", "AI & Society", "CB-CAP inquiry", "Health Equity Hub partnership", "Health Access Day partnership", "Support research and publications", "Bring the model to a community", "Institutional or public-sector inquiry"];
+  const inquiryRoutes = { "Health access collaboration": "Partner with us", "Research collaboration": "Support research and publications", "AI Lab learning": "Partner with us", "AI & Society": "Institutional or public-sector inquiry" };
   const roles = ["Individual or family", "Community organization", "Licensed provider or health organization", "County, state, or public agency", "University or researcher", "Foundation or funder", "Corporate organization", "Other"];
 
   const submit = async (event) => {

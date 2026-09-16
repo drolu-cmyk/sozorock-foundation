@@ -1,0 +1,147 @@
+/* Scoped editorial and responsive refinements. Existing Foundation colors, type and layout remain unchanged. */
+.page-hero .button-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: stretch;
+  width: min(100%, 620px);
+  gap: 16px;
+}
+
+.page-hero .button-row > .button {
+  display: inline-flex;
+  align-self: stretch;
+  justify-content: center;
+  width: 100%;
+  min-height: 48px;
+  text-align: center;
+}
+
+.publication-access-form label,
+.engagement-form label {
+  color: var(--ink);
+}
+
+.publication-access-form input:not([type="checkbox"]),
+.publication-access-form select,
+.publication-access-form textarea,
+.engagement-form input:not([type="checkbox"]),
+.engagement-form select,
+.engagement-form textarea {
+  color: var(--ink);
+  background: var(--white);
+}
+
+.field-hint,
+.form-note,
+.access-privacy {
+  color: var(--muted);
+}
+
+.access-optional-details {
+  padding: 8px 0 20px;
+  border-block: 1px solid var(--line);
+}
+
+.access-optional-details > summary {
+  min-height: 44px;
+  padding: 10px 0;
+  cursor: pointer;
+  color: var(--cobalt);
+  font-weight: 650;
+}
+
+.access-optional-details[open] > summary {
+  margin-bottom: 8px;
+}
+
+.access-optional-details > p {
+  margin: 0 0 20px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.access-optional-details label {
+  display: grid;
+  gap: 8px;
+}
+
+.access-optional-details label + label {
+  margin-top: 20px;
+}
+
+.foundation-footer-bottom > p {
+  max-width: 42ch;
+}
+
+.foundation-footer-bottom nav {
+  justify-content: flex-end;
+}
+
+.policy-copy section + section {
+  margin-top: 38px;
+}
+
+.policy-copy a:not(.text-link) {
+  color: var(--cobalt);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.policy-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 24px;
+}
+
+.publication-record-data dd {
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 599px) {
+  .page-hero .button-row {
+    gap: 12px;
+  }
+
+  .page-hero .button-row > .button {
+    min-height: 48px;
+  }
+
+  .evidence-facts {
+    grid-template-columns: 1fr;
+  }
+
+  .evidence-facts > div,
+  .evidence-facts > div:first-child {
+    display: grid;
+    grid-template-columns: 72px minmax(0, 1fr);
+    align-items: center;
+    gap: 14px;
+    padding: 14px 0;
+    border-left: 0;
+    border-top: 1px solid rgba(255, 255, 255, .22);
+  }
+
+  .evidence-facts > div:first-child {
+    padding-top: 0;
+    border-top: 0;
+  }
+
+  .evidence-facts dt {
+    font-size: 42px;
+  }
+
+  .evidence-facts dd {
+    margin: 0;
+    font-size: 13px;
+  }
+
+  .foundation-footer-bottom nav {
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 419px) {
+  .page-hero .button-row {
+    grid-template-columns: 1fr;
+  }
+}
