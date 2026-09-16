@@ -19,7 +19,7 @@ const routeSeo = {
   },
   "/": {
     title: "The SozoRock Foundation | Health Access, Public Systems & AI",
-    description: "Research, health access, public systems and practical AI learning, including focused work in rural and underserved places. Explore SozoRock platforms and publications.",
+    description: "Research, health access, public systems and practical AI learning, including focused work in rural and underserved places. Explore SozoRock.",
     pageType: "WebPage",
   },
   "/platforms": {
