@@ -8,6 +8,7 @@ import "./editorial.css";
 import "./homepage-evidence.css";
 import "./institutional-refinements.css";
 import "./visibility-capability.css";
+import "./editorial-proof-overrides.css";
 import "./engage-opportunity.css";
 
 const container = document.getElementById("root");

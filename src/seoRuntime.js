@@ -2,23 +2,25 @@ import { getSeoForPath as getBaseSeo } from "./seo.js";
 
 const overrides = {
   "/": {
-    title: "The SozoRock Foundation | Health Access, Workforce & Applied Technology",
-    description: "Research, health access, workforce capability and applied technology for public decisions, delivery and accountable implementation.",
+    title: "The SozoRock Foundation | Health Access, Applied Learning & AI Governance",
+    description: "Health access, applied learning, research and AI governance for public decisions, delivery and accountable implementation.",
     keywords: [
       "SozoRock Foundation",
       "health access",
-      "workforce development",
       "applied learning",
       "experiential learning",
-      "public systems",
+      "workforce development",
+      "work-based learning",
+      "AI governance",
+      "AI and society",
       "health systems assurance",
       "cybersecurity workforce development",
-      "applied AI",
+      "public systems",
     ],
   },
   "/platforms/applied-learning": {
-    title: "Applied Learning & Workforce Development | SozoRock Foundation",
-    description: "A recurring graduate experiential-learning model connecting instruction with cybersecurity implementation, evidence, evaluation and workplace capability.",
+    title: "Applied Learning | Graduate Cybersecurity | SozoRock Foundation",
+    description: "Graduate experiential learning that moves from instruction into cybersecurity implementation, evidence review and professional judgment.",
     keywords: [
       "applied learning",
       "experiential learning",
@@ -48,8 +50,8 @@ const overrides = {
     ],
   },
   "/partner": {
-    title: "Partner | Universities, Technology & Public Institutions | SozoRock",
-    description: "Work with SozoRock on applied learning, health access, public evidence, workforce capability, research and public-interest technology.",
+    title: "Partner with SozoRock | The SozoRock Foundation",
+    description: "Define an applied-learning, health-access, research, public-systems or technology engagement with a clear problem, role and outcome.",
     keywords: [
       "university industry collaboration",
       "technology partnership",
@@ -62,7 +64,7 @@ const overrides = {
   },
   "/support": {
     title: "Support the Work | The SozoRock Foundation",
-    description: "Support health access, applied learning, workforce capability, public-interest research, community participation and technology infrastructure.",
+    description: "Support health access, applied learning, public-interest research, community participation and the technology infrastructure behind the work.",
     keywords: [
       "nonprofit technology funding",
       "workforce development funding",

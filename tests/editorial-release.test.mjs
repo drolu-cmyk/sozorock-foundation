@@ -27,31 +27,43 @@ test('all three publications retain permanent records and verified delivery mapp
   }
 });
 
-test('homepage shows concise documented evidence without turning planned work into impact',()=>{
+test('homepage uses evidence-led editorial storytelling without mechanical labels',()=>{
   const html=readFileSync('dist/client/index.html','utf8');
-  assert.match(html,/Work, documented\./);
-  assert.match(html,/2 cohorts · 11 graduate learners · 2025–26/);
-  assert.match(html,/12 participants · 2 county public-health jurisdictions · 2 universities/);
-  assert.match(html,/Live participant project/);
-  assert.match(html,/25 participants planned · New York/);
-  assert.match(html,/href="\/publication\/rebs-v1-2025"/);
+  assert.match(html,/Starting with 25 people\./);
+  assert.match(html,/Learning, put to work\./);
+  assert.match(html,/11<\/strong><span>graduate learners/);
+  assert.match(html,/2 cohorts · 2025–26/);
+  assert.match(html,/AI changes decisions/i);
+  assert.match(html,/Participation/);
+  assert.match(html,/Human review/);
+  assert.match(html,/Accountability/);
   assert.match(html,/href="\/platforms\/applied-learning"/);
+  assert.match(html,/href="\/ai-society"/);
+  assert.doesNotMatch(html,/Current work/i);
+  assert.doesNotMatch(html,/Work, documented/i);
+  assert.doesNotMatch(html,/In practice/i);
+  assert.doesNotMatch(html,/Faculty perspective/i);
   assert.doesNotMatch(html,/100\+/);
   assert.doesNotMatch(html,/45\+/);
   assert.doesNotMatch(html,/65%/);
   assert.doesNotMatch(html,/Institutions in active coordination/i);
 });
 
-test('applied learning records the two-stage graduate model and practitioner responsibility',()=>{
+test('applied learning records the graduate model and practitioner responsibility without brochure labels',()=>{
   const html=readFileSync('dist/client/platforms/applied-learning.html','utf8');
-  assert.match(html,/From academic knowledge to applied capability/i);
-  assert.match(html,/2<\/dt><dd>consecutive cohorts/);
-  assert.match(html,/11<\/dt><dd>graduate learners/);
+  assert.match(html,/Coursework is the starting point/i);
+  assert.match(html,/From instruction to judgment/i);
+  assert.match(html,/2<\/strong><span>cohorts/);
+  assert.match(html,/11<\/strong><span>graduate learners/);
   assert.match(html,/Capella University’s Applied IT Capstone program/);
   assert.match(html,/Dr\. Oluwabiyi Adeyemo/);
   assert.match(html,/designs the experiential project tasks, mentors learners and evaluates their applied work/i);
   assert.match(html,/Capella University faculty retain course ownership, academic oversight and grading/i);
+  assert.match(html,/Summary of faculty feedback/i);
   assert.match(html,/not a university endorsement/i);
+  assert.doesNotMatch(html,/Faculty perspective/i);
+  assert.doesNotMatch(html,/Practitioner role/i);
+  assert.doesNotMatch(html,/In practice/i);
 });
 
 test('planned health pilot is visible with clinical and evidence boundaries intact',()=>{
@@ -65,12 +77,14 @@ test('planned health pilot is visible with clinical and evidence boundaries inta
   assert.match(html,/Participant enrollment and operating dates will be published when confirmed/i);
 });
 
-test('parent positioning includes rural work without narrowing the mission to rural only',()=>{
+test('parent positioning stays broad while making AI and applied learning visible',()=>{
   const home=readFileSync('dist/client/index.html','utf8');
   const platforms=readFileSync('dist/client/platforms.html','utf8');
   const about=readFileSync('dist/client/about.html','utf8');
-  assert.match(home,/Research, health access, talent and applied technology/i);
+  assert.match(home,/Health access, applied learning, research and AI governance/i);
+  assert.match(home,/Explore AI &amp; Society/i);
   assert.match(platforms,/Rural and underserved places remain a focused part of the work/i);
+  assert.match(platforms,/AI &amp; Society/);
   assert.match(about,/Rural health and rural equity remain important/i);
   assert.match(about,/wider mandate includes health systems assurance, governance, public decisions, community participation and responsible AI/i);
 });
@@ -111,7 +125,7 @@ test('proposed convenings emit no scheduled Event schema',()=>{
     const html=readFileSync(`dist/client/${route}.html`,'utf8');
     const schemas=[...html.matchAll(/<script[^>]*type="application\/ld\+json">(.*?)<\/script>/gs)].map(m=>JSON.parse(m[1]));
     assert.ok(schemas.length);
-    assert.ok(!JSON.stringify(schemas).includes('"@type":"Event"'));
+    assert.ok(!JSON.stringify(schemas).includes('\"@type\":\"Event\"'));
   }
 });
 
