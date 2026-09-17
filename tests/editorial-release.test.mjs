@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import {readFileSync} from 'node:fs';
+import {readFileSync,readdirSync} from 'node:fs';
 import {publications} from '../src/siteData.js';
 import worker from '../worker/index.js';
 
@@ -32,8 +32,8 @@ test('homepage locks a stable proposition and explains why the health pilot exis
   assert.match(html,/Evidence should lead somewhere\./i);
   assert.match(html,/2025 preplanning roundtable/i);
   assert.match(html,/12 participants/i);
-  assert.match(html,/two county public health jurisdictions/i);
-  assert.match(html,/more than 12,000 residents per primary care clinician/i);
+  assert.match(html,/two county public-health jurisdictions/i);
+  assert.match(html,/more than 12,000 residents per primary-care clinician/i);
   assert.match(html,/Why start with 25 people\?/i);
   assert.match(html,/In 2027/i);
   assert.match(html,/Dr\. Michael Purcell and PIOC, a direct primary care practice/i);
@@ -47,12 +47,12 @@ test('homepage locks a stable proposition and explains why the health pilot exis
   assert.doesNotMatch(html,/12 months|two hours/i);
 });
 
-test('applied learning sells a six month cybersecurity capability experience without a numbered process diagram',()=>{
+test('applied learning sells a six-month cybersecurity capability experience without a numbered process diagram',()=>{
   const html=readFileSync('dist/client/platforms/applied-learning.html','utf8');
   assert.match(html,/From coursework to cybersecurity work\./i);
-  assert.match(html,/six month experiential capstone collaboration with Capella University/i);
+  assert.match(html,/six-month experiential capstone collaboration with Capella University/i);
   assert.match(html,/cybersecurity master/i);
-  assert.match(html,/limited hands on cloud exposure/i);
+  assert.match(html,/limited hands-on cloud exposure/i);
   assert.match(html,/Identity and access management/i);
   assert.match(html,/>GRC</);
   assert.match(html,/Cloud security/i);
@@ -69,9 +69,9 @@ test('2027 health page connects field evidence to a deliberately bounded pilot',
   const html=readFileSync('dist/client/platforms/health.html','utf8');
   assert.match(html,/Primary care can exist and still be hard to reach\./i);
   assert.match(html,/2025 SozoRock preplanning roundtable/i);
-  assert.match(html,/more than 12,000 residents per primary care clinician/i);
+  assert.match(html,/more than 12,000 residents per primary-care clinician/i);
   assert.match(html,/REBS connects that access question with health literacy, technology, workforce and community readiness/i);
-  assert.match(html,/In 2027, the next step is a 25 person test\./i);
+  assert.match(html,/In 2027, the next step is a 25-person test\./i);
   assert.match(html,/Starting with 25 keeps the first test small enough/i);
   assert.match(html,/Dr\. Michael Purcell and PIOC, a direct primary care practice/i);
   assert.match(html,/Clinical assessment, diagnosis, treatment and prescribing remain entirely with the licensed provider/i);
@@ -131,13 +131,22 @@ test('navigation, footer and mobile menu expose clear conversion and legal statu
   assert.match(css,/position:fixed; top:96px/);
 });
 
+test('the approved visual system remains gradient-free and loads the targeted contrast correction last',()=>{
+  const main=readFileSync('src/main.jsx','utf8');
+  const cssFiles=readdirSync('src').filter((file)=>file.endsWith('.css'));
+  const css=cssFiles.map((file)=>readFileSync(`src/${file}`,'utf8')).join('\n');
+  assert.match(main,/import "\.\/accessibility-polish\.css";/);
+  assert.doesNotMatch(css,/gradient\(/i);
+  assert.match(readFileSync('src/accessibility-polish.css','utf8'),/Existing palette, type, spacing and visual system remain unchanged/);
+});
+
 test('about and events use a concise evidence led institutional story',()=>{
   const about=readFileSync('dist/client/about.html','utf8');
   const events=readFileSync('dist/client/events.html','utf8');
   assert.match(about,/A foundation built to move from evidence to use\./i);
   assert.match(about,/Health access can fail even when care exists/i);
   assert.match(events,/Put the question in the room\./i);
-  assert.match(events,/more than 12,000 residents per primary care clinician/i);
+  assert.match(events,/more than 12,000 residents per primary-care clinician/i);
   assert.match(events,/2027 pilot will test/i);
   assert.doesNotMatch(about,/class="eyebrow"/);
   assert.doesNotMatch(events,/class="eyebrow"/);
