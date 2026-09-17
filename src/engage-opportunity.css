@@ -6,16 +6,15 @@
 .engage-opportunity-layout {
   display: grid;
   grid-template-columns: minmax(0, .72fr) minmax(0, 1.28fr);
-  gap: 72px;
-  padding: 72px 0 76px;
+  gap: clamp(56px, 7vw, 112px);
+  padding: 88px 0 96px;
 }
 
 .engage-opportunity-layout > div:first-child h2 {
-  margin-top: 10px;
-  max-width: 10ch;
-  font-size: clamp(40px, 3.8vw, 58px);
-  line-height: 1.02;
-  letter-spacing: -.04em;
+  max-width: 11ch;
+  font-size: clamp(42px, 4.2vw, 64px);
+  line-height: .99;
+  letter-spacing: -.045em;
 }
 
 .engage-opportunity-list {
@@ -26,7 +25,7 @@
   display: grid;
   grid-template-columns: minmax(190px, .7fr) minmax(0, 1.3fr);
   gap: 30px;
-  padding: 28px 0 30px;
+  padding: 30px 0 32px;
   border-bottom: 1px solid var(--line);
 }
 
@@ -45,7 +44,7 @@
 .engage-opportunity-list .text-link {
   grid-column: 2;
   width: fit-content;
-  margin-top: -12px;
+  margin-top: -10px;
 }
 
 .support-boundary {
@@ -55,20 +54,16 @@
 
 .support-boundary-inner {
   display: grid;
-  grid-template-columns: minmax(140px, .45fr) minmax(0, 1.25fr) auto;
-  gap: 34px;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 42px;
   align-items: center;
-  padding: 36px 0 40px;
+  padding: 42px 0 46px;
 }
 
-.support-boundary-inner .eyebrow {
-  color: var(--ice);
-}
-
-.support-boundary-inner > p:nth-child(2) {
-  max-width: 58ch;
+.support-boundary-inner > p {
+  max-width: 62ch;
   color: var(--white);
-  font-size: 17px;
+  font-size: 18px;
   line-height: 1.5;
 }
 
@@ -84,17 +79,17 @@
   }
 
   .engage-opportunity-layout > div:first-child h2 {
-    max-width: none;
+    max-width: 16ch;
   }
 
   .support-boundary-inner {
-    gap: 12px;
+    gap: 14px;
   }
 }
 
 @media (max-width: 599px) {
   .engage-opportunity-layout {
-    padding: 50px 0 54px;
+    padding: 58px 0 64px;
   }
 
   .engage-opportunity-list article {
@@ -109,6 +104,6 @@
   }
 
   .support-boundary-inner {
-    padding: 30px 0 34px;
+    padding: 32px 0 36px;
   }
 }
