@@ -44,13 +44,20 @@ test("CloudFront preserves unknown paths for a true S3/CloudFront 404", () => {
   assert.equal(request("/not-a-route").uri, "/not-a-route");
 });
 
-test("CloudFront protects private publication files and legacy routes", () => {
+test("CloudFront protects private publication files and consolidates legacy routes", () => {
   const privateFile = request("/publications/hsa-volume-1-2026.pdf");
   assert.equal(privateFile.statusCode, 302);
   assert.equal(privateFile.headers.location.value, "/publication/hsa-v1-2026/access");
-  const legacy = request("/work/global-institute");
-  assert.equal(legacy.statusCode, 301);
-  assert.equal(legacy.headers.location.value, "/platforms/institute");
+
+  for (const [legacyPath, destination] of [
+    ["/about-us", "/about"],
+    ["/programs", "/platforms"],
+    ["/work/global-institute", "/platforms/institute"],
+  ]) {
+    const legacy = request(legacyPath);
+    assert.equal(legacy.statusCode, 301);
+    assert.equal(legacy.headers.location.value, destination);
+  }
 });
 
 test("CloudFront maps the public publication slug to the established Health API slug", () => {

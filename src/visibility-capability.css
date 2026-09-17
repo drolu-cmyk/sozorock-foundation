@@ -1,0 +1,374 @@
+.current-work-strip {
+  border-bottom: 1px solid var(--line);
+  background: var(--white);
+}
+
+.current-work-inner {
+  display: grid;
+  grid-template-columns: minmax(120px, .55fr) minmax(0, 1.45fr) auto;
+  gap: 28px;
+  align-items: center;
+  min-height: 78px;
+}
+
+.current-work-inner > .eyebrow {
+  margin: 0;
+}
+
+.current-work-copy {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  align-items: baseline;
+}
+
+.current-work-copy strong {
+  font-size: 18px;
+  letter-spacing: -.02em;
+}
+
+.current-work-copy span {
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.current-work-link {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  gap: 8px;
+  color: var(--cobalt);
+  font-size: 14px;
+  font-weight: 650;
+}
+
+.foundation-practice {
+  background: var(--navy);
+  color: var(--white);
+}
+
+.practice-layout {
+  display: grid;
+  grid-template-columns: minmax(0, .68fr) minmax(0, 1.32fr);
+  gap: 72px;
+  padding: 72px 0 76px;
+}
+
+.practice-intro h2 {
+  margin-top: 10px;
+  max-width: 8ch;
+  font-size: clamp(42px, 4vw, 64px);
+  line-height: .98;
+  letter-spacing: -.045em;
+}
+
+.practice-intro > p:last-child {
+  margin-top: 24px;
+  max-width: 34ch;
+  color: var(--ice);
+  font-size: 16px;
+  line-height: 1.55;
+}
+
+.practice-list {
+  border-top: 1px solid rgba(255, 255, 255, .28);
+}
+
+.practice-row {
+  display: grid;
+  grid-template-columns: minmax(170px, .72fr) minmax(0, 1.28fr);
+  gap: 38px;
+  padding: 30px 0 32px;
+  border-bottom: 1px solid rgba(255, 255, 255, .28);
+}
+
+.practice-row .eyebrow {
+  color: var(--ice);
+}
+
+.practice-signal {
+  margin-top: 12px;
+  color: var(--white);
+  font-size: clamp(20px, 2vw, 28px);
+  line-height: 1.15;
+  font-weight: 620;
+  letter-spacing: -.025em;
+}
+
+.practice-row h3 {
+  font-size: clamp(28px, 2.4vw, 38px);
+  line-height: 1.06;
+  letter-spacing: -.035em;
+}
+
+.practice-row h3 + p {
+  margin-top: 14px;
+  max-width: 52ch;
+  color: var(--ice);
+  line-height: 1.55;
+}
+
+.practice-row .editorial-link {
+  margin-top: 18px;
+  color: var(--white);
+}
+
+.health-pilot-signal {
+  background: var(--white);
+  color: var(--ink);
+  border-block: 1px solid var(--line);
+}
+
+.health-pilot-signal-inner {
+  display: grid;
+  grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr);
+  gap: 72px;
+  padding: 58px 0 62px;
+}
+
+.health-pilot-signal h2 {
+  margin-top: 10px;
+  max-width: 13ch;
+  font-size: clamp(38px, 3.6vw, 56px);
+  line-height: 1.02;
+  letter-spacing: -.04em;
+}
+
+.health-pilot-signal-inner > div:last-child > p {
+  max-width: 56ch;
+  line-height: 1.6;
+}
+
+.health-pilot-signal-inner > div:last-child > p + p {
+  margin-top: 16px;
+}
+
+.health-pilot-note {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.applied-learning-summary,
+.applied-learning-role,
+.applied-learning-engage {
+  background: var(--white);
+  color: var(--ink);
+}
+
+.applied-learning-case,
+.applied-learning-voice {
+  background: var(--navy);
+  color: var(--white);
+}
+
+.applied-learning-summary-inner,
+.applied-learning-case-layout,
+.applied-learning-role-layout,
+.applied-learning-voice-layout,
+.applied-learning-engage-layout {
+  display: grid;
+  grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr);
+  gap: 72px;
+  padding: 72px 0;
+}
+
+.applied-learning-model-copy h2,
+.applied-learning-case h2,
+.applied-learning-role h2,
+.applied-learning-voice h2,
+.applied-learning-engage h2 {
+  margin-top: 10px;
+  font-size: clamp(38px, 3.5vw, 56px);
+  line-height: 1.02;
+  letter-spacing: -.04em;
+}
+
+.applied-learning-model-copy > p:last-child,
+.applied-learning-case-layout > div > p,
+.applied-learning-role-layout > div > p,
+.applied-learning-voice-layout > div > p,
+.applied-learning-engage-layout > div > p {
+  margin-top: 20px;
+  max-width: 52ch;
+  line-height: 1.6;
+}
+
+.applied-flow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 14px;
+  align-items: center;
+  padding-bottom: 28px;
+  border-bottom: 1px solid var(--line);
+}
+
+.applied-flow-step {
+  display: inline-flex;
+  gap: 14px;
+  align-items: center;
+  font-size: clamp(20px, 2vw, 30px);
+  font-weight: 620;
+  letter-spacing: -.03em;
+}
+
+.applied-flow-arrow {
+  color: var(--cobalt);
+}
+
+.applied-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: 30px 0 0;
+}
+
+.applied-metrics > div {
+  padding-inline: 18px;
+  border-left: 1px solid var(--line);
+}
+
+.applied-metrics > div:first-child {
+  padding-left: 0;
+  border-left: 0;
+}
+
+.applied-metrics dt {
+  font-size: clamp(42px, 4vw, 62px);
+  line-height: .95;
+  font-weight: 650;
+  letter-spacing: -.05em;
+}
+
+.applied-metrics dd {
+  margin: 10px 0 0;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.35;
+}
+
+.applied-learning-case .eyebrow,
+.applied-learning-voice .eyebrow,
+.applied-learning-case p,
+.applied-learning-voice p {
+  color: var(--ice);
+}
+
+.applied-learning-case h2,
+.applied-learning-voice h2,
+.applied-learning-case strong,
+.applied-learning-voice strong {
+  color: var(--white);
+}
+
+.applied-practice-line {
+  margin-top: 14px !important;
+  color: var(--white) !important;
+  font-size: clamp(21px, 2vw, 30px);
+  line-height: 1.35 !important;
+  font-weight: 620;
+  letter-spacing: -.025em;
+}
+
+.applied-learning-role-layout > div:last-child p:first-child {
+  margin-top: 0;
+  font-size: clamp(22px, 2vw, 30px);
+  line-height: 1.35;
+  letter-spacing: -.025em;
+}
+
+.applied-learning-note {
+  font-size: 13px;
+  color: var(--ice) !important;
+}
+
+.applied-learning-engage {
+  border-top: 1px solid var(--line);
+}
+
+.applied-learning-engage .editorial-link {
+  margin-top: 22px;
+}
+
+@media (max-width: 899px) {
+  .current-work-inner {
+    grid-template-columns: 1fr;
+    gap: 8px;
+    padding: 18px 0 20px;
+  }
+
+  .current-work-link {
+    width: fit-content;
+  }
+
+  .practice-layout,
+  .health-pilot-signal-inner,
+  .applied-learning-summary-inner,
+  .applied-learning-case-layout,
+  .applied-learning-role-layout,
+  .applied-learning-voice-layout,
+  .applied-learning-engage-layout {
+    grid-template-columns: 1fr;
+    gap: 38px;
+  }
+
+  .practice-intro h2,
+  .health-pilot-signal h2 {
+    max-width: none;
+  }
+}
+
+@media (max-width: 599px) {
+  .practice-layout,
+  .health-pilot-signal-inner,
+  .applied-learning-summary-inner,
+  .applied-learning-case-layout,
+  .applied-learning-role-layout,
+  .applied-learning-voice-layout,
+  .applied-learning-engage-layout {
+    padding: 50px 0;
+  }
+
+  .practice-row {
+    grid-template-columns: 1fr;
+    gap: 16px;
+    padding: 26px 0 28px;
+  }
+
+  .practice-signal {
+    font-size: 22px;
+  }
+
+  .applied-flow {
+    align-items: flex-start;
+  }
+
+  .applied-flow-step {
+    font-size: 20px;
+  }
+
+  .applied-metrics {
+    grid-template-columns: 1fr;
+  }
+
+  .applied-metrics > div,
+  .applied-metrics > div:first-child {
+    display: grid;
+    grid-template-columns: 92px minmax(0, 1fr);
+    gap: 16px;
+    align-items: center;
+    padding: 14px 0;
+    border-left: 0;
+    border-top: 1px solid var(--line);
+  }
+
+  .applied-metrics > div:first-child {
+    border-top: 0;
+  }
+
+  .applied-metrics dt {
+    font-size: 40px;
+  }
+
+  .applied-metrics dd {
+    margin: 0;
+  }
+}

@@ -19,6 +19,7 @@ export const APP_ROUTES = new Set([
   "/platforms/institute",
   "/platforms/health",
   "/platforms/ai-lab",
+  "/platforms/applied-learning",
   "/publications",
   "/insights",
   "/events",
@@ -40,6 +41,8 @@ export const APP_ROUTES = new Set([
   "/publication/rebs-v1-2025/access",
 ]);
 export const LEGACY_ROUTES = new Map([
+  ["/about-us", "/about"],
+  ["/programs", "/platforms"],
   ["/work", "/platforms"],
   ["/work/global-institute", "/platforms/institute"],
   ["/work/health", "/platforms/health"],
@@ -88,6 +91,8 @@ const CONTACT_INQUIRY_TYPES = new Set([
   "Health Access Day partnership",
   "Fund the work",
   "Support research and publications",
+  "Support AI & Society participation",
+  "Provide in-kind technology or expertise",
   "Bring the model to a community",
   "Institutional or public-sector inquiry",
 ]);
@@ -230,7 +235,7 @@ function validateContactPayload(input) {
   if (!CONTACT_INQUIRY_TYPES.has(payload.inquiryType)) return { error: "Select a valid area of interest." };
   if (!CONTACT_ROLES.has(payload.role)) return { error: "Select a valid organization or role." };
   if (!isMeaningfulShortText(payload.stateOrCounty)) return { error: "Enter a valid city, state, or region." };
-  if (!isMeaningfulMessage(payload.message)) return { error: "Describe the outcome in at least three meaningful words (20ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“1,200 characters)." };
+  if (!isMeaningfulMessage(payload.message)) return { error: "Describe the outcome in at least three meaningful words (20-1,200 characters)." };
   if (!payload.consent) return { error: "Confirm that we may use this information to respond." };
   return { payload };
 }

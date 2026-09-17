@@ -1,9 +1,11 @@
 import { useEffect } from "react";
 import { HomePage } from "./HomePage";
 import { AiSocietyPage } from "./AiSocietyPage";
+import { AppliedLearningPage } from "./AppliedLearningPage";
+import { HealthInitiativePage } from "./HealthInitiativePage";
+import { PartnerOpportunityPage, SupportOpportunityPage } from "./EngagePages";
 import {
   AiLabPage,
-  HealthPage,
   InsightsPage,
   LeadershipPage,
   NotFoundPage,
@@ -17,18 +19,16 @@ import {
   ParentAboutPage,
   ParentContactPage,
   ParentEventsPage,
-  ParentPartnerPage,
   ParentPlatformsPage,
   ParentPublicationsPage,
   ParentStandardsPage,
-  ParentSupportPage,
   PrivacyNoticePage,
   WebsiteTermsPage,
 } from "./InstitutionalPages";
 import { Footer, Header } from "./SiteChrome";
 import { publications } from "./siteData";
 import { useCurrentPath } from "./router";
-import { getSeoForPath } from "./seo";
+import { getSeoForPath } from "./seoRuntime";
 
 function RouteView({ pathname }) {
   const publication = pathname.startsWith("/publication/") ? publications.find((item) => item.path === pathname) : null;
@@ -39,16 +39,17 @@ function RouteView({ pathname }) {
   if (pathname === "/ai-society") return <AiSocietyPage />;
   if (pathname === "/platforms") return <ParentPlatformsPage />;
   if (pathname === "/platforms/institute") return <GlobalInstitutePage />;
-  if (pathname === "/platforms/health") return <HealthPage />;
+  if (pathname === "/platforms/health") return <HealthInitiativePage />;
   if (pathname === "/platforms/ai-lab") return <AiLabPage />;
+  if (pathname === "/platforms/applied-learning") return <AppliedLearningPage />;
   if (pathname === "/publications") return <ParentPublicationsPage />;
   if (pathname === "/insights") return <InsightsPage />;
   if (pathname === "/events") return <ParentEventsPage />;
   if (pathname === "/about") return <ParentAboutPage />;
   if (pathname === "/leadership") return <LeadershipPage />;
   if (pathname === "/contact") return <ParentContactPage />;
-  if (pathname === "/partner") return <ParentPartnerPage />;
-  if (pathname === "/support") return <ParentSupportPage />;
+  if (pathname === "/partner") return <PartnerOpportunityPage />;
+  if (pathname === "/support") return <SupportOpportunityPage />;
   if (pathname === "/standards") return <ParentStandardsPage />;
   if (pathname === "/privacy") return <PrivacyNoticePage />;
   if (pathname === "/accessibility") return <AccessibilityStatementPage />;

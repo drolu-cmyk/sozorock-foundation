@@ -145,6 +145,8 @@ Resources:
           if (privateFiles[uri]) return response(302, privateFiles[uri], 'no-store');
 
           var legacy = {
+            '/about-us': '/about',
+            '/programs': '/platforms',
             '/work': '/platforms',
             '/work/global-institute': '/platforms/institute',
             '/work/health': '/platforms/health',
@@ -175,6 +177,7 @@ Resources:
             '/platforms/institute': true,
             '/platforms/health': true,
             '/platforms/ai-lab': true,
+            '/platforms/applied-learning': true,
             '/publications': true,
             '/insights': true,
             '/events': true,

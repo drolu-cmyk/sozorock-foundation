@@ -5,7 +5,7 @@ import { createServer } from "vite";
 import { createElement } from "react";
 import { renderToString } from "react-dom/server";
 import { fileURLToPath } from "node:url";
-import { getSeoForPath } from "../src/seo.js";
+import { getSeoForPath } from "../src/seoRuntime.js";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const dist = path.join(root, "dist");
@@ -19,6 +19,7 @@ const permanentRoutes = [
   "/platforms/institute",
   "/platforms/health",
   "/platforms/ai-lab",
+  "/platforms/applied-learning",
   "/publications",
   "/insights",
   "/events",
@@ -135,8 +136,6 @@ notFoundHtml = upsertMeta(notFoundHtml, "name", "robots", "noindex, follow, noar
 notFoundHtml = notFoundHtml.replace(/<link\s+rel="canonical"[^>]*>\s*/u, "");
 writeFileSync(path.join(dist, "client", "404.html"), notFoundHtml);
 
-// CloudFront rewrites clean routes to these crawler-ready entries. The same
-// files preserve the compatibility worker contract for alternate previews.
 for (const route of permanentRoutes) {
   const routeFile = path.join(dist, "client", `${route.slice(1)}.html`);
   mkdirSync(path.dirname(routeFile), { recursive: true });
