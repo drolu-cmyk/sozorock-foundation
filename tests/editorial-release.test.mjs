@@ -27,28 +27,49 @@ test('all three publications retain permanent records and verified delivery mapp
   }
 });
 
-test('homepage roundtable evidence remains accurate, attributed and bounded',()=>{
+test('homepage shows concise documented evidence without turning planned work into impact',()=>{
   const html=readFileSync('dist/client/index.html','utf8');
-  assert.match(html,/What a regional health-access roundtable surfaced\./);
-  assert.match(html,/<dt>12<\/dt><dd>participants<\/dd>/i);
-  assert.match(html,/<dt>2<\/dt><dd>county public-health jurisdictions<\/dd>/i);
-  assert.match(html,/<dt>2<\/dt><dd>Western New York universities represented<\/dd>/i);
-  assert.match(html,/university school of nursing/i);
-  assert.match(html,/12,000\+/);
-  assert.match(html,/primary-care clinician/);
-  assert.match(html,/participant-reported context/i);
-  assert.match(html,/not an independently re-estimated statistic or a program outcome/i);
+  assert.match(html,/Work, documented\./);
+  assert.match(html,/2 cohorts · 11 graduate learners · 2025–26/);
+  assert.match(html,/12 participants · 2 county public-health jurisdictions · 2 universities/);
+  assert.match(html,/Live participant project/);
+  assert.match(html,/25 participants planned · New York/);
   assert.match(html,/href="\/publication\/rebs-v1-2025"/);
-  assert.ok(!html.includes('SUNY'));
-  assert.ok(!html.includes('Brockport'));
-  assert.ok(!html.includes('post-program results'));
+  assert.match(html,/href="\/platforms\/applied-learning"/);
+  assert.doesNotMatch(html,/100\+/);
+  assert.doesNotMatch(html,/45\+/);
+  assert.doesNotMatch(html,/65%/);
+  assert.doesNotMatch(html,/Institutions in active coordination/i);
+});
+
+test('applied learning records the two-stage graduate model and practitioner responsibility',()=>{
+  const html=readFileSync('dist/client/platforms/applied-learning.html','utf8');
+  assert.match(html,/From academic knowledge to applied capability/i);
+  assert.match(html,/2<\/dt><dd>consecutive cohorts/);
+  assert.match(html,/11<\/dt><dd>graduate learners/);
+  assert.match(html,/Capella University’s Applied IT Capstone program/);
+  assert.match(html,/Dr\. Oluwabiyi Adeyemo/);
+  assert.match(html,/designs the experiential project tasks, mentors learners and evaluates their applied work/i);
+  assert.match(html,/Capella University faculty retain course ownership, academic oversight and grading/i);
+  assert.match(html,/not a university endorsement/i);
+});
+
+test('planned health pilot is visible with clinical and evidence boundaries intact',()=>{
+  const html=readFileSync('dist/client/platforms/health.html','utf8');
+  assert.match(html,/Planned New York pilot/);
+  assert.match(html,/25 participants\. One defined primary-care access pathway\./);
+  assert.match(html,/Dr\. Michael Purcell \/ PIOC/);
+  assert.match(html,/adults living with chronic conditions/i);
+  assert.match(html,/nonclinical coordination, health education and deidentified program evidence/i);
+  assert.match(html,/Clinical care remains entirely with the licensed provider/i);
+  assert.match(html,/Participant enrollment and operating dates will be published when confirmed/i);
 });
 
 test('parent positioning includes rural work without narrowing the mission to rural only',()=>{
   const home=readFileSync('dist/client/index.html','utf8');
   const platforms=readFileSync('dist/client/platforms.html','utf8');
   const about=readFileSync('dist/client/about.html','utf8');
-  assert.match(home,/Research, health access, public systems and applied AI/i);
+  assert.match(home,/Research, health access, talent and applied technology/i);
   assert.match(platforms,/Rural and underserved places remain a focused part of the work/i);
   assert.match(about,/Rural health and rural equity remain important/i);
   assert.match(about,/wider mandate includes health systems assurance, governance, public decisions, community participation and responsible AI/i);
