@@ -1,5 +1,7 @@
 import { getSeoForPath as getBaseSeo } from "./seo.js";
 
+const GLOBAL_SITE_DESCRIPTION = "Health access, applied learning, public-interest research and responsible AI for better decisions and implementation.";
+
 const overrides = {
   "/": {
     title: "The SozoRock Foundation | Health Access, Applied Learning & Research",
@@ -17,6 +19,20 @@ const overrides = {
       "public interest research",
       "AI governance",
       "health systems assurance",
+    ],
+  },
+  "/platforms": {
+    title: "Work | The SozoRock Foundation",
+    description: "Choose a route into SozoRock's work: health access, applied learning, public-interest research, or AI & Society.",
+    keywords: [
+      "SozoRock Foundation work",
+      "health access",
+      "applied learning",
+      "workforce capability",
+      "public interest research",
+      "AI and society",
+      "health equity",
+      "public systems",
     ],
   },
   "/platforms/applied-learning": {
@@ -85,9 +101,18 @@ function cleanPath(pathname = "/") {
   return value.length > 1 ? value.replace(/\/+$/u, "") : "/";
 }
 
+function normalizeGlobalSchema(schema) {
+  const graph = schema?.["@graph"]?.map((node) => {
+    if (node?.["@type"] === "WebSite") return { ...node, description: GLOBAL_SITE_DESCRIPTION };
+    return node;
+  });
+  return graph ? { ...schema, "@graph": graph } : schema;
+}
+
 function withSchema(base, config) {
   const keywords = config.keywords.join(", ");
-  const graph = base.schema?.["@graph"]?.map((node) => {
+  const normalized = normalizeGlobalSchema(base.schema);
+  const graph = normalized?.["@graph"]?.map((node) => {
     if (node?.["@type"] === "WebPage" || node?.["@type"] === "CollectionPage" || node?.["@type"] === "AboutPage") {
       return {
         ...node,
@@ -95,9 +120,6 @@ function withSchema(base, config) {
         description: config.description,
         keywords,
       };
-    }
-    if (node?.["@type"] === "WebSite" && base.pathname === "/") {
-      return { ...node, description: config.description };
     }
     if (node?.["@type"] === "NGO") {
       return {
@@ -107,14 +129,14 @@ function withSchema(base, config) {
     }
     return node;
   });
-  return graph ? { ...base.schema, "@graph": graph } : base.schema;
+  return graph ? { ...normalized, "@graph": graph } : normalized;
 }
 
 export function getSeoForPath(inputPathname = "/") {
   const pathname = cleanPath(inputPathname);
   const base = getBaseSeo(pathname);
   const config = overrides[pathname];
-  if (!config) return base;
+  if (!config) return { ...base, schema: normalizeGlobalSchema(base.schema) };
 
   return {
     ...base,
