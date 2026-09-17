@@ -45,8 +45,8 @@ export function HomePage() {
           </div>
           <div className="home-origin-copy">
             <h2 id="origin-story-title">The 2027 health pilot starts with what communities already told us.</h2>
-            <p>In a 2025 preplanning roundtable with a university school of nursing, 12 participants represented two county public health jurisdictions and two universities in Western New York.</p>
-            <p>A regional public health director reported more than 12,000 residents per primary care clinician. REBS then connected health literacy, technology, workforce and local readiness to the wider access problem.</p>
+            <p>In a 2025 preplanning roundtable with a university school of nursing, 12 participants represented two county public-health jurisdictions and two universities in Western New York.</p>
+            <p>A regional public-health director reported more than 12,000 residents per primary-care clinician. REBS then connected health literacy, technology, workforce and local readiness to the wider access problem.</p>
             <Link href="/publication/rebs-v1-2025" className="experience-link">Read the rural health framework<ArrowRight size={22} aria-hidden="true" /></Link>
           </div>
         </div>
@@ -59,7 +59,7 @@ export function HomePage() {
             <p className="home-story-lead">Because the first job is to learn what works, what breaks and what should change before expansion.</p>
           </div>
           <div>
-            <p>In 2027, SozoRock plans to work with Dr. Michael Purcell and PIOC, a direct primary care practice, on a 25 participant New York pilot for residents in rural and underserved communities who face barriers to ongoing primary care.</p>
+            <p>In 2027, SozoRock plans to work with Dr. Michael Purcell and PIOC, a direct primary care practice, on a 25-participant New York pilot for residents in rural and underserved communities who face barriers to ongoing primary care.</p>
             <p>The pilot will test nonclinical coordination, health education and a clearer route into ongoing care. SozoRock will evaluate deidentified program evidence. Clinical care remains entirely with the licensed provider.</p>
             <Link href="/platforms/health" className="experience-link">Explore the 2027 pilot<ArrowRight size={22} aria-hidden="true" /></Link>
           </div>
@@ -69,7 +69,7 @@ export function HomePage() {
       <section className="home-learning-story" aria-labelledby="learning-story-title">
         <div className="shell home-learning-inner">
           <h2 id="learning-story-title">A master&apos;s degree should end with experience, not just coursework.</h2>
-          <p>Through a recurring collaboration with Capella University, cybersecurity master&apos;s learners spend six months moving from instruction into hands on work. Across two cohorts, 11 learners have worked in identity and access management, GRC, cloud security, risk and evidence assurance before graduation.</p>
+          <p>Through a recurring collaboration with Capella University, cybersecurity master&apos;s learners move from instruction into six months of hands-on work. Across two cohorts, 11 learners have worked in identity and access management, GRC, cloud security, risk and evidence assurance before graduation.</p>
           <Link href="/platforms/applied-learning" className="experience-link experience-link-light">See the applied learning model<ArrowRight size={22} aria-hidden="true" /></Link>
         </div>
       </section>
