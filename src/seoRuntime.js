@@ -38,7 +38,7 @@ const overrides = {
   },
   "/platforms/health": {
     title: "2027 New York Health Access Pilot | SozoRock Health",
-    description: "A planned 2027 New York health-access pilot with PIOC, a direct primary care practice, for residents in rural and underserved communities who face barriers to ongoing primary care.",
+    description: "A planned 2027 New York health-access pilot with direct primary care partner PIOC for residents facing barriers in rural and underserved communities.",
     keywords: [
       "2027 New York health access pilot",
       "health equity New York",
