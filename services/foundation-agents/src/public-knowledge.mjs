@@ -1,11 +1,11 @@
-export const PUBLIC_KNOWLEDGE_VERSION = "2026-09-16-visibility";
+export const PUBLIC_KNOWLEDGE_VERSION = "2026-09-16-simplified-journey";
 
 export const PUBLIC_ROUTES = Object.freeze({
   platforms: { label: "Explore the work", href: "/platforms" },
   institute: { label: "SozoRock Global Institute", href: "/platforms/institute" },
   health: { label: "SozoRock Health", href: "/platforms/health" },
   aiLab: { label: "SozoRock AI Lab", href: "/platforms/ai-lab" },
-  appliedLearning: { label: "Applied Learning & Workforce Development", href: "/platforms/applied-learning" },
+  appliedLearning: { label: "Applied Learning & Workforce Capability", href: "/platforms/applied-learning" },
   aiSociety: { label: "AI & Society", href: "/ai-society" },
   publications: { label: "Publications", href: "/publications" },
   insights: { label: "Insights", href: "/insights" },
@@ -20,18 +20,18 @@ export function publicKnowledgeSnapshot() {
   return {
     version: PUBLIC_KNOWLEDGE_VERSION,
     thesis: "Access. Assurance. Intelligence.",
-    purpose: "The SozoRock Foundation builds platforms and applied engagements for better health and public systems.",
-    focus: "The Foundation works across health access, governance, systems assurance, county evidence, talent and workforce capability, community participation and applied AI. Rural health and rural equity are important areas of focus, not the limit of the mission.",
+    purpose: "The SozoRock Foundation develops practical health-access models, applied learning and public-interest research for better public decisions and implementation.",
+    focus: "The Foundation works across health access, research and assurance, applied learning and workforce capability, community participation and responsible AI. Rural and underserved communities are an important focus, not the limit of the mission.",
     platforms: {
       institute: "Public-interest research and convening on governance, health access, systems assurance and public decisions, including the capacity of rural institutions.",
-      health: "Health-access work connecting community models, place-based evidence, digital readiness and workforce capacity. A 25-person New York primary-care access pilot is planned; participant enrollment and operating dates will be published when confirmed.",
+      health: "SozoRock Health develops nonclinical access models and place-based evidence. In 2027, the Foundation plans to test a 25-participant New York health-access pilot with PIOC, a direct primary care practice, for residents in rural and underserved communities who face barriers to ongoing primary care. The purpose is to test a clearer pathway to care and support health equity; clinical care remains with the licensed provider.",
       aiLab: "Task-based AI learning built around real work, verification, privacy and human judgment.",
-      appliedLearning: "A recurring graduate experiential-learning model that moves learners from structured instruction into implementation, evidence and evaluation. Across two 2025–2026 cohorts, 11 graduate learners participated in applied cybersecurity work.",
+      appliedLearning: "SozoRock works with universities and workforce organizations to turn academic knowledge into applied technology capability through defined problems, practitioner guidance and evidence-based review. A documented graduate cybersecurity engagement covered two consecutive cohorts and 11 learners across 2025–2026.",
       aiSociety: "Who Decides? is a developing public process for participation, human review, decision records and institutional response when AI affects learning or work.",
     },
     engagement: {
       partner: "Universities, workforce organizations, public institutions, technology companies, funders and communities can use Partner to define the problem, people affected, contribution and output required.",
-      support: "Use Support to discuss financial or in-kind support, including defined cohorts, health-access work, public-interest research, technology infrastructure, cloud or AI credits and community participation.",
+      support: "Use Support to discuss financial or in-kind support for defined health-access work, applied-learning engagements, public-interest research, technology infrastructure or community participation.",
     },
     evidencePolicy: "Distinguish planned work, proposed models, participant-reported context, observed activity, modeled estimates and measured outcomes. Never turn participation, cataloging, funding or a proposed partnership into an endorsement, implementation claim or achieved result.",
     publicationPolicy: "Use only the Foundation's permanent publication records and access routes. Never invent a DOI, ISBN, release, award, catalog record, partner, metric or publication status.",
@@ -45,7 +45,7 @@ const boundaryMessages = Object.freeze({
   privacy: "Please do not share personal, patient, student, employee, financial, legal, account or other sensitive information.",
   medical: "For medical questions, contact a qualified health professional. This website navigator can only help you find Foundation programs and public information.",
   emergency: "If this may be an emergency, contact local emergency services now. This website navigator cannot provide emergency help.",
-  out_of_scope: "I can help with SozoRock Foundation platforms, applied learning, publications, events, partnerships, support, standards and general website navigation.",
+  out_of_scope: "I can help with SozoRock Foundation health access, applied learning, research, AI & Society, partnerships, support, standards and general website navigation.",
 });
 
 export function normalizePublicAnswer(value) {
@@ -83,14 +83,14 @@ export function resolvePublicNavigation(question) {
   }
   if (includesAny(value, ["capella", "capstone", "experiential learning", "applied learning", "work-based learning", "workforce development", "graduate learner", "cybersecurity learner", "academic industry", "university collaboration", "student project"])) {
     return normalizePublicAnswer({
-      answer: "SozoRock's applied-learning model connects structured instruction with hands-on implementation, evidence and evaluation. The documented graduate cybersecurity engagement spans two consecutive cohorts and 11 learners across 2025–2026.",
+      answer: "SozoRock's applied-learning work turns academic knowledge into applied technology capability through real problems, practitioner guidance and evidence-based review. The documented graduate cybersecurity engagement covered two consecutive cohorts and 11 learners across 2025–2026.",
       linkKeys: ["appliedLearning", "partner", "support"],
       boundary: "none",
     });
   }
   if (includesAny(value, ["cloud credit", "cloud credits", "ai credit", "ai credits", "technology credit", "sponsor", "sponsorship", "funder", "funding", "in-kind", "technology partner"])) {
     return normalizePublicAnswer({
-      answer: "Financial and in-kind support can be tied to a defined cohort, health-access activity, research output or technology use case. The Foundation separates support from editorial and evidence conclusions.",
+      answer: "Financial and in-kind support can be tied to a defined health-access activity, applied-learning engagement, research output or technology use case. The Foundation separates support from editorial and evidence conclusions.",
       linkKeys: ["support", "partner", "appliedLearning"],
       boundary: "none",
     });
@@ -125,7 +125,7 @@ export function resolvePublicNavigation(question) {
   }
   if (includesAny(value, ["donate", "fund", "support", "contribute"])) {
     return normalizePublicAnswer({
-      answer: "Use Support to discuss financial or in-kind support for independent research, public access, health-access work, applied cohorts, technology infrastructure and community participation.",
+      answer: "Use Support to discuss financial or in-kind support for independent research, public access, health-access work, applied learning, technology infrastructure and community participation.",
       linkKeys: ["support", "standards", "partner"],
       boundary: "none",
     });
@@ -137,10 +137,10 @@ export function resolvePublicNavigation(question) {
       boundary: "none",
     });
   }
-  if (includesAny(value, ["health", "cb-cap", "cbcap", "health equity", "access day", "public health", "rural health", "place intelligence", "primary care", "chronic condition"])) {
+  if (includesAny(value, ["health", "cb-cap", "cbcap", "health equity", "access day", "public health", "rural health", "place intelligence", "primary care", "chronic condition", "direct primary care", "underserved"])) {
     return normalizePublicAnswer({
-      answer: "SozoRock Health connects community access models, place-based evidence, digital readiness and workforce capacity. A 25-person New York primary-care access pilot is planned, with clinical care remaining with the licensed provider.",
-      linkKeys: ["health", "platforms", "publications"],
+      answer: "In 2027, SozoRock plans to test a 25-participant New York health-access pilot with PIOC, a direct primary care practice, for residents in rural and underserved communities who face barriers to ongoing primary care. The pilot is intended to test a clearer nonclinical pathway to care and support health equity; clinical care remains with the licensed provider.",
+      linkKeys: ["health", "platforms", "partner"],
       boundary: "none",
     });
   }
@@ -153,8 +153,8 @@ export function resolvePublicNavigation(question) {
   }
   if (includesAny(value, ["platform", "program", "what do you do", "foundation work"])) {
     return normalizePublicAnswer({
-      answer: "Explore SozoRock Global Institute, SozoRock Health, SozoRock AI Lab and CB-CAP, alongside the Foundation's applied-learning work. AI & Society connects research, participation and human review across the work.",
-      linkKeys: ["platforms", "appliedLearning", "about"],
+      answer: "The Foundation's work is organized around health access, applied learning and workforce capability, research and assurance, and AI & Society. Start with Work to choose the route that fits the problem.",
+      linkKeys: ["platforms", "about", "partner"],
       boundary: "none",
     });
   }
@@ -167,7 +167,7 @@ export function resolvePublicNavigation(question) {
   }
   if (includesAny(value, ["about", "leadership", "who is", "mission", "purpose"])) {
     return normalizePublicAnswer({
-      answer: "About explains the Foundation's purpose, leadership, public-systems mandate and focused work in health access, talent, applied technology and rural equity.",
+      answer: "About explains the Foundation's purpose, leadership, public-systems mandate and focused work in health access, applied capability, research and responsible AI.",
       linkKeys: ["about", "platforms", "standards"],
       boundary: "none",
     });
