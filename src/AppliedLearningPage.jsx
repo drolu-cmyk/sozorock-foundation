@@ -34,7 +34,7 @@ export function AppliedLearningPage() {
             <div><strong>2025–26</strong><span>engagement period</span></div>
           </div>
           <div className="learning-evidence-copy">
-            <h2 id="learning-evidence-title">Graduate cybersecurity, under real conditions.</h2>
+            <h2 id="learning-evidence-title">The evidence has to support the conclusion.</h2>
             <p>Since October 2025, graduate learners in Capella University’s Applied IT Capstone program have worked with The SozoRock Foundation across consecutive cybersecurity engagements.</p>
             <p className="learning-disciplines">Identity &amp; access · Cloud security · Evidence assurance · Governance · Risk</p>
           </div>
@@ -55,10 +55,10 @@ export function AppliedLearningPage() {
 
       <section className="learning-proof" aria-labelledby="learning-proof-title">
         <div className="shell learning-proof-grid">
-          <div className="learning-proof-statement"><span aria-hidden="true">“</span><p id="learning-proof-title">Translate academic knowledge into workplace capability.</p></div>
+          <div className="learning-proof-statement"><p id="learning-proof-title">Academic knowledge. Workplace capability.</p></div>
           <div>
             <p>A September 2026 faculty assessment highlighted the learners’ progression toward evidence-based cybersecurity judgment, technical execution, collaboration and professional decision-making.</p>
-            <p className="learning-proof-note">Summary of faculty feedback. It is not a university endorsement of the Foundation.</p>
+            <p className="learning-proof-note">Based on a September 2026 faculty assessment; not a university endorsement of the Foundation.</p>
           </div>
         </div>
       </section>
