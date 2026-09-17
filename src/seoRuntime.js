@@ -2,6 +2,7 @@ import { getSeoForPath as getBaseSeo } from "./seo.js";
 
 const GLOBAL_SITE_DESCRIPTION = "Health access, cybersecurity experiential learning, public interest research and responsible AI for decisions and implementation.";
 const SOCIAL_IMAGE_ALT = "The SozoRock Foundation. Evidence should lead somewhere.";
+const FOUNDATION_SLOGAN = "Evidence should lead somewhere.";
 
 const overrides = {
   "/": {
@@ -22,7 +23,7 @@ const overrides = {
     ],
   },
   "/platforms": {
-    title: "Work | The SozoRock Foundation",
+    title: "What We Do | The SozoRock Foundation",
     description: "Explore SozoRock work in health access, cybersecurity experiential learning, public interest research and AI accountability.",
     keywords: [
       "SozoRock Foundation work",
@@ -121,7 +122,7 @@ function cleanPath(pathname = "/") {
 function normalizeGlobalSchema(schema) {
   const graph = schema?.["@graph"]?.map((node) => {
     if (node?.["@type"] === "WebSite") return { ...node, description: GLOBAL_SITE_DESCRIPTION };
-    if (node?.["@type"] === "NGO") return { ...node, taxID: "39-4736725" };
+    if (node?.["@type"] === "NGO") return { ...node, slogan: FOUNDATION_SLOGAN, taxID: "39-4736725" };
     return node;
   });
   return graph ? { ...schema, "@graph": graph } : schema;
