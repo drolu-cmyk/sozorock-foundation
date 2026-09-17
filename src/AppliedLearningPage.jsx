@@ -1,90 +1,72 @@
 import { Link } from "./router";
 import { PageHero } from "./components";
 
-const phases = ["Instruction", "Implementation", "Evidence", "Evaluation"];
-
 export function AppliedLearningPage() {
   return (
     <>
       <PageHero
-        eyebrow="Talent & capability"
-        title="From academic knowledge to applied capability."
-        copy="SozoRock designs experiential technology engagements that move graduate learners from structured instruction into hands-on implementation, evidence and professional judgment."
+        eyebrow="Applied learning"
+        title="Coursework is the starting point."
+        copy="Graduate learners work through real technology problems, implement decisions, test evidence and defend what the evidence can support."
       />
 
-      <section className="applied-learning-summary" aria-labelledby="applied-model-title">
-        <div className="shell applied-learning-summary-inner">
-          <div className="applied-learning-model-copy">
-            <p className="eyebrow">The model</p>
-            <h2 id="applied-model-title">Learn the problem. Work the problem.</h2>
-            <p>Academic learning becomes the starting point for scoped technical work, review and accountable decisions.</p>
+      <section className="learning-journey" aria-labelledby="learning-journey-title">
+        <div className="shell learning-journey-grid">
+          <div className="learning-journey-copy">
+            <h2 id="learning-journey-title">From instruction to judgment.</h2>
+            <p>Each engagement moves through a deliberate sequence. Learners first understand the problem, then work inside a controlled technical environment, examine what changed and explain what the evidence proves.</p>
+            <Link href="/partner" className="editorial-link">Bring an applied project to SozoRock</Link>
           </div>
-          <div className="applied-learning-model">
-            <div className="applied-flow" aria-label="Instruction, implementation, evidence, evaluation">
-              {phases.map((phase, index) => (
-                <div className="applied-flow-step" key={phase}>
-                  <span>{phase}</span>
-                  {index < phases.length - 1 ? <span className="applied-flow-arrow" aria-hidden="true">→</span> : null}
-                </div>
-              ))}
-            </div>
-            <dl className="applied-metrics" aria-label="Documented graduate engagement">
-              <div><dt>2</dt><dd>consecutive cohorts</dd></div>
-              <div><dt>11</dt><dd>graduate learners</dd></div>
-              <div><dt>2025–26</dt><dd>engagement period</dd></div>
-            </dl>
+          <div className="learning-journey-visual" aria-label="Instruction, implementation, evidence, evaluation">
+            <div><strong>01</strong><span>Instruction</span></div>
+            <div><strong>02</strong><span>Implementation</span></div>
+            <div><strong>03</strong><span>Evidence</span></div>
+            <div><strong>04</strong><span>Evaluation</span></div>
           </div>
         </div>
       </section>
 
-      <section className="applied-learning-case" aria-labelledby="capella-case-title">
-        <div className="shell applied-learning-case-layout">
-          <div>
-            <p className="eyebrow">In practice</p>
-            <h2 id="capella-case-title">Graduate applied cybersecurity.</h2>
-            <p>Since October 2025, graduate learners in Capella University’s Applied IT Capstone program have worked with The SozoRock Foundation through consecutive experiential cybersecurity engagements.</p>
+      <section className="learning-evidence" aria-labelledby="learning-evidence-title">
+        <div className="shell learning-evidence-grid">
+          <div className="learning-evidence-counts" aria-label="Two cohorts, eleven graduate learners, 2025 to 2026">
+            <div><strong>2</strong><span>cohorts</span></div>
+            <div><strong>11</strong><span>graduate learners</span></div>
+            <div><strong>2025–26</strong><span>engagement period</span></div>
           </div>
-          <div className="applied-learning-case-evidence">
-            <p className="eyebrow">Applied work</p>
-            <p className="applied-practice-line">Identity &amp; access · Cloud security · Evidence assurance · Governance · Risk</p>
-            <p>The engagement moves from structured instruction into implementation and validation within a controlled technical environment. Learners are expected to distinguish what the evidence proves, what it suggests and what remains unknown.</p>
+          <div className="learning-evidence-copy">
+            <h2 id="learning-evidence-title">Graduate cybersecurity, under real conditions.</h2>
+            <p>Since October 2025, graduate learners in Capella University’s Applied IT Capstone program have worked with The SozoRock Foundation across consecutive cybersecurity engagements.</p>
+            <p className="learning-disciplines">Identity &amp; access · Cloud security · Evidence assurance · Governance · Risk</p>
           </div>
         </div>
       </section>
 
-      <section className="applied-learning-role" aria-labelledby="practitioner-role-title">
-        <div className="shell applied-learning-role-layout">
+      <section className="learning-practitioner" aria-labelledby="learning-practitioner-title">
+        <div className="shell learning-practitioner-grid">
           <div>
-            <p className="eyebrow">Practitioner role</p>
-            <h2 id="practitioner-role-title">Project design stays close to the work.</h2>
+            <h2 id="learning-practitioner-title">The project is designed around decisions, not assignments.</h2>
           </div>
           <div>
             <p><strong>Dr. Oluwabiyi Adeyemo</strong> designs the experiential project tasks, mentors learners and evaluates their applied work.</p>
-            <p>Capella University faculty retain course ownership, academic oversight and grading. SozoRock provides the applied problem environment, practitioner direction and evidence-based review.</p>
+            <p>Capella University faculty retain course ownership, academic oversight and grading. SozoRock provides the applied environment, practitioner direction and evidence-based review.</p>
           </div>
         </div>
       </section>
 
-      <section className="applied-learning-voice" aria-labelledby="faculty-perspective-title">
-        <div className="shell applied-learning-voice-layout">
-          <p className="eyebrow">Faculty perspective</p>
+      <section className="learning-proof" aria-labelledby="learning-proof-title">
+        <div className="shell learning-proof-grid">
+          <div className="learning-proof-statement"><span aria-hidden="true">“</span><p id="learning-proof-title">Translate academic knowledge into workplace capability.</p></div>
           <div>
-            <h2 id="faculty-perspective-title">Workplace capability, not task completion.</h2>
-            <p>A September 2026 faculty assessment highlighted the engagement’s emphasis on evidence-based cybersecurity judgment, technical execution, professional communication and translating academic knowledge into workplace capability.</p>
-            <p className="applied-learning-note">This is a concise summary of faculty feedback, not a university endorsement of the Foundation.</p>
+            <p>A September 2026 faculty assessment highlighted the learners’ progression toward evidence-based cybersecurity judgment, technical execution, collaboration and professional decision-making.</p>
+            <p className="learning-proof-note">Summary of faculty feedback. It is not a university endorsement of the Foundation.</p>
           </div>
         </div>
       </section>
 
-      <section className="applied-learning-engage">
-        <div className="shell applied-learning-engage-layout">
-          <h2>Build an applied engagement.</h2>
-          <div>
-            <p>Universities, workforce organizations, public institutions, funders and technology partners can bring a defined learning or capability problem.</p>
-            <Link href="/partner" className="editorial-link">Discuss a collaboration</Link>
-          </div>
-        </div>
-      </section>
+      <section className="learning-engage"><div className="shell learning-engage-grid">
+        <h2>Bring the next problem.</h2>
+        <div><p>Universities and workforce organizations can define a technical problem, cohort and outcome. Technology partners and funders can support the environment in which the work happens.</p><Link href="/partner" className="editorial-link">Discuss an engagement</Link></div>
+      </div></section>
     </>
   );
 }
