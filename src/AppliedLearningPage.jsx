@@ -1,72 +1,53 @@
+import { ArrowRight } from "@phosphor-icons/react";
 import { Link } from "./router";
-import { PageHero } from "./components";
 
 export function AppliedLearningPage() {
   return (
     <>
-      <PageHero
-        eyebrow="Applied learning"
-        title="Coursework is the starting point."
-        copy="Graduate learners work through real technology problems, implement decisions, test evidence and defend what the evidence can support."
-      />
-
-      <section className="learning-journey" aria-labelledby="learning-journey-title">
-        <div className="shell learning-journey-grid">
-          <div className="learning-journey-copy">
-            <h2 id="learning-journey-title">From instruction to judgment.</h2>
-            <p>Each engagement moves through a deliberate sequence. Learners first understand the problem, then work inside a controlled technical environment, examine what changed and explain what the evidence proves.</p>
-            <Link href="/partner" className="editorial-link">Bring an applied project to SozoRock</Link>
-          </div>
-          <div className="learning-journey-visual" aria-label="Instruction, implementation, evidence, evaluation">
-            <div><strong>01</strong><span>Instruction</span></div>
-            <div><strong>02</strong><span>Implementation</span></div>
-            <div><strong>03</strong><span>Evidence</span></div>
-            <div><strong>04</strong><span>Evaluation</span></div>
-          </div>
+      <section className="experience-page-hero learning-experience-hero" aria-labelledby="learning-page-title">
+        <div className="shell experience-page-hero-inner">
+          <h1 id="learning-page-title">Real work changes what a learner can do.</h1>
+          <p>SozoRock works with universities and workforce organizations to turn academic knowledge into applied technology capability through defined problems, practitioner guidance and evidence-based review.</p>
+          <Link href="/partner" className="experience-link experience-link-light">Discuss an applied engagement<ArrowRight size={22} aria-hidden="true" /></Link>
         </div>
       </section>
 
-      <section className="learning-evidence" aria-labelledby="learning-evidence-title">
-        <div className="shell learning-evidence-grid">
-          <div className="learning-evidence-counts" aria-label="Two cohorts, eleven graduate learners, 2025 to 2026">
-            <div><strong>2</strong><span>cohorts</span></div>
-            <div><strong>11</strong><span>graduate learners</span></div>
-            <div><strong>2025–26</strong><span>engagement period</span></div>
-          </div>
-          <div className="learning-evidence-copy">
-            <h2 id="learning-evidence-title">The evidence has to support the conclusion.</h2>
-            <p>Since October 2025, graduate learners in Capella University’s Applied IT Capstone program have worked with The SozoRock Foundation across consecutive cybersecurity engagements.</p>
-            <p className="learning-disciplines">Identity &amp; access · Cloud security · Evidence assurance · Governance · Risk</p>
-          </div>
+      <section className="learning-case" aria-labelledby="learning-case-title">
+        <div className="shell learning-case-inner">
+          <p className="experience-context">Graduate cybersecurity · 2025–26</p>
+          <h2 id="learning-case-title">A university course became a working cybersecurity environment.</h2>
+          <p className="experience-lead">Across two consecutive cohorts, eleven Capella University graduate learners moved beyond coursework into hands-on cybersecurity work with The SozoRock Foundation.</p>
+          <p>The engagements covered identity and access management, cloud security, governance, risk and evidence assurance. Learners were expected to implement decisions, examine the resulting evidence and explain what that evidence could support.</p>
         </div>
       </section>
 
-      <section className="learning-practitioner" aria-labelledby="learning-practitioner-title">
-        <div className="shell learning-practitioner-grid">
+      <section className="learning-role" aria-labelledby="learning-role-title">
+        <div className="shell learning-role-inner">
           <div>
-            <h2 id="learning-practitioner-title">The project is designed around decisions, not assignments.</h2>
+            <p className="experience-context">Practitioner-led project design</p>
+            <h2 id="learning-role-title">The work is designed around professional judgment, not assignment completion.</h2>
           </div>
           <div>
             <p><strong>Dr. Oluwabiyi Adeyemo</strong> designs the experiential project tasks, mentors learners and evaluates their applied work.</p>
-            <p>Capella University faculty retain course ownership, academic oversight and grading. SozoRock provides the applied environment, practitioner direction and evidence-based review.</p>
+            <p>Capella University faculty retain academic oversight and grading. SozoRock provides the applied problem environment, practitioner direction and evidence review.</p>
           </div>
         </div>
       </section>
 
-      <section className="learning-proof" aria-labelledby="learning-proof-title">
-        <div className="shell learning-proof-grid">
-          <div className="learning-proof-statement"><p id="learning-proof-title">Academic knowledge. Workplace capability.</p></div>
-          <div>
-            <p>A September 2026 faculty assessment highlighted the learners’ progression toward evidence-based cybersecurity judgment, technical execution, collaboration and professional decision-making.</p>
-            <p className="learning-proof-note">Based on a September 2026 faculty assessment; not a university endorsement of the Foundation.</p>
-          </div>
+      <section className="learning-evidence-story" aria-labelledby="learning-evidence-title">
+        <div className="shell learning-evidence-story-inner">
+          <h2 id="learning-evidence-title">The result is visible in the quality of the decision.</h2>
+          <p>A September 2026 faculty assessment highlighted progression in evidence-based cybersecurity judgment, technical execution, collaboration and professional decision-making. The assessment is evidence about the engagement, not a university endorsement of the Foundation.</p>
         </div>
       </section>
 
-      <section className="learning-engage"><div className="shell learning-engage-grid">
-        <h2>Bring the next problem.</h2>
-        <div><p>Universities and workforce organizations can define a technical problem, cohort and outcome. Technology partners and funders can support the environment in which the work happens.</p><Link href="/partner" className="editorial-link">Discuss an engagement</Link></div>
-      </div></section>
+      <section className="learning-offer" aria-labelledby="learning-offer-title">
+        <div className="shell learning-offer-inner">
+          <h2 id="learning-offer-title">Bring the problem. Build capability through the work.</h2>
+          <p>Universities and workforce organizations can define a technical problem and learner outcome. Technology partners and funders can support the environment, tools and access needed to make the work possible.</p>
+          <Link href="/partner" className="experience-link">Start a conversation<ArrowRight size={24} aria-hidden="true" /></Link>
+        </div>
+      </section>
     </>
   );
 }

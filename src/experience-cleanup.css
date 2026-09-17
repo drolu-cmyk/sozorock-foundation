@@ -1,0 +1,100 @@
+.work-experience-hero {
+  background: var(--cobalt);
+}
+
+.work-route-section {
+  background: var(--white);
+}
+
+.work-route-list {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(64px, 8vw, 112px);
+  padding: clamp(92px, 10vw, 150px) 0;
+  max-width: 1100px;
+}
+
+.work-route {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: clamp(36px, 6vw, 90px);
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.work-route > div {
+  max-width: 780px;
+}
+
+.work-route h2 {
+  margin: 0;
+  font-size: clamp(42px, 5vw, 72px);
+  line-height: .98;
+  letter-spacing: -.05em;
+}
+
+.work-route p {
+  margin: 20px 0 0;
+  max-width: 54ch;
+  color: var(--muted);
+  font-size: 18px;
+  line-height: 1.55;
+}
+
+.work-route small {
+  display: block;
+  margin-top: 16px;
+  color: var(--cobalt);
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.work-route svg {
+  flex: 0 0 auto;
+  margin-top: 8px;
+  transition: transform 160ms ease;
+}
+
+.work-route:hover svg {
+  transform: translateX(8px);
+}
+
+/* Lines are used only where they communicate structure, not as a default visual motif. */
+.foundation-footer-bottom,
+.platform-detail,
+.publication-entry,
+.standards-list article,
+.work-list article,
+.leader-grid article,
+.support-options article,
+.partner-route-grid article,
+.split-copy,
+.contact-panel,
+.policy-links,
+.fireside-concepts article {
+  border: 0 !important;
+}
+
+.foundation-footer-bottom {
+  padding-top: 24px;
+}
+
+@media (max-width: 599px) {
+  .work-route-list {
+    gap: 58px;
+    padding: 72px 0 82px;
+  }
+
+  .work-route {
+    gap: 20px;
+  }
+
+  .work-route h2 {
+    font-size: 38px;
+  }
+
+  .work-route p {
+    font-size: 16px;
+  }
+}
