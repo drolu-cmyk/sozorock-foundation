@@ -47,10 +47,10 @@ export function HomePage() {
     </div></section>
 
     <section className="pilot-feature" aria-labelledby="pilot-feature-title"><div className="shell pilot-feature-grid">
-      <div className="pilot-number" aria-label="25 people planned for the New York primary-care access pilot"><strong>25</strong><span>people planned</span><small>New York</small></div>
+      <div className="pilot-number" aria-label="25 participants planned for the New York primary-care access pilot"><strong>25</strong><span>planned participants</span><small>New York</small></div>
       <div className="pilot-story">
-        <h2 id="pilot-feature-title">Starting with 25 people.</h2>
-        <p>A planned primary-care access pilot will test a clearer path from an initial in-person visit to ongoing care.</p>
+        <h2 id="pilot-feature-title">Access should not end at the first visit.</h2>
+        <p>A planned New York primary-care pilot will test continuity from an initial in-person visit to quarterly follow-up and telehealth access thereafter.</p>
         <div className="pilot-pathway" aria-label="Planned pathway: initial visit, quarterly check-ins, telehealth after the first visit">
           <span>Initial visit</span><i aria-hidden="true" /><span>Quarterly check-ins</span><i aria-hidden="true" /><span>Telehealth after first visit</span>
         </div>
@@ -72,7 +72,7 @@ export function HomePage() {
     <section className="capability-proof" aria-labelledby="capability-proof-title"><div className="shell capability-proof-grid">
       <div className="capability-count"><strong>11</strong><span>graduate learners</span><small>2 cohorts · 2025–26</small></div>
       <div className="capability-story">
-        <h2 id="capability-proof-title">Learning, put to work.</h2>
+        <h2 id="capability-proof-title">From instruction to evidence.</h2>
         <p>Since October 2025, Capella University graduate learners have moved from structured instruction into hands-on cybersecurity implementation and evidence review with SozoRock.</p>
         <div className="capability-rail" aria-label="Instruction, implementation, evidence, evaluation"><span>Instruction</span><i aria-hidden="true" /><span>Implementation</span><i aria-hidden="true" /><span>Evidence</span><i aria-hidden="true" /><span>Evaluation</span></div>
         <p className="capability-role"><strong>Dr. Oluwabiyi Adeyemo</strong> designs the experiential project tasks, mentors the learners and evaluates their applied work.</p>
