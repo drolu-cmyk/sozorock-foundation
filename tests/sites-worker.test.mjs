@@ -378,7 +378,7 @@ test("emits unique canonical SEO metadata and valid schema for every indexable r
     assert.match(html, /<meta property="og:title"/u, `${pathname} Open Graph title`);
     assert.match(html, /<meta name="twitter:card" content="summary_large_image"/u, `${pathname} X card`);
     assert.match(html, /<meta name="twitter:domain" content="sozorockfoundation\.org"/u, `${pathname} X domain`);
-    assert.match(html, /<meta name="sozorock-release" content="foundation-editorial-2026-09-07"/u, `${pathname} release marker`);
+    assert.doesNotMatch(html, /sozorock-release/u, `${pathname} internal release metadata`);
     assert.ok(schemaText, `${pathname} schema`);
     assert.doesNotThrow(() => JSON.parse(schemaText), `${pathname} valid JSON-LD`);
     if (!pathname.endsWith("/access")) {
