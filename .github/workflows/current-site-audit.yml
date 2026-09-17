@@ -1,0 +1,66 @@
+name: Current site contrast and positioning audit
+
+on:
+  pull_request:
+    paths:
+      - "src/**"
+      - "public/**"
+      - "index.html"
+      - "scripts/current-site-audit.mjs"
+      - ".github/workflows/current-site-audit.yml"
+      - "package.json"
+      - "package-lock.json"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Check out exact revision
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+      - name: Set up Node
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e
+        with:
+          node-version: "24"
+          cache: npm
+      - name: Install locked site dependencies
+        run: npm ci
+      - name: Install audit-only browser driver
+        run: npm install --no-save --no-package-lock puppeteer-core@24.23.0
+      - name: Build the current production site
+        run: npm run build
+      - name: Start isolated production preview
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm run preview -- --host 127.0.0.1 > "$RUNNER_TEMP/sozorock-preview.log" 2>&1 &
+          echo $! > "$RUNNER_TEMP/sozorock-preview.pid"
+          for attempt in $(seq 1 60); do
+            if curl --fail --silent --show-error http://127.0.0.1:4173/ >/dev/null; then
+              exit 0
+            fi
+            test "$attempt" -lt 60
+            sleep 1
+          done
+      - name: Capture routes and calculate contrast
+        env:
+          AUDIT_BASE_URL: http://127.0.0.1:4173
+        run: node scripts/current-site-audit.mjs
+      - name: Upload current audit evidence
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: sozorock-current-site-audit
+          path: audit-output/
+          if-no-files-found: error
+          retention-days: 30
+      - name: Stop isolated preview
+        if: always()
+        shell: bash
+        run: |
+          if [[ -f "$RUNNER_TEMP/sozorock-preview.pid" ]]; then
+            kill "$(cat "$RUNNER_TEMP/sozorock-preview.pid")" 2>/dev/null || true
+          fi
