@@ -3,7 +3,7 @@ import { getSeoForPath as getBaseSeo } from "./seo.js";
 const overrides = {
   "/": {
     title: "The SozoRock Foundation | Health Access, Applied Learning & Research",
-    description: "The SozoRock Foundation develops practical health-access models, applied learning and public-interest research, including a planned 2027 New York primary-care access pilot.",
+    description: "The SozoRock Foundation develops health-access models, applied learning and public-interest research, including a planned 2027 New York primary-care pilot.",
     keywords: [
       "SozoRock Foundation",
       "health access",
