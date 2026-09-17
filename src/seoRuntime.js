@@ -1,20 +1,19 @@
 import { getSeoForPath as getBaseSeo } from "./seo.js";
 
-const GLOBAL_SITE_DESCRIPTION = "Health access, applied learning, public-interest research and responsible AI for better decisions and implementation.";
+const GLOBAL_SITE_DESCRIPTION = "Health access, cybersecurity experiential learning, public interest research and responsible AI for decisions and implementation.";
 
 const overrides = {
   "/": {
     title: "The SozoRock Foundation | Health Access, Applied Learning & Research",
-    description: "The SozoRock Foundation develops health-access models, applied learning and public-interest research, including a planned 2027 New York primary-care pilot.",
+    description: "SozoRock turns evidence into practical work in health access, graduate cybersecurity learning, public interest research and responsible AI.",
     keywords: [
       "SozoRock Foundation",
       "health access",
       "New York health equity",
       "rural health access",
-      "underserved communities",
       "primary care access",
-      "applied learning",
-      "experiential learning",
+      "cybersecurity experiential learning",
+      "graduate cybersecurity capstone",
       "workforce capability",
       "public interest research",
       "AI governance",
@@ -23,11 +22,11 @@ const overrides = {
   },
   "/platforms": {
     title: "Work | The SozoRock Foundation",
-    description: "Choose a route into SozoRock's work: health access, applied learning, public-interest research, or AI & Society.",
+    description: "Explore SozoRock work in health access, cybersecurity experiential learning, public interest research and AI accountability.",
     keywords: [
       "SozoRock Foundation work",
       "health access",
-      "applied learning",
+      "cybersecurity experiential learning",
       "workforce capability",
       "public interest research",
       "AI and society",
@@ -36,25 +35,28 @@ const overrides = {
     ],
   },
   "/platforms/applied-learning": {
-    title: "Applied Learning & Workforce Capability | SozoRock Foundation",
-    description: "Applied technology engagements that move graduate learners from academic knowledge into hands-on cybersecurity work, evidence review and professional judgment.",
+    title: "Cybersecurity Experiential Learning | SozoRock Foundation",
+    description: "A six month Capella University capstone collaboration moving cybersecurity master's learners into hands on IAM, GRC, cloud security and evidence assurance.",
     keywords: [
+      "cybersecurity experiential learning",
       "applied learning",
-      "experiential learning",
-      "workforce capability",
-      "work-based learning",
+      "work based learning",
       "cybersecurity workforce development",
       "graduate cybersecurity capstone",
+      "Capella University cybersecurity",
       "academic industry collaboration",
-      "industry aligned learning",
-      "professional judgment",
       "identity and access management",
+      "IAM",
+      "GRC",
       "cloud security",
+      "security assurance",
+      "AWS security",
+      "least privilege",
     ],
   },
   "/platforms/health": {
     title: "2027 New York Health Access Pilot | SozoRock Health",
-    description: "A planned 2027 New York health-access pilot with direct primary care partner PIOC for residents facing barriers in rural and underserved communities.",
+    description: "A planned 2027 New York pilot testing a clearer nonclinical path into ongoing primary care with direct primary care partner PIOC.",
     keywords: [
       "2027 New York health access pilot",
       "health equity New York",
@@ -68,9 +70,23 @@ const overrides = {
       "SozoRock Health",
     ],
   },
+  "/publications": {
+    title: "Research & Publications | The SozoRock Foundation",
+    description: "Citable public interest research on health access, rural governance and digital health assurance, with free verified publication access.",
+    keywords: [
+      "SozoRock research",
+      "health systems assurance",
+      "rural health equity",
+      "rural governance",
+      "health access planning",
+      "digital health assurance",
+      "public interest research",
+      "Rural Equity Blueprint Series",
+    ],
+  },
   "/partner": {
     title: "Partner with SozoRock | The SozoRock Foundation",
-    description: "Define a health-access, applied-learning, research or public-systems engagement with a clear problem, role and outcome.",
+    description: "Define a health access, applied learning, research or public systems engagement with a clear problem, role and outcome.",
     keywords: [
       "university industry collaboration",
       "technology partnership",
@@ -83,7 +99,7 @@ const overrides = {
   },
   "/support": {
     title: "Support the Work | The SozoRock Foundation",
-    description: "Support health access, applied learning, public-interest research, community participation and the technology infrastructure behind the work.",
+    description: "Support health access, applied learning, public interest research, community participation and the technology infrastructure behind the work.",
     keywords: [
       "nonprofit technology funding",
       "workforce development funding",
@@ -104,6 +120,7 @@ function cleanPath(pathname = "/") {
 function normalizeGlobalSchema(schema) {
   const graph = schema?.["@graph"]?.map((node) => {
     if (node?.["@type"] === "WebSite") return { ...node, description: GLOBAL_SITE_DESCRIPTION };
+    if (node?.["@type"] === "NGO") return { ...node, taxID: "39-4736725" };
     return node;
   });
   return graph ? { ...schema, "@graph": graph } : schema;
@@ -114,18 +131,10 @@ function withSchema(base, config) {
   const normalized = normalizeGlobalSchema(base.schema);
   const graph = normalized?.["@graph"]?.map((node) => {
     if (node?.["@type"] === "WebPage" || node?.["@type"] === "CollectionPage" || node?.["@type"] === "AboutPage") {
-      return {
-        ...node,
-        name: config.title,
-        description: config.description,
-        keywords,
-      };
+      return { ...node, name: config.title, description: config.description, keywords };
     }
     if (node?.["@type"] === "NGO") {
-      return {
-        ...node,
-        knowsAbout: Array.from(new Set([...(node.knowsAbout || []), ...config.keywords])),
-      };
+      return { ...node, knowsAbout: Array.from(new Set([...(node.knowsAbout || []), ...config.keywords])) };
     }
     return node;
   });

@@ -27,70 +27,120 @@ test('all three publications retain permanent records and verified delivery mapp
   }
 });
 
-test('homepage leads with a clear proposition and the 2027 New York health-access story',()=>{
+test('homepage locks a stable proposition and explains why the health pilot exists',()=>{
   const html=readFileSync('dist/client/index.html','utf8');
-  assert.match(html,/Research and practical systems for better access, capability and public decisions\./i);
-  assert.match(html,/2027 · New York State/);
-  assert.match(html,/Testing a clearer route to primary care\./i);
-  assert.match(html,/25-participant health-access pilot/i);
-  assert.match(html,/rural and underserved communities/i);
-  assert.match(html,/PIOC, a direct primary care practice/i);
-  assert.match(html,/support health equity across the state/i);
-  assert.match(html,/href="\/platforms\/health"/);
-  assert.match(html,/href="\/platforms\/applied-learning"/);
-  assert.match(html,/href="\/ai-society"/);
-  assert.doesNotMatch(html,/decisions that have to hold up/i);
-  assert.doesNotMatch(html,/25<\/strong><span>planned participants/i);
-  assert.doesNotMatch(html,/From instruction to evidence\./i);
-  assert.doesNotMatch(html,/100\+/);
-  assert.doesNotMatch(html,/45\+/);
-  assert.doesNotMatch(html,/65%/);
-  assert.doesNotMatch(html,/Institutions in active coordination/i);
-});
-
-test('applied learning is an outcome-led capability case without a numbered process diagram',()=>{
-  const html=readFileSync('dist/client/platforms/applied-learning.html','utf8');
-  assert.match(html,/Real work changes what a learner can do\./i);
-  assert.match(html,/A university course became a working cybersecurity environment\./i);
-  assert.match(html,/Across two consecutive cohorts, eleven Capella University graduate learners/i);
-  assert.match(html,/identity and access management, cloud security, governance, risk and evidence assurance/i);
-  assert.match(html,/Dr\. Oluwabiyi Adeyemo/);
-  assert.match(html,/designs the experiential project tasks, mentors learners and evaluates their applied work/i);
-  assert.match(html,/Capella University faculty retain academic oversight and grading/i);
-  assert.match(html,/September 2026 faculty assessment/i);
-  assert.match(html,/not a university endorsement/i);
-  assert.doesNotMatch(html,/learning-journey-visual/);
-  assert.doesNotMatch(html,/>01<\/strong>/);
-  assert.doesNotMatch(html,/>02<\/strong>/);
-  assert.doesNotMatch(html,/>03<\/strong>/);
-  assert.doesNotMatch(html,/>04<\/strong>/);
-});
-
-test('2027 health pilot communicates population, purpose, partner model and clinical boundary',()=>{
-  const html=readFileSync('dist/client/platforms/health.html','utf8');
-  assert.match(html,/2027 · New York State/);
-  assert.match(html,/Testing a clearer route to ongoing primary care\./i);
-  assert.match(html,/25-participant health-access pilot/i);
-  assert.match(html,/rural and underserved communities/i);
+  assert.match(html,/Evidence should lead somewhere\./i);
+  assert.match(html,/2025 preplanning roundtable/i);
+  assert.match(html,/12 participants/i);
+  assert.match(html,/two county public health jurisdictions/i);
+  assert.match(html,/more than 12,000 residents per primary care clinician/i);
+  assert.match(html,/Why start with 25 people\?/i);
+  assert.match(html,/In 2027/i);
   assert.match(html,/Dr\. Michael Purcell and PIOC, a direct primary care practice/i);
-  assert.match(html,/support health equity across New York State/i);
+  assert.match(html,/what works, what breaks and what should change before expansion/i);
+  assert.match(html,/A master&#x27;s degree should end with experience, not just coursework/i);
+  assert.match(html,/11 learners/i);
+  assert.match(html,/identity and access management, GRC, cloud security, risk and evidence assurance/i);
+  assert.match(html,/href="\/partner"/);
+  assert.match(html,/href="\/support"/);
+  assert.doesNotMatch(html,/Research and practical systems for better access/i);
+  assert.doesNotMatch(html,/12 months|two hours/i);
+});
+
+test('applied learning sells a six month cybersecurity capability experience without a numbered process diagram',()=>{
+  const html=readFileSync('dist/client/platforms/applied-learning.html','utf8');
+  assert.match(html,/From coursework to cybersecurity work\./i);
+  assert.match(html,/six month experiential capstone collaboration with Capella University/i);
+  assert.match(html,/cybersecurity master/i);
+  assert.match(html,/limited hands on cloud exposure/i);
+  assert.match(html,/Identity and access management/i);
+  assert.match(html,/>GRC</);
+  assert.match(html,/Cloud security/i);
+  assert.match(html,/Two cohorts\. Eleven graduate learners\. Six months per cohort\./i);
+  assert.match(html,/least privilege/i);
+  assert.match(html,/Capella University faculty retain course ownership, academic oversight and grading/i);
+  assert.match(html,/Dr\. Oluwabiyi Adeyemo designs the experiential project tasks/i);
+  assert.match(html,/not a university endorsement/i);
+  assert.doesNotMatch(html,/>01<\/strong>|>02<\/strong>|>03<\/strong>|>04<\/strong>/);
+  assert.doesNotMatch(html,/class="eyebrow"/);
+});
+
+test('2027 health page connects field evidence to a deliberately bounded pilot',()=>{
+  const html=readFileSync('dist/client/platforms/health.html','utf8');
+  assert.match(html,/Primary care can exist and still be hard to reach\./i);
+  assert.match(html,/2025 SozoRock preplanning roundtable/i);
+  assert.match(html,/more than 12,000 residents per primary care clinician/i);
+  assert.match(html,/REBS connects that access question with health literacy, technology, workforce and community readiness/i);
+  assert.match(html,/In 2027, the next step is a 25 person test\./i);
+  assert.match(html,/Starting with 25 keeps the first test small enough/i);
+  assert.match(html,/Dr\. Michael Purcell and PIOC, a direct primary care practice/i);
   assert.match(html,/Clinical assessment, diagnosis, treatment and prescribing remain entirely with the licensed provider/i);
   assert.match(html,/deidentified program evidence/i);
-  assert.match(html,/Can residents who face access barriers enter an ongoing primary-care relationship more easily/i);
+  assert.doesNotMatch(html,/12 months|two hours/i);
+  assert.doesNotMatch(html,/class="eyebrow"/);
 });
 
-test('parent positioning stays broad while the Work page makes the current priority and routes clear',()=>{
+test('what we do and research pages use proof and conversion rather than program catalog copy',()=>{
+  const work=readFileSync('dist/client/platforms.html','utf8');
+  const research=readFileSync('dist/client/publications.html','utf8');
+  assert.match(work,/Start with the problem\./i);
+  assert.match(work,/Two Capella University cohorts, 11 learners, six months per cohort/i);
+  assert.match(work,/2025 roundtable evidence informs a planned 2027 New York pilot/i);
+  assert.match(research,/Research built to be used\./i);
+  assert.match(research,/free to access, citable and explicit about its limits/i);
+  for(const [,title] of publicationAccessMappings) assert.match(research,new RegExp(title.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')));
+  assert.match(research,/Have a decision the research should inform\?/i);
+  assert.match(research,/href="\/partner"/);
+  assert.doesNotMatch(work,/class="eyebrow"/);
+  assert.doesNotMatch(research,/class="eyebrow"/);
+});
+
+test('publication pages lead with why the research exists and preserve citation access',()=>{
+  for(const [slug,title] of publicationAccessMappings){
+    const html=readFileSync(`dist/client/publication/${slug}.html`,'utf8');
+    assert.match(html,/Why this research exists\./i);
+    assert.match(html,/Use the published record\./i);
+    assert.match(html,/Get the publication/);
+    assert.ok(html.includes(title));
+    assert.doesNotMatch(html,/A permanent, citable record\./i);
+    assert.doesNotMatch(html,/class="eyebrow"/);
+  }
+});
+
+test('navigation, footer and mobile menu expose clear conversion and legal status',()=>{
   const home=readFileSync('dist/client/index.html','utf8');
-  const platforms=readFileSync('dist/client/platforms.html','utf8');
+  const chrome=readFileSync('src/SiteChrome.jsx','utf8');
+  const css=readFileSync('src/final-polish.css','utf8');
+  assert.match(home,/>What we do</);
+  assert.match(home,/>Research</);
+  assert.match(home,/>About</);
+  assert.match(home,/>Contact</);
+  assert.match(home,/>Partner</);
+  assert.match(home,/>Support</);
+  assert.match(home,/501\(c\)\(3\) public charity/);
+  assert.match(home,/EIN 39-4736725/);
+  assert.match(home,/Privacy/);
+  assert.match(home,/Terms/);
+  assert.match(home,/Accessibility/);
+  assert.match(home,/Nondiscrimination/);
+  assert.match(home,/Standards/);
+  assert.match(chrome,/document\.body\.style\.overflow = "hidden"/);
+  assert.match(chrome,/matchMedia\("\(min-width: 900px\)"\)/);
+  assert.match(chrome,/event\.key === "Escape"/);
+  assert.match(css,/@media \(max-width:899px\)/);
+  assert.match(css,/position:fixed; top:96px/);
+});
+
+test('about and events use a concise evidence led institutional story',()=>{
   const about=readFileSync('dist/client/about.html','utf8');
-  assert.match(home,/health access, applied learning, research and responsible AI/i);
-  assert.match(platforms,/Different problems\. Clear routes into the work\./i);
-  assert.match(platforms,/Current focus: 2027 New York health-access pilot/i);
-  assert.match(platforms,/Applied learning/i);
-  assert.match(platforms,/Research &amp; assurance/i);
-  assert.match(platforms,/AI &amp; Society/i);
-  assert.match(about,/Rural health and rural equity remain important/i);
-  assert.match(about,/wider mandate includes health systems assurance, governance, public decisions, community participation and responsible AI/i);
+  const events=readFileSync('dist/client/events.html','utf8');
+  assert.match(about,/A foundation built to move from evidence to use\./i);
+  assert.match(about,/Health access can fail even when care exists/i);
+  assert.match(events,/Put the question in the room\./i);
+  assert.match(events,/more than 12,000 residents per primary care clinician/i);
+  assert.match(events,/2027 pilot will test/i);
+  assert.doesNotMatch(about,/class="eyebrow"/);
+  assert.doesNotMatch(events,/class="eyebrow"/);
 });
 
 test('internal platform links remain inside the parent SPA instead of forcing subdomain reloads',()=>{
@@ -140,7 +190,7 @@ test('proposed convenings emit no scheduled Event schema',()=>{
   }
 });
 
-test('legal routes expose direct institutional notices and footer access',()=>{
+test('legal routes remain available and the footer now states verified nonprofit status',()=>{
   const privacy=readFileSync('dist/client/privacy.html','utf8');
   const accessibility=readFileSync('dist/client/accessibility.html','utf8');
   const terms=readFileSync('dist/client/terms.html','utf8');
@@ -150,9 +200,8 @@ test('legal routes expose direct institutional notices and footer access',()=>{
   assert.match(accessibility,/ongoing design and testing objective, not a claim/i);
   assert.match(terms,/>Public forms</);
   assert.match(home,/href="\/nondiscrimination"/);
-  assert.match(home,/Privacy Notice/);
-  assert.match(home,/Website Terms/);
-  assert.doesNotMatch(home,/A U\.S\. 501\(c\)\(3\) public charity/);
+  assert.match(home,/501\(c\)\(3\) public charity/);
+  assert.match(home,/EIN 39-4736725/);
 });
 
 test('participant interests reach the existing service with consent and perspective intact',async()=>{
