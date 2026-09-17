@@ -12,6 +12,7 @@ const agentDeployScript = await readFile(new URL("services/foundation-agents/scr
 
 assert.deepEqual(workflowFiles, [
   "agentic-foundation-ci.yml",
+  "current-site-audit.yml",
   "deploy-foundation-agent-control-plane.yml",
   "deploy-parent-cloudfront.yml",
   "render-platform-films.yml",
