@@ -1,43 +1,61 @@
-import { CbcapEvidence, PageHero, SectionHeading } from "./components";
-
-const healthPrograms = [
-  ["Community access", "Health Equity Hubs, Health Access Day and practical support around reaching care."],
-  ["Evidence and intelligence", "Place Intelligence and CB-CAP connect county evidence with its sources, dates and limits."],
-  ["Digital readiness and assurance", "Practical readiness, cybersecurity and evidence-based assurance for digital health systems."],
-  ["Workforce capacity", "Education and partnership pathways informed by the capabilities a community needs."],
-];
+import { ArrowRight } from "@phosphor-icons/react";
+import { Link } from "./router";
 
 export function HealthInitiativePage() {
   return (
     <>
-      <PageHero eyebrow="Initiative" title="SozoRock Health" copy="Community access. Place-based intelligence. Digital assurance. Workforce capacity.">
-        <div className="button-row"><a href="https://health.sozorockfoundation.org/" className="button button-light">Open SozoRock Health</a><a href="https://health.sozorockfoundation.org/explore" className="button button-outline-light">Explore a place</a></div>
-      </PageHero>
-      <section className="section media-story">
-        <div className="shell media-story-grid">
-          <div className="media-frame"><img src="/media/health-access.webp" alt="Two people use a tablet together in a community library" /></div>
-          <div><p className="eyebrow">Systems for health access</p><h2>Care can exist. Access still takes a system.</h2><p>SozoRock Health develops practical models, evidence and capabilities to help communities and institutions address barriers to care.</p><p className="boundary">SozoRock Health does not diagnose, treat or prescribe, and does not replace a licensed practitioner. It is not a clinic, provider or telehealth platform.</p></div>
-        </div>
-      </section>
-
-      <section className="health-pilot-signal" aria-labelledby="health-pilot-title">
-        <div className="shell health-pilot-signal-inner">
-          <div>
-            <p className="eyebrow">Planned New York pilot</p>
-            <h2 id="health-pilot-title">25 participants. One defined primary-care access pathway.</h2>
-          </div>
-          <div>
-            <p>The Foundation is preparing a 25-person access pilot with Dr. Michael Purcell / PIOC for adults living with chronic conditions who need a clearer route to ongoing primary care.</p>
-            <p>SozoRock will handle nonclinical coordination, health education and deidentified program evidence. Clinical care remains entirely with the licensed provider.</p>
-            <p className="health-pilot-note">Participant enrollment and operating dates will be published when confirmed.</p>
+      <section className="experience-page-hero health-experience-hero" aria-labelledby="health-page-title">
+        <div className="shell experience-page-hero-inner">
+          <h1 id="health-page-title">Primary care should be easier to reach.</h1>
+          <p>SozoRock Health develops nonclinical access models and place-based evidence for communities where distance, availability, cost or system complexity can stand between residents and ongoing care.</p>
+          <div className="experience-actions">
+            <a href="https://health.sozorockfoundation.org/" className="button button-light">Visit SozoRock Health</a>
+            <a href="https://health.sozorockfoundation.org/explore" className="experience-link experience-link-light">Explore place evidence<ArrowRight size={22} aria-hidden="true" /></a>
           </div>
         </div>
       </section>
 
-      <section className="section soft-section">
-        <div className="shell"><SectionHeading eyebrow="Work" title="One purpose. Connected capabilities." /><div className="work-list">{healthPrograms.map(([title, copy]) => <article key={title}><h3>{title}</h3><p>{copy}</p></article>)}</div></div>
+      <section className="experience-health-media" aria-hidden="true">
+        <img src="/media/health-access.webp" alt="" width="1600" height="900" fetchPriority="high" />
       </section>
-      <CbcapEvidence />
+
+      <section className="health-2027" id="pilot" aria-labelledby="health-pilot-title">
+        <div className="shell health-2027-inner">
+          <p className="experience-context">2027 · New York State</p>
+          <h2 id="health-pilot-title">Testing a clearer route to ongoing primary care.</h2>
+          <p className="experience-lead">The SozoRock Foundation is preparing a 25-participant health-access pilot for New York residents in rural and underserved communities who experience barriers to ongoing primary care.</p>
+          <p>In partnership with Dr. Michael Purcell and PIOC, a direct primary care practice, the pilot will test whether nonclinical coordination, health education and a clearer route into ongoing care can reduce access barriers and support health equity across New York State.</p>
+          <p className="experience-boundary">Clinical assessment, diagnosis, treatment and prescribing remain entirely with the licensed provider. SozoRock coordinates the nonclinical participant experience and evaluates deidentified program evidence.</p>
+        </div>
+      </section>
+
+      <section className="health-question" aria-labelledby="health-question-title">
+        <div className="shell health-question-inner">
+          <h2 id="health-question-title">What the pilot needs to learn.</h2>
+          <p>Can residents who face access barriers enter an ongoing primary-care relationship more easily, remain connected after the first visit, and help us identify where the path to care still breaks down?</p>
+        </div>
+      </section>
+
+      <section className="health-evidence-story" aria-labelledby="health-evidence-title">
+        <div className="shell health-evidence-story-inner">
+          <div>
+            <p className="experience-context">Evidence before expansion</p>
+            <h2 id="health-evidence-title">Start with place. Test the pathway. Publish what the evidence shows.</h2>
+          </div>
+          <div>
+            <p>Place Intelligence brings together public data about communities and access conditions. The 2027 pilot adds real-world program evidence without turning the Foundation into a clinical provider.</p>
+            <a href="https://health.sozorockfoundation.org/explore" className="experience-link">Explore Place Intelligence<ArrowRight size={22} aria-hidden="true" /></a>
+          </div>
+        </div>
+      </section>
+
+      <section className="experience-close health-close">
+        <div className="shell experience-close-inner">
+          <h2>Help make the pathway possible.</h2>
+          <p>We are building the pilot with clear roles for providers, community organizations, sponsors and public institutions.</p>
+          <Link href="/partner" className="experience-link">Discuss a health-access partnership<ArrowRight size={24} aria-hidden="true" /></Link>
+        </div>
+      </section>
     </>
   );
 }
