@@ -113,6 +113,41 @@
   color: var(--white);
 }
 
+.health-pilot-signal {
+  background: var(--white);
+  color: var(--ink);
+  border-block: 1px solid var(--line);
+}
+
+.health-pilot-signal-inner {
+  display: grid;
+  grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr);
+  gap: 72px;
+  padding: 58px 0 62px;
+}
+
+.health-pilot-signal h2 {
+  margin-top: 10px;
+  max-width: 13ch;
+  font-size: clamp(38px, 3.6vw, 56px);
+  line-height: 1.02;
+  letter-spacing: -.04em;
+}
+
+.health-pilot-signal-inner > div:last-child > p {
+  max-width: 56ch;
+  line-height: 1.6;
+}
+
+.health-pilot-signal-inner > div:last-child > p + p {
+  margin-top: 16px;
+}
+
+.health-pilot-note {
+  color: var(--muted);
+  font-size: 13px;
+}
+
 .applied-learning-summary,
 .applied-learning-role,
 .applied-learning-engage {
@@ -265,6 +300,7 @@
   }
 
   .practice-layout,
+  .health-pilot-signal-inner,
   .applied-learning-summary-inner,
   .applied-learning-case-layout,
   .applied-learning-role-layout,
@@ -274,13 +310,15 @@
     gap: 38px;
   }
 
-  .practice-intro h2 {
+  .practice-intro h2,
+  .health-pilot-signal h2 {
     max-width: none;
   }
 }
 
 @media (max-width: 599px) {
   .practice-layout,
+  .health-pilot-signal-inner,
   .applied-learning-summary-inner,
   .applied-learning-case-layout,
   .applied-learning-role-layout,
