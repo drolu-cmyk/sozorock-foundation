@@ -4,22 +4,22 @@ import { Link } from "./router";
 const workAreas = [
   {
     title: "Health access",
-    copy: "Practical routes to care for communities facing access barriers.",
+    copy: "Test nonclinical ways to help people reach ongoing primary care.",
     href: "/platforms/health",
   },
   {
     title: "Applied learning",
-    copy: "Real technology work that develops capability and professional judgment.",
+    copy: "Give graduate learners practical cybersecurity experience before graduation.",
     href: "/platforms/applied-learning",
   },
   {
-    title: "Research & assurance",
-    copy: "Public-interest research designed to inform decisions and implementation.",
+    title: "Research",
+    copy: "Publish evidence and frameworks that institutions can examine and use.",
     href: "/publications",
   },
   {
-    title: "AI & Society",
-    copy: "Participation, human review and accountability when AI affects people.",
+    title: "AI and Society",
+    copy: "Keep human judgment and accountability visible when AI affects people.",
     href: "/ai-society",
   },
 ];
@@ -27,34 +27,56 @@ const workAreas = [
 export function HomePage() {
   return (
     <>
-      <section className="experience-hero" aria-labelledby="foundation-title">
+      <section className="experience-hero final-hero" aria-labelledby="foundation-title">
         <div className="shell experience-hero-inner">
-          <h1 id="foundation-title">Research and practical systems for better access, capability and public decisions.</h1>
-          <p>The SozoRock Foundation works across health access, applied learning, research and responsible AI to move from evidence to implementation.</p>
+          <h1 id="foundation-title">Evidence should lead somewhere.</h1>
+          <p>SozoRock works with communities, universities and institutions to improve health access, build applied technology capability and strengthen public decisions.</p>
           <div className="experience-actions">
-            <Link href="/platforms" className="button button-light">Explore our work</Link>
-            <Link href="/partner" className="experience-link experience-link-light">Partner with SozoRock<ArrowRight size={22} aria-hidden="true" /></Link>
+            <Link href="/platforms" className="button button-light">See what we do</Link>
+            <Link href="/partner" className="experience-link experience-link-light">Work with SozoRock<ArrowRight size={22} aria-hidden="true" /></Link>
           </div>
         </div>
       </section>
 
-      <section className="experience-health" aria-labelledby="health-story-title">
-        <div className="experience-health-image">
-          <img src="/media/health-access.webp" alt="Two people use a tablet together in a community setting" width="1600" height="900" fetchPriority="high" />
-        </div>
-        <div className="shell experience-health-content">
-          <p className="experience-context">2027 · New York State</p>
-          <h2 id="health-story-title">Testing a clearer route to primary care.</h2>
-          <p className="experience-lead">SozoRock is preparing a 25-participant health-access pilot for New York residents in rural and underserved communities who experience barriers to ongoing primary care.</p>
-          <p>In partnership with PIOC, a direct primary care practice, the pilot will test whether nonclinical coordination, health education and a clearer route into ongoing care can reduce access barriers and support health equity across the state.</p>
-          <p className="experience-boundary">Clinical care remains with the licensed provider. SozoRock coordinates the nonclinical experience and evaluates deidentified program evidence.</p>
-          <Link href="/platforms/health" className="experience-link">Explore the 2027 health-access pilot<ArrowRight size={22} aria-hidden="true" /></Link>
+      <section className="home-origin-story" aria-labelledby="origin-story-title">
+        <div className="shell home-origin-grid">
+          <div className="home-origin-image">
+            <img src="/media/health-access.webp" alt="Two people use a tablet together in a community setting" width="1600" height="900" fetchPriority="high" />
+          </div>
+          <div className="home-origin-copy">
+            <h2 id="origin-story-title">The 2027 health pilot starts with what communities already told us.</h2>
+            <p>In a 2025 preplanning roundtable with a university school of nursing, 12 participants represented two county public health jurisdictions and two universities in Western New York.</p>
+            <p>A regional public health director reported more than 12,000 residents per primary care clinician. REBS then connected health literacy, technology, workforce and local readiness to the wider access problem.</p>
+            <Link href="/publication/rebs-v1-2025" className="experience-link">Read the rural health framework<ArrowRight size={22} aria-hidden="true" /></Link>
+          </div>
         </div>
       </section>
 
-      <section className="experience-work" aria-labelledby="work-title">
+      <section className="home-pilot-story" aria-labelledby="pilot-story-title">
+        <div className="shell home-pilot-inner">
+          <div>
+            <h2 id="pilot-story-title">Why start with 25 people?</h2>
+            <p className="home-story-lead">Because the first job is to learn what works, what breaks and what should change before expansion.</p>
+          </div>
+          <div>
+            <p>In 2027, SozoRock plans to work with Dr. Michael Purcell and PIOC, a direct primary care practice, on a 25 participant New York pilot for residents in rural and underserved communities who face barriers to ongoing primary care.</p>
+            <p>The pilot will test nonclinical coordination, health education and a clearer route into ongoing care. SozoRock will evaluate deidentified program evidence. Clinical care remains entirely with the licensed provider.</p>
+            <Link href="/platforms/health" className="experience-link">Explore the 2027 pilot<ArrowRight size={22} aria-hidden="true" /></Link>
+          </div>
+        </div>
+      </section>
+
+      <section className="home-learning-story" aria-labelledby="learning-story-title">
+        <div className="shell home-learning-inner">
+          <h2 id="learning-story-title">A master&apos;s degree should end with experience, not just coursework.</h2>
+          <p>Through a recurring collaboration with Capella University, cybersecurity master&apos;s learners spend six months moving from instruction into hands on work. Across two cohorts, 11 learners have worked in identity and access management, GRC, cloud security, risk and evidence assurance before graduation.</p>
+          <Link href="/platforms/applied-learning" className="experience-link experience-link-light">See the applied learning model<ArrowRight size={22} aria-hidden="true" /></Link>
+        </div>
+      </section>
+
+      <section className="experience-work home-work" aria-labelledby="work-title">
         <div className="shell experience-work-inner">
-          <h2 id="work-title">Where we work.</h2>
+          <h2 id="work-title">What we do.</h2>
           <div className="experience-work-list">
             {workAreas.map((area) => (
               <Link href={area.href} className="experience-work-item" key={area.title}>
@@ -67,13 +89,12 @@ export function HomePage() {
         </div>
       </section>
 
-      <section className="experience-research" aria-labelledby="research-feature-title">
+      <section className="experience-research home-research" aria-labelledby="research-feature-title">
         <div className="shell experience-research-inner">
           <div className="experience-research-copy">
-            <p className="experience-context">Featured research</p>
-            <h2 id="research-feature-title">What should evidence prove before we trust a digital health system?</h2>
-            <p><em>Health Systems Assurance, Volume 1</em> examines how obligations, risks, operating evidence, exceptions and accountable decisions fit together.</p>
-            <Link href="/publication/hsa-v1-2026" className="experience-link experience-link-light">Read the publication<ArrowRight size={22} aria-hidden="true" /></Link>
+            <h2 id="research-feature-title">Publish the thinking. Let others examine it.</h2>
+            <p><em>Health Systems Assurance, Volume 1</em> asks what evidence should support trust in digital health systems and how accountable decisions should be made when the evidence is incomplete.</p>
+            <Link href="/publications" className="experience-link experience-link-light">Explore the research<ArrowRight size={22} aria-hidden="true" /></Link>
           </div>
           <Link href="/publication/hsa-v1-2026" className="experience-research-cover" aria-label="Read Health Systems Assurance, Volume 1">
             <img src="/media/hsa-cover.webp" alt="Health Systems Assurance, Volume 1 book cover" width="600" height="780" loading="lazy" />
@@ -81,11 +102,14 @@ export function HomePage() {
         </div>
       </section>
 
-      <section className="experience-close">
+      <section className="experience-close home-close">
         <div className="shell experience-close-inner">
-          <h2>Bring us a problem worth solving.</h2>
-          <p>We work with universities, public institutions, technology partners, funders and community organizations on defined questions with clear roles and accountable outcomes.</p>
-          <Link href="/partner" className="experience-link">Start a conversation<ArrowRight size={24} aria-hidden="true" /></Link>
+          <h2>Bring a defined problem.</h2>
+          <p>Universities, public institutions, technology partners, funders and community organizations can work with SozoRock on a question with clear roles and an outcome that can be examined.</p>
+          <div className="home-close-actions">
+            <Link href="/partner" className="experience-link">Discuss a partnership<ArrowRight size={24} aria-hidden="true" /></Link>
+            <Link href="/support" className="experience-link">Support a defined program<ArrowRight size={24} aria-hidden="true" /></Link>
+          </div>
         </div>
       </section>
     </>

@@ -5,22 +5,13 @@ import { AppliedLearningPage } from "./AppliedLearningPage";
 import { HealthInitiativePage } from "./HealthInitiativePage";
 import { WorkPage } from "./WorkPage";
 import { PartnerOpportunityPage, SupportOpportunityPage } from "./EngagePages";
-import {
-  AiLabPage,
-  InsightsPage,
-  LeadershipPage,
-  NotFoundPage,
-  PublicationPage,
-} from "./Pages";
+import { InsightsPage, LeadershipPage, NotFoundPage } from "./Pages";
 import { PublicationAccessPage } from "./PublicationAccessPage";
+import { PublicationDetailPage, ResearchPage } from "./ResearchExperience";
+import { AboutExperiencePage, AiLabExperiencePage, ContactExperiencePage, EventsExperiencePage, InstituteExperiencePage } from "./InstitutionalExperience";
 import {
   AccessibilityStatementPage,
-  GlobalInstitutePage,
   NondiscriminationNoticePage,
-  ParentAboutPage,
-  ParentContactPage,
-  ParentEventsPage,
-  ParentPublicationsPage,
   ParentStandardsPage,
   PrivacyNoticePage,
   WebsiteTermsPage,
@@ -34,20 +25,20 @@ function RouteView({ pathname }) {
   const publication = pathname.startsWith("/publication/") ? publications.find((item) => item.path === pathname) : null;
   const accessPublication = pathname.startsWith("/publication/") ? publications.find((item) => item.accessPath === pathname) : null;
   if (accessPublication) return <PublicationAccessPage publication={accessPublication} />;
-  if (publication) return <PublicationPage publication={publication} />;
+  if (publication) return <PublicationDetailPage publication={publication} />;
   if (pathname === "/") return <HomePage />;
   if (pathname === "/ai-society") return <AiSocietyPage />;
   if (pathname === "/platforms") return <WorkPage />;
-  if (pathname === "/platforms/institute") return <GlobalInstitutePage />;
+  if (pathname === "/platforms/institute") return <InstituteExperiencePage />;
   if (pathname === "/platforms/health") return <HealthInitiativePage />;
-  if (pathname === "/platforms/ai-lab") return <AiLabPage />;
+  if (pathname === "/platforms/ai-lab") return <AiLabExperiencePage />;
   if (pathname === "/platforms/applied-learning") return <AppliedLearningPage />;
-  if (pathname === "/publications") return <ParentPublicationsPage />;
+  if (pathname === "/publications") return <ResearchPage />;
   if (pathname === "/insights") return <InsightsPage />;
-  if (pathname === "/events") return <ParentEventsPage />;
-  if (pathname === "/about") return <ParentAboutPage />;
+  if (pathname === "/events") return <EventsExperiencePage />;
+  if (pathname === "/about") return <AboutExperiencePage />;
   if (pathname === "/leadership") return <LeadershipPage />;
-  if (pathname === "/contact") return <ParentContactPage />;
+  if (pathname === "/contact") return <ContactExperiencePage />;
   if (pathname === "/partner") return <PartnerOpportunityPage />;
   if (pathname === "/support") return <SupportOpportunityPage />;
   if (pathname === "/standards") return <ParentStandardsPage />;
