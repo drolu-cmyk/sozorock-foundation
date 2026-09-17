@@ -1,6 +1,7 @@
 import { getSeoForPath as getBaseSeo } from "./seo.js";
 
 const GLOBAL_SITE_DESCRIPTION = "Health access, cybersecurity experiential learning, public interest research and responsible AI for decisions and implementation.";
+const SOCIAL_IMAGE_ALT = "The SozoRock Foundation. Evidence should lead somewhere.";
 
 const overrides = {
   "/": {
@@ -145,7 +146,7 @@ export function getSeoForPath(inputPathname = "/") {
   const pathname = cleanPath(inputPathname);
   const base = getBaseSeo(pathname);
   const config = overrides[pathname];
-  if (!config) return { ...base, schema: normalizeGlobalSchema(base.schema) };
+  if (!config) return { ...base, imageAlt: SOCIAL_IMAGE_ALT, schema: normalizeGlobalSchema(base.schema) };
 
   return {
     ...base,
@@ -154,6 +155,7 @@ export function getSeoForPath(inputPathname = "/") {
     title: config.title,
     description: config.description,
     keywords: config.keywords.join(", "),
+    imageAlt: SOCIAL_IMAGE_ALT,
     robots: "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
     schema: withSchema({ ...base, pathname }, config),
   };
