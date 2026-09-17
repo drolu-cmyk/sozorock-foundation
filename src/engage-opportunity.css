@@ -1,0 +1,114 @@
+.engage-opportunity {
+  background: var(--white);
+  color: var(--ink);
+}
+
+.engage-opportunity-layout {
+  display: grid;
+  grid-template-columns: minmax(0, .72fr) minmax(0, 1.28fr);
+  gap: 72px;
+  padding: 72px 0 76px;
+}
+
+.engage-opportunity-layout > div:first-child h2 {
+  margin-top: 10px;
+  max-width: 10ch;
+  font-size: clamp(40px, 3.8vw, 58px);
+  line-height: 1.02;
+  letter-spacing: -.04em;
+}
+
+.engage-opportunity-list {
+  border-top: 1px solid var(--line);
+}
+
+.engage-opportunity-list article {
+  display: grid;
+  grid-template-columns: minmax(190px, .7fr) minmax(0, 1.3fr);
+  gap: 30px;
+  padding: 28px 0 30px;
+  border-bottom: 1px solid var(--line);
+}
+
+.engage-opportunity-list h3 {
+  font-size: clamp(23px, 2vw, 30px);
+  line-height: 1.1;
+  letter-spacing: -.03em;
+}
+
+.engage-opportunity-list p {
+  max-width: 52ch;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.engage-opportunity-list .text-link {
+  grid-column: 2;
+  width: fit-content;
+  margin-top: -12px;
+}
+
+.support-boundary {
+  background: var(--navy);
+  color: var(--white);
+}
+
+.support-boundary-inner {
+  display: grid;
+  grid-template-columns: minmax(140px, .45fr) minmax(0, 1.25fr) auto;
+  gap: 34px;
+  align-items: center;
+  padding: 36px 0 40px;
+}
+
+.support-boundary-inner .eyebrow {
+  color: var(--ice);
+}
+
+.support-boundary-inner > p:nth-child(2) {
+  max-width: 58ch;
+  color: var(--white);
+  font-size: 17px;
+  line-height: 1.5;
+}
+
+.support-boundary .text-link {
+  color: var(--white);
+}
+
+@media (max-width: 899px) {
+  .engage-opportunity-layout,
+  .support-boundary-inner {
+    grid-template-columns: 1fr;
+    gap: 34px;
+  }
+
+  .engage-opportunity-layout > div:first-child h2 {
+    max-width: none;
+  }
+
+  .support-boundary-inner {
+    gap: 12px;
+  }
+}
+
+@media (max-width: 599px) {
+  .engage-opportunity-layout {
+    padding: 50px 0 54px;
+  }
+
+  .engage-opportunity-list article {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    padding: 24px 0 26px;
+  }
+
+  .engage-opportunity-list .text-link {
+    grid-column: 1;
+    margin-top: 4px;
+  }
+
+  .support-boundary-inner {
+    padding: 30px 0 34px;
+  }
+}
