@@ -20,8 +20,8 @@ export function HealthInitiativePage() {
           <div className="health-origin-image"><img src="/media/health-access.webp" alt="Two people use a tablet together in a community setting" width="1600" height="900" fetchPriority="high" /></div>
           <div>
             <h2 id="health-origin-title">The problem became concrete in Western New York.</h2>
-            <p>A 2025 SozoRock preplanning roundtable with a university school of nursing brought together 12 participants from two county public health jurisdictions, two universities and a regional community health organization.</p>
-            <p>A regional public health director reported more than 12,000 residents per primary care clinician. The figure is participant reported context, not a measured outcome or an independently recalculated ratio.</p>
+            <p>A 2025 SozoRock preplanning roundtable with a university school of nursing brought together 12 participants from two county public-health jurisdictions, two universities and a regional community-health organization.</p>
+            <p>A regional public-health director reported more than 12,000 residents per primary-care clinician. The figure is participant-reported context, not a measured outcome or an independently recalculated ratio.</p>
             <p>REBS connects that access question with health literacy, technology, workforce and community readiness.</p>
             <Link href="/publication/rebs-v1-2025" className="experience-link">Read REBS<ArrowRight size={22} aria-hidden="true" /></Link>
           </div>
@@ -30,9 +30,9 @@ export function HealthInitiativePage() {
 
       <section className="health-2027 final-health-pilot" id="pilot" aria-labelledby="health-pilot-title">
         <div className="shell health-2027-inner">
-          <h2 id="health-pilot-title">In 2027, the next step is a 25 person test.</h2>
+          <h2 id="health-pilot-title">In 2027, the next step is a 25-person test.</h2>
           <p className="experience-lead">The Foundation is preparing a New York pilot with Dr. Michael Purcell and PIOC, a direct primary care practice, for residents in rural and underserved communities who face barriers to ongoing primary care.</p>
-          <p>Starting with 25 keeps the first test small enough to see where the pathway works, where it fails and what should change before any expansion. The pilot will examine nonclinical coordination, health education and entry into an ongoing primary care relationship.</p>
+          <p>Starting with 25 keeps the first test small enough to show where the pathway works, where it fails and what should change. The pilot will examine nonclinical coordination, health education and entry into an ongoing primary care relationship before any expansion.</p>
           <p className="experience-boundary">Clinical assessment, diagnosis, treatment and prescribing remain entirely with the licensed provider. SozoRock coordinates the nonclinical participant experience and evaluates deidentified program evidence.</p>
         </div>
       </section>

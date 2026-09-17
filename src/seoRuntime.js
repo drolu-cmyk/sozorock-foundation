@@ -1,12 +1,12 @@
 import { getSeoForPath as getBaseSeo } from "./seo.js";
 
-const GLOBAL_SITE_DESCRIPTION = "Health access, cybersecurity experiential learning, public interest research and responsible AI for decisions and implementation.";
+const GLOBAL_SITE_DESCRIPTION = "Health access, cybersecurity experiential learning, public-interest research and responsible AI for decisions and implementation.";
 const SOCIAL_IMAGE_ALT = "The SozoRock Foundation. Evidence should lead somewhere.";
 
 const overrides = {
   "/": {
     title: "The SozoRock Foundation | Health Access, Applied Learning & Research",
-    description: "SozoRock turns evidence into practical work in health access, graduate cybersecurity learning, public interest research and responsible AI.",
+    description: "SozoRock turns evidence into practical work in health access, graduate cybersecurity learning, public-interest research and responsible AI.",
     keywords: [
       "SozoRock Foundation",
       "health access",
@@ -16,20 +16,20 @@ const overrides = {
       "cybersecurity experiential learning",
       "graduate cybersecurity capstone",
       "workforce capability",
-      "public interest research",
+      "public-interest research",
       "AI governance",
       "health systems assurance",
     ],
   },
   "/platforms": {
     title: "Work | The SozoRock Foundation",
-    description: "Explore SozoRock work in health access, cybersecurity experiential learning, public interest research and AI accountability.",
+    description: "Explore SozoRock work in health access, cybersecurity experiential learning, public-interest research and AI accountability.",
     keywords: [
       "SozoRock Foundation work",
       "health access",
       "cybersecurity experiential learning",
       "workforce capability",
-      "public interest research",
+      "public-interest research",
       "AI and society",
       "health equity",
       "public systems",
@@ -37,15 +37,15 @@ const overrides = {
   },
   "/platforms/applied-learning": {
     title: "Cybersecurity Experiential Learning | SozoRock Foundation",
-    description: "A six month Capella University capstone collaboration moving cybersecurity master's learners into hands on IAM, GRC, cloud security and evidence assurance.",
+    description: "A six-month Capella University capstone collaboration moving cybersecurity master's learners into hands-on IAM, GRC, cloud security and evidence assurance.",
     keywords: [
       "cybersecurity experiential learning",
       "applied learning",
-      "work based learning",
+      "work-based learning",
       "cybersecurity workforce development",
       "graduate cybersecurity capstone",
       "Capella University cybersecurity",
-      "academic industry collaboration",
+      "university nonprofit collaboration",
       "identity and access management",
       "IAM",
       "GRC",
@@ -73,7 +73,7 @@ const overrides = {
   },
   "/publications": {
     title: "Research & Publications | The SozoRock Foundation",
-    description: "Citable public interest research on health access, rural governance and digital health assurance, with free verified publication access.",
+    description: "Citable public-interest research on health access, rural governance and digital health assurance, with free verified publication access.",
     keywords: [
       "SozoRock research",
       "health systems assurance",
@@ -81,7 +81,7 @@ const overrides = {
       "rural governance",
       "health access planning",
       "digital health assurance",
-      "public interest research",
+      "public-interest research",
       "Rural Equity Blueprint Series",
     ],
   },
@@ -89,25 +89,25 @@ const overrides = {
     title: "Partner with SozoRock | The SozoRock Foundation",
     description: "Define a health access, applied learning, research or public systems engagement with a clear problem, role and outcome.",
     keywords: [
-      "university industry collaboration",
+      "university nonprofit collaboration",
       "technology partnership",
       "workforce development partnership",
       "applied learning partner",
       "health access partnership",
-      "public interest technology",
+      "public-interest technology",
       "SozoRock Foundation",
     ],
   },
   "/support": {
     title: "Support the Work | The SozoRock Foundation",
-    description: "Support health access, applied learning, public interest research, community participation and the technology infrastructure behind the work.",
+    description: "Support health access, applied learning, public-interest research, community participation and the technology infrastructure behind the work.",
     keywords: [
       "nonprofit technology funding",
       "workforce development funding",
       "applied learning sponsorship",
       "health access funding",
       "technology credits nonprofit",
-      "public interest research",
+      "public-interest research",
       "SozoRock Foundation",
     ],
   },

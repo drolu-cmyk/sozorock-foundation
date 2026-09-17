@@ -1,0 +1,51 @@
+/* Targeted current-site corrections. Existing palette, type, spacing and visual system remain unchanged. */
+
+/* Restore readable body copy where inherited muted text drifted onto dark brand fields. */
+.home-learning-inner > p,
+.research-detail-record p,
+.research-detail-record .research-detail-citation,
+.research-detail-record .copyright-note {
+  color: var(--ice);
+}
+
+.research-page-hero p,
+.institutional-hero p {
+  color: rgba(255, 255, 255, .86);
+}
+
+/* Keep public form boundaries visible without introducing a new brand color. */
+.engagement-form input:not([type="checkbox"]):not([type="radio"]),
+.engagement-form select,
+.engagement-form textarea,
+.publication-access-form input:not([type="checkbox"]):not([type="radio"]),
+.publication-access-form select,
+.publication-access-form textarea {
+  border-color: rgba(7, 29, 59, .55);
+}
+
+/* Restore the intended desktop title / description / action reading order. */
+@media (min-width: 900px) {
+  .home-work .experience-work-list {
+    max-width: none;
+  }
+
+  .home-work .experience-work-item {
+    display: grid;
+    grid-template-columns: minmax(240px, 310px) minmax(0, 1fr) 30px;
+    gap: 36px;
+    align-items: center;
+  }
+
+  .home-work .experience-work-item strong {
+    width: auto;
+  }
+
+  .home-work .experience-work-item span {
+    max-width: 54ch;
+  }
+
+  .home-work .experience-work-item svg {
+    margin-left: 0;
+    justify-self: end;
+  }
+}

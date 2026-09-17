@@ -13,6 +13,7 @@ import "./engage-opportunity.css";
 import "./experience-simplified.css";
 import "./experience-cleanup.css";
 import "./final-polish.css";
+import "./accessibility-polish.css";
 
 const container = document.getElementById("root");
 const render = container.hasChildNodes() ? (app) => hydrateRoot(container, app) : (app) => createRoot(container).render(app);
