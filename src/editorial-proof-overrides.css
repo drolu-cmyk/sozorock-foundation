@@ -22,6 +22,14 @@
   text-underline-offset: 8px;
 }
 
+.learning-proof-statement {
+  padding-left: 0;
+}
+
+.learning-proof-statement > span {
+  display: none;
+}
+
 @media (max-width: 599px) {
   .platform-detail-list .society-work-context {
     margin-top: 48px;
@@ -31,5 +39,9 @@
 
   .platform-detail-list .society-work-context .society-inline-link {
     font-size: 42px;
+  }
+
+  .learning-proof-statement {
+    padding-left: 0;
   }
 }
