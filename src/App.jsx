@@ -3,6 +3,7 @@ import { HomePage } from "./HomePage";
 import { AiSocietyPage } from "./AiSocietyPage";
 import { AppliedLearningPage } from "./AppliedLearningPage";
 import { HealthInitiativePage } from "./HealthInitiativePage";
+import { PartnerOpportunityPage, SupportOpportunityPage } from "./EngagePages";
 import {
   AiLabPage,
   InsightsPage,
@@ -18,11 +19,9 @@ import {
   ParentAboutPage,
   ParentContactPage,
   ParentEventsPage,
-  ParentPartnerPage,
   ParentPlatformsPage,
   ParentPublicationsPage,
   ParentStandardsPage,
-  ParentSupportPage,
   PrivacyNoticePage,
   WebsiteTermsPage,
 } from "./InstitutionalPages";
@@ -49,8 +48,8 @@ function RouteView({ pathname }) {
   if (pathname === "/about") return <ParentAboutPage />;
   if (pathname === "/leadership") return <LeadershipPage />;
   if (pathname === "/contact") return <ParentContactPage />;
-  if (pathname === "/partner") return <ParentPartnerPage />;
-  if (pathname === "/support") return <ParentSupportPage />;
+  if (pathname === "/partner") return <PartnerOpportunityPage />;
+  if (pathname === "/support") return <SupportOpportunityPage />;
   if (pathname === "/standards") return <ParentStandardsPage />;
   if (pathname === "/privacy") return <PrivacyNoticePage />;
   if (pathname === "/accessibility") return <AccessibilityStatementPage />;
