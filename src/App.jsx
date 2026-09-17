@@ -29,7 +29,7 @@ import {
 import { Footer, Header } from "./SiteChrome";
 import { publications } from "./siteData";
 import { useCurrentPath } from "./router";
-import { getSeoForPath } from "./seo";
+import { getSeoForPath } from "./seoRuntime";
 
 function RouteView({ pathname }) {
   const publication = pathname.startsWith("/publication/") ? publications.find((item) => item.path === pathname) : null;
