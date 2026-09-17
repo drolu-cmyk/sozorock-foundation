@@ -13,20 +13,20 @@
 .experience-page-hero h1 {
   max-width: 17ch;
   margin: 0;
+  color: var(--white);
   font-size: clamp(54px, 7vw, 104px);
+  font-weight: 650;
   line-height: .94;
   letter-spacing: -.058em;
-  font-weight: 650;
-  color: var(--white);
 }
 
 .experience-hero p,
 .experience-page-hero p {
   max-width: 53ch;
   margin: 34px 0 0;
+  color: rgba(255,255,255,.86);
   font-size: clamp(19px, 1.8vw, 25px);
   line-height: 1.48;
-  color: rgba(255,255,255,.86);
 }
 
 .experience-actions {
@@ -48,7 +48,6 @@
   text-decoration: none;
 }
 
-.experience-link:hover span,
 .experience-link:hover {
   text-decoration: underline;
   text-underline-offset: 5px;
@@ -78,25 +77,16 @@
   font-size: 14px !important;
 }
 
-/* Homepage: one primary current story, then a small set of choices. */
 .experience-health {
   position: relative;
   min-height: 760px;
-  background: var(--pale);
   overflow: hidden;
+  background: var(--pale);
 }
 
 .experience-health-image {
   position: absolute;
   inset: 0 42% 0 0;
-}
-
-.experience-health-image::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(90deg, transparent 68%, rgba(243,244,245,.92) 100%);
-  pointer-events: none;
 }
 
 .experience-health-image img {
@@ -108,7 +98,8 @@
 .experience-health-content {
   position: relative;
   z-index: 1;
-  margin-left: 55%;
+  width: 45%;
+  margin-left: auto;
   padding: clamp(92px, 10vw, 148px) 0;
 }
 
@@ -122,12 +113,12 @@
 .learning-offer h2,
 .experience-research h2,
 .experience-close h2 {
-  margin: 0;
   max-width: 14ch;
+  margin: 0;
   font-size: clamp(42px, 5vw, 76px);
+  font-weight: 640;
   line-height: .98;
   letter-spacing: -.05em;
-  font-weight: 640;
 }
 
 .experience-health-content > p:not(.experience-context),
@@ -140,8 +131,8 @@
 .learning-offer p,
 .experience-research p,
 .experience-close p {
-  margin-top: 24px;
   max-width: 58ch;
+  margin-top: 24px;
   font-size: 17px;
   line-height: 1.62;
 }
@@ -169,27 +160,31 @@
 }
 
 .experience-work-item {
-  display: grid;
-  grid-template-columns: minmax(220px, .7fr) minmax(0, 1fr) auto;
-  gap: 40px;
+  display: flex;
   align-items: center;
+  gap: 36px;
   color: var(--ink);
   text-decoration: none;
 }
 
 .experience-work-item strong {
+  width: min(34%, 310px);
+  flex: 0 0 auto;
   font-size: clamp(28px, 3vw, 42px);
   line-height: 1;
   letter-spacing: -.04em;
 }
 
 .experience-work-item span {
+  max-width: 52ch;
   color: var(--muted);
   font-size: 17px;
   line-height: 1.5;
 }
 
 .experience-work-item svg {
+  flex: 0 0 auto;
+  margin-left: auto;
   transition: transform 160ms ease;
 }
 
@@ -230,9 +225,9 @@
 }
 
 .experience-research-cover img {
+  display: block;
   width: 100%;
   height: auto;
-  display: block;
   box-shadow: 0 28px 64px rgba(0,0,0,.22);
 }
 
@@ -248,8 +243,8 @@
   max-width: 13ch;
 }
 
-/* Health: content is presented as one current initiative, not a dashboard. */
-.health-experience-hero {
+.health-experience-hero,
+.learning-experience-hero {
   background: var(--navy);
 }
 
@@ -265,11 +260,16 @@
   object-fit: cover;
 }
 
-.health-2027 {
+.health-2027,
+.learning-case,
+.learning-offer {
   background: var(--white);
 }
 
-.health-2027-inner {
+.health-2027-inner,
+.learning-case-inner,
+.learning-evidence-story-inner,
+.learning-offer-inner {
   max-width: 980px;
   padding: clamp(92px, 11vw, 164px) 0;
 }
@@ -299,49 +299,31 @@
   letter-spacing: -.025em;
 }
 
-.health-evidence-story {
+.health-evidence-story,
+.learning-role {
   background: var(--pale);
 }
 
 .health-evidence-story-inner,
 .learning-role-inner {
-  display: grid;
-  grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr);
+  display: flex;
+  align-items: flex-start;
   gap: clamp(56px, 8vw, 120px);
-  align-items: start;
   padding: clamp(92px, 10vw, 150px) 0;
+}
+
+.health-evidence-story-inner > div,
+.learning-role-inner > div {
+  flex: 1 1 0;
 }
 
 .health-evidence-story h2 {
   max-width: 12ch;
 }
 
-/* Applied learning: one case story, no process graphics or numbered steps. */
-.learning-experience-hero {
-  background: var(--navy);
-}
-
-.learning-case,
-.learning-offer {
-  background: var(--white);
-}
-
-.learning-case-inner,
-.learning-evidence-story-inner,
-.learning-offer-inner {
-  max-width: 980px;
-  padding: clamp(92px, 11vw, 164px) 0;
-}
-
-.learning-case h2 {
-  max-width: 15ch;
-}
-
-.learning-role {
-  background: var(--pale);
-}
-
-.learning-role-inner h2 {
+.learning-case h2,
+.learning-role-inner h2,
+.learning-offer h2 {
   max-width: 15ch;
 }
 
@@ -372,11 +354,6 @@
   line-height: 1.45;
 }
 
-.learning-offer h2 {
-  max-width: 15ch;
-}
-
-/* Reduce the visual language that made older surfaces read as bordered grids. */
 .platform-detail,
 .publication-entry,
 .standards-list article,
@@ -400,33 +377,34 @@
     min-height: 360px;
   }
 
-  .experience-health-image::after {
-    display: none;
-  }
-
   .experience-health-content {
+    width: auto;
     margin-left: 0;
     padding: 72px 0 86px;
   }
 
   .experience-work-item {
-    grid-template-columns: 1fr auto;
-    gap: 12px 28px;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 12px 24px;
+  }
+
+  .experience-work-item strong {
+    width: calc(100% - 54px);
   }
 
   .experience-work-item span {
-    grid-column: 1 / 2;
+    order: 3;
+    width: 100%;
   }
 
   .experience-work-item svg {
-    grid-column: 2;
-    grid-row: 1 / span 2;
+    margin-left: auto;
   }
 
   .experience-research-inner,
   .health-evidence-story-inner,
   .learning-role-inner {
-    grid-template-columns: 1fr;
     flex-direction: column;
   }
 
@@ -447,8 +425,8 @@
   }
 
   .experience-actions {
-    align-items: flex-start;
     flex-direction: column;
+    align-items: flex-start;
     gap: 18px;
   }
 
@@ -463,11 +441,6 @@
 
   .experience-work-list {
     gap: 38px;
-  }
-
-  .experience-work-item {
-    display: grid;
-    grid-template-columns: 1fr auto;
   }
 
   .experience-work-item strong {
