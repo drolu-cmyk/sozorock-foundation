@@ -29,8 +29,9 @@ test('all three publications retain permanent records and verified delivery mapp
 
 test('homepage uses evidence-led editorial storytelling without mechanical labels',()=>{
   const html=readFileSync('dist/client/index.html','utf8');
-  assert.match(html,/Starting with 25 people\./);
-  assert.match(html,/Learning, put to work\./);
+  assert.match(html,/Access should not end at the first visit\./);
+  assert.match(html,/From instruction to evidence\./);
+  assert.match(html,/25<\/strong><span>planned participants/);
   assert.match(html,/11<\/strong><span>graduate learners/);
   assert.match(html,/2 cohorts · 2025–26/);
   assert.match(html,/AI changes decisions/i);
@@ -53,13 +54,15 @@ test('applied learning records the graduate model and practitioner responsibilit
   const html=readFileSync('dist/client/platforms/applied-learning.html','utf8');
   assert.match(html,/Coursework is the starting point/i);
   assert.match(html,/From instruction to judgment/i);
+  assert.match(html,/The evidence has to support the conclusion/i);
+  assert.match(html,/Academic knowledge\. Workplace capability\./i);
   assert.match(html,/2<\/strong><span>cohorts/);
   assert.match(html,/11<\/strong><span>graduate learners/);
   assert.match(html,/Capella University’s Applied IT Capstone program/);
   assert.match(html,/Dr\. Oluwabiyi Adeyemo/);
   assert.match(html,/designs the experiential project tasks, mentors learners and evaluates their applied work/i);
   assert.match(html,/Capella University faculty retain course ownership, academic oversight and grading/i);
-  assert.match(html,/Summary of faculty feedback/i);
+  assert.match(html,/Based on a September 2026 faculty assessment/i);
   assert.match(html,/not a university endorsement/i);
   assert.doesNotMatch(html,/Faculty perspective/i);
   assert.doesNotMatch(html,/Practitioner role/i);
