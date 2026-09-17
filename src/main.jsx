@@ -7,6 +7,7 @@ import "./foundation-system.css";
 import "./editorial.css";
 import "./homepage-evidence.css";
 import "./institutional-refinements.css";
+import "./visibility-capability.css";
 
 const container = document.getElementById("root");
 const render = container.hasChildNodes() ? (app) => hydrateRoot(container, app) : (app) => createRoot(container).render(app);
