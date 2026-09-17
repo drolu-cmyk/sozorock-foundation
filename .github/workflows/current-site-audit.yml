@@ -7,6 +7,8 @@ on:
       - "public/**"
       - "index.html"
       - "scripts/current-site-audit.mjs"
+      - "scripts/full-current-site-audit.mjs"
+      - "scripts/assert-current-site-audit.mjs"
       - ".github/workflows/current-site-audit.yml"
       - "package.json"
       - "package-lock.json"
@@ -18,7 +20,7 @@ permissions:
 jobs:
   audit:
     runs-on: ubuntu-24.04
-    timeout-minutes: 20
+    timeout-minutes: 30
     steps:
       - name: Check out exact revision
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
@@ -46,11 +48,14 @@ jobs:
             test "$attempt" -lt 60
             sleep 1
           done
-      - name: Capture routes and calculate contrast
+      - name: Capture all permanent routes and calculate contrast
         env:
           AUDIT_BASE_URL: http://127.0.0.1:4173
-        run: node scripts/current-site-audit.mjs
+        run: node scripts/full-current-site-audit.mjs
+      - name: Require clean contrast, controls and route rendering
+        run: node scripts/assert-current-site-audit.mjs
       - name: Upload current audit evidence
+        if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: sozorock-current-site-audit
