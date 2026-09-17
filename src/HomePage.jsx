@@ -14,7 +14,7 @@ const practice = [
     label: "Talent & capability",
     title: "Graduate applied cybersecurity.",
     signal: "2 cohorts · 11 graduate learners · 2025–26",
-    copy: "A recurring experiential engagement moves learners from instruction into implementation, evidence and professional judgment.",
+    copy: "A recurring Capella University experiential engagement moves learners from instruction into implementation, evidence and professional judgment.",
     href: "/platforms/applied-learning",
     action: "See the applied-learning model",
   },
