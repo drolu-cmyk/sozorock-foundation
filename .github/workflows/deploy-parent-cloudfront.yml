@@ -222,7 +222,7 @@ jobs:
           aws cloudfront create-invalidation --distribution-id "$distribution_id" --paths '/*' >/dev/null
           for attempt in $(seq 1 30); do
             page="$(curl --proto '=https' --tlsv1.2 --fail --silent --show-error --max-time 20 "https://${distribution_domain}/?preview=${GITHUB_RUN_ID}" || true)"
-            if grep -Fq 'Access. Assurance. Intelligence.' <<<"$page"; then break; fi
+            if grep -Fq 'A clearer route' <<<"$page"; then break; fi
             test "$attempt" -lt 30
             sleep 10
           done
@@ -450,7 +450,7 @@ jobs:
 
           for attempt in $(seq 1 30); do
             page="$(curl --proto '=https' --tlsv1.2 --fail --silent --show-error --max-time 20 "https://${CANONICAL_HOST}/?live=${GITHUB_RUN_ID}" || true)"
-            if grep -Fq 'Access. Assurance. Intelligence.' <<<"$page"; then break; fi
+            if grep -Fq 'A clearer route' <<<"$page"; then break; fi
             test "$attempt" -lt 30
             sleep 10
           done

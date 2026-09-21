@@ -4,8 +4,8 @@ This repository is the production parent website for The SozoRock Foundation. Th
 
 ## Durable requirements
 
-- Keep the primary navigation compact and stable: What we do, Research, About, Contact. Keep the canonical `/platforms` route unless a separate migration is approved.
-- Lock the parent homepage opening to “Evidence should lead somewhere.” Do not replace, rotate or reinterpret this hero headline without an explicit new user instruction.
+- Keep the primary navigation compact and stable: What we do, Who we are, and a separated Support action. Keep Research, Partner and Contact in the footer or deeper routes. Keep the canonical `/platforms` route unless a separate migration is approved.
+- Lock the parent homepage opening to “A clearer route to primary care.” with the planned 25-person 2027 New York pilot, qualified partner attribution and the clinical-responsibility boundary. Do not replace, rotate or reinterpret this hero headline without an explicit new user instruction.
 - The homepage premise is evidence moving into practical use. Connect that premise naturally to health access, cybersecurity experiential learning, public interest research and responsible AI.
 - Do not use visible eyebrow labels. Avoid repetitive label, headline, paragraph and CTA templates. Let hierarchy come from typography, whitespace, contrast, evidence and composition.
 - Keep public copy concise, specific and natural. Avoid generic consulting language, AI sounding prose, internal planning terms and mechanical process writing. Prefer problem, evidence, response and action.
@@ -30,6 +30,9 @@ This repository is the production parent website for The SozoRock Foundation. Th
 - Keep the parent homepage broader than publications. Use a natural story from premise to evidence to current work to proof to engagement. Avoid brochure and textbook layouts.
 - Prefer editorial fields, asymmetric hierarchy, strong whitespace and real evidence over boxed card grids. Keep the legal footer compact and keep Partner and Support separate from legal policy links.
 - The footer must identify The SozoRock Foundation, Inc. as a 501(c)(3) public charity and include the verified EIN. Keep legal links concise: Privacy, Terms, Accessibility, Nondiscrimination and Standards.
+- Preserve the approved blue footer composition and its EIN 39-4736725 legal statement.
+- Present the three authentic publication covers as small three-dimensional book mockups in the homepage hero; preserve the cover faces exactly.
+- Present the Capella University work as a recurring six-month applied cybersecurity model: six master's learners in the initial cohort and five in the current cohort. State that Dr. Oluwabiyi Adeyemo, Director of Strategic Initiatives, designs and evaluates the experience and personally mentors every learner.
 - Keep rural health and rural equity visible as important areas of focus, but never describe the Foundation's overall mission as rural only. Parent positioning must also cover health access, cybersecurity experiential learning, public interest research, governance, community evidence, participation and responsible AI.
 - Describe roundtables, participation, partnerships, funding, cataloging and library holdings precisely. Do not turn participation or cataloging into endorsement, implementation, adoption or a continuing institutional commitment.
 - Participant reported figures may be displayed only with visible attribution and limits. Do not restate them as independently estimated statistics or achieved outcomes.

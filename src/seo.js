@@ -258,7 +258,7 @@ export function getSeoForPath(inputPathname = "/") {
         width: 236,
         height: 48,
       },
-      slogan: "Access. Assurance. Intelligence.",
+      slogan: "A clearer route to primary care.",
       publishingPrinciples: `${SITE_ORIGIN}/standards`,
       ethicsPolicy: `${SITE_ORIGIN}/standards`,
       knowsAbout: [
@@ -326,7 +326,7 @@ export function getSeoForPath(inputPathname = "/") {
     image,
     imageWidth: publication ? 1200 : 1731,
     imageHeight: publication ? 630 : 909,
-    imageAlt: publication ? `${publication.title}, ${publication.volume} publication preview` : "The SozoRock Foundation — Access. Assurance. Intelligence.",
+    imageAlt: publication ? `${publication.title}, ${publication.volume} publication preview` : "The SozoRock Foundation — A clearer route to primary care.",
     schema: { "@context": "https://schema.org", "@graph": graph },
     publication,
   };

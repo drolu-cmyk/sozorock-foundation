@@ -29,18 +29,20 @@ test('all three publications retain permanent records and verified delivery mapp
 
 test('homepage locks a stable proposition and explains why the health pilot exists',()=>{
   const html=readFileSync('dist/client/index.html','utf8');
-  assert.match(html,/Evidence should lead somewhere\./i);
-  assert.match(html,/2025 preplanning roundtable/i);
+  assert.match(html,/A clearer route/i);
+  assert.match(html,/2025 SozoRock preplanning roundtable/i);
   assert.match(html,/12 participants/i);
   assert.match(html,/two county public-health jurisdictions/i);
   assert.match(html,/more than 12,000 residents per primary-care clinician/i);
-  assert.match(html,/Why start with 25 people\?/i);
-  assert.match(html,/In 2027/i);
-  assert.match(html,/Dr\. Michael Purcell and PIOC, a direct primary care practice/i);
-  assert.match(html,/what works, what breaks and what should change before expansion/i);
-  assert.match(html,/A master&#x27;s degree should end with experience, not just coursework/i);
-  assert.match(html,/11 learners/i);
+  assert.match(html,/Starting with 25 people facing barriers to ongoing care in New York/i);
+  assert.match(html,/Planned for 2027 with Dr\. Michael Purcell and PIOC/i);
+  assert.match(html,/Clinical care remains with the licensed provider/i);
+  assert.match(html,/Applied cybersecurity, personally mentored/i);
+  assert.match(html,/Six learners completed the initial cohort/i);
+  assert.match(html,/Five are participating in the current six-month cohort/i);
   assert.match(html,/identity and access management, GRC, cloud security, risk and evidence assurance/i);
+  assert.match(html,/Dr\. Oluwabiyi Adeyemo, Director of Strategic Initiatives/i);
+  assert.match(html,/personally mentors every learner/i);
   assert.match(html,/href="\/partner"/);
   assert.match(html,/href="\/support"/);
   assert.doesNotMatch(html,/Research and practical systems for better access/i);
@@ -112,12 +114,12 @@ test('navigation, footer and mobile menu expose clear conversion and legal statu
   const chrome=readFileSync('src/SiteChrome.jsx','utf8');
   const css=readFileSync('src/final-polish.css','utf8');
   assert.match(home,/>What we do</);
+  assert.match(home,/>Who we are</);
   assert.match(home,/>Research</);
-  assert.match(home,/>About</);
   assert.match(home,/>Contact</);
   assert.match(home,/>Partner</);
   assert.match(home,/>Support</);
-  assert.match(home,/501\(c\)\(3\) public charity/);
+  assert.match(home,/tax-exempt under Section 501\(c\)\(3\)/);
   assert.match(home,/EIN 39-4736725/);
   assert.match(home,/Privacy/);
   assert.match(home,/Terms/);
@@ -209,7 +211,7 @@ test('legal routes remain available and the footer now states verified nonprofit
   assert.match(accessibility,/ongoing design and testing objective, not a claim/i);
   assert.match(terms,/>Public forms</);
   assert.match(home,/href="\/nondiscrimination"/);
-  assert.match(home,/501\(c\)\(3\) public charity/);
+  assert.match(home,/tax-exempt under Section 501\(c\)\(3\)/);
   assert.match(home,/EIN 39-4736725/);
 });
 

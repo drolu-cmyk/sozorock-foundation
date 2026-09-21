@@ -1,117 +1,59 @@
-import { ArrowRight } from "@phosphor-icons/react";
 import { Link } from "./router";
 
-const workAreas = [
-  {
-    title: "Health access",
-    copy: "Test nonclinical ways to help people reach ongoing primary care.",
-    href: "/platforms/health",
-  },
-  {
-    title: "Applied learning",
-    copy: "Give graduate learners practical cybersecurity experience before graduation.",
-    href: "/platforms/applied-learning",
-  },
-  {
-    title: "Research",
-    copy: "Publish evidence and frameworks that institutions can examine and use.",
-    href: "/publications",
-  },
-  {
-    title: "AI and Society",
-    copy: "Keep human judgment and accountability visible when AI affects people.",
-    href: "/ai-society",
-  },
+const platforms = [
+  { name: "SozoRock Health", copy: "Rural health access, local evidence and digital readiness.", href: "https://health.sozorockfoundation.org/" },
+  { name: "CB-CAP", copy: "County intelligence with visible sources, dates and limitations.", href: "https://cbcap.sozorockfoundation.org/" },
+  { name: "SozoRock AI Lab", copy: "Applied AI systems, cybersecurity and governance learning.", href: "https://ai-lab.sozorockfoundation.org/" },
+  { name: "AI and Society", copy: "Human judgment and accountability when AI affects people.", href: "/ai-society" },
+];
+
+const publicationLinks = [
+  { title: "Rural Equity Blueprint Series", description: "Rural access and local response", href: "/publication/rebs-v1-2025" },
+  { title: "Rethinking Rural Governance", description: "Public systems and place", href: "/publication/rrg-v1-2025" },
+  { title: "Health Systems Assurance", description: "Trust, evidence and accountability", href: "/publication/hsa-v1-2026" },
 ];
 
 export function HomePage() {
-  return (
-    <>
-      <section className="experience-hero final-hero" aria-labelledby="foundation-title">
-        <div className="shell experience-hero-inner">
-          <h1 id="foundation-title">Evidence should lead somewhere.</h1>
-          <p>SozoRock works with communities, universities and institutions to improve health access, build applied technology capability and strengthen public decisions.</p>
-          <div className="experience-actions">
-            <Link href="/platforms" className="button button-light">See what we do</Link>
-            <Link href="/partner" className="experience-link experience-link-light">Work with SozoRock<ArrowRight size={22} aria-hidden="true" /></Link>
-          </div>
+  return <>
+    <section className="approval-hero" aria-labelledby="foundation-title">
+      <div className="shell approval-hero-grid">
+        <div className="approval-hero-copy">
+          <h1 id="foundation-title">A clearer route<br />to primary care.</h1>
+          <p>Starting with 25 people facing barriers to ongoing care in New York.</p>
+          <Link className="approval-action is-light" href="/support">Support the pilot</Link>
+          <div className="approval-pilot-note"><span>Planned for 2027 with Dr. Michael Purcell and PIOC.</span><span>Clinical care remains with the licensed provider.</span></div>
         </div>
-      </section>
+        <div className="approval-publications" aria-label="Featured SozoRock publications">
+          <Link className="approval-book approval-book-rebs" href="/publication/rebs-v1-2025" aria-label="Rural Equity Blueprint Series, Volume 1"><img src="/media/rebs-cover.webp" alt="Rural Equity Blueprint Series, Volume 1 cover" /></Link>
+          <Link className="approval-book approval-book-rrg" href="/publication/rrg-v1-2025" aria-label="Rethinking Rural Governance, Volume 1"><img src="/media/rrg-cover.webp" alt="Rethinking Rural Governance, Volume 1 cover" /></Link>
+          <Link className="approval-book approval-book-hsa" href="/publication/hsa-v1-2026" aria-label="Health Systems Assurance, Volume 1"><img src="/media/hsa-cover.webp" alt="Health Systems Assurance, Volume 1 cover" /></Link>
+        </div>
+      </div>
+    </section>
 
-      <section className="home-origin-story" aria-labelledby="origin-story-title">
-        <div className="shell home-origin-grid">
-          <div className="home-origin-image">
-            <img src="/media/health-access.webp" alt="Two people use a tablet together in a community setting" width="1600" height="900" fetchPriority="high" />
-          </div>
-          <div className="home-origin-copy">
-            <h2 id="origin-story-title">The 2027 health pilot starts with what communities already told us.</h2>
-            <p>In a 2025 preplanning roundtable with a university school of nursing, 12 participants represented two county public-health jurisdictions and two universities in Western New York.</p>
-            <p>A regional public-health director reported more than 12,000 residents per primary-care clinician. REBS then connected health literacy, technology, workforce and local readiness to the wider access problem.</p>
-            <Link href="/publication/rebs-v1-2025" className="experience-link">Read the rural health framework<ArrowRight size={22} aria-hidden="true" /></Link>
-          </div>
-        </div>
-      </section>
+    <section className="approval-evidence" aria-labelledby="regional-evidence-title">
+      <h2 id="regional-evidence-title">The work begins with what local institutions reported.</h2>
+      <div><p className="approval-evidence-number">More than 12,000 residents per primary-care clinician.</p><p>A regional public-health director reported the ratio during a 2025 SozoRock preplanning roundtable in Western New York. The discussion brought together 12 participants from two county public-health jurisdictions and two universities.</p><Link className="approval-action" href="/publication/rebs-v1-2025">Read the rural health framework</Link></div>
+    </section>
 
-      <section className="home-pilot-story" aria-labelledby="pilot-story-title">
-        <div className="shell home-pilot-inner">
-          <div>
-            <h2 id="pilot-story-title">Why start with 25 people?</h2>
-            <p className="home-story-lead">Because the first job is to learn what works, what breaks and what should change before expansion.</p>
-          </div>
-          <div>
-            <p>In 2027, SozoRock plans to work with Dr. Michael Purcell and PIOC, a direct primary care practice, on a 25-participant New York pilot for residents in rural and underserved communities who face barriers to ongoing primary care.</p>
-            <p>The pilot will test nonclinical coordination, health education and a clearer route into ongoing care. SozoRock will evaluate deidentified program evidence. Clinical care remains entirely with the licensed provider.</p>
-            <Link href="/platforms/health" className="experience-link">Explore the 2027 pilot<ArrowRight size={22} aria-hidden="true" /></Link>
-          </div>
-        </div>
-      </section>
+    <section className="approval-capella" aria-labelledby="capella-title">
+      <p className="approval-section-marker">SozoRock × Capella University</p>
+      <div className="approval-capella-grid"><h2 id="capella-title">Applied cybersecurity, personally mentored.</h2><div className="approval-capella-copy"><p>SozoRock provides cybersecurity master’s learners with six months of applied experience across identity and access management, GRC, cloud security, risk and evidence assurance.</p><p className="approval-cohort-proof">Six learners completed the initial cohort. Five are participating in the current six-month cohort.</p><p>The experience is designed and evaluated by <strong>Dr. Oluwabiyi Adeyemo, Director of Strategic Initiatives</strong>, who personally mentors every learner.</p><Link className="approval-action" href="/partner">Partner with SozoRock</Link></div></div>
+    </section>
 
-      <section className="home-learning-story" aria-labelledby="learning-story-title">
-        <div className="shell home-learning-inner">
-          <h2 id="learning-story-title">A master&apos;s degree should end with experience, not just coursework.</h2>
-          <p>Through a recurring collaboration with Capella University, cybersecurity master&apos;s learners move from instruction into six months of hands-on work. Across two cohorts, 11 learners have worked in identity and access management, GRC, cloud security, risk and evidence assurance before graduation.</p>
-          <Link href="/platforms/applied-learning" className="experience-link experience-link-light">See the applied learning model<ArrowRight size={22} aria-hidden="true" /></Link>
-        </div>
-      </section>
+    <section className="approval-platforms" aria-labelledby="platforms-title">
+      <div className="approval-platform-intro"><h2 id="platforms-title">SozoRock connects health access, county intelligence, applied AI and public accountability.</h2><p>Research, technology and learning designed around public need.</p></div>
+      <div className="approval-platform-list">{platforms.map((platform) => <Link className="approval-platform-row" href={platform.href} key={platform.name}><h3>{platform.name}</h3><p>{platform.copy}</p></Link>)}</div>
+    </section>
 
-      <section className="experience-work home-work" aria-labelledby="work-title">
-        <div className="shell experience-work-inner">
-          <h2 id="work-title">What we do.</h2>
-          <div className="experience-work-list">
-            {workAreas.map((area) => (
-              <Link href={area.href} className="experience-work-item" key={area.title}>
-                <strong>{area.title}</strong>
-                <span>{area.copy}</span>
-                <ArrowRight size={30} aria-hidden="true" />
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
+    <section className="approval-research" aria-labelledby="research-title">
+      <div className="approval-research-intro"><h2 id="research-title">Research built to be used.</h2><p>Three publication series connect rural access, public governance and health-systems assurance.</p></div>
+      <div className="approval-publication-list">{publicationLinks.map((publication) => <Link href={publication.href} key={publication.title}><span>{publication.title}</span><small>{publication.description}</small></Link>)}</div>
+      <Link className="approval-action" href="/publications">View publications</Link>
+    </section>
 
-      <section className="experience-research home-research" aria-labelledby="research-feature-title">
-        <div className="shell experience-research-inner">
-          <div className="experience-research-copy">
-            <h2 id="research-feature-title">Publish the thinking. Let others examine it.</h2>
-            <p><em>Health Systems Assurance, Volume 1</em> asks what evidence should support trust in digital health systems and how accountable decisions should be made when the evidence is incomplete.</p>
-            <Link href="/publications" className="experience-link experience-link-light">Explore the research<ArrowRight size={22} aria-hidden="true" /></Link>
-          </div>
-          <Link href="/publication/hsa-v1-2026" className="experience-research-cover" aria-label="Read Health Systems Assurance, Volume 1">
-            <img src="/media/hsa-cover.webp" alt="Health Systems Assurance, Volume 1 book cover" width="600" height="780" loading="lazy" />
-          </Link>
-        </div>
-      </section>
+    <section className="approval-society" aria-labelledby="society-title"><h2 id="society-title">When AI shapes public decisions, who remains accountable?</h2><div><p>SozoRock examines how institutions can use AI while preserving human judgment, evidence and public responsibility.</p><Link className="approval-action is-light" href="/ai-society">Explore AI and Society</Link></div></section>
 
-      <section className="experience-close home-close">
-        <div className="shell experience-close-inner">
-          <h2>Bring a defined problem.</h2>
-          <p>Universities, public institutions, technology partners, funders and community organizations can work with SozoRock on a question with clear roles and an outcome that can be examined.</p>
-          <div className="home-close-actions">
-            <Link href="/partner" className="experience-link">Discuss a partnership<ArrowRight size={24} aria-hidden="true" /></Link>
-            <Link href="/support" className="experience-link">Support a defined program<ArrowRight size={24} aria-hidden="true" /></Link>
-          </div>
-        </div>
-      </section>
-    </>
-  );
+    <section className="approval-support" aria-labelledby="support-title"><p>Work with The SozoRock Foundation.</p><h2 id="support-title">Bring SozoRock’s research, training and access models to your institution or community.</h2><div><Link className="approval-action" href="/partner">Partner with SozoRock</Link><Link className="approval-action" href="/support">Support the work</Link></div></section>
+  </>;
 }

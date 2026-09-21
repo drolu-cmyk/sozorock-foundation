@@ -1,7 +1,7 @@
 import { getSeoForPath as getBaseSeo } from "./seo.js";
 
 const GLOBAL_SITE_DESCRIPTION = "Health access, cybersecurity experiential learning, public-interest research and responsible AI for decisions and implementation.";
-const SOCIAL_IMAGE_ALT = "The SozoRock Foundation. Evidence should lead somewhere.";
+const SOCIAL_IMAGE_ALT = "The SozoRock Foundation. A clearer route to primary care.";
 
 const overrides = {
   "/": {

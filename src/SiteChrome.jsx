@@ -5,7 +5,7 @@ export function Brand() {
   return <Link href="/" className="foundation-wordmark" aria-label="The SozoRock Foundation home"><span>The</span><strong>SozoRock.</strong><span>Foundation</span></Link>;
 }
 
-const links = [["What we do", "/platforms"], ["Research", "/publications"], ["About", "/about"], ["Contact", "/contact"]];
+const primaryLinks = [["What we do", "/platforms"], ["Who we are", "/about"]];
 
 export function Header({ pathname }) {
   const [open, setOpen] = useState(false);
@@ -62,7 +62,8 @@ export function Header({ pathname }) {
       <Brand />
       <button ref={toggle} className="foundation-menu-toggle" type="button" aria-expanded={open} aria-controls="foundation-navigation" onClick={() => setOpen((value) => !value)}>{open ? "Close" : "Menu"}</button>
       <nav ref={navigation} id="foundation-navigation" className={`foundation-navigation ${open ? "is-open" : ""}`} aria-label="Primary navigation" onClick={(event) => { if (event.target.closest("a")) setOpen(false); }}>
-        {links.map(([label, href]) => <Link key={href} href={href} aria-current={pathname === href ? "page" : undefined}>{label}</Link>)}
+        {primaryLinks.map(([label, href]) => <Link key={href} href={href} aria-current={pathname === href ? "page" : undefined}>{label}</Link>)}
+        <Link className="foundation-support-link" href="/support" aria-current={pathname === "/support" ? "page" : undefined}>Support</Link>
       </nav>
     </div>
   </header>;
@@ -74,24 +75,36 @@ export function Footer() {
     <div className="shell">
       <div className="foundation-footer-top">
         <Brand />
-        <nav aria-label="Footer navigation">
-          {links.map(([label, href]) => <Link key={href} href={href}>{label}</Link>)}
-          <Link href="/partner">Partner</Link>
-          <Link href="/support">Support</Link>
-        </nav>
-      </div>
-      <div className="foundation-footer-status">
-        <p>The SozoRock Foundation, Inc. is a 501(c)(3) public charity. EIN 39-4736725.</p>
+        <p className="foundation-footer-purpose">We build platforms for better health and public systems.</p>
+        <div className="foundation-footer-groups">
+          <nav aria-label="Explore">
+            <strong>Explore</strong>
+            <Link href="/platforms">Platforms</Link>
+            <Link href="/publications">Publications</Link>
+            <Link href="/insights">Research</Link>
+            <Link href="/events">Events</Link>
+            <Link href="/ai-society">AI and Society</Link>
+          </nav>
+          <nav aria-label="Foundation">
+            <strong>Foundation</strong>
+            <Link href="/about">Who we are</Link>
+            <Link href="/leadership">Leadership</Link>
+            <Link href="/standards">Standards</Link>
+            <Link href="/contact">Contact</Link>
+            <Link href="/partner">Partner</Link>
+            <Link href="/support">Support</Link>
+          </nav>
+        </div>
       </div>
       <div className="foundation-footer-bottom">
-        <p>© {year} The SozoRock Foundation, Inc.</p>
+        <p>The SozoRock Foundation, Inc. is recognized as tax-exempt under Section 501(c)(3) of the Internal Revenue Code. EIN 39-4736725. Contributions are tax-deductible as allowed by law.</p>
         <nav aria-label="Legal and policy links">
           <Link href="/privacy">Privacy</Link>
           <Link href="/terms">Terms</Link>
           <Link href="/accessibility">Accessibility</Link>
           <Link href="/nondiscrimination">Nondiscrimination</Link>
-          <Link href="/standards">Standards</Link>
         </nav>
+        <p>© {year} The SozoRock Foundation, Inc.</p>
       </div>
     </div>
   </footer>;
