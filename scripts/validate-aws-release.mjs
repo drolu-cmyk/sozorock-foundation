@@ -65,7 +65,7 @@ assert.match(template, /CanonicalBridgeApiId/u);
 assert.match(workflow, /get-domain-name --domain-name "\$CANONICAL_HOST"/u);
 assert.match(workflow, /update-api-mapping/u);
 assert.match(await readFile(new URL("scripts/bootstrap-parent-aws.sh", root), "utf8"), /apigateway:TagResource/u);
-assert.match(workflow, /<title>Work \| The SozoRock Foundation<\/title>/u);
+assert.match(workflow, /<title>What we do \| SozoRock Foundation<\/title>/u);
 assert.match(agentDeployScript, /ThrottlingBurstLimit/u);
 assert.match(agentDeployScript, /ThrottlingRateLimit/u);
 assert.match(agentDeployScript, /FoundationAgentsDeployCanaryInvoke/u);
