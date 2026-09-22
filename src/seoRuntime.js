@@ -1,7 +1,7 @@
 import approvedMetadata from "./approved-metadata.json" with { type: "json" };
 import { getSeoForPath as getBaseSeo } from "./seo.js";
 
-const GLOBAL_SITE_DESCRIPTION = "Health access, cybersecurity experiential learning, public-interest research and responsible AI for decisions and implementation.";
+const GLOBAL_SITE_DESCRIPTION = "Health equity initiatives, county health data, cybersecurity capstones and research on rural governance, health access and AI.";
 const SOCIAL_IMAGE_ALT = "The SozoRock Foundation. A clearer route to primary care.";
 
 const overrides = {
@@ -122,7 +122,7 @@ function cleanPath(pathname = "/") {
 function normalizeGlobalSchema(schema) {
   const graph = schema?.["@graph"]?.map((node) => {
     if (node?.["@type"] === "WebSite") return { ...node, description: GLOBAL_SITE_DESCRIPTION };
-    if (node?.["@type"] === "NGO") return { ...node, taxID: "39-4736725" };
+    if (node?.["@type"] === "NGO") return { ...node, taxID: "39-4736725", knowsAbout: (node.knowsAbout || []).filter(term => term !== "systems intelligence") };
     return node;
   });
   return graph ? { ...schema, "@graph": graph } : schema;

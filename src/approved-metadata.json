@@ -1,30 +1,30 @@
 {
   "/": {
-    "title": "A clearer route to primary care. | SozoRock Foundation",
-    "description": "Help fund SozoRock\u2019s planned New York pilot for 25 people facing barriers to ongoing primary care."
+    "title": "SozoRock Foundation | Health Equity, Cybersecurity & Research",
+    "description": "Support health equity, explore county health data and discover SozoRock\u2019s cybersecurity capstones, applied AI learning and public-interest research."
   },
   "/platforms": {
     "title": "What we do | SozoRock Foundation",
     "description": "Health equity, county intelligence, research and applied AI and cybersecurity learning."
   },
   "/platforms/health": {
-    "title": "SozoRock Health | SozoRock Foundation",
+    "title": "Health Equity Hubs & Primary Care Access | SozoRock",
     "description": "Health equity in libraries, communities and homes."
   },
   "/platforms/applied-learning": {
-    "title": "Applied cybersecurity. Six-month cohorts. | SozoRock Foundation",
+    "title": "Cybersecurity Capstone & Workforce Learning | SozoRock",
     "description": "A recurring six-month cybersecurity capstone combining instructional sessions, hands-on projects and workforce capability development."
   },
   "/platforms/institute": {
-    "title": "SozoRock Global Institute | SozoRock Foundation",
+    "title": "SozoRock Global Institute | Health and Governance Research",
     "description": "Rural health equity, public governance and health systems assurance."
   },
   "/platforms/ai-lab": {
-    "title": "SozoRock AI Lab | SozoRock Foundation",
+    "title": "SozoRock AI Lab | Applied AI and Cybersecurity Learning",
     "description": "Applied AI systems. Cybersecurity. AI governance."
   },
   "/ai-society": {
-    "title": "A public voice in AI decisions. | SozoRock Foundation",
+    "title": "AI and Society | Public Participation in AI Decisions",
     "description": "Who Decides? A proposed SozoRock initiative for AI in education and work."
   },
   "/publications": {
@@ -60,7 +60,7 @@
     "description": "Notes from SozoRock\u2019s research and programs."
   },
   "/events": {
-    "title": "Roundtables and briefings | SozoRock Foundation",
+    "title": "SozoRock Preplanning Roundtable & Research Briefings",
     "description": "Health access, research and AI in public life."
   },
   "/about": {
@@ -72,11 +72,11 @@
     "description": "The people responsible for SozoRock\u2019s work."
   },
   "/support": {
-    "title": "Help fund the 25-person pilot. | SozoRock Foundation",
+    "title": "Fund Health Equity Programs | SozoRock Foundation",
     "description": "Support SozoRock\u2019s planned New York primary care pilot\u2014or discuss funding for health equity, county data, research and applied learning."
   },
   "/partner": {
-    "title": "Partner with SozoRock. | SozoRock Foundation",
+    "title": "Health, Research & Learning Partnerships | SozoRock",
     "description": "Bring local knowledge, clinical expertise, technology or applied learning to a shared project."
   },
   "/contact": {
