@@ -1,3 +1,5 @@
+import { ApprovedPage, approvedRoutes } from "./ApprovedPages";
+import { ApprovedFooter } from "./ApprovedFooter";
 import { useEffect } from "react";
 import { HomePage } from "./HomePage";
 import { AiSocietyPage } from "./AiSocietyPage";
@@ -22,6 +24,7 @@ import { useCurrentPath } from "./router";
 import { getSeoForPath } from "./seoRuntime";
 
 function RouteView({ pathname }) {
+  if (approvedRoutes.includes(pathname)) return <ApprovedPage pathname={pathname} />;
   const publication = pathname.startsWith("/publication/") ? publications.find((item) => item.path === pathname) : null;
   const accessPublication = pathname.startsWith("/publication/") ? publications.find((item) => item.accessPath === pathname) : null;
   if (accessPublication) return <PublicationAccessPage publication={accessPublication} />;
@@ -127,12 +130,12 @@ export function App({ initialPath }) {
   }, [seo]);
 
   return (
-    <div className="site-frame">
+    <div className="site-frame approved-site">
       <Header pathname={pathname} />
       <main id="main-content" key={pathname} className="page-view" tabIndex={-1}>
         <RouteView pathname={pathname} />
       </main>
-      <Footer />
+      <ApprovedFooter />
     </div>
   );
 }

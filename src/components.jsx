@@ -87,8 +87,8 @@ export function EngagementForm({ kind }) {
   const [message, setMessage] = useState("");
   const options = kind === "Support"
     ? ["Fund the work", "Support research and publications", "Support AI & Society participation", "Provide in-kind technology or expertise", "Partner with us"]
-    : ["Partner with us", "Health access collaboration", "Research collaboration", "AI Lab learning", "AI & Society", "CB-CAP inquiry", "Health Equity Hub partnership", "Health Access Day partnership", "Support research and publications", "Bring the model to a community", "Institutional or public-sector inquiry"];
-  const inquiryRoutes = { "Health access collaboration": "Partner with us", "Research collaboration": "Support research and publications", "AI Lab learning": "Partner with us", "AI & Society": "Institutional or public-sector inquiry" };
+    : ["Partner with us", "Health access collaboration", "Research collaboration", "AI Lab learning", "AI & Society", "CB-CAP inquiry", "Library Health Equity Hub", "Community Health Equity Hub", "Home Health Equity Hub", "Capella cybersecurity capstone", "Health Equity Hub partnership", "Health Access Day partnership", "Support research and publications", "Bring the model to a community", "Institutional or public-sector inquiry"];
+  const inquiryRoutes = { "Library Health Equity Hub":"Health Equity Hub partnership", "Community Health Equity Hub":"Health Equity Hub partnership", "Home Health Equity Hub":"Health Equity Hub partnership", "Capella cybersecurity capstone":"Partner with us", "Health access collaboration": "Partner with us", "Research collaboration": "Support research and publications", "AI Lab learning": "Partner with us", "AI & Society": "Institutional or public-sector inquiry" };
   const roles = ["Individual or family", "Community organization", "Licensed provider or health organization", "County, state, or public agency", "University or researcher", "Foundation or funder", "Corporate organization", "Other"];
 
   const submit = async (event) => {
@@ -113,7 +113,7 @@ export function EngagementForm({ kind }) {
         ...payload,
         message: participation
           ? `AI & Society participation interest\nPerspective: ${String(data.get("perspective") || "")}\nFuture deliberation interest: ${String(data.get("futureParticipation") || "Not specified")}\n\n${payload.message}`
-          : `Organization or affiliation: ${payload.organization}\n\nArea of interest: ${String(data.get("interest") || "")}\n\n${payload.message}`,
+          : `Role or job title: ${String(data.get("jobTitle") || "")}\n\nSubject: ${String(data.get("subject") || "")}\n\nOrganization or affiliation: ${payload.organization}\n\nArea of interest: ${String(data.get("interest") || "")}\n\n${payload.message}`,
       };
       const response = await fetch("/api/contact", {
         method: "POST",
@@ -141,16 +141,18 @@ export function EngagementForm({ kind }) {
         </div>
       ) : (
         <>
+          <p className="form-note">Required fields are marked *.</p>
           <div className="field-row">
-            <label>First name<input name="firstName" autoComplete="given-name" required /></label>
-            <label>Last name<input name="lastName" autoComplete="family-name" required /></label>
+            <label>First name *<input name="firstName" autoComplete="given-name" required /></label>
+            <label>Last name *<input name="lastName" autoComplete="family-name" required /></label>
           </div>
-          <label>Email<input type="email" name="email" autoComplete="email" required /></label>
-          {!participation && <label>Organization or affiliation<input name="organization" maxLength="180" autoComplete="organization" required /></label>}
-          {participation ? <label>Your perspective<select name="perspective" required defaultValue=""><option value="" disabled>Select an option</option>{["Student / learner", "Educator", "Worker", "Job seeker", "Employer / workforce professional", "Researcher", "Community organization", "Government / public sector", "Technology practitioner", "Other"].map(role => <option key={role}>{role}</option>)}</select></label> : <label>Organization or role<select name="role" required defaultValue=""><option value="" disabled>Select an option</option>{roles.map((role) => <option key={role}>{role}</option>)}</select></label>}
-          <label>City, state, or region<input name="location" maxLength="160" autoComplete="address-level1" required /></label>
-          {!participation && <label>Area of interest<select name="interest" required defaultValue=""><option value="" disabled>Select an option</option>{options.map((option) => <option key={option}>{option}</option>)}</select></label>}
-          <label>{participation ? "What AI-related question deserves attention?" : "What outcome are you working toward?"}<textarea name="message" rows="5" minLength="20" maxLength="800" required /></label>
+          <label>Email *<input type="email" name="email" autoComplete="email" required /></label>
+          {!participation && <label>Organization or affiliation *<input name="organization" maxLength="180" autoComplete="organization" required /></label>}
+          {participation ? <label>Your perspective<select name="perspective" required defaultValue=""><option value="" disabled>Select an option</option>{["Student / learner", "Educator", "Worker", "Job seeker", "Employer / workforce professional", "Researcher", "Community organization", "Government / public sector", "Technology practitioner", "Other"].map(role => <option key={role}>{role}</option>)}</select></label> : <label>Organization type *<select name="role" required defaultValue=""><option value="" disabled>Select an option</option>{roles.map((role) => <option key={role}>{role}</option>)}</select></label>}
+          {!participation && <><label>Role or job title *<input name="jobTitle" autoComplete="organization-title" maxLength="100" required /></label><label>Subject *<input name="subject" maxLength="120" required /></label></>}
+          <label>City, state, or region *<input name="location" maxLength="160" autoComplete="address-level1" required /></label>
+          {!participation && <label>Area of interest *<select name="interest" required defaultValue=""><option value="" disabled>Select an option</option>{options.map((option) => <option key={option}>{option}</option>)}</select></label>}
+          <label>{participation ? "What AI-related question deserves attention?" : "Message *"}<textarea name="message" rows="5" minLength="20" maxLength="600" required /></label>
           {participation && <label>Interested in a future Fireside or deliberation? (optional)<select name="futureParticipation" defaultValue=""><option value="">Select an option</option><option>Yes</option><option>I would like more information</option><option>Not at this time</option></select></label>}
           <div className="access-honeypot" aria-hidden="true"><label>Website<input name="website" tabIndex="-1" autoComplete="off" /></label></div>
           <label className="check-field"><input name="consent" type="checkbox" value="yes" required /><span>I agree that The SozoRock Foundation, Inc. may use this information to respond to my inquiry. I have read the <Link href="/privacy">Privacy Notice</Link>.</span></label>

@@ -1,0 +1,106 @@
+{
+  "/": {
+    "title": "A clearer route to primary care. | SozoRock Foundation",
+    "description": "Help fund SozoRock\u2019s planned New York pilot for 25 people facing barriers to ongoing primary care."
+  },
+  "/platforms": {
+    "title": "What we do | SozoRock Foundation",
+    "description": "Health equity, county intelligence, research and applied AI and cybersecurity learning."
+  },
+  "/platforms/health": {
+    "title": "SozoRock Health | SozoRock Foundation",
+    "description": "Health equity in libraries, communities and homes."
+  },
+  "/platforms/applied-learning": {
+    "title": "Applied cybersecurity. Six-month cohorts. | SozoRock Foundation",
+    "description": "A recurring six-month cybersecurity capstone combining instructional sessions, hands-on projects and workforce capability development."
+  },
+  "/platforms/institute": {
+    "title": "SozoRock Global Institute | SozoRock Foundation",
+    "description": "Rural health equity, public governance and health systems assurance."
+  },
+  "/platforms/ai-lab": {
+    "title": "SozoRock AI Lab | SozoRock Foundation",
+    "description": "Applied AI systems. Cybersecurity. AI governance."
+  },
+  "/ai-society": {
+    "title": "A public voice in AI decisions. | SozoRock Foundation",
+    "description": "Who Decides? A proposed SozoRock initiative for AI in education and work."
+  },
+  "/publications": {
+    "title": "Publications | SozoRock Foundation",
+    "description": "Rural health. Public governance. Health systems assurance."
+  },
+  "/publication/hsa-v1-2026": {
+    "title": "Health Systems Assurance | SozoRock Foundation",
+    "description": "What evidence supports trust in digital health systems?"
+  },
+  "/publication/hsa-v1-2026/access": {
+    "title": "Read Health Systems Assurance | SozoRock Foundation",
+    "description": "Free PDF. Verify your email to open the publication."
+  },
+  "/publication/rrg-v1-2025": {
+    "title": "Rethinking Rural Governance | SozoRock Foundation",
+    "description": "Coordinating public decisions in rural communities."
+  },
+  "/publication/rrg-v1-2025/access": {
+    "title": "Read Rethinking Rural Governance | SozoRock Foundation",
+    "description": "Free PDF. Verify your email to open the publication."
+  },
+  "/publication/rebs-v1-2025": {
+    "title": "Rural Equity Blueprint Series | SozoRock Foundation",
+    "description": "Planning rural health access."
+  },
+  "/publication/rebs-v1-2025/access": {
+    "title": "Read Rural Equity Blueprint Series | SozoRock Foundation",
+    "description": "Free PDF. Verify your email to open the publication."
+  },
+  "/insights": {
+    "title": "Insights | SozoRock Foundation",
+    "description": "Notes from SozoRock\u2019s research and programs."
+  },
+  "/events": {
+    "title": "Roundtables and briefings | SozoRock Foundation",
+    "description": "Health access, research and AI in public life."
+  },
+  "/about": {
+    "title": "Who we are | SozoRock Foundation",
+    "description": "Health equity, county intelligence and applied learning for communities and institutions."
+  },
+  "/leadership": {
+    "title": "Leadership | SozoRock Foundation",
+    "description": "The people responsible for SozoRock\u2019s work."
+  },
+  "/support": {
+    "title": "Help fund the 25-person pilot. | SozoRock Foundation",
+    "description": "Support SozoRock\u2019s planned New York primary care pilot\u2014or discuss funding for health equity, county data, research and applied learning."
+  },
+  "/partner": {
+    "title": "Partner with SozoRock. | SozoRock Foundation",
+    "description": "Bring local knowledge, clinical expertise, technology or applied learning to a shared project."
+  },
+  "/contact": {
+    "title": "Contact SozoRock | SozoRock Foundation",
+    "description": "Questions about our work, publications or website?"
+  },
+  "/standards": {
+    "title": "Standards | SozoRock Foundation",
+    "description": "How we publish, disclose support and correct errors."
+  },
+  "/privacy": {
+    "title": "Privacy | SozoRock Foundation",
+    "description": "How we handle information submitted through this website."
+  },
+  "/terms": {
+    "title": "Website terms | SozoRock Foundation",
+    "description": "Conditions for using this website and its materials."
+  },
+  "/accessibility": {
+    "title": "Accessibility | SozoRock Foundation",
+    "description": "Request help accessing our website, publications or activities."
+  },
+  "/nondiscrimination": {
+    "title": "Nondiscrimination | SozoRock Foundation",
+    "description": "Equal access and respectful participation."
+  }
+}

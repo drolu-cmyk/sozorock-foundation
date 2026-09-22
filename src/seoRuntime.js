@@ -1,3 +1,4 @@
+import approvedMetadata from "./approved-metadata.json" with { type: "json" };
 import { getSeoForPath as getBaseSeo } from "./seo.js";
 
 const GLOBAL_SITE_DESCRIPTION = "Health access, cybersecurity experiential learning, public-interest research and responsible AI for decisions and implementation.";
@@ -131,7 +132,7 @@ function withSchema(base, config) {
   const keywords = config.keywords.join(", ");
   const normalized = normalizeGlobalSchema(base.schema);
   const graph = normalized?.["@graph"]?.map((node) => {
-    if (node?.["@type"] === "WebPage" || node?.["@type"] === "CollectionPage" || node?.["@type"] === "AboutPage") {
+    if (node?.["@type"] === "WebPage" || node?.["@type"] === "CollectionPage" || node?.["@type"] === "AboutPage" || node?.["@type"] === "ContactPage") {
       return { ...node, name: config.title, description: config.description, keywords };
     }
     if (node?.["@type"] === "NGO") {
@@ -145,7 +146,8 @@ function withSchema(base, config) {
 export function getSeoForPath(inputPathname = "/") {
   const pathname = cleanPath(inputPathname);
   const base = getBaseSeo(pathname);
-  const config = overrides[pathname];
+  const approved = approvedMetadata[pathname];
+  const config = approved && !pathname.startsWith("/publication/") ? { ...(overrides[pathname] || {}), ...approved, keywords: overrides[pathname]?.keywords || ["SozoRock Foundation", approved.title.split(" | ")[0]] } : overrides[pathname];
   if (!config) return { ...base, imageAlt: SOCIAL_IMAGE_ALT, schema: normalizeGlobalSchema(base.schema) };
 
   return {

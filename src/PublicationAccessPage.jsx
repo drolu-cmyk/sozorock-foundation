@@ -58,7 +58,7 @@ function isMeaningfulReason(value) {
   return text.length >= 30 && text.length <= 800 && words.length >= 3 && new Set(characters).size >= 6 && !/(.)\1{3,}/iu.test(text);
 }
 
-export function PublicationAccessPage({ publication }) {
+export function PublicationAccessPage({ publication, embedded = false }) {
   const [status, setStatus] = useState("idle");
   const [message, setMessage] = useState("");
   const [errors, setErrors] = useState({});
@@ -148,7 +148,7 @@ export function PublicationAccessPage({ publication }) {
       <section className="access-page access-confirmation">
         <div className="shell access-confirmation-inner">
           <p className="eyebrow">Verification sent</p>
-          <h1 ref={confirmationRef} tabIndex="-1">Check your email.</h1>
+          <h2 ref={confirmationRef} tabIndex="-1">Check your email.</h2>
           <p>{message}</p>
           <p>Your publication access link expires in 30 minutes. If it does not arrive, check your spam folder or submit the form again.</p>
           <div className="button-row">
@@ -160,21 +160,10 @@ export function PublicationAccessPage({ publication }) {
     );
   }
 
-  return (
-    <section className="access-page">
-      <div className="shell access-layout">
-        <div className="access-intro">
-          <p className="eyebrow">Publication access</p>
-          <h1>Request {publication.title}, {publication.volume}</h1>
-          <p>Get the full publication at no cost. Enter your name and email, then verify the email address to open the PDF.</p>
-          <dl className="access-summary">
-            <div><dt>Access</dt><dd>Free</dd></div>
-            <div><dt>Verification</dt><dd>Email link</dd></div>
-            <div><dt>Link validity</dt><dd>30 minutes</dd></div>
-          </dl>
-          <p className="access-boundary">Only your name and email are required for delivery. Do not include health, medical or other sensitive information.</p>
-          <Link href={publication.path} className="text-link">About this publication</Link>
-        </div>
+  const accessForm = (
+    <>
+      {!embedded && <div className="access-intro"><h1>Read {publication.title}</h1><p>Free PDF. Verify your email to open the publication.</p></div>}
+      <div>
         <form className="publication-access-form" onSubmit={submitAccess} noValidate aria-describedby="access-privacy access-status">
           <div className="field-row">
             <label htmlFor="access-first-name">First name<input id="access-first-name" name="firstName" required autoComplete="given-name" aria-invalid={Boolean(errors.firstName)} aria-describedby={errors.firstName ? "access-firstName-error" : undefined} />{errorFor("firstName")}</label>
@@ -199,6 +188,7 @@ export function PublicationAccessPage({ publication }) {
           <p id="access-status" className={`access-status ${status === "error" ? "is-error" : ""}`} role="status" aria-live="polite">{message}</p>
         </form>
       </div>
-    </section>
+    </>
   );
+  return embedded ? accessForm : <section className="section"><div className="shell">{accessForm}</div></section>;
 }

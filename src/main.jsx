@@ -15,6 +15,8 @@ import "./experience-cleanup.css";
 import "./final-polish.css";
 import "./accessibility-polish.css";
 
+import "./approved.css";
+
 const container = document.getElementById("root");
 const render = container.hasChildNodes() ? (app) => hydrateRoot(container, app) : (app) => createRoot(container).render(app);
 render(

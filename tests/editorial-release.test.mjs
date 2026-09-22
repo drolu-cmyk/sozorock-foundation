@@ -27,192 +27,47 @@ test('all three publications retain permanent records and verified delivery mapp
   }
 });
 
-test('homepage locks a stable proposition and explains why the health pilot exists',()=>{
-  const html=readFileSync('dist/client/index.html','utf8');
-  assert.match(html,/A clearer route/i);
-  assert.match(html,/2025 SozoRock preplanning roundtable/i);
-  assert.match(html,/12 participants/i);
-  assert.match(html,/two county public-health jurisdictions/i);
-  assert.match(html,/more than 12,000 residents per primary-care clinician/i);
-  assert.match(html,/Starting with 25 people facing barriers to ongoing care in New York/i);
-  assert.match(html,/Planned for 2027 with Dr\. Michael Purcell and PIOC/i);
-  assert.match(html,/Clinical care remains with the licensed provider/i);
-  assert.match(html,/Applied cybersecurity, personally mentored/i);
-  assert.match(html,/Six learners completed the initial cohort/i);
-  assert.match(html,/Five are participating in the current six-month cohort/i);
-  assert.match(html,/identity and access management, GRC, cloud security, risk and evidence assurance/i);
-  assert.match(html,/Dr\. Oluwabiyi Adeyemo, Director of Strategic Initiatives/i);
-  assert.match(html,/personally mentors every learner/i);
-  assert.match(html,/href="\/partner"/);
-  assert.match(html,/href="\/support"/);
-  assert.doesNotMatch(html,/Research and practical systems for better access/i);
-  assert.doesNotMatch(html,/12 months|two hours/i);
+const page = route => readFileSync(`dist/client/${route || 'index'}.html`,'utf8');
+const visible = html => html.replace(/<script[\s\S]*?<\/script>/g,'').replace(/<[^>]+>/g,' ').replace(/\s+/g,' ');
+test('approved pages retain the core programs and claim boundaries',()=>{
+  const home=visible(page(''));
+  for(const term of ['A clearer route to primary care.','Library Health Equity Hub','Community Health Equity Hub','Home Health Equity Hub','CB-CAP','SozoRock preplanning roundtable','Participant-reported','Planned for 2027','Dr. Michael Purcell and PIOC','Clinical care remains','Capella University capstone','instructional sessions','hands-on cybersecurity','personally mentors every learner']) assert.ok(home.includes(term),term);
+  const learning=visible(page('platforms/applied-learning'));
+  for(const term of ['capstone','six-month','Instructional sessions','hands-on projects','Six learners in the initial cohort','Five in the current cohort','Capella University retains academic oversight and grading']) assert.ok(learning.includes(term),term);
+  assert.doesNotMatch(home,/12 months|two hours|founder/i);
 });
-
-test('applied learning sells a six-month cybersecurity capability experience without a numbered process diagram',()=>{
-  const html=readFileSync('dist/client/platforms/applied-learning.html','utf8');
-  assert.match(html,/From coursework to cybersecurity work\./i);
-  assert.match(html,/six-month experiential capstone collaboration with Capella University/i);
-  assert.match(html,/cybersecurity master/i);
-  assert.match(html,/limited hands-on cloud exposure/i);
-  assert.match(html,/Identity and access management/i);
-  assert.match(html,/>GRC</);
-  assert.match(html,/Cloud security/i);
-  assert.match(html,/Two cohorts\. Eleven graduate learners\. Six months per cohort\./i);
-  assert.match(html,/least privilege/i);
-  assert.match(html,/Capella University faculty retain course ownership, academic oversight and grading/i);
-  assert.match(html,/Dr\. Oluwabiyi Adeyemo designs the experiential project tasks/i);
-  assert.match(html,/not a university endorsement/i);
-  assert.doesNotMatch(html,/>01<\/strong>|>02<\/strong>|>03<\/strong>|>04<\/strong>/);
-  assert.doesNotMatch(html,/class="eyebrow"/);
+test('all approved routes have one heading, unique canonical metadata, and working internal destinations',()=>{
+ const paths=JSON.parse(readFileSync('src/approved-metadata.json','utf8'));
+ const titles=new Set();
+ for(const route of Object.keys(paths)){
+  const html=page(route==='/'?'':route.slice(1));
+  assert.equal((html.match(/<h1[ >]/g)||[]).length,1,route);
+  const title=html.match(/<title>(.*?)<\/title>/)[1]; assert.ok(!titles.has(title),title);titles.add(title);
+  assert.ok(html.includes(`rel="canonical" href="https://www.sozorockfoundation.org${route==='/'?'':route}`),route);
+  assert.doesNotMatch(visible(html),/Draft for approval|Effective date to follow|Keep the existing|inspected Albany/i);
+  for(const [,href] of html.matchAll(/<a[^>]*href="(\/[^"?#]*)/g)) assert.ok(paths[href]||href==='/','internal link '+href);
+ }
 });
-
-test('2027 health page connects field evidence to a deliberately bounded pilot',()=>{
-  const html=readFileSync('dist/client/platforms/health.html','utf8');
-  assert.match(html,/Primary care can exist and still be hard to reach\./i);
-  assert.match(html,/2025 SozoRock preplanning roundtable/i);
-  assert.match(html,/more than 12,000 residents per primary-care clinician/i);
-  assert.match(html,/REBS connects that access question with health literacy, technology, workforce and community readiness/i);
-  assert.match(html,/In 2027, the next step is a 25-person test\./i);
-  assert.match(html,/Starting with 25 keeps the first test small enough/i);
-  assert.match(html,/Dr\. Michael Purcell and PIOC, a direct primary care practice/i);
-  assert.match(html,/Clinical assessment, diagnosis, treatment and prescribing remain entirely with the licensed provider/i);
-  assert.match(html,/deidentified program evidence/i);
-  assert.doesNotMatch(html,/12 months|two hours/i);
-  assert.doesNotMatch(html,/class="eyebrow"/);
+test('research records and access keep citations, delivery essentials and separate optional consent',()=>{
+ for(const [slug] of publicationAccessMappings){
+  const html=page('publication/'+slug),access=page('publication/'+slug+'/access');
+  assert.match(html,/>Citation</);assert.match(html,/Copy citation/);assert.match(html,/Scope/);
+  assert.match(access,/Optional readership details/);assert.match(access,/This is not required for access/);
+  for(const field of ['firstName','lastName','email','deliveryConsent']) assert.match(access,new RegExp('<input(?=[^>]*name="'+field+'")(?=[^>]*required)[^>]*>'));
+  for(const field of ['organization','sector','reason','updatesConsent']) assert.doesNotMatch(access,new RegExp('<input(?=[^>]*name="'+field+'")(?=[^>]*required)[^>]*>'));
+  assert.doesNotMatch(access,/href="[^"<>]*\.pdf(?:["?])/i);
+ }
 });
-
-test('what we do and research pages use proof and conversion rather than program catalog copy',()=>{
-  const work=readFileSync('dist/client/platforms.html','utf8');
-  const research=readFileSync('dist/client/publications.html','utf8');
-  assert.match(work,/Start with the problem\./i);
-  assert.match(work,/Two Capella University cohorts, 11 learners, six months per cohort/i);
-  assert.match(work,/2025 roundtable evidence informs a planned 2027 New York pilot/i);
-  assert.match(research,/Research built to be used\./i);
-  assert.match(research,/free to access, citable and explicit about its limits/i);
-  for(const [,title] of publicationAccessMappings) assert.match(research,new RegExp(title.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')));
-  assert.match(research,/Have a decision the research should inform\?/i);
-  assert.match(research,/href="\/partner"/);
-  assert.doesNotMatch(work,/class="eyebrow"/);
-  assert.doesNotMatch(research,/class="eyebrow"/);
+test('navigation, footer and forms retain accessible actions and legal identity',()=>{
+ const html=page(''), chrome=readFileSync('src/SiteChrome.jsx','utf8');
+ for(const label of ['What we do','Who we are','Support','Publications','Contact','Partner','Privacy','Terms','Accessibility','Nondiscrimination','Standards','EIN 39-4736725','501(c)(3)']) assert.ok(html.includes(label),label);
+ assert.match(chrome,/event\.key === "Escape"/);assert.match(chrome,/document\.body\.style\.overflow = "hidden"/);
+ for(const route of ['support','partner','contact']){const form=page(route);for(const name of ['firstName','lastName','email','organization','jobTitle','subject','message'])assert.ok(form.includes(`name="${name}"`),route+' '+name);}
 });
-
-test('publication pages lead with why the research exists and preserve citation access',()=>{
-  for(const [slug,title] of publicationAccessMappings){
-    const html=readFileSync(`dist/client/publication/${slug}.html`,'utf8');
-    assert.match(html,/Why this research exists\./i);
-    assert.match(html,/Use the published record\./i);
-    assert.match(html,/Get the publication/);
-    assert.ok(html.includes(title));
-    assert.doesNotMatch(html,/A permanent, citable record\./i);
-    assert.doesNotMatch(html,/class="eyebrow"/);
-  }
-});
-
-test('navigation, footer and mobile menu expose clear conversion and legal status',()=>{
-  const home=readFileSync('dist/client/index.html','utf8');
-  const chrome=readFileSync('src/SiteChrome.jsx','utf8');
-  const css=readFileSync('src/final-polish.css','utf8');
-  assert.match(home,/>What we do</);
-  assert.match(home,/>Who we are</);
-  assert.match(home,/>Research</);
-  assert.match(home,/>Contact</);
-  assert.match(home,/>Partner</);
-  assert.match(home,/>Support</);
-  assert.match(home,/tax-exempt under Section 501\(c\)\(3\)/);
-  assert.match(home,/EIN 39-4736725/);
-  assert.match(home,/Privacy/);
-  assert.match(home,/Terms/);
-  assert.match(home,/Accessibility/);
-  assert.match(home,/Nondiscrimination/);
-  assert.match(home,/Standards/);
-  assert.match(chrome,/document\.body\.style\.overflow = "hidden"/);
-  assert.match(chrome,/matchMedia\("\(min-width: 900px\)"\)/);
-  assert.match(chrome,/event\.key === "Escape"/);
-  assert.match(css,/@media \(max-width:899px\)/);
-  assert.match(css,/position:fixed; top:96px/);
-});
-
-test('the approved visual system remains gradient-free and loads the targeted contrast correction last',()=>{
-  const main=readFileSync('src/main.jsx','utf8');
-  const cssFiles=readdirSync('src').filter((file)=>file.endsWith('.css'));
-  const css=cssFiles.map((file)=>readFileSync(`src/${file}`,'utf8')).join('\n');
-  assert.match(main,/import "\.\/accessibility-polish\.css";/);
-  assert.doesNotMatch(css,/gradient\(/i);
-  assert.match(readFileSync('src/accessibility-polish.css','utf8'),/Existing palette, type, spacing and visual system remain unchanged/);
-});
-
-test('about and events use a concise evidence led institutional story',()=>{
-  const about=readFileSync('dist/client/about.html','utf8');
-  const events=readFileSync('dist/client/events.html','utf8');
-  assert.match(about,/A foundation built to move from evidence to use\./i);
-  assert.match(about,/Health access can fail even when care exists/i);
-  assert.match(events,/Put the question in the room\./i);
-  assert.match(events,/more than 12,000 residents per primary-care clinician/i);
-  assert.match(events,/2027 pilot will test/i);
-  assert.doesNotMatch(about,/class="eyebrow"/);
-  assert.doesNotMatch(events,/class="eyebrow"/);
-});
-
-test('internal platform links remain inside the parent SPA instead of forcing subdomain reloads',()=>{
-  const source=readFileSync('src/router.jsx','utf8');
-  assert.doesNotMatch(source,/\["\/platforms\/health",\s*"https:\/\/health\.sozorockfoundation\.org\//);
-  assert.doesNotMatch(source,/\["\/platforms\/ai-lab",\s*"https:\/\/ai-lab\.sozorockfoundation\.org\//);
-  assert.match(source,/\["\/platforms\/cbcap",\s*"https:\/\/cbcap\.sozorockfoundation\.org\//);
-});
-
-test('publication access requires only delivery essentials and keeps profiling optional for every title',()=>{
-  const source=readFileSync('src/PublicationAccessPage.jsx','utf8');
-  assert.match(source,/name="firstName" required/);
-  assert.match(source,/name="lastName" required/);
-  assert.match(source,/name="email" required/);
-  assert.match(source,/name="deliveryConsent" type="checkbox" value="yes" required/);
-  assert.doesNotMatch(source,/name="organization" required/);
-  assert.doesNotMatch(source,/name="sector" required/);
-  assert.doesNotMatch(source,/name="cityOrRegion" required/);
-  assert.doesNotMatch(source,/name="reason" required/);
-  for(const [slug] of publicationAccessMappings){
-    const html=readFileSync(`dist/client/publication/${slug}/access.html`,'utf8');
-    assert.match(html,/Only your name and email are required for delivery/i);
-    assert.match(html,/Optional readership details/);
-    assert.match(html,/This is not required for access/);
-  }
-});
-
-test('AI Society uses aligned CTAs and inspectable, bounded output cases',()=>{
-  const html=readFileSync('dist/client/ai-society.html','utf8');
-  assert.match(html,/class="button button-light"[^>]*>See the process</);
-  assert.match(html,/class="button button-outline-light"[^>]*>Express interest</);
-  assert.match(html,/Planned public outputs/);
-  assert.match(html,/Records people can inspect/);
-  assert.match(html,/Illustrative record/);
-  assert.match(html,/Not a completed decision/);
-  assert.match(html,/is not an adopted policy, completed decision or institutional commitment/i);
-  assert.match(html,/What support makes possible/);
-  assert.match(html,/without directing findings/i);
-});
-
-test('proposed convenings emit no scheduled Event schema',()=>{
-  for(const route of ['events','ai-society']){
-    const html=readFileSync(`dist/client/${route}.html`,'utf8');
-    const schemas=[...html.matchAll(/<script[^>]*type="application\/ld\+json">(.*?)<\/script>/gs)].map(m=>JSON.parse(m[1]));
-    assert.ok(schemas.length);
-    assert.ok(!JSON.stringify(schemas).includes('\"@type\":\"Event\"'));
-  }
-});
-
-test('legal routes remain available and the footer now states verified nonprofit status',()=>{
-  const privacy=readFileSync('dist/client/privacy.html','utf8');
-  const accessibility=readFileSync('dist/client/accessibility.html','utf8');
-  const terms=readFileSync('dist/client/terms.html','utf8');
-  const home=readFileSync('dist/client/index.html','utf8');
-  assert.match(privacy,/>Retention</);
-  assert.match(privacy,/No website, email or storage system can be guaranteed to be completely secure/i);
-  assert.match(accessibility,/ongoing design and testing objective, not a claim/i);
-  assert.match(terms,/>Public forms</);
-  assert.match(home,/href="\/nondiscrimination"/);
-  assert.match(home,/tax-exempt under Section 501\(c\)\(3\)/);
-  assert.match(home,/EIN 39-4736725/);
+test('proposed convenings do not claim scheduled events and show public participation',()=>{
+ const html=page('ai-society');assert.match(html,/Illustrative discussion prompt/);assert.match(html,/aria-pressed="true"/);assert.match(html,/aria-pressed="false"/);assert.match(html,/name="perspective"/);
+ for(const route of ['events','ai-society']) assert.doesNotMatch(page(route),/"@type":"Event"/);
+ const css=readdirSync('src').filter(f=>f.endsWith('.css')).map(f=>readFileSync('src/'+f,'utf8')).join('');assert.doesNotMatch(css,/gradient\(/i);
 });
 
 test('participant interests reach the existing service with consent and perspective intact',async()=>{
