@@ -5,7 +5,7 @@ export function ApprovedFooter(){return (<footer className="footer"><div classNa
 <a className="" href="/events">{"Roundtables"}</a>
 <a className="" href="https://health.sozorockfoundation.org/">{"SozoRock Health"}</a>
 <a className="" href="https://cbcap.sozorockfoundation.org/" target="_blank" rel="noopener">{"CB-CAP"}</a>
-<a className="" href="/ai-society">{"AI and Society"}</a>
+<a className="" href="/ai-society">{"AI & Society"}</a>
 </nav>
 <nav aria-label="Foundation"><a className="" href="/about">{"Who we are"}</a>
 <a className="" href="/leadership">{"Leadership"}</a>

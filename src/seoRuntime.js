@@ -1,7 +1,7 @@
 import approvedMetadata from "./approved-metadata.json" with { type: "json" };
 import { getSeoForPath as getBaseSeo } from "./seo.js";
 
-const GLOBAL_SITE_DESCRIPTION = "Health equity initiatives, county health data, cybersecurity capstones and research on rural governance, health access and AI.";
+const GLOBAL_SITE_DESCRIPTION = "Health systems and health equity, cybersecurity workforce development, AI & Society and public-interest research.";
 const SOCIAL_IMAGE_ALT = "The SozoRock Foundation. A clearer route to primary care.";
 
 const overrides = {
@@ -16,6 +16,7 @@ const overrides = {
       "primary care access",
       "cybersecurity experiential learning",
       "graduate cybersecurity capstone",
+      "cybersecurity capstone workforce development",
       "workforce capability",
       "public-interest research",
       "AI governance",
@@ -45,6 +46,7 @@ const overrides = {
       "work-based learning",
       "cybersecurity workforce development",
       "graduate cybersecurity capstone",
+      "cybersecurity capstone workforce development",
       "Capella University cybersecurity",
       "university nonprofit collaboration",
       "identity and access management",
@@ -62,6 +64,8 @@ const overrides = {
     keywords: [
       "2027 New York health access pilot",
       "health equity New York",
+      "health systems",
+      "health equity hubs",
       "primary care access",
       "direct primary care",
       "rural health",

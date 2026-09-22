@@ -96,7 +96,7 @@ case "/": return <>
 </div>
 </div>
 </section>
-<section className="section soft"><div className="shell split"><div><h2>{"Applied cybersecurity."}<br />{"Six-month cohorts."}</h2>
+<section className="section soft"><div className="shell split"><div><h2>{"Cybersecurity capstones."}<br />{"Workforce development."}</h2>
 <p>{"SozoRock’s recurring Capella University capstone combines instructional sessions with hands-on cybersecurity projects to develop workforce capabilities in identity and access management, cloud security, and governance, risk and compliance."}</p>
 <a className="textlink" href="/platforms/applied-learning">{"Explore"}</a>
 </div>
@@ -123,8 +123,8 @@ case "/": return <>
 <p>{"Applied AI systems, cybersecurity and AI governance through practical projects."}</p>
 <a className="textlink" href="/platforms/ai-lab">{"Explore"}</a>
 </article>
-<article><h3>{"AI and Society"}</h3>
-<p>{"A proposed forum for public participation in AI decisions affecting education and work."}</p>
+<article><h3>{"AI & Society"}</h3>
+<p>{"A proposed initiative bringing students, workers and institutions into decisions about AI in education and work."}</p>
 <a className="textlink" href="/ai-society">{"Explore"}</a>
 </article>
 </div>
@@ -132,11 +132,11 @@ case "/": return <>
 </>;
 case "/platforms": return <>
 <section className="hero blue"><div className="shell"><h1>{"What we do"}</h1>
-<p>{"Health equity, county intelligence, research and applied AI and cybersecurity learning."}</p>
+<p>{"Health systems, cybersecurity workforce development and AI & Society—supported by community evidence and research."}</p>
 </div>
 </section>
 <section className="section"><div className="shell rows"><article><h2>{"SozoRock Health"}</h2>
-<div><p>{"Health Equity Hubs, Health Access Day and provider partnerships address the practical conditions around care: health literacy, digital readiness and local support."}</p>
+<div><p>{"Health systems and health equity: county evidence, digital readiness and proposed Health Equity Hubs to help communities plan access to care."}</p>
 <a className="textlink" href="/platforms/health">{"Explore"}</a>
 </div>
 </article>
@@ -160,13 +160,13 @@ case "/platforms": return <>
 <a className="textlink" href="/platforms/ai-lab">{"Explore"}</a>
 </div>
 </article>
-<article><h2>{"SozoRock × Capella University"}</h2>
-<div><p>{"Recurring six-month cybersecurity projects, designed, evaluated and personally mentored by Dr. Oluwabiyi Adeyemo."}</p>
+<article><h2>{"Cybersecurity capstones"}</h2>
+<div><p>{"SozoRock’s recurring Capella University capstone combines instruction, hands-on cybersecurity projects and practitioner mentoring for workforce development."}</p>
 <a className="textlink" href="/platforms/applied-learning">{"Explore"}</a>
 </div>
 </article>
-<article><h2>{"AI and Society"}</h2>
-<div><p>{"A proposed forum for students, educators, workers and institutions to examine AI decisions and recommend safeguards."}</p>
+<article><h2>{"AI & Society"}</h2>
+<div><p>{"A proposed initiative for public participation in AI governance: participants examine decisions, recommend safeguards and invite institutional responses."}</p>
 <a className="textlink" href="/ai-society">{"Explore"}</a>
 </div>
 </article>
@@ -174,8 +174,8 @@ case "/platforms": return <>
 </section>
 </>;
 case "/platforms/health": return <>
-<section className="hero blue"><div className="shell"><h1>{"SozoRock Health"}</h1>
-<p>{"Health equity in libraries, communities and homes."}</p>
+<section className="hero blue"><div className="shell"><h1>{"Health systems & health equity"}</h1>
+<p>{"SozoRock Health brings county evidence, digital readiness and community partnerships to the barriers people face in accessing care."}</p>
 <a className="action" href="/partner">{"Partner"}</a>
 </div>
 </section>
@@ -263,12 +263,12 @@ case "/platforms/health": return <>
 </section>
 </>;
 case "/platforms/applied-learning": return <>
-<section className="hero blue"><div className="shell"><h1>{"Applied cybersecurity. Six-month cohorts."}</h1>
-<p>{"A recurring six-month cybersecurity capstone with SozoRock and Capella University: instructional sessions, hands-on experience and workforce capability development."}</p>
-<a className="action" href="/partner">{"Partner"}</a>
+<section className="hero blue"><div className="shell"><h1>{"Cybersecurity capstones for workforce development."}</h1>
+<p>{"SozoRock’s recurring six-month Capella University capstone combines instructional sessions, hands-on projects and personal mentoring to develop practical cybersecurity capabilities."}</p>
+<a className="action" href="/partner">{"Discuss a capstone"}</a>
 </div>
 </section>
-<section className="section"><div className="shell split"><h2>{"Instruction. Practice. Workforce capabilities."}</h2>
+<section className="section"><div className="shell split"><h2>{"Cybersecurity skills, applied to project work"}</h2>
 <div><p>{"Instructional sessions prepare learners to apply concepts in hands-on projects. Learners configure access controls, review cloud security, assess risk and document their recommendations. Focus areas: identity and access management, governance, risk and compliance (GRC), cloud security and least privilege."}</p>
 </div>
 </div>
@@ -284,7 +284,7 @@ case "/platforms/applied-learning": return <>
 </div>
 </section>
 <section className="section soft"><div className="shell split"><h2>{"For universities and employers"}</h2>
-<div><p>{"Discuss an applied cybersecurity project for your learners. Project scope, supervision and assessment would be agreed before work begins."}</p>
+<div><p>{"Universities can discuss a mentored capstone for master’s learners. Employers can discuss project briefs and workforce learning needs. Scope, supervision and evaluation would be agreed before work begins."}</p>
 </div>
 </div>
 </section>
@@ -338,8 +338,8 @@ case "/platforms/ai-lab": return <>
 </section>
 </>;
 case "/ai-society": return <>
-<section className="hero blue"><div className="shell"><h1>{"A public voice in AI decisions."}</h1>
-<p>{"Who Decides? A proposed SozoRock initiative for AI in education and work."}</p>
+<section className="hero blue"><div className="shell"><h1>{"AI & Society"}</h1>
+<p>{"Public participation in AI decisions about education and work. Who Decides? is a proposed SozoRock initiative."}</p>
 <a className="action" href="#interest">{"Participate"}</a>
 </div>
 </section>
@@ -358,7 +358,7 @@ case "/ai-society": return <>
 </div>
 </div>
 </section>
-<section className="section soft"><div className="shell split"><h2>{"Help make the first discussions possible"}</h2>
+<section className="section soft"><div className="shell split"><h2>{"Fund public participation in AI governance"}</h2>
 <div><p>{"Support could fund participant compensation, accessible facilitation and publication of findings. Hosts could contribute venues and expertise. Support would not direct the findings."}</p>
 <a className="textlink" href="/support">{"Discuss support"}</a>
 </div>
@@ -543,8 +543,8 @@ case "/events": return <>
 </div>
 </section>
 <section className="section"><div className="shell split"><h2>{"Future discussions"}</h2>
-<div><p>{"AI and Society is developing discussions on AI in education and work. Dates and participation details will appear when confirmed."}</p>
-<a className="textlink" href="/ai-society">{"AI and Society"}</a>
+<div><p>{"AI & Society is developing discussions on AI in education and work. Dates and participation details will appear when confirmed."}</p>
+<a className="textlink" href="/ai-society">{"AI & Society"}</a>
 </div>
 </div>
 </section>
@@ -621,7 +621,7 @@ case "/support": return <>
 </div>
 </section>
 <section className="section soft"><div className="shell split"><h2>{"Learning and public participation"}</h2>
-<div><p>{"Support applied AI and cybersecurity learning, recurring graduate projects or planned AI and Society discussions."}</p>
+<div><p>{"Support mentored cybersecurity capstones, applied AI learning or public participation in AI governance. Funding would support agreed project delivery and participation costs."}</p>
 </div>
 </div>
 </section>
@@ -654,7 +654,7 @@ case "/partner": return <>
 </div>
 </section>
 <section className="section soft"><div className="shell split"><h2>{"Universities and employers"}</h2>
-<div><p>{"Develop an applied cybersecurity cohort, AI learning project, research collaboration or workforce initiative."}</p>
+<div><p>{"Discuss a cybersecurity capstone combining instruction, hands-on projects, practitioner mentoring and evaluation—or an applied AI learning or research collaboration."}</p>
 </div>
 </div>
 </section>

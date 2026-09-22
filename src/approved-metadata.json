@@ -1,19 +1,19 @@
 {
   "/": {
-    "title": "SozoRock Foundation | Health Equity, Cybersecurity & Research",
-    "description": "Support health equity, explore county health data and discover SozoRock\u2019s cybersecurity capstones, applied AI learning and public-interest research."
+    "title": "SozoRock Foundation | Health Systems, Cybersecurity & AI",
+    "description": "Explore SozoRock’s health equity initiatives, cybersecurity capstones and AI & Society. Support community health access, workforce learning and research."
   },
   "/platforms": {
     "title": "What we do | SozoRock Foundation",
-    "description": "Health equity, county intelligence, research and applied AI and cybersecurity learning."
+    "description": "Health systems, cybersecurity workforce development and AI & Society. Explore SozoRock’s programs, county evidence and research."
   },
   "/platforms/health": {
-    "title": "Health Equity Hubs & Primary Care Access | SozoRock",
-    "description": "Health equity in libraries, communities and homes."
+    "title": "Health Systems & Health Equity | SozoRock Health",
+    "description": "Explore SozoRock Health’s proposed Health Equity Hubs, primary care pilot and county evidence for community health-access planning."
   },
   "/platforms/applied-learning": {
-    "title": "Cybersecurity Capstone & Workforce Learning | SozoRock",
-    "description": "A recurring six-month cybersecurity capstone combining instructional sessions, hands-on projects and workforce capability development."
+    "title": "Cybersecurity Capstone & Workforce Development | SozoRock",
+    "description": "Recurring six-month cybersecurity capstones with instruction, hands-on projects, mentoring and evaluation. Explore SozoRock’s Capella University collaboration."
   },
   "/platforms/institute": {
     "title": "SozoRock Global Institute | Health and Governance Research",
@@ -24,8 +24,8 @@
     "description": "Applied AI systems. Cybersecurity. AI governance."
   },
   "/ai-society": {
-    "title": "AI and Society | Public Participation in AI Decisions",
-    "description": "Who Decides? A proposed SozoRock initiative for AI in education and work."
+    "title": "AI & Society | Education, Work & Public Participation | SozoRock",
+    "description": "SozoRock’s proposed AI governance initiative brings public voices into education and work: decisions, safeguards and institutional responses."
   },
   "/publications": {
     "title": "Publications | SozoRock Foundation",
@@ -57,7 +57,7 @@
   },
   "/insights": {
     "title": "Insights | SozoRock Foundation",
-    "description": "Notes from SozoRock\u2019s research and programs."
+    "description": "Notes from SozoRock’s research and programs."
   },
   "/events": {
     "title": "SozoRock Preplanning Roundtable & Research Briefings",
@@ -69,15 +69,15 @@
   },
   "/leadership": {
     "title": "Leadership | SozoRock Foundation",
-    "description": "The people responsible for SozoRock\u2019s work."
+    "description": "The people responsible for SozoRock’s work."
   },
   "/support": {
     "title": "Fund Health Equity Programs | SozoRock Foundation",
-    "description": "Support SozoRock\u2019s planned New York primary care pilot\u2014or discuss funding for health equity, county data, research and applied learning."
+    "description": "Support SozoRock’s planned New York primary care pilot—or discuss funding for health equity, county data, research and applied learning."
   },
   "/partner": {
-    "title": "Health, Research & Learning Partnerships | SozoRock",
-    "description": "Bring local knowledge, clinical expertise, technology or applied learning to a shared project."
+    "title": "Health Systems & Workforce Partnerships | SozoRock",
+    "description": "Discuss health equity hubs, cybersecurity capstones, applied AI learning or research partnerships with SozoRock."
   },
   "/contact": {
     "title": "Contact SozoRock | SozoRock Foundation",
