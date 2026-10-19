@@ -7,9 +7,9 @@ import { CoverButton, CitationButton, DiscussionScenario } from "./ApprovedInter
 export function ApprovedPage({pathname}) { switch(pathname) {
 case "/": return <>
 <div className="blue"><section className="hero home"><div className="shell homegrid"><div><h1>{"A clearer route to primary care."}</h1>
-<p>{"Help fund SozoRock’s planned New York pilot for 25 people facing barriers to ongoing primary care."}</p>
+<p>{"Help fund a year of primary care for up to 25 New Yorkers living with a chronic condition and financial need."}</p>
 <a className="action" href="/support">{"Support"}</a>
-<p className="fine">{"Planned for 2027 with Dr. Michael Purcell and PIOC."}<br />{"Clinical care remains with the licensed provider."}</p>
+<p className="fine">{"Launching January 2027 with Dr. Michael Purcell and PIOC."}<br />{"Clinical care remains with the licensed provider."}</p>
 </div>
 <div className="bookrack"><figure><CoverButton cover="rebs" /></figure>
 <figure><CoverButton cover="rrg" /></figure>
@@ -47,7 +47,7 @@ case "/": return <>
 </article>
 </div>
 <p className="modelnote">{"Proposed partner models. Local implementation depends on agreed responsibilities, available services and delivery capacity. Clinical care remains with licensed providers."}</p>
-<p className="modelnote">{"Also within SozoRock Health: Health Access Day, provider platform readiness, workforce development and the planned primary care pilot."}</p>
+<p className="modelnote">{"Also within SozoRock Health: Health Access Day, provider platform readiness, workforce development and the Primary Care Access Program, launching January 2027."}</p>
 </div>
 </section>
 <section className="section soft"><div className="shell"><div className="split"><h2>{"County data for"}<br />{"health-access planning."}</h2>
@@ -237,9 +237,11 @@ case "/platforms/health": return <>
 </div>
 </div>
 </section>
-<section className="section soft"><div className="shell split"><h2>{"The planned"}<br />{"25-person pilot."}</h2>
-<div><p>{"Help fund a planned 2027 New York pilot for people facing barriers to ongoing primary care, with Dr. Michael Purcell and PIOC."}</p>
-<p className="fine">{"The pilot would combine nonclinical support and health education. Clinical care remains with the licensed provider."}</p>
+<section className="section soft" id="primary-care-access"><div className="shell split"><h2>{"Primary Care"}<br />{"Access Program."}</h2>
+<div><p>{"Beginning January 2027, the Foundation will sponsor 12 months of primary care support for up to 25 New Yorkers, one per household. Participants are 64 or younger, have financial need and live with a chronic condition such as diabetes or high blood pressure, in any of New York's 62 counties."}</p>
+<p>{"Each participant receives a sponsored direct primary care membership with Dr. Michael Purcell and PIOC, ongoing telehealth, help with transportation and health access education."}</p>
+<p>{"Starting with up to 25 keeps the first cohort small enough to show where the pathway works, where it fails and what should change before expansion."}</p>
+<p className="fine">{"Part of the SozoRock Health Equity Initiative. Clinical care remains with the licensed provider. Membership is not health insurance."}</p>
 <a className="textlink" href="/support">{"Support"}</a>
 </div>
 </div>
@@ -542,7 +544,14 @@ case "/events": return <>
 </div>
 </div>
 </section>
-<section className="section"><div className="shell split"><h2>{"Future discussions"}</h2>
+<section className="section"><div className="shell split"><h2>{"The Fireside and the Working Roundtable"}</h2>
+<div><p>{"A planned series on rural health transformation, measured locally. The Fireside frames the choices with industry, county and academic leaders, moderated by SozoRock. The Working Roundtable tests the implications with providers, public health, educators and communities. A Local Outcomes Brief follows."}</p>
+<p className="fine">{"Dates, locations and participants will appear when confirmed."}</p>
+<a className="textlink" href="/partner">{"Partner"}</a>
+</div>
+</div>
+</section>
+<section className="section soft"><div className="shell split"><h2>{"Future discussions"}</h2>
 <div><p>{"AI & Society is developing discussions on AI in education and work. Dates and participation details will appear when confirmed."}</p>
 <a className="textlink" href="/ai-society">{"AI & Society"}</a>
 </div>
@@ -600,13 +609,15 @@ case "/leadership": return <>
 </section>
 </>;
 case "/support": return <>
-<section className="hero blue"><div className="shell"><h1>{"Help fund the 25-person pilot."}</h1>
-<p>{"Support SozoRock’s planned New York primary care pilot—or discuss funding for health equity, county data, research and applied learning."}</p>
+<section className="hero blue"><div className="shell"><h1>{"Help fund primary care access."}</h1>
+<p>{"Sponsor a year of primary care for up to 25 New Yorkers starting January 2027—or discuss funding for health equity, county data, research and applied learning."}</p>
 <a className="action" href="#inquiry">{"Support"}</a>
 </div>
 </section>
-<section className="section"><div className="shell split"><h2>{"Primary care pilot"}</h2>
-<div><p>{"Help fund nonclinical coordination, health education and evaluation for the planned 2027 New York pilot with Dr. Michael Purcell and PIOC."}</p>
+<section className="section"><div className="shell split"><h2>{"Primary Care Access Program"}</h2>
+<div><p>{"$108,000 funds the first 12-month cohort, starting January 2027: about $4,320 to support one participant for a full year, including the direct primary care membership with Dr. Michael Purcell and PIOC, ongoing telehealth, transportation help, health access education, coordination and reporting."}</p>
+<p>{"Sponsorship levels: Community $5,000 · Access $10,000 · Principal $25,000 · Lead $50,000. Other amounts are welcome."}</p>
+<p className="fine">{"Funds are confirmed before anyone enrolls. Sponsors receive reports at months 3, 6, 9 and 12. Renewal is optional. Sponsors do not select participants or influence clinical care."}</p>
 </div>
 </div>
 </section>
@@ -644,7 +655,7 @@ case "/partner": return <>
 </div>
 </section>
 <section className="section soft"><div className="shell split"><h2>{"Licensed providers"}</h2>
-<div><p>{"Discuss the planned primary care pilot or digital readiness around your existing clinical platform."}</p>
+<div><p>{"Discuss the Primary Care Access Program, launching January 2027, or digital readiness around your existing clinical platform."}</p>
 </div>
 </div>
 </section>
