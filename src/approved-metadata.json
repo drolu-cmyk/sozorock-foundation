@@ -1,15 +1,15 @@
 {
   "/": {
-    "title": "SozoRock Foundation | Health Systems, Cybersecurity & AI",
-    "description": "Explore SozoRock’s health equity initiatives, cybersecurity capstones and AI & Society. Support community health access, workforce learning and research."
+    "title": "SozoRock Foundation | Primary Care Access, Cybersecurity Learning & AI",
+    "description": "A New York 501(c)(3) expanding primary care access from January 2027, with graduate cybersecurity learning, public-interest research and AI & Society."
   },
   "/platforms": {
     "title": "What we do | SozoRock Foundation",
     "description": "Health systems, cybersecurity workforce development and AI & Society. Explore SozoRock’s programs, county evidence and research."
   },
   "/platforms/health": {
-    "title": "Health Systems & Health Equity | SozoRock Health",
-    "description": "Explore SozoRock Health’s proposed Health Equity Hubs, primary care pilot and county evidence for community health-access planning."
+    "title": "Primary Care Access Program, New York 2027 | SozoRock Health",
+    "description": "SozoRock Health's Primary Care Access Program for up to 25 New Yorkers from January 2027, plus proposed Health Equity Hubs and county evidence."
   },
   "/platforms/applied-learning": {
     "title": "Cybersecurity Capstone & Workforce Development | SozoRock",
@@ -60,8 +60,8 @@
     "description": "Notes from SozoRock’s research and programs."
   },
   "/events": {
-    "title": "SozoRock Preplanning Roundtable & Research Briefings",
-    "description": "Health access, research and AI in public life."
+    "title": "Roundtables, Fireside and Briefings | SozoRock Foundation",
+    "description": "The 2025 Western New York roundtable and the planned Fireside and Working Roundtable on rural health, measured locally."
   },
   "/about": {
     "title": "Who we are | SozoRock Foundation",
@@ -72,8 +72,8 @@
     "description": "The people responsible for SozoRock’s work."
   },
   "/support": {
-    "title": "Fund Health Equity Programs | SozoRock Foundation",
-    "description": "Support SozoRock’s planned New York primary care pilot—or discuss funding for health equity, county data, research and applied learning."
+    "title": "Sponsor Primary Care Access in New York | SozoRock Foundation",
+    "description": "Sponsor a year of primary care for up to 25 New Yorkers from January 2027. Levels from $5,000, with quarterly reports."
   },
   "/partner": {
     "title": "Health Systems & Workforce Partnerships | SozoRock",

@@ -34,6 +34,7 @@
 @media(prefers-reduced-motion:reduce){.approved-site *{scroll-behavior:auto!important;transition:none!important}}
 /* Production controls retain validation, native dialogs, and keyboard behavior. */
 .approved-site{font-family:"Instrument Sans Variable","Instrument Sans",Arial,sans-serif;color:#071d3b;background:#fff}
+.approved-site .skip-link{color:#fff}
 .approved-site .page-view{min-height:0}.approved-site .section{border:0}.approved-site p{letter-spacing:0}.approved-site .hero h1{max-width:1000px}.approved-site .home h1{max-width:680px}
 .approved-site .foundation-header{position:relative;box-shadow:none;border:0;background:#fff}.approved-site .foundation-header.on-cobalt{background:#0644ad;color:white}.approved-site .foundation-header-inner{min-height:118px}.approved-site .foundation-wordmark{color:inherit}.approved-site .foundation-support-link{border:0;border-radius:0;padding:12px 0;text-decoration:underline;text-underline-offset:8px;background:transparent;color:inherit}
 .approved-site .footer .brand{display:block}.approved-site .footer a{white-space:normal}.approved-site .footertop nav{display:flex;flex-direction:column;align-items:flex-start;gap:14px}.approved-site .footer nav a{display:block;line-height:1.5}.approved-site .footer .legal{display:flex;flex-wrap:wrap;gap:14px 25px}

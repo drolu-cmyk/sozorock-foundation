@@ -19,9 +19,9 @@ export function HomePage() {
       <div className="shell approval-hero-grid">
         <div className="approval-hero-copy">
           <h1 id="foundation-title">A clearer route<br />to primary care.</h1>
-          <p>Starting with 25 people facing barriers to ongoing care in New York.</p>
-          <Link className="approval-action is-light" href="/support">Support the pilot</Link>
-          <div className="approval-pilot-note"><span>Planned for 2027 with Dr. Michael Purcell and PIOC.</span><span>Clinical care remains with the licensed provider.</span></div>
+          <p>Help fund a year of primary care for up to 25 New Yorkers living with a chronic condition and financial need.</p>
+          <Link className="approval-action is-light" href="/support">Support</Link>
+          <div className="approval-pilot-note"><span>Launching January 2027 with Dr. Michael Purcell and Purcell Integrative Osteopathic Care.</span><span>Clinical care remains with the licensed provider.</span></div>
         </div>
         <div className="approval-publications" aria-label="Featured SozoRock publications">
           <Link className="approval-book approval-book-rebs" href="/publication/rebs-v1-2025" aria-label="Rural Equity Blueprint Series, Volume 1"><img src="/media/rebs-cover.webp" alt="Rural Equity Blueprint Series, Volume 1 cover" /></Link>

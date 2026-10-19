@@ -183,10 +183,12 @@ async function inspectPage(name, route, viewport, suffix) {
 
       if (element.matches("input:not([type='checkbox']):not([type='radio']), select, textarea, button, a.button")) {
         const background = effectiveBackground(element.parentElement || element);
-        const border = parseColor(style.borderTopColor);
         const elementBackground = parseColor(style.backgroundColor);
         const selector = simpleSelector(element);
-        if (border && border.a > 0) {
+        for (const side of ["Top", "Right", "Bottom", "Left"]) {
+          if (Number.parseFloat(style[`border${side}Width`]) <= 0 || ["none", "hidden"].includes(style[`border${side}Style`])) continue;
+          const border = parseColor(style[`border${side}Color`]);
+          if (!border || border.a <= 0) continue;
           const ratio = contrast(composite(border, background), background);
           if (ratio < 3) {
             const key = `${selector}|border|${colorString(border)}|${colorString(background)}`;
@@ -196,7 +198,8 @@ async function inspectPage(name, route, viewport, suffix) {
             }
           }
         }
-        if (elementBackground && elementBackground.a > 0 && (element.matches("button, a.button"))) {
+        const hasVisibleLabel = [element, ...element.querySelectorAll("*")].some((node) => isVisible(node) && directText(node));
+        if (elementBackground && elementBackground.a > 0 && element.matches("button, a.button") && !hasVisibleLabel) {
           const ratio = contrast(composite(elementBackground, background), background);
           if (ratio < 3 && style.boxShadow === "none") {
             const key = `${selector}|fill|${colorString(elementBackground)}|${colorString(background)}`;

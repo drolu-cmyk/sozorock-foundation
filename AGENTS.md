@@ -5,7 +5,7 @@ This repository is the production parent website for The SozoRock Foundation. Th
 ## Durable requirements
 
 - Keep the primary navigation compact and stable: What we do, Who we are, and a separated Support action. Keep Research, Partner and Contact in the footer or deeper routes. Keep the canonical `/platforms` route unless a separate migration is approved.
-- Lock the parent homepage opening to “A clearer route to primary care.” with the planned 25-person 2027 New York pilot, qualified partner attribution and the clinical-responsibility boundary. Do not replace, rotate or reinterpret this hero headline without an explicit new user instruction.
+- Lock the parent homepage opening to “A clearer route to primary care.” with the Primary Care Access Program for up to 25 New Yorkers launching January 2027, qualified partner attribution and the clinical-responsibility boundary. Do not replace, rotate or reinterpret this hero headline without an explicit new user instruction.
 - The homepage premise is evidence moving into practical use. Connect that premise naturally to health access, cybersecurity experiential learning, public interest research and responsible AI.
 - Do not use visible eyebrow labels. Avoid repetitive label, headline, paragraph and CTA templates. Let hierarchy come from typography, whitespace, contrast, evidence and composition.
 - Keep public copy concise, specific and natural. Avoid generic consulting language, AI sounding prose, internal planning terms and mechanical process writing. Prefer problem, evidence, response and action.
@@ -21,7 +21,18 @@ This repository is the production parent website for The SozoRock Foundation. Th
 - Preserve `/publication/hsa-v1-2026`, `/publication/rrg-v1-2025` and `/publication/rebs-v1-2025` as individual publication routes.
 - Keep research pages oriented around why the research exists, who can use it, what decision it can inform, its evidence limits and a clear access or engagement path. Do not reduce publications to catalog records.
 - Present cybersecurity experiential learning as a recurring Capella University collaboration in which graduate cybersecurity learners move from instruction into six months of applied work. Keep verified capability language such as identity and access management, GRC, cloud security, risk, least privilege and evidence assurance. Capella retains academic ownership, oversight and grading. Do not imply endorsement.
-- The direct primary care health access pilot is planned for 2027, not 2026. Explain why the first cohort is 25 people: to test the nonclinical pathway, identify failure points and improve the model before expansion.
+- Name: Primary Care Access Program, part of the SozoRock Health Equity Initiative.
+- Starts January 2027. Each participant gets 12 months of support.
+- Up to 25 New Yorkers, one per household. Always write "up to 25" when describing cohort size.
+- Eligibility: aged 64 or younger, financial need, and a chronic condition such as diabetes or high blood pressure. Open to residents of any of New York's 62 counties.
+- Services: sponsored direct primary care membership with Dr. Michael Purcell and Purcell Integrative Osteopathic Care, ongoing telehealth, help with transportation, and health access education. Written consent covers naming Dr. Purcell and Purcell Integrative Osteopathic Care.
+- Always write Purcell Integrative Osteopathic Care in full; do not abbreviate the practice name.
+- Clinical care remains with the licensed provider. Membership is not health insurance.
+- Why the first cohort is small: to show where the pathway works, where it fails and what should change before expansion.
+- First-cohort budget: $108,000, about $4,320 per participant for a full year. This covers the membership, telehealth, transportation help, health access education, coordination and reporting.
+- Sponsorship levels: Community $5,000, Access $10,000, Principal $25,000, Lead $50,000. Other amounts are welcome.
+- Funds are confirmed before anyone enrolls. Sponsors receive reports at months 3, 6, 9 and 12. Renewal is optional for sponsors. Sponsors do not select participants or influence clinical care.
+- The Fireside and the Working Roundtable are a planned series; do not publish dates, locations, participants or partner organizations until confirmed.
 - The health access story may use the verified 2025 Western New York preplanning roundtable and REBS evidence. The reported figure of more than 12,000 residents per primary care clinician must remain visibly attributed as participant reported context. Do not publish wait time, travel duration or similar figures until their exact source is verified.
 - Show CB CAP as a peer product alongside Health, Global Institute and AI Lab only where that architecture remains accurate. Its redesign is a separate assignment.
 - Do not describe Health Systems Assurance as validated, certified, proven, adopted or a standard. Present its constructs as proposed analytical tools and a research agenda.

@@ -5,7 +5,7 @@ const routes = [
   {
     title: "Health access",
     copy: "Understand where access breaks, then test a nonclinical path into ongoing care.",
-    proof: "2025 roundtable evidence informs a planned 2027 New York pilot.",
+    proof: "The Primary Care Access Program launches January 2027 with 12 months of support for up to 25 New Yorkers.",
     href: "/platforms/health",
   },
   {

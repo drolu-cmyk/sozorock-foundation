@@ -59,10 +59,10 @@ const overrides = {
     ],
   },
   "/platforms/health": {
-    title: "2027 New York Health Access Pilot | SozoRock Health",
-    description: "A planned 2027 New York pilot testing a clearer nonclinical path into ongoing primary care with direct primary care partner PIOC.",
+    title: "Primary Care Access Program, New York 2027 | SozoRock Health",
+    description: "SozoRock Health's Primary Care Access Program for up to 25 New Yorkers from January 2027, plus proposed Health Equity Hubs and county evidence.",
     keywords: [
-      "2027 New York health access pilot",
+      "primary care access program",
       "health equity New York",
       "health systems",
       "health equity hubs",
