@@ -20,6 +20,10 @@ const publicBucketWindowMs = 60_000;
 const publicRequestLimit = 6;
 const publicGlobalRequestLimit = 60;
 
+function modelExecutionEnabled() {
+  return process.env.FOUNDATION_MODEL_EXECUTION_ENABLED === "true";
+}
+
 function response(statusCode, body, headers = securityHeaders) {
   return {
     statusCode,
@@ -173,6 +177,9 @@ function requestBody(event) {
 }
 
 export async function handler(event) {
+  if (typeof event?.operation === "string" && event.operation.startsWith("deployment:") && !modelExecutionEnabled()) {
+    return response(503, { error: "model_execution_paused" });
+  }
   if (event?.operation === "deployment:model-probe") {
     if (!modelAuthConfigured()) return response(503, { error: "model_service_not_configured" });
     const model = typeof event?.model === "string" ? event.model : "";
@@ -247,7 +254,8 @@ export async function handler(event) {
     return response(200, {
       ok: true,
       service: "foundation-agents",
-      modelConfigured: modelAuthConfigured(),
+      modelConfigured: modelExecutionEnabled() && modelAuthConfigured(),
+      modelExecutionEnabled: modelExecutionEnabled(),
       modelAuthMode: modelAuthMode(),
       modelApiMode: modelApiMode(),
       model: process.env.OPENAI_AGENT_MODEL || null,
@@ -261,6 +269,7 @@ export async function handler(event) {
   }
 
   if (method !== "POST" || path !== "/internal/v1/run") return response(404, { error: "not_found" });
+  if (!modelExecutionEnabled()) return response(503, { error: "model_execution_paused" });
   if (!modelAuthConfigured()) return response(503, { error: "model_service_not_configured" });
 
   try {

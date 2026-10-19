@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+if [[ "${FOUNDATION_MODEL_EXECUTION_ENABLED:-false}" != 'true' ]]; then
+  echo 'Model deployment is paused pending an approved operating budget.' >&2
+  exit 1
+fi
+
 : "${AWS_REGION:?AWS_REGION is required}"
 : "${ACCOUNT_ID:?ACCOUNT_ID is required}"
 : "${FUNCTION_NAME:?FUNCTION_NAME is required}"
@@ -163,7 +168,7 @@ jq -n \
   --arg service "${OPENAI_SERVICE_ACCOUNT_ID:-}" \
   --arg audience "${OPENAI_WIF_AUDIENCE:-}" \
   --arg bedrockRegion "$AWS_REGION" \
-  '{Variables:{OPENAI_AGENT_MODEL:$model,BEDROCK_MODEL_REGION:$bedrockRegion,OPENAI_API_KEY:$key,OPENAI_IDENTITY_PROVIDER_ID:$provider,OPENAI_SERVICE_ACCOUNT_ID:$service,OPENAI_WIF_AUDIENCE:$audience}} | .Variables |= with_entries(select(.value != ""))' \
+  '{Variables:{FOUNDATION_MODEL_EXECUTION_ENABLED:"true",OPENAI_AGENT_MODEL:$model,BEDROCK_MODEL_REGION:$bedrockRegion,OPENAI_API_KEY:$key,OPENAI_IDENTITY_PROVIDER_ID:$provider,OPENAI_SERVICE_ACCOUNT_ID:$service,OPENAI_WIF_AUDIENCE:$audience}} | .Variables |= with_entries(select(.value != ""))' \
   > "$work/lambda-env.json"
 
 aws lambda update-function-code --function-name "$FUNCTION_NAME" --zip-file "fileb://$LAMBDA_ZIP" >/dev/null

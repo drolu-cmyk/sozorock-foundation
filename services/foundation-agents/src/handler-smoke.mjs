@@ -17,6 +17,7 @@ const saved = {
   OPENAI_SERVICE_ACCOUNT_ID: process.env.OPENAI_SERVICE_ACCOUNT_ID,
   OPENAI_WIF_AUDIENCE: process.env.OPENAI_WIF_AUDIENCE,
   AWS_REGION: process.env.AWS_REGION,
+  FOUNDATION_MODEL_EXECUTION_ENABLED: process.env.FOUNDATION_MODEL_EXECUTION_ENABLED,
 };
 for (const key of Object.keys(saved)) delete process.env[key];
 
@@ -28,6 +29,7 @@ assert.equal(redirect.headers["strict-transport-security"], "max-age=31536000; i
 const health = await handler(event("GET", "/internal/health"));
 assert.equal(health.statusCode, 200);
 assert.equal(JSON.parse(health.body).modelConfigured, false);
+assert.equal(JSON.parse(health.body).modelExecutionEnabled, false);
 assert.equal(JSON.parse(health.body).modelApiMode, "responses");
 assert.equal(health.headers["cache-control"], "no-store");
 assert.equal(health.headers["strict-transport-security"], "max-age=31536000; includeSubDomains; preload");
@@ -75,6 +77,32 @@ const runWithoutModel = await handler(
   event("POST", "/internal/v1/run", { graphId: "foundationSiteAssurance", input: { task: "test" } })
 );
 assert.equal(runWithoutModel.statusCode, 503);
+assert.equal(JSON.parse(runWithoutModel.body).error, "model_execution_paused");
+
+const previousFetch = globalThis.fetch;
+let modelRequests = 0;
+globalThis.fetch = async () => { modelRequests += 1; throw new Error("Unexpected model request"); };
+process.env.OPENAI_API_KEY = "test-only-not-a-credential";
+try {
+  for (const enabled of [undefined, "false", "TRUE", "1"]) {
+    if (enabled === undefined) delete process.env.FOUNDATION_MODEL_EXECUTION_ENABLED;
+    else process.env.FOUNDATION_MODEL_EXECUTION_ENABLED = enabled;
+    for (const operation of ["deployment:model-probe", "deployment:graph-smoke", "deployment:agent-canary"]) {
+      const paused = await handler({ operation, model: "openai.gpt-oss-120b" });
+      assert.equal(paused.statusCode, 503);
+      assert.equal(JSON.parse(paused.body).error, "model_execution_paused");
+    }
+    const pausedRun = await handler(event("POST", "/internal/v1/run", { graphId: "foundationSiteAssurance", input: { task: "test" } }));
+    assert.equal(JSON.parse(pausedRun.body).error, "model_execution_paused");
+  }
+  assert.equal(modelRequests, 0);
+  process.env.FOUNDATION_MODEL_EXECUTION_ENABLED = "true";
+  delete process.env.OPENAI_API_KEY;
+  const unconfiguredRun = await handler(event("POST", "/internal/v1/run", {}));
+  assert.equal(JSON.parse(unconfiguredRun.body).error, "model_service_not_configured");
+} finally {
+  globalThis.fetch = previousFetch;
+}
 
 const missingInternal = await handler(event("GET", "/internal/missing"));
 assert.equal(missingInternal.statusCode, 404);

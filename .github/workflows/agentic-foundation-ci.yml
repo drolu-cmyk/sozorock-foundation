@@ -61,7 +61,12 @@ jobs:
         run: bash ../../scripts/audit-npm-production.sh
 
       - name: Validate agent deployment shell
-        run: bash -n services/foundation-agents/scripts/deploy-control-plane.sh
+        run: |
+          bash -n services/foundation-agents/scripts/deploy-control-plane.sh
+          bash -n services/foundation-agents/scripts/deploy-public-guidance.sh
+
+      - name: Test restricted deployment and rollback
+        run: python3 services/foundation-agents/scripts/deploy-public-guidance-smoke.py
 
       - name: Validate workflow YAML
         run: ruby -e "require 'yaml'; Dir['.github/workflows/*.yml'].sort.each { |f| YAML.load_file(f); puts f }"
