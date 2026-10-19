@@ -9,7 +9,7 @@ case "/": return <>
 <div className="blue"><section className="hero home"><div className="shell homegrid"><div><h1>{"A clearer route to primary care."}</h1>
 <p>{"Help fund a year of primary care for up to 25 New Yorkers living with a chronic condition and financial need."}</p>
 <a className="action" href="/support">{"Support"}</a>
-<p className="fine">{"Launching January 2027 with Dr. Michael Purcell and PIOC."}<br />{"Clinical care remains with the licensed provider."}</p>
+<p className="fine">{"Launching January 2027 with Dr. Michael Purcell and Purcell Integrative Osteopathic Care."}<br />{"Clinical care remains with the licensed provider."}</p>
 </div>
 <div className="bookrack"><figure><CoverButton cover="rebs" /></figure>
 <figure><CoverButton cover="rrg" /></figure>
@@ -239,7 +239,7 @@ case "/platforms/health": return <>
 </section>
 <section className="section soft" id="primary-care-access"><div className="shell split"><h2>{"Primary Care"}<br />{"Access Program."}</h2>
 <div><p>{"Beginning January 2027, the Foundation will sponsor 12 months of primary care support for up to 25 New Yorkers, one per household. Participants are 64 or younger, have financial need and live with a chronic condition such as diabetes or high blood pressure, in any of New York's 62 counties."}</p>
-<p>{"Each participant receives a sponsored direct primary care membership with Dr. Michael Purcell and PIOC, ongoing telehealth, help with transportation and health access education."}</p>
+<p>{"Each participant receives a sponsored direct primary care membership with Dr. Michael Purcell and Purcell Integrative Osteopathic Care, ongoing telehealth, help with transportation and health access education."}</p>
 <p>{"Starting with up to 25 keeps the first cohort small enough to show where the pathway works, where it fails and what should change before expansion."}</p>
 <p className="fine">{"Part of the SozoRock Health Equity Initiative. Clinical care remains with the licensed provider. Membership is not health insurance."}</p>
 <a className="textlink" href="/support">{"Support"}</a>
@@ -615,7 +615,7 @@ case "/support": return <>
 </div>
 </section>
 <section className="section"><div className="shell split"><h2>{"Primary Care Access Program"}</h2>
-<div><p>{"$108,000 funds the first 12-month cohort, starting January 2027: about $4,320 to support one participant for a full year, including the direct primary care membership with Dr. Michael Purcell and PIOC, ongoing telehealth, transportation help, health access education, coordination and reporting."}</p>
+<div><p>{"$108,000 funds the first 12-month cohort, starting January 2027: about $4,320 to support one participant for a full year, including the direct primary care membership with Dr. Michael Purcell and Purcell Integrative Osteopathic Care, ongoing telehealth, transportation help, health access education, coordination and reporting."}</p>
 <p>{"Sponsorship levels: Community $5,000 · Access $10,000 · Principal $25,000 · Lead $50,000. Other amounts are welcome."}</p>
 <p className="fine">{"Funds are confirmed before anyone enrolls. Sponsors receive reports at months 3, 6, 9 and 12. Renewal is optional. Sponsors do not select participants or influence clinical care."}</p>
 </div>

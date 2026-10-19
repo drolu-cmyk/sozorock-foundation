@@ -32,7 +32,7 @@ export function HealthInitiativePage() {
         <div className="shell health-2027-inner">
           <h2 id="health-pilot-title">Primary Care Access Program.</h2>
           <p className="experience-lead">Beginning January 2027, the Foundation will sponsor 12 months of primary care support for up to 25 New Yorkers, one per household. Participants are 64 or younger, have financial need and live with a chronic condition such as diabetes or high blood pressure, in any of New York's 62 counties.</p>
-          <p>Each participant receives a sponsored direct primary care membership with Dr. Michael Purcell and PIOC, ongoing telehealth, help with transportation and health access education.</p>
+          <p>Each participant receives a sponsored direct primary care membership with Dr. Michael Purcell and Purcell Integrative Osteopathic Care, ongoing telehealth, help with transportation and health access education.</p>
           <p>Starting with up to 25 keeps the first cohort small enough to show where the pathway works, where it fails and what should change before expansion.</p>
           <p className="experience-boundary">Part of the SozoRock Health Equity Initiative. Clinical care remains with the licensed provider. Membership is not health insurance.</p>
         </div>

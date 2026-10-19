@@ -25,7 +25,8 @@ This repository is the production parent website for The SozoRock Foundation. Th
 - Starts January 2027. Each participant gets 12 months of support.
 - Up to 25 New Yorkers, one per household. Always write "up to 25" when describing cohort size.
 - Eligibility: aged 64 or younger, financial need, and a chronic condition such as diabetes or high blood pressure. Open to residents of any of New York's 62 counties.
-- Services: sponsored direct primary care membership with Dr. Michael Purcell and PIOC, ongoing telehealth, help with transportation, and health access education. Written consent covers naming Dr. Purcell and PIOC.
+- Services: sponsored direct primary care membership with Dr. Michael Purcell and Purcell Integrative Osteopathic Care, ongoing telehealth, help with transportation, and health access education. Written consent covers naming Dr. Purcell and Purcell Integrative Osteopathic Care.
+- Always write Purcell Integrative Osteopathic Care in full; do not abbreviate the practice name.
 - Clinical care remains with the licensed provider. Membership is not health insurance.
 - Why the first cohort is small: to show where the pathway works, where it fails and what should change before expansion.
 - First-cohort budget: $108,000, about $4,320 per participant for a full year. This covers the membership, telehealth, transportation help, health access education, coordination and reporting.

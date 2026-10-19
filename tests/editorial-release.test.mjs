@@ -31,7 +31,7 @@ const page = route => readFileSync(`dist/client/${route || 'index'}.html`,'utf8'
 const visible = html => html.replace(/<script[\s\S]*?<\/script>/g,'').replace(/<[^>]+>/g,' ').replace(/\s+/g,' ');
 test('approved pages retain the core programs and claim boundaries',()=>{
   const home=visible(page(''));
-  for(const term of ['A clearer route to primary care.','Library Health Equity Hub','Community Health Equity Hub','Home Health Equity Hub','CB-CAP','SozoRock preplanning roundtable','Participant-reported','Launching January 2027','Dr. Michael Purcell and PIOC','Clinical care remains','Capella University capstone','instructional sessions','hands-on cybersecurity','personally mentors every learner']) assert.ok(home.includes(term),term);
+  for(const term of ['A clearer route to primary care.','Library Health Equity Hub','Community Health Equity Hub','Home Health Equity Hub','CB-CAP','SozoRock preplanning roundtable','Participant-reported','Launching January 2027','Dr. Michael Purcell and Purcell Integrative Osteopathic Care','Clinical care remains','Capella University capstone','instructional sessions','hands-on cybersecurity','personally mentors every learner']) assert.ok(home.includes(term),term);
   const learning=visible(page('platforms/applied-learning'));
   for(const term of ['capstone','six-month','Instructional sessions','hands-on projects','Six learners in the initial cohort','Five in the current cohort','Capella University retains academic oversight and grading']) assert.ok(learning.includes(term),term);
   assert.doesNotMatch(home,/12 months|two hours|founder/i);
