@@ -62,6 +62,15 @@ const publicGuide = await handler(event("POST", "/public/v1/navigate", { questio
 assert.equal(publicGuide.statusCode, 200);
 assert.equal(JSON.parse(publicGuide.body).links[0].key, "publications");
 
+const healthGuide = await handler(event("POST", "/public/v1/navigate", { question: "Tell me about primary care access" }));
+assert.equal(healthGuide.statusCode, 200);
+const healthAnswer = JSON.parse(healthGuide.body);
+for (const text of ["Primary Care Access Program", "January 2027", "12 months", "up to 25", "one per household", "64 or younger", "62 counties", "Purcell Integrative Osteopathic Care", "Membership is not health insurance"]) {
+  assert.ok(healthAnswer.answer.includes(text), text);
+}
+assert.equal(healthAnswer.links[0].key, "health");
+assert.equal(healthAnswer.knowledgeVersion, "2026-10-19-primary-care-access");
+
 const runWithoutModel = await handler(
   event("POST", "/internal/v1/run", { graphId: "foundationSiteAssurance", input: { task: "test" } })
 );
