@@ -1,0 +1,83 @@
+name: Publish legacy Health permanent redirect
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: legacy-health-redirect-production
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    if: github.repository == 'drolu-cmyk/sozorock-foundation' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment: production
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      LEGACY_HEALTH_DISTRIBUTION_ID: ${{ vars.LEGACY_HEALTH_DISTRIBUTION_ID }}
+      LEGACY_HEALTH_FUNCTION_NAME: ${{ vars.LEGACY_HEALTH_FUNCTION_NAME }}
+      LEGACY_HEALTH_DEPLOY_ROLE_ARN: ${{ vars.LEGACY_HEALTH_DEPLOY_ROLE_ARN }}
+      AWS_REGION: ${{ vars.AWS_REGION || 'us-east-1' }}
+      AWS_PAGER: ""
+      AWS_CLI_AUTO_PROMPT: "off"
+    steps:
+      - name: Check out the reviewed main revision
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+
+      - name: Set up Node
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e
+        with:
+          node-version: 24
+
+      - name: Validate settings and redirect behavior
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$LEGACY_HEALTH_DISTRIBUTION_ID"
+          test -n "$LEGACY_HEALTH_FUNCTION_NAME"
+          test -n "$LEGACY_HEALTH_DEPLOY_ROLE_ARN"
+          node --test tests/legacy-health-redirect.test.mjs
+
+      - name: Assume the existing bounded deployment role
+        uses: aws-actions/configure-aws-credentials@e6de054238d6b7531b4efff3b6587d9aade6a06c
+        with:
+          role-to-assume: ${{ env.LEGACY_HEALTH_DEPLOY_ROLE_ARN }}
+          role-session-name: LegacyHealthRedirect-${{ github.run_id }}
+          aws-region: ${{ env.AWS_REGION }}
+          unset-current-credentials: true
+          mask-aws-account-id: true
+
+      - name: Verify associations and back up both function stages
+        run: node scripts/publish-legacy-health-redirect.mjs backup
+
+      - name: Preserve the complete pre-change backup
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: legacy-health-redirect-before-${{ github.run_id }}
+          path: ${{ runner.temp }}/legacy-health-redirect/backup/
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Update, test DEVELOPMENT and publish with a fresh ETag
+        run: node scripts/publish-legacy-health-redirect.mjs publish
+
+      - name: Verify both hosts and their final destinations
+        run: node scripts/publish-legacy-health-redirect.mjs verify
+
+      - name: Preserve verification results
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: legacy-health-redirect-verification-${{ github.run_id }}
+          path: ${{ runner.temp }}/legacy-health-redirect/results/
+          if-no-files-found: ignore
+          retention-days: 30
