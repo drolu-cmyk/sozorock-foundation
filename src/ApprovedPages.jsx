@@ -27,26 +27,26 @@ case "/": return <>
 <a className="textlink" href="/platforms/health">{"Explore"}</a>
 </div>
 </div>
-<div className="hubset"><article><h3>{"Proposed: Library Health Equity Hub"}</h3>
+<div className="hubset"><article><h3>{"Library Health Equity Hub"}</h3>
 <p>{"Health literacy and digital support through local libraries."}</p>
 <details><summary>{"Details"}</summary>
-<p>{"A proposed library-based model for health information, digital skills and preparation to use provider-led services. Local partners would agree the space, connectivity, privacy and staff responsibilities."}</p>
+<p>{"A library based model in development for health information, digital skills and preparation to use provider-led services. Local partners would agree the space, connectivity, privacy and staff responsibilities."}</p>
 </details>
 </article>
-<article><h3>{"Proposed: Community Health Equity Hub"}</h3>
+<article><h3>{"Community Health Equity Hub"}</h3>
 <p>{"Health education and digital support through community organizations."}</p>
 <details><summary>{"Details"}</summary>
-<p>{"A proposed community-based model combining local health information, digital support and preparation for provider-led services. Activities would reflect local needs, partner capacity and available services."}</p>
+<p>{"A community based model in development combining local health information, digital support and preparation for provider-led services. Activities would reflect local needs, partner capacity and available services."}</p>
 </details>
 </article>
-<article><h3>{"Proposed: Home Health Equity Hub"}</h3>
+<article><h3>{"Home Health Equity Hub"}</h3>
 <p>{"Help preparing to use provider platforms from home."}</p>
 <details><summary>{"Details"}</summary>
-<p>{"A proposed home-based model for people who need support using devices, connectivity or provider platforms. It does not establish a home-care or home-health clinical service."}</p>
+<p>{"A home based model in development for people who need support using devices, connectivity or provider platforms. It does not establish a home-care or home-health clinical service."}</p>
 </details>
 </article>
 </div>
-<p className="modelnote">{"Proposed partner models. Local implementation depends on agreed responsibilities, available services and delivery capacity. Clinical care remains with licensed providers."}</p>
+<p className="modelnote">{"Partner models in development. Local implementation depends on agreed responsibilities, available services and delivery capacity. Clinical care remains with licensed providers."}</p>
 <p className="modelnote">{"Also within SozoRock Health: Health Access Day, provider platform readiness, workforce development and the Primary Care Access Program, launching January 2027."}</p>
 </div>
 </section>
@@ -124,50 +124,45 @@ case "/": return <>
 <a className="textlink" href="/platforms/ai-lab">{"Explore"}</a>
 </article>
 <article><h3>{"AI & Society"}</h3>
-<p>{"A proposed initiative bringing students, workers and institutions into decisions about AI in education and work."}</p>
+<p>{"An initiative bringing students, workers and institutions into decisions about AI in education and work."}</p>
 <a className="textlink" href="/ai-society">{"Explore"}</a>
 </article>
 </div>
 </section>
 </>;
 case "/platforms": return <>
-<section className="hero blue"><div className="shell"><h1>{"What we do"}</h1>
-<p>{"Health systems, cybersecurity workforce development and AI & Society—supported by community evidence and research."}</p>
+<section className="hero blue"><div className="shell"><h1>{"Our work"}</h1>
+<p>{"Three gaps, one loop. We listen to communities, study the evidence, build programs and publish results in access, capacity and trust."}</p>
 </div>
 </section>
-<section className="section"><div className="shell rows"><article><h2>{"SozoRock Health"}</h2>
-<div><p>{"Health systems and health equity: county evidence, digital readiness and proposed Health Equity Hubs to help communities plan access to care."}</p>
-<a className="textlink" href="/platforms/health">{"Explore"}</a>
+<section className="section"><div className="shell rows"><article><h2>{"Health Access"}</h2>
+<div><p>{"SozoRock Health and the Primary Care Access Program: a sponsored year of primary care for up to 25 New Yorkers from January 2027, with county evidence for local planning."}</p>
+<a className="textlink" href="https://health.sozorockfoundation.org/">{"Visit SozoRock Health"}</a>
 </div>
 </article>
-<article><h2>{"CB-CAP"}</h2>
-<div><p>{"County evidence for community health-access planning. Explore the public preview and discuss future institutional planning, funding and workforce use."}</p>
-<a className="textlink" href="https://cbcap.sozorockfoundation.org/" target="_blank" rel="noopener">{"Explore"}</a>
-</div>
-</article>
-<article><h2>{"Place Intelligence"}</h2>
-<div><p>{"County health and community data with geography, source dates and definitions. Search by county, city or ZIP Code; results resolve to county evidence."}</p>
-<a className="textlink" href="https://health.sozorockfoundation.org/evidence">{"Explore"}</a>
-</div>
-</article>
-<article><h2>{"SozoRock Global Institute"}</h2>
-<div><p>{"Publications on rural health equity, public governance and digital health systems."}</p>
-<a className="textlink" href="/platforms/institute">{"Read"}</a>
-</div>
-</article>
-<article><h2>{"SozoRock AI Lab"}</h2>
-<div><p>{"Applied AI systems, cybersecurity and AI governance. Practical projects for individuals and organizations."}</p>
-<a className="textlink" href="/platforms/ai-lab">{"Explore"}</a>
-</div>
-</article>
-<article><h2>{"Cybersecurity capstones"}</h2>
-<div><p>{"SozoRock’s recurring Capella University capstone combines instruction, hands-on cybersecurity projects and practitioner mentoring for workforce development."}</p>
-<a className="textlink" href="/platforms/applied-learning">{"Explore"}</a>
+<article><h2>{"Workforce Capacity"}</h2>
+<div><p>{"Hands on learning in cloud computing, cloud security, identity and access, governance and AI, built with universities, employers and health systems."}</p>
+<a className="textlink" href="/workforce">{"Explore Workforce Capacity"}</a>
 </div>
 </article>
 <article><h2>{"AI & Society"}</h2>
-<div><p>{"A proposed initiative for public participation in AI governance: participants examine decisions, recommend safeguards and invite institutional responses."}</p>
-<a className="textlink" href="/ai-society">{"Explore"}</a>
+<div><p>{"Building public trust in AI. Who Decides? forums bring residents, educators, employers and policymakers together on AI in learning, work and health."}</p>
+<a className="textlink" href="/ai-society">{"Explore AI & Society"}</a>
+</div>
+</article>
+<article><h2>{"SozoRock AI Lab"}</h2>
+<div><p>{"Free, practical AI skills for any background. Tuesdays at 6:30 pm, Albany, New York State."}</p>
+<a className="textlink" href="https://ai-lab.sozorockfoundation.org/">{"Register for the AI Lab"}</a>
+</div>
+</article>
+<article><h2>{"SozoRock Global Institute"}</h2>
+<div><p>{"Research series on health systems assurance, rural governance and rural health equity."}</p>
+<a className="textlink" href="/publications">{"Read the research"}</a>
+</div>
+</article>
+<article><h2>{"County data"}</h2>
+<div><p>{"Place Intelligence and CB-CAP bring county health and community evidence into planning, with sources and dates."}</p>
+<a className="textlink" href="https://health.sozorockfoundation.org/evidence">{"Explore county data"}</a>
 </div>
 </article>
 </div>
@@ -182,30 +177,30 @@ case "/platforms/health": return <>
 <section className="section" id="hubs"><div className="shell"><div className="hubintro"><h2>{"Health Equity Initiative"}</h2>
 <p>{"Health literacy, digital readiness and preparation for provider-led care. Three models, designed for the places people use."}</p>
 </div>
-<div className="hubset"><article><h3>{"Proposed: Library Health Equity Hub"}</h3>
+<div className="hubset"><article><h3>{"Library Health Equity Hub"}</h3>
 <p>{"Health literacy and digital support through local libraries."}</p>
 <details><summary>{"Details"}</summary>
-<p>{"A proposed library-based model for health information, digital skills and preparation to use provider-led services. Local partners would agree the space, connectivity, privacy and staff responsibilities."}</p>
+<p>{"A library based model in development for health information, digital skills and preparation to use provider-led services. Local partners would agree the space, connectivity, privacy and staff responsibilities."}</p>
 </details>
 </article>
-<article><h3>{"Proposed: Community Health Equity Hub"}</h3>
+<article><h3>{"Community Health Equity Hub"}</h3>
 <p>{"Health education and digital support through community organizations."}</p>
 <details><summary>{"Details"}</summary>
-<p>{"A proposed community-based model combining local health information, digital support and preparation for provider-led services. Activities would reflect local needs, partner capacity and available services."}</p>
+<p>{"A community based model in development combining local health information, digital support and preparation for provider-led services. Activities would reflect local needs, partner capacity and available services."}</p>
 </details>
 </article>
-<article><h3>{"Proposed: Home Health Equity Hub"}</h3>
+<article><h3>{"Home Health Equity Hub"}</h3>
 <p>{"Help preparing to use provider platforms from home."}</p>
 <details><summary>{"Details"}</summary>
-<p>{"A proposed home-based model for people who need support using devices, connectivity or provider platforms. It does not establish a home-care or home-health clinical service."}</p>
+<p>{"A home based model in development for people who need support using devices, connectivity or provider platforms. It does not establish a home-care or home-health clinical service."}</p>
 </details>
 </article>
 </div>
-<p className="modelnote">{"Proposed partner models. Local implementation depends on agreed responsibilities, available services and delivery capacity. Clinical care remains with licensed providers."}</p>
+<p className="modelnote">{"Partner models in development. Local implementation depends on agreed responsibilities, available services and delivery capacity. Clinical care remains with licensed providers."}</p>
 </div>
 </section>
 <section className="section soft"><div className="shell focusgrid"><article><h2>{"Health Access Day"}</h2>
-<p>{"A proposed community format for health education and health literacy, with locally agreed activities and follow-up."}</p>
+<p>{"A community format in development for health education and health literacy, with locally agreed activities and follow-up."}</p>
 </article>
 <article><h2>{"Provider partnerships"}</h2>
 <p>{"Bring Your Own Platform keeps clinical systems, records, consent and medical decisions with the provider. SozoRock supports nonclinical readiness and coordination."}</p>
@@ -341,7 +336,7 @@ case "/platforms/ai-lab": return <>
 </>;
 case "/ai-society": return <>
 <section className="hero blue"><div className="shell"><h1>{"AI & Society"}</h1>
-<p>{"Public participation in AI decisions about education and work. Who Decides? is a proposed SozoRock initiative."}</p>
+<p>{"Public participation in AI decisions about education and work. Who Decides? is a SozoRock initiative in development."}</p>
 <a className="action" href="#interest">{"Participate"}</a>
 </div>
 </section>
@@ -402,12 +397,12 @@ case "/publication/hsa-v1-2026": return <>
 </div>
 </section>
 <section className="section"><div className="shell split"><h2>{"Overview"}</h2>
-<div><p>{"A proposed approach to reviewing obligations, controls, risks and exceptions in digital health systems."}</p>
+<div><p>{"An approach for testing how to review obligations, controls, risks and exceptions in digital health systems."}</p>
 </div>
 </div>
 </section>
 <section className="section soft"><div className="shell split"><h2>{"Scope"}</h2>
-<div><p>{"Proposed analytical tools and a research agenda. Not a validated standard, certification, audit or professional advice."}</p>
+<div><p>{"Analytical tools offered for testing and a research agenda. Not a validated standard, certification, audit or professional advice."}</p>
 </div>
 </div>
 </section>
@@ -447,7 +442,7 @@ case "/publication/rrg-v1-2025": return <>
 </div>
 </section>
 <section className="section soft"><div className="shell split"><h2>{"Scope"}</h2>
-<div><p>{"A proposed governance framework. The Delaware County reference case does not establish adoption, validation or measured outcomes."}</p>
+<div><p>{"A governance framework for testing. The Delaware County reference case does not establish adoption, validation or measured outcomes."}</p>
 </div>
 </div>
 </section>
@@ -483,12 +478,12 @@ case "/publication/rebs-v1-2025": return <>
 </div>
 </section>
 <section className="section"><div className="shell split"><h2>{"Overview"}</h2>
-<div><p>{"Connects health literacy, technology, workforce and local capacity in proposed health-access models."}</p>
+<div><p>{"Connects health literacy, technology, workforce and local capacity in health access models in development."}</p>
 </div>
 </div>
 </section>
 <section className="section soft"><div className="shell split"><h2>{"Scope"}</h2>
-<div><p>{"Proposed models, not evidence of operating services or measured health outcomes. Implementation depends on partners, capacity and licensed providers."}</p>
+<div><p>{"Models in development, not evidence of operating services or measured health outcomes. Implementation depends on partners, capacity and licensed providers."}</p>
 </div>
 </div>
 </section>
@@ -578,7 +573,7 @@ case "/about": return <>
 </div>
 </div>
 </section>
-<section className="section soft"><div className="shell split"><h2>{"Our programs"}</h2><div><p>{"The Primary Care Access Program begins January 2027: 12 months of sponsored primary care and practical support for up to 25 New Yorkers with financial need and a chronic condition. Clinical care remains with the licensed provider. Membership is not health insurance."}</p><p>{"Our public research examines health equity, rural governance and digital health assurance. County evidence tools make public data available for local planning. Our recurring six-month cybersecurity learning collaboration connects graduate study with applied work; the university retains academic oversight and grading."}</p><p>{"Library, Community and Home Health Equity Hubs remain Proposed. The Fireside and Working Roundtable are a planned series."}</p><a className="textlink" href="/platforms">Explore our programs</a></div></div></section>
+<section className="section soft"><div className="shell split"><h2>{"Our programs"}</h2><div><p>{"The Primary Care Access Program begins January 2027: 12 months of sponsored primary care and practical support for up to 25 New Yorkers with financial need and a chronic condition. Clinical care remains with the licensed provider. Membership is not health insurance."}</p><p>{"Our public research examines health equity, rural governance and digital health assurance. County evidence tools make public data available for local planning. Our recurring six-month cybersecurity learning collaboration connects graduate study with applied work; the university retains academic oversight and grading."}</p><p>{"Library, Community and Home Health Equity Hubs are in development with partners. The Fireside and Working Roundtable are a planned series."}</p><a className="textlink" href="/platforms">Explore our programs</a></div></div></section>
 <section className="section soft"><div className="shell split"><h2>{"Where we work with partners"}</h2>
 <div><p>{"Libraries, community organizations, licensed providers, universities, public agencies, employers and funders. Each collaboration has agreed responsibilities and a clear purpose."}</p>
 <a className="textlink" href="/partner">{"Partner"}</a>
@@ -592,7 +587,7 @@ case "/about": return <>
 </div>
 </section>
 <section className="section soft"><div className="shell split"><h2>{"Our responsibilities"}</h2>
-<div><p>{"We distinguish operating services, public previews and proposed models. Clinical decisions stay with licensed providers; academic decisions stay with universities."}</p>
+<div><p>{"We distinguish operating services, public previews and models in development. Clinical decisions stay with licensed providers; academic decisions stay with universities."}</p>
 <a className="textlink" href="/standards">{"Standards"}</a>
 </div>
 </div>
@@ -719,7 +714,7 @@ case "/standards": return <>
 <p>{"The Foundation and named authors are responsible for research conclusions. Funding does not purchase a conclusion."}</p>
 </article>
 <article id="s1"><h2>{"Evidence"}</h2>
-<p>{"We identify proposed models, participant reports, observations, estimates and measured outcomes. Claims link to their sources and limitations."}</p>
+<p>{"We identify models in development, participant reports, observations, estimates and measured outcomes. Claims link to their sources and limitations."}</p>
 </article>
 <article id="s2"><h2>{"Corrections"}</h2>
 <p>{"Report an error to contact@sozorockfoundation.org with the page or publication and supporting source. Material corrections explain what changed and preserve the publication record."}</p>

@@ -1,26 +1,49 @@
 import approvedMetadata from "./approved-metadata.json" with { type: "json" };
 import { getSeoForPath as getBaseSeo } from "./seo.js";
 
-const GLOBAL_SITE_DESCRIPTION = "The SozoRock Foundation is a New York public charity connecting health access, public-interest research, county evidence and applied learning.";
-const SOCIAL_IMAGE_ALT = "The SozoRock Foundation. Health access, public research and applied learning.";
+const GLOBAL_SITE_DESCRIPTION = "The SozoRock Foundation is a 501(c)(3) public charity building healthier communities and stronger systems through health access, workforce capacity and trusted AI.";
+const SOCIAL_IMAGE_ALT = "The SozoRock Foundation. Healthier communities. Stronger systems. A say in what’s next. Access, Capacity, Trust.";
 
 const overrides = {
   "/": {
-    title: "The SozoRock Foundation | Health Access, Applied Learning & Research",
-    description: "SozoRock turns evidence into practical work in health access, graduate cybersecurity learning, public-interest research and responsible AI.",
+    title: "The SozoRock Foundation | Health Access, Workforce Capacity & Trusted AI",
+    description: "Healthier communities, stronger systems and a say in what’s next. We expand primary care access, build health workforce capacity and shape trusted AI.",
     keywords: [
       "SozoRock Foundation",
-      "health access",
-      "New York health equity",
-      "rural health access",
       "primary care access",
-      "cybersecurity experiential learning",
-      "graduate cybersecurity capstone",
-      "cybersecurity capstone workforce development",
-      "workforce capability",
-      "public-interest research",
+      "health access",
+      "health equity",
+      "rural health",
+      "health workforce",
+      "workforce capacity",
+      "cybersecurity workforce development",
+      "cloud security training",
+      "AI literacy",
+      "responsible AI",
+      "public trust in AI",
       "AI governance",
       "health systems assurance",
+      "public-interest research",
+    ],
+  },
+  "/workforce": {
+    title: "Workforce Capacity | Cloud, Security & AI Skills | SozoRock",
+    description: "Hands on learning in cloud computing, cloud security, identity and access, governance and AI, built with universities, employers and health systems.",
+    keywords: [
+      "workforce capacity",
+      "health workforce",
+      "experiential learning",
+      "work integrated learning",
+      "cloud computing training",
+      "AWS cloud skills",
+      "cloud security",
+      "identity and access management",
+      "governance, risk and compliance",
+      "AI skills",
+      "cybersecurity workforce development",
+      "talent pipeline",
+      "Capella University",
+      "Athabasca University",
     ],
   },
   "/platforms": {
@@ -60,7 +83,7 @@ const overrides = {
   },
   "/platforms/health": {
     title: "Primary Care Access Program, New York 2027 | SozoRock Health",
-    description: "SozoRock Health's Primary Care Access Program for up to 25 New Yorkers from January 2027, plus proposed Health Equity Hubs and county evidence.",
+    description: "SozoRock Health's Primary Care Access Program for up to 25 New Yorkers from January 2027, plus Health Equity Hubs in development and county evidence.",
     keywords: [
       "primary care access program",
       "health equity New York",

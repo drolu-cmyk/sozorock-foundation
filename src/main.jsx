@@ -16,6 +16,7 @@ import "./final-polish.css";
 import "./accessibility-polish.css";
 
 import "./approved.css";
+import "./site-2026.css";
 
 const container = document.getElementById("root");
 const render = container.hasChildNodes() ? (app) => hydrateRoot(container, app) : (app) => createRoot(container).render(app);

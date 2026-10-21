@@ -1,11 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "./router";
+import { BriefingSection } from "./BriefingForm";
 
 export function Brand() {
-  return <Link href="/" className="foundation-wordmark" aria-label="The SozoRock Foundation home"><span>The</span><strong>SozoRock.</strong><span>Foundation</span></Link>;
+  return <Link href="/" className="ns-brand foundation-wordmark" aria-label="The SozoRock Foundation home"><span>The</span><strong>SozoRock.</strong><span>Foundation</span></Link>;
 }
 
-const primaryLinks = [["What we do", "/platforms"], ["Who we are", "/about"]];
+const primaryLinks = [["Our Work", "/platforms"], ["Research", "/publications"], ["Events", "/events"], ["About", "/about"]];
+const workRoutes = ["/platforms", "/workforce", "/ai-society"];
+const isCurrent = (pathname, href) => pathname === href || (href === "/platforms" && (workRoutes.includes(pathname) || pathname.startsWith("/platforms/"))) || (href === "/publications" && pathname.startsWith("/publication"));
 
 export function Header({ pathname }) {
   const [open, setOpen] = useState(false);
@@ -56,55 +59,57 @@ export function Header({ pathname }) {
     };
   }, [open]);
 
-  return <header className={`foundation-header ${pathname === "/" ? "on-cobalt" : ""}`}>
+  return <header className="ns ns-header">
     <a className="skip-link" href="#main-content">Skip to main content</a>
-    <div className="shell foundation-header-inner">
+    <div className="ns-shell ns-header-inner">
       <Brand />
-      <button ref={toggle} className="foundation-menu-toggle" type="button" aria-expanded={open} aria-controls="foundation-navigation" onClick={() => setOpen((value) => !value)}>{open ? "Close" : "Menu"}</button>
-      <nav ref={navigation} id="foundation-navigation" className={`foundation-navigation ${open ? "is-open" : ""}`} aria-label="Primary navigation" onClick={(event) => { if (event.target.closest("a")) setOpen(false); }}>
-        {primaryLinks.map(([label, href]) => <Link key={href} href={href} aria-current={pathname === href ? "page" : undefined}>{label}</Link>)}
-        <Link className="foundation-support-link" href="/support" aria-current={pathname === "/support" ? "page" : undefined}>Support</Link>
+      <button ref={toggle} className="ns-menu-toggle" type="button" aria-expanded={open} aria-controls="foundation-navigation" onClick={() => setOpen((value) => !value)}>{open ? "Close" : "Menu"}</button>
+      <nav ref={navigation} id="foundation-navigation" className={`ns-nav ${open ? "is-open" : ""}`} aria-label="Primary navigation" onClick={(event) => { if (event.target.closest("a")) setOpen(false); }}>
+        <div className="ns-nav-main">
+          {primaryLinks.map(([label, href]) => <Link key={href} href={href} aria-current={isCurrent(pathname, href) ? "page" : undefined}>{label}</Link>)}
+        </div>
+        <div className="ns-nav-utility">
+          <a href="#briefing">Subscribe</a>
+          <Link className="ns-btn ns-btn-outline" href="/support" aria-current={pathname === "/support" ? "page" : undefined}>Support</Link>
+        </div>
       </nav>
     </div>
   </header>;
 }
 
+const footerColumns = [
+  ["Our Work", [["Health Access", "https://health.sozorockfoundation.org/"], ["Workforce Capacity", "/workforce"], ["AI & Society", "/ai-society"], ["AI Lab", "https://ai-lab.sozorockfoundation.org/"]]],
+  ["Research & Events", [["Research", "/publications"], ["Events", "/events"], ["The Briefing", "#briefing"]]],
+  ["About", [["Our story", "/about"], ["Leadership", "/leadership"], ["Partner with us", "/partner"], ["Contact", "/contact"]]],
+];
+
 export function Footer() {
   const year = new Date().getFullYear();
-  return <footer className="foundation-footer">
-    <div className="shell">
-      <div className="foundation-footer-top">
-        <Brand />
-        <p className="foundation-footer-purpose">We build platforms for better health and public systems.</p>
-        <div className="foundation-footer-groups">
-          <nav aria-label="Explore">
-            <strong>Explore</strong>
-            <Link href="/platforms">Platforms</Link>
-            <Link href="/publications">Publications</Link>
-            <Link href="/insights">Research</Link>
-            <Link href="/events">Events</Link>
-            <Link href="/ai-society">AI and Society</Link>
-          </nav>
-          <nav aria-label="Foundation">
-            <strong>Foundation</strong>
-            <Link href="/about">Who we are</Link>
-            <Link href="/leadership">Leadership</Link>
-            <Link href="/standards">Standards</Link>
-            <Link href="/contact">Contact</Link>
-            <Link href="/partner">Partner</Link>
-            <Link href="/support">Support</Link>
-          </nav>
+  return <footer className="ns ns-site-footer">
+    <BriefingSection />
+    <div className="ns-footer ns-dark">
+      <div className="ns-shell ns-footer-top">
+        <div>
+          <Brand />
+          <p className="ns-footer-mission">We build healthier communities and stronger systems through access, capacity and trust.</p>
+          <Link className="ns-btn ns-btn-light" href="/support">Support our work</Link>
         </div>
+        {footerColumns.map(([title, links]) => <nav key={title} aria-label={title}>
+          <span className="ns-tag">{title}</span>
+          {links.map(([label, href]) => href.startsWith("#") ? <a key={label} href={href}>{label}</a> : <Link key={label} href={href}>{label}</Link>)}
+        </nav>)}
       </div>
-      <div className="foundation-footer-bottom">
-        <p>The SozoRock Foundation, Inc. is recognized as tax-exempt under Section 501(c)(3) of the Internal Revenue Code. EIN 39-4736725. Contributions are tax-deductible as allowed by law.</p>
+    </div>
+    <div className="ns-legal">
+      <div className="ns-shell ns-legal-inner">
         <nav aria-label="Legal and policy links">
-          <Link href="/privacy">Privacy</Link>
-          <Link href="/terms">Terms</Link>
+          <Link href="/privacy">Privacy Policy</Link>
+          <Link href="/terms">Terms of Use</Link>
           <Link href="/accessibility">Accessibility</Link>
           <Link href="/nondiscrimination">Nondiscrimination</Link>
+          <Link href="/standards">Standards</Link>
         </nav>
-        <p>© {year} The SozoRock Foundation, Inc.</p>
+        <p>© {year} The SozoRock Foundation, Inc. · 501(c)(3) public charity · EIN 39-4736725</p>
       </div>
     </div>
   </footer>;

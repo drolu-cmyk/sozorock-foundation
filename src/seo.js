@@ -2,7 +2,7 @@ import { leaders, publications } from "./siteData.js";
 
 export const SITE_ORIGIN = "https://www.sozorockfoundation.org";
 export const SITE_NAME = "The SozoRock Foundation";
-export const DEFAULT_SOCIAL_IMAGE = `${SITE_ORIGIN}/media/foundation-public-work-2026.png`;
+export const DEFAULT_SOCIAL_IMAGE = `${SITE_ORIGIN}/media/foundation-access-capacity-trust-2026.png`;
 export const ORGANIZATION_ID = `${SITE_ORIGIN}/#organization`;
 export const WEBSITE_ID = `${SITE_ORIGIN}/#website`;
 
@@ -18,9 +18,15 @@ const routeSeo = {
     pageType: "ContactPage",
   },
   "/": {
-    title: "The SozoRock Foundation | Health Access, Public Systems & AI",
-    description: "Research, health access, public systems and applied AI—built for decisions, delivery and public scrutiny, including rural and underserved places.",
+    title: "The SozoRock Foundation | Health Access, Workforce Capacity & Trusted AI",
+    description: "Healthier communities, stronger systems and a say in what’s next. We expand primary care access, build health workforce capacity and shape trusted AI.",
     pageType: "WebPage",
+  },
+  "/workforce": {
+    title: "Workforce Capacity | Cloud, Security & AI Skills | SozoRock",
+    description: "Hands on learning in cloud computing, cloud security, identity and access, governance and AI, built with universities, employers and health systems.",
+    pageType: "WebPage",
+    image: `${SITE_ORIGIN}/media/foundation-workforce-capacity-2026.png`,
   },
   "/platforms": {
     title: "Platforms | The SozoRock Foundation",
@@ -106,7 +112,8 @@ const routeSeo = {
 
 const routeKeywords = {
   "/ai-society": ["AI and society", "community participation", "human review", "AI governance", "institutional response", "public accountability"],
-  "/": ["SozoRock Foundation", "health access", "public systems", "health systems assurance", "county evidence", "rural equity", "applied AI"],
+  "/": ["SozoRock Foundation", "primary care access", "health access", "health workforce", "workforce capacity", "trusted AI", "responsible AI", "public trust in AI", "health systems assurance", "rural health"],
+  "/workforce": ["workforce capacity", "health workforce", "experiential learning", "work integrated learning", "cloud computing training", "cloud security", "identity and access management", "governance risk and compliance", "AI skills", "cybersecurity workforce development"],
   "/platforms": ["SozoRock platforms", "Global Institute", "SozoRock Health", "SozoRock AI Lab", "county evidence", "public systems"],
   "/platforms/institute": ["public-interest research", "governance research", "health systems assurance", "public decisions", "rural institutions", "SozoRock Global Institute"],
   "/platforms/health": ["health access", "place intelligence", "community health evidence", "rural health", "SozoRock Health"],
@@ -123,7 +130,8 @@ const routeKeywords = {
 const breadcrumbNames = {
   "ai-society": "AI & Society",
   contact: "Contact",
-  platforms: "Work",
+  platforms: "Our Work",
+  workforce: "Workforce Capacity",
   institute: "SozoRock Global Institute",
   health: "SozoRock Health",
   "ai-lab": "SozoRock AI Lab",
@@ -260,7 +268,7 @@ export function getSeoForPath(inputPathname = "/") {
         width: 236,
         height: 48,
       },
-      slogan: "A clearer route to primary care.",
+      slogan: "Healthier communities. Stronger systems. A say in what’s next.",
       publishingPrinciples: `${SITE_ORIGIN}/standards`,
       ethicsPolicy: `${SITE_ORIGIN}/standards`,
       knowsAbout: [
@@ -274,6 +282,12 @@ export function getSeoForPath(inputPathname = "/") {
         "rural equity",
         "community participation",
         "applied artificial intelligence",
+        "workforce capacity",
+        "health workforce",
+        "cloud security",
+        "AI literacy",
+        "responsible AI",
+        "public trust in AI",
       ],
       sameAs: ["https://x.com/srockfoundation", "https://www.instagram.com/srockfoundation/", "https://www.youtube.com/@srockfoundation"],
     },
@@ -328,7 +342,7 @@ export function getSeoForPath(inputPathname = "/") {
     image,
     imageWidth: 1200,
     imageHeight: 630,
-    imageAlt: publication ? `${publication.title}, ${publication.volume} publication preview` : "The SozoRock Foundation — A clearer route to primary care.",
+    imageAlt: publication ? `${publication.title}, ${publication.volume} publication preview` : "The SozoRock Foundation. Healthier communities. Stronger systems. A say in what’s next.",
     schema: { "@context": "https://schema.org", "@graph": graph },
     publication,
   };

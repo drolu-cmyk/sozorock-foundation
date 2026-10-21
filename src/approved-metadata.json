@@ -1,15 +1,19 @@
 {
   "/": {
-    "title": "SozoRock Foundation | Primary Care Access, Cybersecurity Learning & AI",
-    "description": "A New York 501(c)(3) expanding primary care access from January 2027, with graduate cybersecurity learning, public-interest research and AI & Society."
+    "title": "The SozoRock Foundation | Health Access, Workforce Capacity & Trusted AI",
+    "description": "Healthier communities, stronger systems and a say in what’s next. We expand primary care access, build health workforce capacity and shape trusted AI."
   },
   "/platforms": {
     "title": "What we do | SozoRock Foundation",
     "description": "Health systems, cybersecurity workforce development and AI & Society. Explore SozoRock’s programs, county evidence and research."
   },
+  "/workforce": {
+    "title": "Workforce Capacity | Cloud, Security & AI Skills | SozoRock",
+    "description": "Hands on learning in cloud computing, cloud security, identity and access, governance and AI, built with universities, employers and health systems."
+  },
   "/platforms/health": {
     "title": "Health Access Initiative | The SozoRock Foundation",
-    "description": "How the Foundation supports health access in New York: the 2027 Primary Care Access Program, proposed community hubs, education and county evidence."
+    "description": "How the Foundation supports health access: the Primary Care Access Program from January 2027, Health Equity Hubs in development, education and county evidence."
   },
   "/platforms/applied-learning": {
     "title": "Cybersecurity Capstone & Workforce Development | SozoRock",
@@ -24,8 +28,8 @@
     "description": "Applied AI systems. Cybersecurity. AI governance."
   },
   "/ai-society": {
-    "title": "AI & Society | Education, Work & Public Participation | SozoRock",
-    "description": "SozoRock’s proposed AI governance initiative brings public voices into education and work: decisions, safeguards and institutional responses."
+    "title": "AI & Society | Public Trust in AI | SozoRock Foundation",
+    "description": "AI & Society builds public trust in AI. Who Decides? forums bring people into decisions about AI in learning, work and health, with published responses."
   },
   "/publications": {
     "title": "Publications | SozoRock Foundation",
