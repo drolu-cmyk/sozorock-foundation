@@ -2,6 +2,7 @@ import { ApprovedPage, approvedRoutes } from "./ApprovedPages";
 import { ApprovedFooter } from "./ApprovedFooter";
 import { useEffect } from "react";
 import { HomePage } from "./HomePage";
+import { FoundationHome } from "./FoundationHome";
 import { AiSocietyPage } from "./AiSocietyPage";
 import { AppliedLearningPage } from "./AppliedLearningPage";
 import { HealthInitiativePage } from "./HealthInitiativePage";
@@ -24,6 +25,7 @@ import { useCurrentPath } from "./router";
 import { getSeoForPath } from "./seoRuntime";
 
 function RouteView({ pathname }) {
+  if (pathname === "/") return <FoundationHome />;
   if (approvedRoutes.includes(pathname)) return <ApprovedPage pathname={pathname} />;
   const publication = pathname.startsWith("/publication/") ? publications.find((item) => item.path === pathname) : null;
   const accessPublication = pathname.startsWith("/publication/") ? publications.find((item) => item.accessPath === pathname) : null;
