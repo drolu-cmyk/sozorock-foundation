@@ -20,6 +20,7 @@ export const APP_ROUTES = new Set([
   "/platforms/health",
   "/platforms/ai-lab",
   "/platforms/applied-learning",
+  "/workforce",
   "/publications",
   "/insights",
   "/events",

@@ -178,6 +178,7 @@ Resources:
             '/platforms/health': true,
             '/platforms/ai-lab': true,
             '/platforms/applied-learning': true,
+            '/workforce': true,
             '/publications': true,
             '/insights': true,
             '/events': true,

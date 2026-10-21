@@ -131,43 +131,38 @@ case "/": return <>
 </section>
 </>;
 case "/platforms": return <>
-<section className="hero blue"><div className="shell"><h1>{"What we do"}</h1>
-<p>{"Health systems, cybersecurity workforce development and AI & Society—supported by community evidence and research."}</p>
+<section className="hero blue"><div className="shell"><h1>{"Our work"}</h1>
+<p>{"Three gaps, one loop. We listen to communities, study the evidence, build programs and publish results in access, capacity and trust."}</p>
 </div>
 </section>
-<section className="section"><div className="shell rows"><article><h2>{"SozoRock Health"}</h2>
-<div><p>{"Health systems and health equity: county evidence, digital readiness and proposed Health Equity Hubs to help communities plan access to care."}</p>
-<a className="textlink" href="/platforms/health">{"Explore"}</a>
+<section className="section"><div className="shell rows"><article><h2>{"Health Access"}</h2>
+<div><p>{"SozoRock Health and the Primary Care Access Program: a sponsored year of primary care for up to 25 New Yorkers from January 2027, with county evidence for local planning."}</p>
+<a className="textlink" href="https://health.sozorockfoundation.org/">{"Visit SozoRock Health"}</a>
 </div>
 </article>
-<article><h2>{"CB-CAP"}</h2>
-<div><p>{"County evidence for community health-access planning. Explore the public preview and discuss future institutional planning, funding and workforce use."}</p>
-<a className="textlink" href="https://cbcap.sozorockfoundation.org/" target="_blank" rel="noopener">{"Explore"}</a>
-</div>
-</article>
-<article><h2>{"Place Intelligence"}</h2>
-<div><p>{"County health and community data with geography, source dates and definitions. Search by county, city or ZIP Code; results resolve to county evidence."}</p>
-<a className="textlink" href="https://health.sozorockfoundation.org/evidence">{"Explore"}</a>
-</div>
-</article>
-<article><h2>{"SozoRock Global Institute"}</h2>
-<div><p>{"Publications on rural health equity, public governance and digital health systems."}</p>
-<a className="textlink" href="/platforms/institute">{"Read"}</a>
-</div>
-</article>
-<article><h2>{"SozoRock AI Lab"}</h2>
-<div><p>{"Applied AI systems, cybersecurity and AI governance. Practical projects for individuals and organizations."}</p>
-<a className="textlink" href="/platforms/ai-lab">{"Explore"}</a>
-</div>
-</article>
-<article><h2>{"Cybersecurity capstones"}</h2>
-<div><p>{"SozoRock’s recurring Capella University capstone combines instruction, hands-on cybersecurity projects and practitioner mentoring for workforce development."}</p>
-<a className="textlink" href="/platforms/applied-learning">{"Explore"}</a>
+<article><h2>{"Workforce Capacity"}</h2>
+<div><p>{"Hands on learning in cloud computing, cloud security, identity and access, governance and AI, built with universities, employers and health systems."}</p>
+<a className="textlink" href="/workforce">{"Explore Workforce Capacity"}</a>
 </div>
 </article>
 <article><h2>{"AI & Society"}</h2>
-<div><p>{"A proposed initiative for public participation in AI governance: participants examine decisions, recommend safeguards and invite institutional responses."}</p>
-<a className="textlink" href="/ai-society">{"Explore"}</a>
+<div><p>{"Building public trust in AI. Who Decides? forums bring residents, educators, employers and policymakers together on AI in learning, work and health."}</p>
+<a className="textlink" href="/ai-society">{"Explore AI & Society"}</a>
+</div>
+</article>
+<article><h2>{"SozoRock AI Lab"}</h2>
+<div><p>{"Free, practical AI skills for any background. Tuesdays at 6:30 pm, Albany, New York State."}</p>
+<a className="textlink" href="https://ai-lab.sozorockfoundation.org/">{"Register for the AI Lab"}</a>
+</div>
+</article>
+<article><h2>{"SozoRock Global Institute"}</h2>
+<div><p>{"Research series on health systems assurance, rural governance and rural health equity."}</p>
+<a className="textlink" href="/publications">{"Read the research"}</a>
+</div>
+</article>
+<article><h2>{"County data"}</h2>
+<div><p>{"Place Intelligence and CB-CAP bring county health and community evidence into planning, with sources and dates."}</p>
+<a className="textlink" href="https://health.sozorockfoundation.org/evidence">{"Explore county data"}</a>
 </div>
 </article>
 </div>

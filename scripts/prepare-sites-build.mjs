@@ -20,6 +20,7 @@ const permanentRoutes = [
   "/platforms/health",
   "/platforms/ai-lab",
   "/platforms/applied-learning",
+  "/workforce",
   "/publications",
   "/insights",
   "/events",
