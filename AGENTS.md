@@ -1,15 +1,19 @@
 # SozoRock Parent Site Design Decisions
 
-This repository is the production parent website for The SozoRock Foundation. The September 17, 2026 editorial and conversion system is the current approved direction and supersedes earlier homepage, navigation and campaign language.
+This repository is the production parent website for The SozoRock Foundation. The October 21, 2026 Access, Capacity and Trust direction, approved by the user, is the current direction and supersedes every earlier homepage, navigation, campaign and footer rule in this file or elsewhere in the repository.
 
 ## Durable requirements
 
-- Keep the primary navigation compact and stable: What we do, Who we are, and a separated Support action. Keep Research, Partner and Contact in the footer or deeper routes. Keep the canonical `/platforms` route unless a separate migration is approved.
-- Lock the parent homepage opening to “A clearer route to primary care.” with the Primary Care Access Program for up to 25 New Yorkers launching January 2027, qualified partner attribution and the clinical-responsibility boundary. Do not replace, rotate or reinterpret this hero headline without an explicit new user instruction.
-- The homepage premise is evidence moving into practical use. Connect that premise naturally to health access, cybersecurity experiential learning, public interest research and responsible AI.
-- Do not use visible eyebrow labels. Avoid repetitive label, headline, paragraph and CTA templates. Let hierarchy come from typography, whitespace, contrast, evidence and composition.
+- Primary navigation: Our Work (`/platforms`), Research (`/publications`), Events (`/events`) and About (`/about`), with Subscribe and a quiet Support action at the right. Partner, Contact, Standards and legal pages live in the footer. Keep the canonical `/platforms` route.
+- The homepage opening is “Healthier communities. Stronger systems. A say in what’s next.” with the line “We open doors to primary care, build the people who run and protect health systems, and give communities a voice on AI.” Primary action: Explore our work. Secondary action: Partner with us. Do not replace it without an explicit new user instruction.
+- The Foundation story is one loop, Listen, Study, Build, Prove, closing three gaps: Access (Health Access, SozoRock Health), Capacity (Workforce Capacity, which leads cybersecurity, cloud, governance and AI learning) and Trust (AI & Society, research and assurance). Every page shows where it sits in that story.
+- Write broadly so the work can grow beyond one state. Name New York State only for facts, places and data, and always write “New York State” after Albany, the Capital Region or a county name.
+- Follow McKinsey and Brookings for hierarchy and restraint: a finding stated as a headline, one chart per point, few words, one main action per section, secondary actions as text links.
+- Do not use visible eyebrow labels, except the short gap names Access, Capacity and Trust that mark charts and impact stories. Avoid repetitive label, headline, paragraph and CTA templates. Let hierarchy come from typography, whitespace, contrast, evidence and composition.
+- Never write the word “Proposed” in public copy. Do not use dashes as punctuation in public copy.
+- Buttons are rounded pills, never square boxes. Form fields use a label above a single underline, never boxed fields.
 - Keep public copy concise, specific and natural. Avoid generic consulting language, AI sounding prose, internal planning terms and mechanical process writing. Prefer problem, evidence, response and action.
-- Use the approved cobalt, deep navy, royal blue, icy blue, white and supporting gray palette. Do not use green as the parent site color and do not use gradients.
+- Use only the approved cobalt, deep navy, royal blue, icy blue, white and supporting gray palette. No orange, no green, no gradients and no AI looking glows or patterns.
 - Use the existing geometric sans serif voice. Do not make serif typography the primary brand voice.
 - Do not use generated hero art, generic nonprofit imagery, decorative CSS art, fake dashboards, invented endorsements, partners, funding, events or impact claims.
 - Do not use website screenshots as parent site campaign imagery. Prefer real program photography, publication covers, leadership portraits and verified evidence.
@@ -32,7 +36,7 @@ This repository is the production parent website for The SozoRock Foundation. Th
 - First-cohort budget: $108,000, about $4,320 per participant for a full year. This covers the membership, telehealth, transportation help, health access education, coordination and reporting.
 - Sponsorship levels: Community $5,000, Access $10,000, Principal $25,000, Lead $50,000. Other amounts are welcome.
 - Funds are confirmed before anyone enrolls. Sponsors receive reports at months 3, 6, 9 and 12. Renewal is optional for sponsors. Sponsors do not select participants or influence clinical care.
-- The Fireside and the Working Roundtable are a planned series; do not publish dates, locations, participants or partner organizations until confirmed.
+- The Fireside and the Working Roundtable are a planned series. Upcoming events may show a working title, format and region with “Date to be announced” and a Register interest action. Do not publish dates, participants or partner organizations until confirmed, and do not name prospective partners such as companies being pitched.
 - The health access story may use the verified 2025 Western New York preplanning roundtable and REBS evidence. The reported figure of more than 12,000 residents per primary care clinician must remain visibly attributed as participant reported context. Do not publish wait time, travel duration or similar figures until their exact source is verified.
 - Show CB CAP as a peer product alongside Health, Global Institute and AI Lab only where that architecture remains accurate. Its redesign is a separate assignment.
 - Do not describe Health Systems Assurance as validated, certified, proven, adopted or a standard. Present its constructs as proposed analytical tools and a research agenda.
@@ -41,9 +45,11 @@ This repository is the production parent website for The SozoRock Foundation. Th
 - Keep the parent homepage broader than publications. Use a natural story from premise to evidence to current work to proof to engagement. Avoid brochure and textbook layouts.
 - Prefer editorial fields, asymmetric hierarchy, strong whitespace and real evidence over boxed card grids. Keep the legal footer compact and keep Partner and Support separate from legal policy links.
 - The footer must identify The SozoRock Foundation, Inc. as a 501(c)(3) public charity and include the verified EIN. Keep legal links concise: Privacy, Terms, Accessibility, Nondiscrimination and Standards.
-- Preserve the approved blue footer composition and its EIN 39-4736725 legal statement.
-- Present the three authentic publication covers as small three-dimensional book mockups in the homepage hero; preserve the cover faces exactly.
-- Present the Capella University work as a recurring six-month applied cybersecurity model: six master's learners in the initial cohort and five in the current cohort. State that Dr. Oluwabiyi Adeyemo, Director of Strategic Initiatives, designs and evaluates the experience and personally mentors every learner.
+- The footer follows Brookings and McKinsey: wordmark, one mission line and Support our work on the left; three link columns (Our Work, Research & Events, About); a slim legal strip with Privacy Policy, Terms of Use, Accessibility, Nondiscrimination, Standards, copyright and EIN 39-4736725.
+- Show the three authentic publication covers at legible size in Research and insights, using the full resolution cover files. Label each as series name, then “Volume 1 · year”. Rethinking Rural Governance belongs to the Modernization and Resilience Program.
+- Present Workforce Capacity broadly: hands on learning in cloud computing (AWS), cloud security, identity and access management, governance, risk and compliance, and AI. Capella University: recurring six month graduate model, six learners October 2025 to March 2026 and five learners April to September 2026. Athabasca University, Alberta, Canada: one undergraduate in work integrated learning, February to July 2026, building a security framework for community health sites; keep this informational and do not publish grades or name the learner without consent. Dr. Oluwabiyi Adeyemo, Director of Strategic Initiatives, designs, mentors and evaluates the work. Use partner names as text; show logos only with written permission.
+- SozoRock AI Lab is free community AI learning for any background, Tuesdays at 6:30 pm in the community room of Beacon Bank, Albany, New York State. Registration happens on ai-lab.sozorockfoundation.org, so AI Lab actions link there.
+- AI & Society is framed as building public trust in AI, with Who Decides? forums on AI in learning, work and health.
 - Keep rural health and rural equity visible as important areas of focus, but never describe the Foundation's overall mission as rural only. Parent positioning must also cover health access, cybersecurity experiential learning, public interest research, governance, community evidence, participation and responsible AI.
 - Describe roundtables, participation, partnerships, funding, cataloging and library holdings precisely. Do not turn participation or cataloging into endorsement, implementation, adoption or a continuing institutional commitment.
 - Participant reported figures may be displayed only with visible attribution and limits. Do not restate them as independently estimated statistics or achieved outcomes.

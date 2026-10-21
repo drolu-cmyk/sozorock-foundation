@@ -1,5 +1,19 @@
 # Foundation design system
 
+## October 2026 system (current)
+
+This section supersedes the older tables below wherever they differ. It is implemented in `src/site-2026.css` and the shared header, footer, homepage and Workforce Capacity page.
+
+- Type: Instrument Sans. Opening headline 56px desktop, 40px phone, weight 700, tracking -0.03em. Section headings 32px (26px phone). Card and list titles 20px weight 600. Body 16 to 17px at 1.6. Dates, sources and small labels 13px. Navigation 15px weight 500.
+- Actions: one primary action per section as a rounded pill, 44px tall, 15px weight 600. Secondary actions are text links with an arrow. No square button boxes.
+- Forms: label above a single underline field. No boxed inputs.
+- Color: navy #071D3B, cobalt #0644AD, royal #0B2F6E, ice #EFF5FF and #DCEAFF, chart blues #6E9BDF and #A9C6F0, line #CED7E3, text #33495D, muted #4B607A. Focus ring is cobalt on light surfaces and white on dark. No orange, green or gradients.
+- Charts: one chart per point and each chart a different form (people icons, gauge, paired bars, stacked bar, timeline). Every chart names its source and date underneath.
+- Header: wordmark, Our Work, Research, Events, About; Search, Subscribe and an outlined Support pill at the right. Mobile uses the existing controlled disclosure with Escape, focus trap and scroll lock.
+- Footer: navy band with wordmark, mission line and Support our work; columns Our Work, Research & Events, About; white legal strip with policies, copyright, 501(c)(3) status and EIN.
+
+## Earlier system (reference only)
+
 VERIFIED: implemented in src/foundation-system.css, extending the existing shared stylesheet. Production-build QA is recorded separately. This file describes the implementation awaiting release.
 
 ## Typography
