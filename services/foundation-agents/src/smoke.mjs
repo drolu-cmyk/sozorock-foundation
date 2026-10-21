@@ -48,3 +48,13 @@ assert.equal(graphs.foundationSiteAssurance.parallelAfterOrchestrator, true);
 assert.equal(graphs.aiLabLearnerLoop.candidateNode, "projectReviewer");
 
 console.log(`Validated ${requiredGraphs.length} adaptive agent graphs.`);
+
+const { publicKnowledgeSnapshot } = await import("./public-knowledge.mjs");
+const { formatOperationalContext } = await import("./operational-context.mjs");
+const snapshot = publicKnowledgeSnapshot();
+const full = formatOperationalContext({notes:"x".repeat(8000), approvedKnowledge:snapshot});
+const approved = JSON.parse(full.split("Complete approved public knowledge:\n")[1]);
+assert.deepEqual(approved,snapshot);
+assert.equal(approved.routes.events.href,"/events");
+assert.equal(approved.routes.support.href,"/support");
+assert.throws(()=>formatOperationalContext({approvedKnowledge:{value:"x".repeat(32000)}}));
