@@ -50,6 +50,6 @@ body:has(.approved-site){min-width:0}.approved-site{min-width:0}
 .approved-site .event-video-layout{display:grid;grid-template-columns:1fr 1.2fr;gap:46px;align-items:start;margin-top:30px}
 .approved-site .event-video-layout>div{min-width:0}
 .approved-site .event-video-layout figure{margin:0;min-width:0}
-.approved-site .event-video-layout video{display:block;width:100%;height:auto;aspect-ratio:16/9;background:#071d3b}
+.approved-site .event-video-layout video{display:block;width:100%;height:auto;aspect-ratio:16/9;background:#071d3b;color:#fff}
 .approved-site .event-video-layout figcaption{font-size:14px;line-height:1.6;margin-top:12px}
 @media(max-width:800px){.approved-site .event-video-layout{grid-template-columns:1fr;gap:28px}}
