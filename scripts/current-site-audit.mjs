@@ -185,12 +185,49 @@ async function inspectPage(name, route, viewport, suffix) {
         const background = effectiveBackground(element.parentElement || element);
         const elementBackground = parseColor(style.backgroundColor);
         const selector = simpleSelector(element);
+        const hasVisibleLabel = [element, ...element.querySelectorAll("*")].some((node) => isVisible(node) && directText(node));
+        const iconOnlyButton = element.matches("button, a.button") && !hasVisibleLabel;
+        const opacityWithinControl = (node) => {
+          let opacity = 1;
+          for (let current = node; current && current !== element.parentElement; current = current.parentElement) {
+            const currentStyle = getComputedStyle(current);
+            if (currentStyle.display === "none" || ["hidden", "collapse"].includes(currentStyle.visibility) || currentStyle.clipPath !== "none" || currentStyle.maskImage !== "none" || currentStyle.filter !== "none") return 0;
+            opacity *= Number(currentStyle.opacity);
+          }
+          return opacity;
+        };
+        const strongColor = (raw, against, opacity = 1) => {
+          const color = parseColor(raw);
+          return color && contrast(composite({ ...color, a: color.a * opacity }, against), against) >= 3;
+        };
+        const hasContrastingIcon = iconOnlyButton && [...element.querySelectorAll("svg path, svg rect, svg circle, svg ellipse, svg polygon, svg polyline, svg line")].some((glyph) => {
+          const glyphStyle = getComputedStyle(glyph);
+          const rect = glyph.getBoundingClientRect();
+          const controlRect = element.getBoundingClientRect();
+          if (rect.right < controlRect.left || rect.left > controlRect.right || rect.bottom < controlRect.top || rect.top > controlRect.bottom) return false;
+          const opacity = opacityWithinControl(glyph);
+          const iconBackground = effectiveBackground(element);
+          const fill = rect.width > 0 && rect.height > 0 && strongColor(glyphStyle.fill, iconBackground, opacity * Number(glyphStyle.fillOpacity));
+          const stroke = (rect.width > 0 || rect.height > 0) && Number.parseFloat(glyphStyle.strokeWidth) > 0 && strongColor(glyphStyle.stroke, iconBackground, opacity * Number(glyphStyle.strokeOpacity));
+          return fill || stroke;
+        });
+        const controlOpacity = opacityWithinControl(element);
+        const hasContrastingOutline = iconOnlyButton && Number.parseFloat(style.outlineWidth) > 0 && !["none", "hidden"].includes(style.outlineStyle) && strongColor(style.outlineColor, background, controlOpacity);
+        // Count an unblurred outer ring only when its painted color meets 3:1.
+        // A shadow declaration alone is not evidence of adequate contrast.
+        const hasContrastingShadow = iconOnlyButton && style.boxShadow.split(/,(?![^()]*\))/u).some((shadow) => {
+          if (/\binset\b/u.test(shadow)) return false;
+          const color = shadow.match(/rgba?\([^)]+\)/u)?.[0];
+          const lengths = shadow.replace(/rgba?\([^)]+\)/u, "").match(/-?[\d.]+px/gu)?.map(Number.parseFloat) ?? [];
+          return lengths[0] === 0 && lengths[1] === 0 && (lengths[2] ?? 0) === 0 && (lengths[3] ?? 0) > 0 && strongColor(color, background, controlOpacity);
+        });
+        const hasContrastingIdentifier = hasContrastingIcon || hasContrastingOutline || hasContrastingShadow;
         for (const side of ["Top", "Right", "Bottom", "Left"]) {
           if (Number.parseFloat(style[`border${side}Width`]) <= 0 || ["none", "hidden"].includes(style[`border${side}Style`])) continue;
           const border = parseColor(style[`border${side}Color`]);
           if (!border || border.a <= 0) continue;
           const ratio = contrast(composite(border, background), background);
-          if (ratio < 3) {
+          if (ratio < 3 && !hasContrastingIdentifier) {
             const key = `${selector}|border|${colorString(border)}|${colorString(background)}`;
             if (!seenControls.has(key)) {
               seenControls.add(key);
@@ -198,10 +235,9 @@ async function inspectPage(name, route, viewport, suffix) {
             }
           }
         }
-        const hasVisibleLabel = [element, ...element.querySelectorAll("*")].some((node) => isVisible(node) && directText(node));
         if (elementBackground && elementBackground.a > 0 && element.matches("button, a.button") && !hasVisibleLabel) {
           const ratio = contrast(composite(elementBackground, background), background);
-          if (ratio < 3 && style.boxShadow === "none") {
+          if (ratio < 3 && !hasContrastingIdentifier) {
             const key = `${selector}|fill|${colorString(elementBackground)}|${colorString(background)}`;
             if (!seenControls.has(key)) {
               seenControls.add(key);

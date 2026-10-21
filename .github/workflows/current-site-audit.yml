@@ -7,6 +7,7 @@ on:
       - "public/**"
       - "index.html"
       - "scripts/current-site-audit.mjs"
+      - "scripts/test-control-contrast.mjs"
       - "scripts/full-current-site-audit.mjs"
       - "scripts/assert-current-site-audit.mjs"
       - ".github/workflows/current-site-audit.yml"
@@ -48,6 +49,8 @@ jobs:
             test "$attempt" -lt 60
             sleep 1
           done
+      - name: Verify rendered control contrast regressions
+        run: node scripts/test-control-contrast.mjs
       - name: Capture all permanent routes and calculate contrast
         env:
           AUDIT_BASE_URL: http://127.0.0.1:4173
