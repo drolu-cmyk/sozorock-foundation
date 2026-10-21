@@ -35,6 +35,8 @@ test('approved pages retain the core programs and claim boundaries',()=>{
   const learning=visible(page('platforms/applied-learning'));
   for(const term of ['capstone','six-month','Instructional sessions','hands-on projects','Six learners in the initial cohort','Five in the current cohort','Capella University retains academic oversight and grading']) assert.ok(learning.includes(term),term);
   assert.doesNotMatch(home,/12 months|two hours|founder/i);
+  const events=visible(page('events'));
+  for(const term of ['Western New York preplanning roundtable','A planned series','Dates, locations and participants will appear when confirmed.']) assert.ok(events.includes(term),term);
 });
 test('all approved routes have one heading, unique canonical metadata, and working internal destinations',()=>{
  const paths=JSON.parse(readFileSync('src/approved-metadata.json','utf8'));

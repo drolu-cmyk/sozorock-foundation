@@ -533,7 +533,7 @@ case "/events": return <>
 <a className="action" href="/partner">{"Partner"}</a>
 </div>
 </section>
-<section className="section"><div className="shell split"><h2>{"Western New York roundtable"}</h2>
+<section className="section"><div className="shell split"><h2>{"Western New York preplanning roundtable"}</h2>
 <div><p>{"Western New York · September 22, 2025"}<br />{"12 participants. Two county public-health jurisdictions. Two universities."}</p>
 </div>
 </div>
