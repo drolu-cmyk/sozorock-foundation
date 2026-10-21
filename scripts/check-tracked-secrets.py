@@ -15,6 +15,9 @@ import urllib.request
 
 
 VERSION = "8.30.1"
+# Reviewed digest for the exact linux_x64 release archive. Updating the scanner
+# requires reviewing a new digest rather than trusting mutable release metadata.
+SCANNER_ARCHIVE_SHA256 = "551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb"
 
 
 def install_scanner(work):
@@ -23,10 +26,7 @@ def install_scanner(work):
     archive = work / asset
     with urllib.request.urlopen(f"{base}/{asset}", timeout=45) as response:
         archive.write_bytes(response.read())
-    with urllib.request.urlopen(f"{base}/gitleaks_{VERSION}_checksums.txt", timeout=45) as response:
-        rows = response.read().decode("utf-8").splitlines()
-    expected = [row.split()[0] for row in rows if len(row.split()) == 2 and row.split()[1] == asset]
-    if len(expected) != 1 or hashlib.sha256(archive.read_bytes()).hexdigest() != expected[0]:
+    if hashlib.sha256(archive.read_bytes()).hexdigest() != SCANNER_ARCHIVE_SHA256:
         raise RuntimeError("Scanner checksum verification failed")
     binary = work / "gitleaks"
     with tarfile.open(archive) as source:
