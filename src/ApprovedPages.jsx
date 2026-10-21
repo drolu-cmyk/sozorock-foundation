@@ -553,7 +553,6 @@ case "/events": return <>
 <video controls playsInline preload="none" poster="/media/fireside-roundtable.poster.jpg" aria-label="The Fireside and the Working Roundtable, a 30-second introduction to the planned series">
 <source src="/media/fireside-roundtable.web.mp4" type="video/mp4" />
 <track kind="captions" src="/media/fireside-roundtable.en.vtt" srcLang="en" label="English" />
-Your browser does not support video. <a href="/media/fireside-roundtable.transcript.txt">Read the descriptive transcript</a>.
 </video>
 <figcaption><a href="/media/fireside-roundtable.transcript.txt">Read the descriptive transcript</a></figcaption>
 </figure>
