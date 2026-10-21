@@ -545,7 +545,7 @@ case "/events": return <>
 </div>
 </section>
 <section className="section"><div className="shell"><h2>{"The Fireside and the Working Roundtable"}</h2>
-<div className="event-video-layout"><div><p>{"A planned series on rural health transformation, measured locally. The Fireside frames the choices with industry, county and academic leaders, moderated by SozoRock. The Working Roundtable tests the implications with providers, public health, educators and communities. A Local Outcomes Brief follows."}</p>
+<div className="event-video-layout"><div><p>{"A planned series on rural health transformation, measured locally. The Fireside frames the choices. The Working Roundtable tests their practical implications. A Local Outcomes Brief follows."}</p>
 <p className="fine">{"Dates, locations and participants will appear when confirmed."}</p>
 <a className="textlink" href="/partner">{"Partner"}</a>
 </div>
@@ -626,7 +626,7 @@ case "/support": return <>
 <section className="section"><div className="shell split"><h2>{"Primary Care Access Program"}</h2>
 <div><p>{"$108,000 funds the first 12-month cohort, starting January 2027: about $4,320 to support one participant for a full year, including the direct primary care membership with Dr. Michael Purcell and Purcell Integrative Osteopathic Care, ongoing telehealth, transportation help, health access education, coordination and reporting."}</p>
 <p>{"Sponsorship levels: Community $5,000 · Access $10,000 · Principal $25,000 · Lead $50,000. Other amounts are welcome."}</p>
-<p className="fine">{"Funds are confirmed before anyone enrolls. Sponsors receive reports at months 3, 6, 9 and 12. Renewal is optional. Sponsors do not select participants or influence clinical care."}</p>
+<p className="fine">{"Funds are confirmed before anyone enrolls. Sponsors receive reports at months 3, 6, 9 and 12. Renewal is optional. Sponsors do not select participants or influence clinical care. Clinical care remains with the licensed provider. Membership is not health insurance."}</p>
 </div>
 </div>
 </section>

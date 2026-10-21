@@ -34,8 +34,11 @@ test('approved pages retain the core programs and claim boundaries',()=>{
   for(const term of ['A clearer route to primary care.','Library Health Equity Hub','Community Health Equity Hub','Home Health Equity Hub','CB-CAP','SozoRock preplanning roundtable','Participant-reported','Launching January 2027','Dr. Michael Purcell and Purcell Integrative Osteopathic Care','Clinical care remains','Capella University capstone','instructional sessions','hands-on cybersecurity','personally mentors every learner']) assert.ok(home.includes(term),term);
   const learning=visible(page('platforms/applied-learning'));
   for(const term of ['capstone','six-month','Instructional sessions','hands-on projects','Six learners in the initial cohort','Five in the current cohort','Capella University retains academic oversight and grading']) assert.ok(learning.includes(term),term);
-  assert.doesNotMatch(home,/12 months|two hours|founder/i);
+  const support=visible(page('support'));
+  for(const term of ['Clinical care remains with the licensed provider.','Membership is not health insurance.']) assert.ok(support.includes(term),term);
   const events=visible(page('events'));
+  assert.doesNotMatch(events,/industry, county and academic leaders|providers, public health, educators and communities/i);
+  assert.doesNotMatch(home,/12 months|two hours|founder/i);
   for(const term of ['Western New York preplanning roundtable','A planned series','Dates, locations and participants will appear when confirmed.']) assert.ok(events.includes(term),term);
 });
 test('all approved routes have one heading, unique canonical metadata, and working internal destinations',()=>{
