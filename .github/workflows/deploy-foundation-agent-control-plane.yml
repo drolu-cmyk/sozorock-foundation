@@ -24,6 +24,7 @@ env:
   FUNCTION_NAME: SozoRockFoundationParentOrigin
   API_NAME: SozoRockFoundationParentSite
   RECEIPT_ISSUE: '58'
+  FOUNDATION_MODEL_EXECUTION_ENABLED: 'false'
 
 jobs:
   deploy:
@@ -75,7 +76,8 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
-          gh issue comment "$RECEIPT_ISSUE" --repo "$GITHUB_REPOSITORY" --body "Agent control-plane deployment **started** for commit \`${GITHUB_SHA}\` (run \`${GITHUB_RUN_ID}\`). Production accepts only short-term Bedrock model authentication; completion requires a signed real graph smoke."
+          printf 'Foundation runtime deployment started for commit `%s` (run `%s`). Model execution enabled: `%s`.\n' "$GITHUB_SHA" "$GITHUB_RUN_ID" "$FOUNDATION_MODEL_EXECUTION_ENABLED" > "$RUNNER_TEMP/runtime-start.md"
+          gh issue comment "$RECEIPT_ISSUE" --repo "$GITHUB_REPOSITORY" --body-file "$RUNNER_TEMP/runtime-start.md"
 
       - name: Deploy combined redirect and private Bedrock agent control plane
         id: deploy
@@ -84,10 +86,14 @@ jobs:
         run: |
           set -euo pipefail
           unset OPENAI_API_KEY OPENAI_IDENTITY_PROVIDER_ID OPENAI_SERVICE_ACCOUNT_ID OPENAI_WIF_AUDIENCE || true
-          bash services/foundation-agents/scripts/deploy-control-plane.sh
+          if [[ "$FOUNDATION_MODEL_EXECUTION_ENABLED" == 'true' ]]; then
+            bash services/foundation-agents/scripts/deploy-control-plane.sh
+          else
+            bash services/foundation-agents/scripts/deploy-public-guidance.sh
+          fi
 
       - name: Publish deployment receipt
-        if: always()
+        if: always() && env.FOUNDATION_MODEL_EXECUTION_ENABLED == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
@@ -105,7 +111,7 @@ jobs:
           printf '%s\n' "$body" >> "$GITHUB_STEP_SUMMARY"
 
       - name: Require secure Bedrock infrastructure and a real six-agent canary
-        if: always()
+        if: always() && env.FOUNDATION_MODEL_EXECUTION_ENABLED == 'true'
         shell: bash
         run: |
           set -euo pipefail
@@ -125,6 +131,16 @@ jobs:
           decision='${{ steps.deploy.outputs.graph_decision }}'
           [[ "$status" = 'review_required' || "$status" = 'escalated' ]]
           [[ "$decision" = 'pass' || "$decision" = 'revise' || "$decision" = 'escalate' ]]
+
+      - name: Verify public guidance with model execution paused
+        if: always() && env.FOUNDATION_MODEL_EXECUTION_ENABLED != 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "${{ steps.deploy.outcome }}" = 'success'
+          test "${{ steps.deploy.outputs.public_guidance_verified }}" = 'true'
+          test "${{ steps.deploy.outputs.model_execution_paused }}" = 'true'
+          printf 'Approved public guidance is deployed. Model execution is paused. Redirects and private-route authentication passed.\n' >> "$GITHUB_STEP_SUMMARY"
 
       - name: Close activation receipt after verified Bedrock model activation
         if: success() && steps.deploy.outputs.signed_route_verified == 'true' && steps.deploy.outputs.model_configured == 'true' && steps.deploy.outputs.auth_mode == 'bedrock_short_term' && (steps.deploy.outputs.model_api_mode == 'responses' || steps.deploy.outputs.model_api_mode == 'chat_completions') && (steps.deploy.outputs.graph_status == 'review_required' || steps.deploy.outputs.graph_status == 'escalated')

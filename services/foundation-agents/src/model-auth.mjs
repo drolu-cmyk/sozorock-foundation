@@ -30,12 +30,13 @@ export function bedrockBaseURLForModel(model, awsRegion) {
     return `https://bedrock-mantle.${awsRegion}.api.aws/openai/v1`;
   }
   if (model.includes("gpt-oss")) {
-    return `https://bedrock-mantle.${awsRegion}.api.aws/v1`;
+    return `https://bedrock-runtime.${awsRegion}.amazonaws.com/openai/v1`;
   }
   return `https://bedrock-runtime.${awsRegion}.amazonaws.com/v1`;
 }
 
 export function bedrockRuntimeModelId(model) {
+  if (model === "openai.gpt-oss-20b" || model === "openai.gpt-oss-120b") return `${model}-1:0`;
   return model;
 }
 

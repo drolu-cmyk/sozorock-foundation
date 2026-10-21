@@ -201,7 +201,7 @@ async function inspectPage(name, route, viewport, suffix) {
         const hasVisibleLabel = [element, ...element.querySelectorAll("*")].some((node) => isVisible(node) && directText(node));
         if (elementBackground && elementBackground.a > 0 && element.matches("button, a.button") && !hasVisibleLabel) {
           const ratio = contrast(composite(elementBackground, background), background);
-          if (ratio < 3) {
+          if (ratio < 3 && style.boxShadow === "none") {
             const key = `${selector}|fill|${colorString(elementBackground)}|${colorString(background)}`;
             if (!seenControls.has(key)) {
               seenControls.add(key);

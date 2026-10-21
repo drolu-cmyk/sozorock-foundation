@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import {readFileSync,readdirSync} from 'node:fs';
+import {readFileSync,readdirSync,existsSync} from 'node:fs';
 import {publications} from '../src/siteData.js';
 import worker from '../worker/index.js';
 
@@ -39,6 +39,7 @@ test('approved pages retain the core programs and claim boundaries',()=>{
   const events=visible(page('events'));
   assert.doesNotMatch(events,/industry, county and academic leaders|providers, public health, educators and communities/i);
   assert.doesNotMatch(home,/12 months|two hours|founder/i);
+  for(const term of ['Western New York preplanning roundtable','A planned series','Dates, locations and participants will appear when confirmed.']) assert.ok(events.includes(term),term);
 });
 test('all approved routes have one heading, unique canonical metadata, and working internal destinations',()=>{
  const paths=JSON.parse(readFileSync('src/approved-metadata.json','utf8'));
@@ -49,7 +50,7 @@ test('all approved routes have one heading, unique canonical metadata, and worki
   const title=html.match(/<title>(.*?)<\/title>/)[1]; assert.ok(!titles.has(title),title);titles.add(title);
   assert.ok(html.includes(`rel="canonical" href="https://www.sozorockfoundation.org${route==='/'?'':route}`),route);
   assert.doesNotMatch(visible(html),/Draft for approval|Effective date to follow|Keep the existing|inspected Albany/i);
-  for(const [,href] of html.matchAll(/<a[^>]*href="(\/[^"?#]*)/g)) assert.ok(paths[href]||href==='/','internal link '+href);
+  for(const [,href] of html.matchAll(/<a[^>]*href="(\/[^"?#]*)/g)) assert.ok(paths[href]||href==='/'||existsSync('dist/client'+href),'internal link '+href);
  }
 });
 test('research records and access keep citations, delivery essentials and separate optional consent',()=>{

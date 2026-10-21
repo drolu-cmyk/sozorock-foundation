@@ -15,6 +15,7 @@ assert.deepEqual(workflowFiles, [
   "current-site-audit.yml",
   "deploy-foundation-agent-control-plane.yml",
   "deploy-parent-cloudfront.yml",
+  "publish-legacy-health-redirect.yml",
   "render-platform-films.yml",
 ]);
 const filmWorkflow = (await readFile(new URL("render-platform-films.yml", workflowDirectory), "utf8")).replaceAll("\r\n", "\n");
