@@ -12,6 +12,7 @@ on:
       - scripts/prepare-sites-build.mjs
       - scripts/bootstrap-parent-aws.sh
       - scripts/validate-aws-release.mjs
+      - scripts/check-tracked-secrets.py
       - infra/cloudformation/parent-cloudfront.yml
       - .github/workflows/deploy-parent-cloudfront.yml
   workflow_dispatch:
@@ -58,6 +59,7 @@ jobs:
       - name: Build and validate the approved site
         run: |
           set -euo pipefail
+          python3 scripts/check-tracked-secrets.py --self-test
           npm ci
           npm run build
           npm run test:sites

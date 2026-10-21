@@ -33,6 +33,9 @@ jobs:
           ref: ${{ github.sha }}
           persist-credentials: false
 
+      - name: Check committed source
+        run: python3 scripts/check-tracked-secrets.py --self-test
+
       - name: Set up Node
         uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e
         with:
