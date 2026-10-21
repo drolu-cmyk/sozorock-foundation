@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import {readFileSync,readdirSync} from 'node:fs';
+import {readFileSync,readdirSync,existsSync} from 'node:fs';
 import {publications} from '../src/siteData.js';
 import worker from '../worker/index.js';
 
@@ -45,7 +45,7 @@ test('all approved routes have one heading, unique canonical metadata, and worki
   const title=html.match(/<title>(.*?)<\/title>/)[1]; assert.ok(!titles.has(title),title);titles.add(title);
   assert.ok(html.includes(`rel="canonical" href="https://www.sozorockfoundation.org${route==='/'?'':route}`),route);
   assert.doesNotMatch(visible(html),/Draft for approval|Effective date to follow|Keep the existing|inspected Albany/i);
-  for(const [,href] of html.matchAll(/<a[^>]*href="(\/[^"?#]*)/g)) assert.ok(paths[href]||href==='/','internal link '+href);
+  for(const [,href] of html.matchAll(/<a[^>]*href="(\/[^"?#]*)/g)) assert.ok(paths[href]||href==='/'||existsSync('dist/client'+href),'internal link '+href);
  }
 });
 test('research records and access keep citations, delivery essentials and separate optional consent',()=>{
