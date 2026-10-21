@@ -4,13 +4,14 @@ on:
   push:
     branches: [main]
     paths:
+      - scripts/check-tracked-secrets.py
+      - scripts/audit-npm-production.sh
       - services/foundation-agents/**
       - .github/workflows/deploy-foundation-agent-control-plane.yml
   workflow_dispatch:
 
 permissions:
   contents: read
-  issues: write
   id-token: write
 
 concurrency:
@@ -23,7 +24,6 @@ env:
   ACCOUNT_ID: '791860731989'
   FUNCTION_NAME: SozoRockFoundationParentOrigin
   API_NAME: SozoRockFoundationParentSite
-  RECEIPT_ISSUE: '58'
   FOUNDATION_MODEL_EXECUTION_ENABLED: 'false'
 
 jobs:
@@ -37,6 +37,9 @@ jobs:
         with:
           persist-credentials: false
 
+      - name: Check committed source
+        run: python3 scripts/check-tracked-secrets.py --self-test
+
       - name: Set up Node
         uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
         with:
@@ -49,6 +52,7 @@ jobs:
           set -euo pipefail
           npm ci --ignore-scripts --no-audit --no-fund
           npm run smoke
+          bash ../../scripts/audit-npm-production.sh
 
       - name: Package Lambda runtime
         working-directory: services/foundation-agents
@@ -70,14 +74,7 @@ jobs:
           role-session-name: FoundationAgents-${{ github.run_id }}
           aws-region: ${{ env.AWS_REGION }}
           retry-max-attempts: 3
-
-      - name: Record deployment start
-        env:
-          GH_TOKEN: ${{ github.token }}
-        shell: bash
-        run: |
-          printf 'Foundation runtime deployment started for commit `%s` (run `%s`). Model execution enabled: `%s`.\n' "$GITHUB_SHA" "$GITHUB_RUN_ID" "$FOUNDATION_MODEL_EXECUTION_ENABLED" > "$RUNNER_TEMP/runtime-start.md"
-          gh issue comment "$RECEIPT_ISSUE" --repo "$GITHUB_REPOSITORY" --body-file "$RUNNER_TEMP/runtime-start.md"
+          mask-aws-account-id: true
 
       - name: Deploy combined redirect and private Bedrock agent control plane
         id: deploy
@@ -94,8 +91,6 @@ jobs:
 
       - name: Publish deployment receipt
         if: always() && env.FOUNDATION_MODEL_EXECUTION_ENABLED == 'true'
-        env:
-          GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
           outcome='${{ steps.deploy.outcome }}'
@@ -107,7 +102,6 @@ jobs:
           graph_status='${{ steps.deploy.outputs.graph_status }}'
           graph_decision='${{ steps.deploy.outputs.graph_decision }}'
           body="Agent control-plane run \`${GITHUB_RUN_ID}\`: secure infrastructure deployment **${outcome}**. Canonical redirect and unsigned 403 protection are required before infrastructure remains deployed. Model configured: **${configured:-unknown}**; selected model: \`${selected_model:-unknown}\`; auth mode: \`${auth_mode:-none}\`; model API: \`${api_mode:-unknown}\`; deploy-role signed internal route: \`${signed_route:-not-run}\`; authenticated parallel six-agent canary status: \`${graph_status:-not-run}\`; decision: \`${graph_decision:-not-run}\`. No secret values are included in this receipt."
-          gh issue comment "$RECEIPT_ISSUE" --repo "$GITHUB_REPOSITORY" --body "$body"
           printf '%s\n' "$body" >> "$GITHUB_STEP_SUMMARY"
 
       - name: Require secure Bedrock infrastructure and a real six-agent canary
@@ -141,23 +135,3 @@ jobs:
           test "${{ steps.deploy.outputs.public_guidance_verified }}" = 'true'
           test "${{ steps.deploy.outputs.model_execution_paused }}" = 'true'
           printf 'Approved public guidance is deployed. Model execution is paused. Redirects and private-route authentication passed.\n' >> "$GITHUB_STEP_SUMMARY"
-
-      - name: Close activation receipt after verified Bedrock model activation
-        if: success() && steps.deploy.outputs.signed_route_verified == 'true' && steps.deploy.outputs.model_configured == 'true' && steps.deploy.outputs.auth_mode == 'bedrock_short_term' && (steps.deploy.outputs.model_api_mode == 'responses' || steps.deploy.outputs.model_api_mode == 'chat_completions') && (steps.deploy.outputs.graph_status == 'review_required' || steps.deploy.outputs.graph_status == 'escalated')
-        env:
-          GH_TOKEN: ${{ github.token }}
-        shell: bash
-        run: |
-          set -euo pipefail
-          graph_status='${{ steps.deploy.outputs.graph_status }}'
-          graph_decision='${{ steps.deploy.outputs.graph_decision }}'
-          selected_model='${{ steps.deploy.outputs.selected_model }}'
-          cat > "$RUNNER_TEMP/activation-complete.md" <<EOF
-          ## Foundation agent activation complete
-
-          \`${selected_model}\` is active through short-term Amazon Bedrock credentials and its documented OpenAI-compatible API on the private AWS-IAM-protected Foundation control plane. The production deployment passed canonical redirect verification, unsigned 403 protection, the signed internal route check, and an authenticated parallel canary across all six real model-backed site-assurance agents ending in \`${graph_status}\` with decision \`${graph_decision}\`.
-
-          No long-lived model credential is stored in the Foundation runtime.
-          EOF
-          gh issue comment "$RECEIPT_ISSUE" --repo "$GITHUB_REPOSITORY" --body-file "$RUNNER_TEMP/activation-complete.md"
-          gh issue close "$RECEIPT_ISSUE" --repo "$GITHUB_REPOSITORY" --reason completed

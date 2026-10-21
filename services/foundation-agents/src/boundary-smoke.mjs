@@ -13,7 +13,8 @@ assert.equal(containsForbiddenMaterial({ nested: { apiKey: "redacted" } }), true
 assert.equal(containsForbiddenMaterial({ nested: { API_KEY: "redacted" } }), true);
 assert.equal(containsForbiddenMaterial({ nested: { medical_record_number: "redacted" } }), true);
 assert.equal(containsForbiddenMaterial({ note: "sk-proj-abcdefghijklmnopqrstuvwxyz0123456789" }), true);
-assert.equal(containsForbiddenMaterial({ note: "AKIAABCDEFGHIJKLMNOP" }), true);
+const syntheticAwsAccessKey = "AKIA" + "A".repeat(16);
+assert.equal(containsForbiddenMaterial({ note: syntheticAwsAccessKey }), true);
 assert.equal(containsForbiddenMaterial({ note: "123-45-6789" }), true);
 assert.equal(containsForbiddenMaterial({ note: "-----BEGIN PRIVATE KEY-----" }), true);
 
