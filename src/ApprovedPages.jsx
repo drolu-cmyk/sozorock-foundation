@@ -533,7 +533,7 @@ case "/events": return <>
 <a className="action" href="/partner">{"Partner"}</a>
 </div>
 </section>
-<section className="section"><div className="shell split"><h2>{"SozoRock preplanning roundtable"}</h2>
+<section className="section"><div className="shell split"><h2>{"Western New York roundtable"}</h2>
 <div><p>{"Western New York · September 22, 2025"}<br />{"12 participants. Two county public-health jurisdictions. Two universities."}</p>
 </div>
 </div>
@@ -544,10 +544,19 @@ case "/events": return <>
 </div>
 </div>
 </section>
-<section className="section"><div className="shell split"><h2>{"The Fireside and the Working Roundtable"}</h2>
-<div><p>{"A planned series on rural health transformation, measured locally. The Fireside frames the choices with industry, county and academic leaders, moderated by SozoRock. The Working Roundtable tests the implications with providers, public health, educators and communities. A Local Outcomes Brief follows."}</p>
+<section className="section"><div className="shell"><h2>{"The Fireside and the Working Roundtable"}</h2>
+<div className="event-video-layout"><div><p>{"A planned series on rural health transformation, measured locally. The Fireside frames the choices with industry, county and academic leaders, moderated by SozoRock. The Working Roundtable tests the implications with providers, public health, educators and communities. A Local Outcomes Brief follows."}</p>
 <p className="fine">{"Dates, locations and participants will appear when confirmed."}</p>
 <a className="textlink" href="/partner">{"Partner"}</a>
+</div>
+<figure>
+<video controls playsInline preload="none" poster="/media/fireside-roundtable.poster.jpg" aria-label="The Fireside and the Working Roundtable, a 30-second introduction to the planned series">
+<source src="/media/fireside-roundtable.web.mp4" type="video/mp4" />
+<track kind="captions" src="/media/fireside-roundtable.en.vtt" srcLang="en" label="English" />
+<track kind="descriptions" src="/media/fireside-roundtable.visual.en.vtt" srcLang="en" label="English visual description" />
+</video>
+<figcaption><a href="/media/fireside-roundtable.transcript.txt">Read the descriptive transcript</a></figcaption>
+</figure>
 </div>
 </div>
 </section>

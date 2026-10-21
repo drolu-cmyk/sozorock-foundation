@@ -46,3 +46,10 @@
 .approved-site .blue p,.approved-site .blue .fine,.approved-site .blue figcaption,.approved-site .footer p{color:#fff!important}.approved-site .bookrack figcaption{display:block!important;margin-top:18px;line-height:1.45;font-size:14px;font-weight:500;text-align:left}.approved-site .bookrack figcaption .hint{display:block;font-size:12px;opacity:.85;margin-top:3px}.approved-site .bookrack figure:nth-child(2){transform:translateY(-20px)}
 body:has(.approved-site){min-width:0}.approved-site{min-width:0}
 .approved-site .policy a{overflow-wrap:anywhere}.approved-site .policy>div{min-width:0}
+
+.approved-site .event-video-layout{display:grid;grid-template-columns:1fr 1.2fr;gap:46px;align-items:start;margin-top:30px}
+.approved-site .event-video-layout>div{min-width:0}
+.approved-site .event-video-layout figure{margin:0;min-width:0}
+.approved-site .event-video-layout video{display:block;width:100%;height:auto;aspect-ratio:16/9;background:#071d3b;color:#fff}
+.approved-site .event-video-layout figcaption{font-size:14px;line-height:1.6;margin-top:12px}
+@media(max-width:800px){.approved-site .event-video-layout{grid-template-columns:1fr;gap:28px}}
