@@ -1,0 +1,24 @@
+# The SozoRock Foundation
+
+> Healthier communities. Stronger systems. A say in what's next. The SozoRock Foundation, Inc. is a 501(c)(3) public charity (EIN 39-4736725) based in Albany, New York State. It works on three gaps: Access, Capacity and Trust, through one loop: listen, study, build and prove results in public.
+
+## Our work
+- [Health Access](https://health.sozorockfoundation.org/): SozoRock Health. The Primary Care Access Program sponsors a year of direct primary care for up to 25 New Yorkers with a chronic condition and financial need, from January 2027. Clinical care stays with the licensed provider. Membership is not health insurance.
+- [Workforce Capacity](https://www.sozorockfoundation.org/workforce): hands on learning in cloud computing (AWS), cloud security, identity and access management, governance, risk and compliance, and AI, with universities, employers and health systems. Includes a recurring graduate model with Capella University and work integrated learning with Athabasca University in Alberta, Canada.
+- [AI & Society](https://www.sozorockfoundation.org/ai-society): building public trust in AI through Who Decides? forums on AI in learning, work and health.
+- [SozoRock AI Lab](https://ai-lab.sozorockfoundation.org/): free, practical AI learning for any background, Tuesdays at 6:30 pm in Albany, New York State. Registration required.
+
+## Research
+- [Health Systems Assurance Series, Volume 1 (2026)](https://www.sozorockfoundation.org/publication/hsa-v1-2026): what evidence should support trust in digital health systems.
+- [Rethinking Rural Governance Series, Volume 1 (2025)](https://www.sozorockfoundation.org/publication/rrg-v1-2025): from fragmented response to coordinated public action. Modernization and Resilience Program.
+- [Rural Equity Blueprint Series, Volume 1 (2025)](https://www.sozorockfoundation.org/publication/rebs-v1-2025): a practical framework for local health access.
+
+## Events
+- [Events](https://www.sozorockfoundation.org/events): Firesides, Working Roundtables and Who Decides? forums. Dates are published only when confirmed.
+
+## Organization
+- [About](https://www.sozorockfoundation.org/about)
+- [Leadership](https://www.sozorockfoundation.org/leadership)
+- [Standards](https://www.sozorockfoundation.org/standards)
+- [Partner with us](https://www.sozorockfoundation.org/partner)
+- [Contact](https://www.sozorockfoundation.org/contact)
