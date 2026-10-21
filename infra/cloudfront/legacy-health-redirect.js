@@ -10,6 +10,7 @@ function handler(event) {
   }
   var uri = request.uri || '/';
   var target = 'https://health.sozorockfoundation.org' + uri;
+  if (uri === '/about' || uri === '/about/') target = 'https://health.sozorockfoundation.org/work';
   if (uri === '/cb-cap' || uri === '/cb-cap/' || uri === '/cbcap' || uri === '/cbcap/') target = 'https://cbcap.sozorockfoundation.org/';
   var query = request.querystring || {};
   var allowed = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term'];
