@@ -1,8 +1,8 @@
 import approvedMetadata from "./approved-metadata.json" with { type: "json" };
 import { getSeoForPath as getBaseSeo } from "./seo.js";
 
-const GLOBAL_SITE_DESCRIPTION = "Health systems and health equity, cybersecurity workforce development, AI & Society and public-interest research.";
-const SOCIAL_IMAGE_ALT = "The SozoRock Foundation. A clearer route to primary care.";
+const GLOBAL_SITE_DESCRIPTION = "The SozoRock Foundation is a New York public charity connecting health access, public-interest research, county evidence and applied learning.";
+const SOCIAL_IMAGE_ALT = "The SozoRock Foundation. Health access, public research and applied learning.";
 
 const overrides = {
   "/": {

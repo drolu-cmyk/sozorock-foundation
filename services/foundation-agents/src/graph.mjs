@@ -9,6 +9,7 @@ import {
 } from "./agents.mjs";
 import { ensureModelAuthConfigured, modelAuthConfigured } from "./model-auth.mjs";
 import { publicKnowledgeSnapshot } from "./public-knowledge.mjs";
+import { formatOperationalContext } from "./operational-context.mjs";
 
 export const graphs = Object.freeze({
   publicNavigator: {
@@ -72,7 +73,7 @@ function nodeInput({ graphId, graph, nodeId, originalInput, outputs, context, it
     `Iteration: ${iteration}`,
     `Permitted revision targets: ${revisionTargets.join(", ")}`,
     `Original task and evidence:\n${safeValue(originalInput)}`,
-    `Operational context:\n${safeValue(context, 4_000)}`,
+    `Operational context:\n${formatOperationalContext(context)}`,
     evaluationFeedback
       ? `Evaluation feedback driving this revision:\n${safeValue(evaluationFeedback, 8_000)}`
       : "Evaluation feedback driving this revision: none.",

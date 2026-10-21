@@ -58,6 +58,16 @@ export function inspectHeaders(raw, location) {
   return { status, location: headers.get("location"), matches: status === 301 && headers.get("location") === location };
 }
 
+export function validateFunctionTestResult(tested, sample) {
+  assert.ok(!tested.TestResult?.FunctionErrorMessage, "The development function returned an error.");
+  const output = JSON.parse(tested.TestResult?.FunctionOutput ?? "null");
+  const response = output?.response;
+  assert.ok(response && typeof response === "object", "The development test did not return a response.");
+  assert.equal(Number(response.statusCode), sample.status);
+  if (sample.location) assert.equal(response.headers?.location?.value, sample.location);
+  return response;
+}
+
 function aws(...args) {
   try {
     return JSON.parse(execFileSync("aws", ["cloudfront", ...args, "--output", "json", "--no-cli-pager"], { encoding: "utf8", timeout: 60_000, maxBuffer: 8 * 1024 * 1024, stdio: ["ignore", "pipe", "pipe"] }));
@@ -127,10 +137,7 @@ function publish(settings) {
     writeJson(eventFile, sample.event);
     const tested = aws("test-function", "--name", functionName, "--if-match", updated.ETag, "--stage", "DEVELOPMENT", "--event-object", "fileb://" + eventFile);
     writeJson(path.join(results, "test-" + index + ".json"), tested);
-    assert.ok(!tested.TestResult?.FunctionErrorMessage, "The development function returned an error.");
-    const output = JSON.parse(tested.TestResult.FunctionOutput);
-    assert.equal(Number(output.statusCode), sample.status);
-    if (sample.location) assert.equal(output.headers.location.value, sample.location);
+    validateFunctionTestResult(tested, sample);
   }
   const fresh = aws("describe-function", "--name", functionName, "--stage", "DEVELOPMENT");
   assert.equal(fresh.ETag, updated.ETag, "Development changed after testing. Refusing to publish untested code.");

@@ -27,19 +27,19 @@ case "/": return <>
 <a className="textlink" href="/platforms/health">{"Explore"}</a>
 </div>
 </div>
-<div className="hubset"><article><h3>{"Library Health Equity Hub"}</h3>
+<div className="hubset"><article><h3>{"Proposed: Library Health Equity Hub"}</h3>
 <p>{"Health literacy and digital support through local libraries."}</p>
 <details><summary>{"Details"}</summary>
 <p>{"A proposed library-based model for health information, digital skills and preparation to use provider-led services. Local partners would agree the space, connectivity, privacy and staff responsibilities."}</p>
 </details>
 </article>
-<article><h3>{"Community Health Equity Hub"}</h3>
+<article><h3>{"Proposed: Community Health Equity Hub"}</h3>
 <p>{"Health education and digital support through community organizations."}</p>
 <details><summary>{"Details"}</summary>
 <p>{"A proposed community-based model combining local health information, digital support and preparation for provider-led services. Activities would reflect local needs, partner capacity and available services."}</p>
 </details>
 </article>
-<article><h3>{"Home Health Equity Hub"}</h3>
+<article><h3>{"Proposed: Home Health Equity Hub"}</h3>
 <p>{"Help preparing to use provider platforms from home."}</p>
 <details><summary>{"Details"}</summary>
 <p>{"A proposed home-based model for people who need support using devices, connectivity or provider platforms. It does not establish a home-care or home-health clinical service."}</p>
@@ -56,7 +56,7 @@ case "/": return <>
 </div>
 </div>
 <div style={{"marginTop": "38px"}}><div className="datahead"><h3>{"Albany County, New York"}</h3>
-<span>{"County FIPS 36001 · 2022–2023 estimates"}</span>
+<span>{"County FIPS 36001 · 2023 estimates · 2025 release"}</span>
 </div>
 <div className="datastrip"><div><strong>{"5.5%"}</strong>
 <span>{"Adults without health insurance"}</span>
@@ -71,7 +71,7 @@ case "/": return <>
 <small>{"95% interval: 9.9–15.0%"}</small>
 </div>
 </div>
-<p className="sources">{"Example captured from SozoRock Health’s Place Intelligence on 22 September 2026. Modeled county estimates describe community conditions, not SozoRock results or an individual’s needs. Review the underlying definitions, eligible populations and sources before use."}</p>
+<p className="sources">{"CDC PLACES, 2025 release: model-based crude prevalence estimates for 2023. Insurance covers adults aged 18–64; the other measures cover adults 18+. County estimates describe communities, not SozoRock results or individual needs."}</p>
 <a className="textlink" href="https://health.sozorockfoundation.org/evidence">{"Explore"}</a>
 </div>
 </div>
@@ -182,19 +182,19 @@ case "/platforms/health": return <>
 <section className="section" id="hubs"><div className="shell"><div className="hubintro"><h2>{"Health Equity Initiative"}</h2>
 <p>{"Health literacy, digital readiness and preparation for provider-led care. Three models, designed for the places people use."}</p>
 </div>
-<div className="hubset"><article><h3>{"Library Health Equity Hub"}</h3>
+<div className="hubset"><article><h3>{"Proposed: Library Health Equity Hub"}</h3>
 <p>{"Health literacy and digital support through local libraries."}</p>
 <details><summary>{"Details"}</summary>
 <p>{"A proposed library-based model for health information, digital skills and preparation to use provider-led services. Local partners would agree the space, connectivity, privacy and staff responsibilities."}</p>
 </details>
 </article>
-<article><h3>{"Community Health Equity Hub"}</h3>
+<article><h3>{"Proposed: Community Health Equity Hub"}</h3>
 <p>{"Health education and digital support through community organizations."}</p>
 <details><summary>{"Details"}</summary>
 <p>{"A proposed community-based model combining local health information, digital support and preparation for provider-led services. Activities would reflect local needs, partner capacity and available services."}</p>
 </details>
 </article>
-<article><h3>{"Home Health Equity Hub"}</h3>
+<article><h3>{"Proposed: Home Health Equity Hub"}</h3>
 <p>{"Help preparing to use provider platforms from home."}</p>
 <details><summary>{"Details"}</summary>
 <p>{"A proposed home-based model for people who need support using devices, connectivity or provider platforms. It does not establish a home-care or home-health clinical service."}</p>
@@ -217,7 +217,7 @@ case "/platforms/health": return <>
 </div>
 </div>
 <div style={{"marginTop": "35px"}}><div className="datahead"><h3>{"Albany County, New York"}</h3>
-<span>{"County FIPS 36001 · 2022–2023 estimates"}</span>
+<span>{"County FIPS 36001 · 2023 estimates · 2025 release"}</span>
 </div>
 <div className="datastrip"><div><strong>{"5.5%"}</strong>
 <span>{"Adults without health insurance"}</span>
@@ -232,7 +232,7 @@ case "/platforms/health": return <>
 <small>{"95% interval: 9.9–15.0%"}</small>
 </div>
 </div>
-<p className="sources">{"Example captured from SozoRock Health’s Place Intelligence on 22 September 2026. Modeled county estimates describe community conditions, not SozoRock results or an individual’s needs. Review the underlying definitions, eligible populations and sources before use."}</p>
+<p className="sources">{"CDC PLACES, 2025 release: model-based crude prevalence estimates for 2023. Insurance covers adults aged 18–64; the other measures cover adults 18+. County estimates describe communities, not SozoRock results or individual needs."}</p>
 <a className="textlink" href="https://health.sozorockfoundation.org/evidence">{"Explore"}</a>
 </div>
 </div>
@@ -572,12 +572,13 @@ case "/about": return <>
 <p>{"Health equity, county intelligence and applied learning for communities and institutions."}</p>
 </div>
 </section>
-<section className="section"><div className="shell split"><h2>{"What connects our work"}</h2>
-<div><p>{"Health Equity Hubs address practical barriers around care. Place Intelligence and CB-CAP bring local evidence into planning. Research and applied learning support the people and institutions doing that work."}</p>
+<section className="section"><div className="shell split"><h2>{"Our mission"}</h2>
+<div><p>{"The SozoRock Foundation, Inc. is a New York 501(c)(3) public charity. We connect public-interest research with practical work to improve health access, strengthen applied learning and support accountable technology decisions. Rural and underserved communities are an important focus of our work."}</p>
 <a className="textlink" href="/platforms">{"Explore"}</a>
 </div>
 </div>
 </section>
+<section className="section soft"><div className="shell split"><h2>{"Our programs"}</h2><div><p>{"The Primary Care Access Program begins January 2027: 12 months of sponsored primary care and practical support for up to 25 New Yorkers with financial need and a chronic condition. Clinical care remains with the licensed provider. Membership is not health insurance."}</p><p>{"Our public research examines health equity, rural governance and digital health assurance. County evidence tools make public data available for local planning. Our recurring six-month cybersecurity learning collaboration connects graduate study with applied work; the university retains academic oversight and grading."}</p><p>{"Library, Community and Home Health Equity Hubs remain Proposed. The Fireside and Working Roundtable are a planned series."}</p><a className="textlink" href="/platforms">Explore our programs</a></div></div></section>
 <section className="section soft"><div className="shell split"><h2>{"Where we work with partners"}</h2>
 <div><p>{"Libraries, community organizations, licensed providers, universities, public agencies, employers and funders. Each collaboration has agreed responsibilities and a clear purpose."}</p>
 <a className="textlink" href="/partner">{"Partner"}</a>

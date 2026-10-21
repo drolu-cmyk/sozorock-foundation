@@ -2,7 +2,7 @@ import { leaders, publications } from "./siteData.js";
 
 export const SITE_ORIGIN = "https://www.sozorockfoundation.org";
 export const SITE_NAME = "The SozoRock Foundation";
-export const DEFAULT_SOCIAL_IMAGE = `${SITE_ORIGIN}/media/foundation-editorial-social.png`;
+export const DEFAULT_SOCIAL_IMAGE = `${SITE_ORIGIN}/media/foundation-public-work-2026.png`;
 export const ORGANIZATION_ID = `${SITE_ORIGIN}/#organization`;
 export const WEBSITE_ID = `${SITE_ORIGIN}/#website`;
 
@@ -250,6 +250,8 @@ export function getSeoForPath(inputPathname = "/") {
       "@id": ORGANIZATION_ID,
       name: SITE_NAME,
       legalName: "The SozoRock Foundation, Inc.",
+      nonprofitStatus: "https://schema.org/Nonprofit501c3",
+      taxID: "39-4736725",
       alternateName: "SozoRock Foundation",
       url: SITE_ORIGIN,
       logo: {
@@ -295,7 +297,7 @@ export function getSeoForPath(inputPathname = "/") {
       about: { "@id": ORGANIZATION_ID },
       breadcrumb: breadcrumb ? { "@id": breadcrumb["@id"] } : undefined,
       inLanguage: "en-US",
-      primaryImageOfPage: { "@type": "ImageObject", url: image, width: publication ? 1200 : 1731, height: publication ? 630 : 909 },
+      primaryImageOfPage: { "@type": "ImageObject", url: image, width: 1200, height: 630 },
       mainEntity: publication ? { "@id": `${canonicalUrl}/#report` } : undefined,
     },
     breadcrumb,
@@ -324,8 +326,8 @@ export function getSeoForPath(inputPathname = "/") {
     robots: base.robots || "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
     ogType: base.ogType || "website",
     image,
-    imageWidth: publication ? 1200 : 1731,
-    imageHeight: publication ? 630 : 909,
+    imageWidth: 1200,
+    imageHeight: 630,
     imageAlt: publication ? `${publication.title}, ${publication.volume} publication preview` : "The SozoRock Foundation — A clearer route to primary care.",
     schema: { "@context": "https://schema.org", "@graph": graph },
     publication,
