@@ -23,7 +23,19 @@ test('legacy about pages reach the existing Health work page',()=>{
  }
 });
 
-const {validateDistribution,sampleEvents,inspectHeaders}=await import('../scripts/publish-legacy-health-redirect.mjs');
+const {validateDistribution,sampleEvents,inspectHeaders,validateFunctionTestResult}=await import('../scripts/publish-legacy-health-redirect.mjs');
+test('AWS TestFunction response envelopes are validated before publishing',()=>{
+ for(const sample of sampleEvents()){
+  const response=ctx.handler(sample.event);
+  const result={TestResult:{FunctionOutput:JSON.stringify({response})}};
+  assert.equal(validateFunctionTestResult(result,sample).statusCode,sample.status);
+  assert.throws(()=>validateFunctionTestResult({TestResult:{FunctionErrorMessage:'execution failed',FunctionOutput:JSON.stringify({response})}},sample));
+  assert.throws(()=>validateFunctionTestResult({TestResult:{FunctionOutput:JSON.stringify(response)}},sample));
+  assert.throws(()=>validateFunctionTestResult({TestResult:{FunctionOutput:JSON.stringify({response:{...response,statusCode:500}})}},sample));
+  if(sample.location)assert.throws(()=>validateFunctionTestResult({TestResult:{FunctionOutput:JSON.stringify({response:{...response,headers:{location:{value:'https://example.invalid'}}}})}},sample));
+ }
+ for(const FunctionOutput of [undefined,'{','null','{}'])assert.throws(()=>validateFunctionTestResult({TestResult:{FunctionOutput}},sampleEvents()[0]));
+});
 test('every development-stage sample has the expected response',()=>{
  for(const sample of sampleEvents()){
   const result=ctx.handler(sample.event);
