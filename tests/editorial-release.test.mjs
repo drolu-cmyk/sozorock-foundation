@@ -31,7 +31,11 @@ const page = route => readFileSync(`dist/client/${route || 'index'}.html`,'utf8'
 const visible = html => html.replace(/<script[\s\S]*?<\/script>/g,'').replace(/<[^>]+>/g,' ').replace(/\s+/g,' ');
 test('approved pages retain the core programs and claim boundaries',()=>{
   const home=visible(page(''));
-  for(const term of ['A clearer route to primary care.','Library Health Equity Hub','Community Health Equity Hub','Home Health Equity Hub','CB-CAP','SozoRock preplanning roundtable','Participant-reported','Launching January 2027','Dr. Michael Purcell and Purcell Integrative Osteopathic Care','Clinical care remains','Capella University capstone','instructional sessions','hands-on cybersecurity','personally mentors every learner']) assert.ok(home.includes(term),term);
+  for(const term of ['Healthier communities. Stronger systems.','A say in what’s next.','Demand for care, skills and trusted AI is outpacing supply.','Our approach','Health Access','Workforce Capacity','AI &amp; Society','Our impact','Up to 25 people gain a year of primary care from January 2027.','Research and insights','Health Systems Assurance Series','Rethinking Rural Governance Series','Rural Equity Blueprint Series','Modernization and Resilience Program','Tuesdays at 6:30 pm, Albany, New York State','Upcoming events','Date to be announced','Western New York preplanning roundtable','The SozoRock Briefing']) assert.ok(home.includes(term),term);
+  assert.doesNotMatch(home,/Proposed|\u2014|\u2013/);
+  const workforce=visible(page('workforce'));
+  for(const term of ['Stronger systems start with skilled people.','cloud, security, governance and AI','Capella University','Athabasca University','6 learners','5 learners','1 learner','Capella University, which retains academic oversight and grading','Dr. Oluwabiyi Adeyemo','Register for the AI Lab']) assert.ok(workforce.includes(term),term);
+  assert.doesNotMatch(workforce,/94|grade of/i);
   const learning=visible(page('platforms/applied-learning'));
   for(const term of ['capstone','six-month','Instructional sessions','hands-on projects','Six learners in the initial cohort','Five in the current cohort','Capella University retains academic oversight and grading']) assert.ok(learning.includes(term),term);
   const support=visible(page('support'));
@@ -65,7 +69,7 @@ test('research records and access keep citations, delivery essentials and separa
 });
 test('navigation, footer and forms retain accessible actions and legal identity',()=>{
  const html=page(''), chrome=readFileSync('src/SiteChrome.jsx','utf8');
- for(const label of ['What we do','Who we are','Support','Publications','Contact','Partner','Privacy','Terms','Accessibility','Nondiscrimination','Standards','EIN 39-4736725','501(c)(3)']) assert.ok(html.includes(label),label);
+ for(const label of ['Our Work','Research','Events','About','Subscribe','Support','Support our work','Partner with us','Contact','Leadership','Privacy Policy','Terms of Use','Accessibility','Nondiscrimination','Standards','EIN 39-4736725','501(c)(3)']) assert.ok(html.includes(label),label);
  assert.match(chrome,/event\.key === "Escape"/);assert.match(chrome,/document\.body\.style\.overflow = "hidden"/);
  for(const route of ['support','partner','contact']){const form=page(route);for(const name of ['firstName','lastName','email','organization','jobTitle','subject','message'])assert.ok(form.includes(`name="${name}"`),route+' '+name);}
 });
