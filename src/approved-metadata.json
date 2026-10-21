@@ -13,7 +13,7 @@
   },
   "/platforms/health": {
     "title": "Health Access Initiative | The SozoRock Foundation",
-    "description": "How the Foundation supports health access in New York: the 2027 Primary Care Access Program, proposed community hubs, education and county evidence."
+    "description": "How the Foundation supports health access: the Primary Care Access Program from January 2027, Health Equity Hubs in development, education and county evidence."
   },
   "/platforms/applied-learning": {
     "title": "Cybersecurity Capstone & Workforce Development | SozoRock",
@@ -28,8 +28,8 @@
     "description": "Applied AI systems. Cybersecurity. AI governance."
   },
   "/ai-society": {
-    "title": "AI & Society | Education, Work & Public Participation | SozoRock",
-    "description": "SozoRock’s proposed AI governance initiative brings public voices into education and work: decisions, safeguards and institutional responses."
+    "title": "AI & Society | Public Trust in AI | SozoRock Foundation",
+    "description": "AI & Society builds public trust in AI. Who Decides? forums bring people into decisions about AI in learning, work and health, with published responses."
   },
   "/publications": {
     "title": "Publications | SozoRock Foundation",
