@@ -34,7 +34,7 @@ jobs:
             npm exec remotion -- render src/index.tsx "$film" "out/$film.mp4" --concurrency=2
             npm exec remotion -- still src/index.tsx "$film" "out/$film.png" --frame=120
           done
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
         with:
           name: sozorock-platform-introductions
           path: media/overview/out/
