@@ -25,3 +25,9 @@ updates:
       interval: weekly
       day: monday
     open-pull-requests-limit: 3
+  - package-ecosystem: npm
+    directory: /media/overview
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 3
