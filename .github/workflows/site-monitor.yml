@@ -29,9 +29,10 @@ jobs:
           for h in strict-transport-security content-security-policy x-content-type-options x-frame-options referrer-policy permissions-policy cross-origin-opener-policy; do
             grep -qi "^$h:" <<<"$headers" || { echo "missing $h"; exit 1; }
           done
-          for h in server x-amz-server-side-encryption x-amz-version-id x-powered-by; do
+          for h in x-amz-server-side-encryption x-amz-version-id x-amz-request-id x-powered-by; do
             if grep -qi "^$h:" <<<"$headers"; then echo "exposed $h"; exit 1; fi
           done
+          if grep -qi '^server: *amazons3' <<<"$headers"; then echo 'origin server exposed'; exit 1; fi
           for pair in /platforms/applied-learning:/workforce /platforms/institute:/publications /insights:/publications; do
             from="${pair%%:*}"; to="${pair##*:}"
             loc="$(curl --proto '=https' --tlsv1.2 -sI --max-time 20 "$site$from" | awk 'tolower($1)=="location:"{print $2}' | tr -d '\r')"
