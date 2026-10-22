@@ -247,11 +247,11 @@ jobs:
             navigator_status="$(curl --proto '=https' --tlsv1.2 --silent --show-error --output "$RUNNER_TEMP/navigator-preflight.json" --write-out '%{http_code}' \
               --request POST --header "Origin: https://${CANONICAL_HOST}" --header 'Content-Type: application/json' --data '{"question":"x"}' \
               "https://${distribution_domain}/api/navigator")"
-            [[ "$navigator_status" = '400' ]] && break
+            [[ "$navigator_status" = '410' ]] && break
             test "$attempt" -lt 40
             sleep 15
           done
-          test "$navigator_status" = '400'
+          test "$navigator_status" = '410'
 
       - name: Move and attach the canonical production alias after preflight
         if: steps.release_state.outputs.enable_aliases != 'true' && steps.release_state.outputs.bridge_mode != 'true'
@@ -466,7 +466,7 @@ jobs:
           navigator_status="$(curl --proto '=https' --tlsv1.2 --silent --show-error --output "$RUNNER_TEMP/navigator-live.json" --write-out '%{http_code}' \
             --request POST --header "Origin: https://${CANONICAL_HOST}" --header 'Content-Type: application/json' --data '{"question":"x"}' \
             "https://${CANONICAL_HOST}/api/navigator")"
-          test "$navigator_status" = '400'
+          test "$navigator_status" = '410'
           verified=1
           echo 'verified=true' >> "$GITHUB_OUTPUT"
           echo "mode=${receipt_mode}" >> "$GITHUB_OUTPUT"

@@ -105,9 +105,9 @@ export function AboutPage() {
       title="We close three gaps: access, capacity and trust."
       lede="The SozoRock Foundation, Inc. is a New York 501(c)(3) public charity. We connect public interest research with practical programs in health access, workforce capacity and trusted AI."
       actions={<><Btn href="/platforms">Explore our work</Btn><More href="/leadership">Meet our leadership</More></>}
-      panelTone="white"
-      panelLabel="Portraits of the Foundation's leadership team"
-      panel={<div className="ns-panel-people">{leaders.map((leader) => <img key={leader.name} src={leader.image} alt="" width="400" height="400" decoding="async" />)}</div>}
+      panelTone="royal"
+      panelLabel="Three gaps we work to close. Twelve learners across two countries. Three free research series."
+      panel={<div className="ns-panel-figures"><div><b>3</b><span>gaps we work to close: access, capacity and trust</span></div><div><b>12</b><span>learners in applied programs across two countries</span></div><div><b>3</b><span>research series, free to read</span></div></div>}
     />
     <Sec labelledBy="story-title">
       <Head id="story-title" eyebrow="Our story" title="One loop: listen, study, build, prove." />
