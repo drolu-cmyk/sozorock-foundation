@@ -51,7 +51,7 @@ jobs:
           node --test tests/legacy-health-redirect.test.mjs
 
       - name: Assume the existing bounded deployment role
-        uses: aws-actions/configure-aws-credentials@e6de054238d6b7531b4efff3b6587d9aade6a06c
+        uses: aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd
         with:
           role-to-assume: ${{ env.LEGACY_HEALTH_DEPLOY_ROLE_ARN }}
           role-session-name: LegacyHealthRedirect-${{ github.run_id }}
