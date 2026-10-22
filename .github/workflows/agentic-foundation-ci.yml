@@ -48,6 +48,20 @@ jobs:
       - name: Audit production dependencies
         run: bash scripts/audit-npm-production.sh
 
+      - name: Report every dependency advisory, including development tools
+        run: |
+          for dir in . services/foundation-agents; do
+            (cd "$dir" && npm audit --json 2>/dev/null || true) | node -e '
+              let raw = ""; process.stdin.on("data", (c) => raw += c).on("end", () => {
+                const report = JSON.parse(raw || "{}"); const vulns = report.vulnerabilities || {};
+                for (const [name, v] of Object.entries(vulns)) {
+                  const via = (v.via || []).filter((x) => typeof x === "object").map((x) => x.title).join("; ");
+                  console.log(`::warning title=${process.argv[1]} advisory::${v.severity} ${name} ${v.range} fix=${JSON.stringify(v.fixAvailable)} ${via}`);
+                }
+                console.log(`${process.argv[1]}: ${Object.keys(vulns).length} advisories`);
+              });' "$dir"
+          done
+
       - name: Validate AWS bootstrap shell
         run: bash -n scripts/bootstrap-parent-aws.sh
 
