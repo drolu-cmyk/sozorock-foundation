@@ -1,0 +1,46 @@
+name: Live site monitor
+
+# Every six hours: pages answer, security headers are present, infrastructure headers stay hidden,
+# retired routes redirect, DOI records resolve and the TLS certificate is not near expiry.
+# A failed run emails the repository owners through GitHub notifications.
+on:
+  schedule:
+    - cron: "17 */6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check pages, headers, redirects and certificate
+        shell: bash
+        run: |
+          set -euo pipefail
+          site='https://www.sozorockfoundation.org'
+          for path in / /platforms /platforms/health /workforce /ai-society /platforms/ai-lab /publications /publication/hsa-v1-2026 /publication/rrg-v1-2025 /publication/rebs-v1-2025 /events /about /leadership /partner /support /contact /privacy /sitemap.xml /robots.txt /llms.txt; do
+            code="$(curl --proto '=https' --tlsv1.2 -s -o /dev/null -w '%{http_code}' --max-time 20 "$site$path")"
+            echo "$path $code"; test "$code" = '200'
+          done
+          headers="$(curl --proto '=https' --tlsv1.2 -sI --max-time 20 "$site/")"
+          for h in strict-transport-security content-security-policy x-content-type-options x-frame-options referrer-policy permissions-policy cross-origin-opener-policy; do
+            grep -qi "^$h:" <<<"$headers" || { echo "missing $h"; exit 1; }
+          done
+          for h in server x-amz-server-side-encryption x-amz-version-id x-powered-by; do
+            if grep -qi "^$h:" <<<"$headers"; then echo "exposed $h"; exit 1; fi
+          done
+          for pair in /platforms/applied-learning:/workforce /platforms/institute:/publications /insights:/publications; do
+            from="${pair%%:*}"; to="${pair##*:}"
+            loc="$(curl --proto '=https' --tlsv1.2 -sI --max-time 20 "$site$from" | awk 'tolower($1)=="location:"{print $2}' | tr -d '\r')"
+            test "$loc" = "$to" || { echo "$from redirected to '$loc'"; exit 1; }
+          done
+          for doi in 10.65473/rrg-v1-2025 10.65473/rebs-v1-2025; do
+            code="$(curl -s -o /dev/null -w '%{http_code}' --max-time 20 "https://doi.org/$doi")"
+            echo "doi $doi $code"; case "$code" in 301|302|303|200) ;; *) exit 1 ;; esac
+          done
+          expiry="$(echo | openssl s_client -servername www.sozorockfoundation.org -connect www.sozorockfoundation.org:443 2>/dev/null | openssl x509 -noout -enddate | cut -d= -f2)"
+          days=$(( ( $(date -d "$expiry" +%s) - $(date +%s) ) / 86400 ))
+          echo "certificate expires in $days days"; test "$days" -gt 14

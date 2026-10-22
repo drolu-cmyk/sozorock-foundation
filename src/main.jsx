@@ -3,19 +3,7 @@ import { createRoot, hydrateRoot } from "react-dom/client";
 import { App } from "./App.jsx";
 import "@fontsource-variable/instrument-sans";
 import "./styles.css";
-import "./foundation-system.css";
-import "./editorial.css";
-import "./homepage-evidence.css";
-import "./institutional-refinements.css";
-import "./visibility-capability.css";
-import "./editorial-proof-overrides.css";
-import "./engage-opportunity.css";
-import "./experience-simplified.css";
-import "./experience-cleanup.css";
-import "./final-polish.css";
-import "./accessibility-polish.css";
 
-import "./approved.css";
 import "./site-2026.css";
 
 const container = document.getElementById("root");

@@ -231,12 +231,12 @@ export const leaders = [
     name: "Nike Oye, MBA",
     title: "Director of Global Health Partnerships",
     image: "/leadership/nike-oye.webp",
-    bio: "Nike Oye leads institutional relationships for health-access work. Her role is to clarify partner responsibilities, delivery requirements and the contribution each organization can make.",
+    bio: "Nike Oye leads institutional relationships for health access work. Her role is to clarify partner responsibilities, delivery requirements and the contribution each organization can make.",
   },
   {
     name: "Anthony Abraham, MSC",
     title: "Director of Global Affairs",
-    image: "/leadership/anthony-abraham.jpg",
+    image: "/leadership/anthony-abraham.webp",
     bio: "Anthony Abraham leads global affairs and cross-border institutional relations. He focuses on cooperation among health, academic and development organizations without obscuring differences in mandate, jurisdiction or accountability.",
   },
   {

@@ -31,19 +31,21 @@ const page = route => readFileSync(`dist/client/${route || 'index'}.html`,'utf8'
 const visible = html => html.replace(/<script[\s\S]*?<\/script>/g,'').replace(/<[^>]+>/g,' ').replace(/\s+/g,' ');
 test('approved pages retain the core programs and claim boundaries',()=>{
   const home=visible(page(''));
-  for(const term of ['Healthier communities. Stronger systems.','A say in what’s next.','Demand for care, skills and trusted AI is outpacing supply.','Our approach','Health Access','Workforce Capacity','AI &amp; Society','Our impact','Up to 25 people gain a year of primary care from January 2027.','Research and insights','Health Systems Assurance Series','Rethinking Rural Governance Series','Rural Equity Blueprint Series','Modernization and Resilience Program','Tuesdays at 6:30 pm, Albany, New York State','Upcoming events','Date to be announced','Western New York preplanning roundtable','The SozoRock Briefing']) assert.ok(home.includes(term),term);
+  for(const term of ['Healthier communities. Stronger systems.','A say in what’s next.','Demand for care, skills and trusted AI is outpacing supply.','How we work','Health Access','Workforce Capacity','AI &amp; Society','Results people can see.','Up to 25 people gain a year of primary care from January 2027.','Evidence leaders can act on.','Health Systems Assurance Series','Rethinking Rural Governance Series','Rural Equity Blueprint Series','Modernization and Resilience Program','Tuesdays at 6:30 pm, Albany, New York State','Join the conversation.','Date to be announced','Western New York preplanning roundtable','The SozoRock Briefing']) assert.ok(home.includes(term),term);
   assert.doesNotMatch(home,/Proposed|\u2014|\u2013/);
   const workforce=visible(page('workforce'));
   for(const term of ['Stronger systems start with skilled people.','cloud, security, governance and AI','Capella University','Athabasca University','6 learners','5 learners','1 learner','Capella University, which retains academic oversight and grading','Dr. Oluwabiyi Adeyemo','Register for the AI Lab']) assert.ok(workforce.includes(term),term);
   assert.doesNotMatch(workforce,/94|grade of/i);
-  const learning=visible(page('platforms/applied-learning'));
-  for(const term of ['capstone','six-month','Instructional sessions','hands-on projects','Six learners in the initial cohort','Five in the current cohort','Capella University retains academic oversight and grading']) assert.ok(learning.includes(term),term);
+  const work=visible(page('platforms'));
+  for(const term of ['Three gaps we work to close.','Health Equity Hubs','Primary Care Access Program','Nike Oye','Jordan Hare','Anthony Abraham','Dr. Oluwabiyi Adeyemo','Funding never buys a conclusion.']) assert.ok(work.includes(term),term);
+  const health=visible(page('platforms/health'));
+  for(const term of ['libraries, community centers and homes','Library Health Equity Hub','Community Health Equity Hub','Home Health Equity Hub','Health Access Day','Clinical care remains with the licensed provider.','Membership is not health insurance.','Participant reported context']) assert.ok(health.includes(term),term);
   const support=visible(page('support'));
   for(const term of ['Clinical care remains with the licensed provider.','Membership is not health insurance.']) assert.ok(support.includes(term),term);
   const events=visible(page('events'));
   assert.doesNotMatch(events,/industry, county and academic leaders|providers, public health, educators and communities/i);
   assert.doesNotMatch(home,/12 months|two hours|founder/i);
-  for(const term of ['Western New York preplanning roundtable','A planned series','Dates, locations and participants will appear when confirmed.']) assert.ok(events.includes(term),term);
+  for(const term of ['Western New York preplanning roundtable','Dates are announced as they are confirmed.','Date to be announced','Participant reported context']) assert.ok(events.includes(term),term);
 });
 test('all approved routes have one heading, unique canonical metadata, and working internal destinations',()=>{
  const paths=JSON.parse(readFileSync('src/approved-metadata.json','utf8'));
@@ -74,7 +76,7 @@ test('navigation, footer and forms retain accessible actions and legal identity'
  for(const route of ['support','partner','contact']){const form=page(route);for(const name of ['firstName','lastName','email','organization','jobTitle','subject','message'])assert.ok(form.includes(`name="${name}"`),route+' '+name);}
 });
 test('proposed convenings do not claim scheduled events and show public participation',()=>{
- const html=page('ai-society');assert.match(html,/Illustrative discussion prompt/);assert.match(html,/aria-pressed="true"/);assert.match(html,/aria-pressed="false"/);assert.match(html,/name="perspective"/);
+ const html=page('ai-society');assert.match(html,/Who Decides\?/);assert.match(html,/name="perspective"/);
  for(const route of ['events','ai-society']) assert.doesNotMatch(page(route),/"@type":"Event"/);
  const css=readdirSync('src').filter(f=>f.endsWith('.css')).map(f=>readFileSync('src/'+f,'utf8')).join('');assert.doesNotMatch(css,/gradient\(/i);
 });
