@@ -1,6 +1,18 @@
 # SozoRock Parent Site Design Decisions
 
-This repository is the production parent website for The SozoRock Foundation. The October 21, 2026 Access, Capacity and Trust direction, approved by the user, is the current direction and supersedes every earlier homepage, navigation, campaign and footer rule in this file or elsewhere in the repository.
+This repository is the production parent website for The SozoRock Foundation. The October 21, 2026 Access, Capacity and Trust direction and the October 22, 2026 page designs, approved by the user, are the current direction and supersede every earlier homepage, navigation, campaign, page and footer rule in this file or elsewhere in the repository.
+
+## October 22, 2026 design system (current)
+
+- No rules, dividers or hairlines. Sections separate by color fields (white, light blue #EFF5FF, navy, royal, cobalt) and space. The only lines are form field underlines.
+- Every page opens with the same hero composition as the homepage: bold headline left, one panel right (a photo, covers, portraits, one large number or the Access, Capacity, Trust panel).
+- Section statements use regular weight at 40 to 48 px with a short section label above them. Data is shown as one large number, one thin rounded bar and a visible source.
+- Tiles are solid light blue, white or brand blue with a round arrow button. Buttons are pills.
+- The Briefing sits on a light blue band, followed by a clean white footer. No cream or warm neutrals anywhere.
+- Health Access covers the Health Equity Initiative (Library, Community and Home Health Equity Hubs, Health Access Day) and the Primary Care Access Program, framed as removing barriers: cost, distance, technology, health information and trust.
+- Our Work shows who leads each program: Nike Oye (health partnerships), Jordan Hare (health education), Dr. Oluwabiyi Adeyemo (Workforce Capacity and AI & Society), Anthony Abraham (global affairs).
+- Retired routes redirect permanently: /platforms/applied-learning to /workforce, /platforms/institute and /insights to /publications.
+- Page components live in src/site/. Styles live in src/site-2026.css.
 
 ## Durable requirements
 
@@ -9,7 +21,7 @@ This repository is the production parent website for The SozoRock Foundation. Th
 - The Foundation story is one loop, Listen, Study, Build, Prove, closing three gaps: Access (Health Access, SozoRock Health), Capacity (Workforce Capacity, which leads cybersecurity, cloud, governance and AI learning) and Trust (AI & Society, research and assurance). Every page shows where it sits in that story.
 - Write broadly so the work can grow beyond one state. Name New York State only for facts, places and data, and always write “New York State” after Albany, the Capital Region or a county name.
 - Follow McKinsey and Brookings for hierarchy and restraint: a finding stated as a headline, one chart per point, few words, one main action per section, secondary actions as text links.
-- Do not use visible eyebrow labels, except the short gap names Access, Capacity and Trust that mark charts and impact stories. Avoid repetitive label, headline, paragraph and CTA templates. Let hierarchy come from typography, whitespace, contrast, evidence and composition.
+- Short section labels above statements are part of the approved design. Avoid repetitive headline, paragraph and CTA templates. Let hierarchy come from typography, whitespace, contrast, evidence and composition.
 - Never write the word “Proposed” in public copy. Do not use dashes as punctuation in public copy.
 - Buttons are rounded pills, never square boxes. Form fields use a label above a single underline, never boxed fields.
 - Keep public copy concise, specific and natural. Avoid generic consulting language, AI sounding prose, internal planning terms and mechanical process writing. Prefer problem, evidence, response and action.
@@ -45,7 +57,7 @@ This repository is the production parent website for The SozoRock Foundation. Th
 - Keep the parent homepage broader than publications. Use a natural story from premise to evidence to current work to proof to engagement. Avoid brochure and textbook layouts.
 - Prefer editorial fields, asymmetric hierarchy, strong whitespace and real evidence over boxed card grids. Keep the legal footer compact and keep Partner and Support separate from legal policy links.
 - The footer must identify The SozoRock Foundation, Inc. as a 501(c)(3) public charity and include the verified EIN. Keep legal links concise: Privacy, Terms, Accessibility, Nondiscrimination and Standards.
-- The footer follows Brookings and McKinsey: wordmark, one mission line and Support our work on the left; three link columns (Our Work, Research & Events, About); a slim legal strip with Privacy Policy, Terms of Use, Accessibility, Nondiscrimination, Standards, copyright and EIN 39-4736725.
+- The footer follows Brookings and McKinsey on a clean white field: wordmark, one mission line and Support our work on the left; three link columns (Our Work, Research & Events, About); a slim legal line with Privacy Policy, Terms of Use, Accessibility, Nondiscrimination, Standards, copyright and EIN 39-4736725.
 - Show the three authentic publication covers at legible size in Research and insights, using the full resolution cover files. Label each as series name, then “Volume 1 · year”. Rethinking Rural Governance belongs to the Modernization and Resilience Program.
 - Present Workforce Capacity broadly: hands on learning in cloud computing (AWS), cloud security, identity and access management, governance, risk and compliance, and AI. Capella University: recurring six month graduate model, six learners October 2025 to March 2026 and five learners April to September 2026. Athabasca University, Alberta, Canada: one undergraduate in work integrated learning, February to July 2026, building a security framework for community health sites; keep this informational and do not publish grades or name the learner without consent. Dr. Oluwabiyi Adeyemo, Director of Strategic Initiatives, designs, mentors and evaluates the work. Use partner names as text; show logos only with written permission.
 - SozoRock AI Lab is free community AI learning for any background, Tuesdays at 6:30 pm in the community room of Beacon Bank, Albany, New York State. Registration happens on ai-lab.sozorockfoundation.org, so AI Lab actions link there.
