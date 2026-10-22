@@ -71,9 +71,11 @@ test("CloudFront maps the public publication slug to the established Health API 
   assert.equal(request("/api/contact").uri, "/api/contact");
 });
 
-test("CloudFront maps only the public navigator path to the unsigned agent route", () => {
-  assert.equal(request("/api/navigator").uri, "/public/v1/navigate");
-  assert.equal(request("/api/navigator/private").uri, "/api/navigator/private");
-  assert.match(template, /PathPattern: \/api\/navigator[\s\S]*TargetOriginId: foundation-agent-api/u);
+test("CloudFront answers the switched off website guide at the edge", () => {
+  for (const path of ["/api/navigator", "/api/navigator/private"]) {
+    const response = request(path);
+    assert.equal(response.statusCode, 410);
+  }
+  assert.doesNotMatch(template, /PathPattern: \/api\/navigator/u);
   assert.match(template, /Aliases: !If[\s\S]*\[!Ref CanonicalDomain\]/u);
 });

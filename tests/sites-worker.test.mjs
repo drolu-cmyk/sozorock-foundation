@@ -305,43 +305,17 @@ test("rejects invalid contact submissions and quietly accepts the honeypot", asy
   assert.equal(upstreamCalls, 0);
 });
 
-test("proxies a bounded navigator question to the public Foundation graph", async () => {
-  const calls = [];
-  const response = await worker.fetch(new Request("https://example.test/api/navigator", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ question: "Where can I find Foundation publications?" }),
-  }), {
-    FOUNDATION_AGENT_PUBLIC_ORIGIN: "https://abc.execute-api.us-east-1.amazonaws.com/public/v1/navigate",
-    AGENT_FETCH: async (url, options) => {
-      calls.push({ url, options, body: JSON.parse(options.body) });
-      return Response.json({
-        answer: "Start with the Foundation publications index.",
-        links: [{ key: "publications", label: "Publications", href: "/publications" }],
-        notice: null,
-      });
-    },
-  });
-
-  assert.equal(response.status, 200);
-  assert.equal(calls.length, 1);
-  assert.equal(calls[0].options.headers.Origin, "https://www.sozorockfoundation.org");
-  assert.equal(calls[0].body.question, "Where can I find Foundation publications?");
-  assert.deepEqual(await response.json(), {
-    answer: "Start with the Foundation publications index.",
-    links: [{ key: "publications", label: "Publications", href: "/publications" }],
-    notice: null,
-  });
-});
-
-test("fails closed when the public navigator endpoint is not configured", async () => {
-  const response = await worker.fetch(new Request("https://example.test/api/navigator", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ question: "Where are the publications?" }),
-  }), {});
-  assert.equal(response.status, 503);
-  assert.deepEqual(await response.json(), { error: "The website guide is temporarily unavailable." });
+test("the switched off website guide answers 410 and never calls the agent service", async () => {
+  let calls = 0;
+  for (const path of ["/api/navigator", "/api/navigator/private"]) {
+    const response = await worker.fetch(new Request(`https://example.test${path}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ question: "Where are the publications?" }),
+    }), { FOUNDATION_AGENT_PUBLIC_ORIGIN: "https://abc.execute-api.us-east-1.amazonaws.com/public/v1/navigate", AGENT_FETCH: async () => { calls += 1; return Response.json({}); } });
+    assert.equal(response.status, 410);
+  }
+  assert.equal(calls, 0);
 });
 
 test("emits the files required by CloudFront plus the compatibility worker package", async () => {
