@@ -143,6 +143,20 @@ export function PublicationAccessPage({ publication, embedded = false }) {
 
   if (!publication?.accessPath) return null;
 
+  if (status === "sent" && embedded) {
+    return (
+      <div className="access-confirmation-embedded">
+        <h3 className="ns-stmt s36" ref={confirmationRef} tabIndex="-1">Check your email.</h3>
+        <p className="ns-body" style={{ marginTop: 16 }}>{message}</p>
+        <p className="ns-body" style={{ marginTop: 12 }}>Your publication access link expires in 30 minutes. If it does not arrive, check your spam folder or submit the form again.</p>
+        <div className="ns-actions" style={{ marginTop: 28 }}>
+          <Link href={publication.path} className="ns-btn ns-btn-primary">Return to the publication</Link>
+          <button type="button" className="ns-btn ns-btn-ice" onClick={() => { setStatus("idle"); setMessage(""); }}>Send another link</button>
+        </div>
+      </div>
+    );
+  }
+
   if (status === "sent") {
     return (
       <section className="access-page access-confirmation">
