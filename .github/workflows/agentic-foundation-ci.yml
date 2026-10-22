@@ -50,7 +50,7 @@ jobs:
 
       - name: Report every dependency advisory, including development tools
         run: |
-          for dir in . services/foundation-agents; do
+          for dir in . services/foundation-agents media/overview; do
             (cd "$dir" && npm audit --json 2>/dev/null || true) | node -e '
               let raw = ""; process.stdin.on("data", (c) => raw += c).on("end", () => {
                 const report = JSON.parse(raw || "{}"); const vulns = report.vulnerabilities || {};
