@@ -1,58 +1,43 @@
-import { ApprovedPage, approvedRoutes } from "./ApprovedPages";
-import { ApprovedFooter } from "./ApprovedFooter";
 import { useEffect } from "react";
-import { HomePage } from "./HomePage";
-import { FoundationHome } from "./FoundationHome";
-import { WorkforcePage } from "./WorkforcePage";
-import { AiSocietyPage } from "./AiSocietyPage";
-import { AppliedLearningPage } from "./AppliedLearningPage";
-import { HealthInitiativePage } from "./HealthInitiativePage";
-import { WorkPage } from "./WorkPage";
-import { PartnerOpportunityPage, SupportOpportunityPage } from "./EngagePages";
-import { InsightsPage, LeadershipPage, NotFoundPage } from "./Pages";
-import { PublicationAccessPage } from "./PublicationAccessPage";
-import { PublicationDetailPage, ResearchPage } from "./ResearchExperience";
-import { AboutExperiencePage, AiLabExperiencePage, ContactExperiencePage, EventsExperiencePage, InstituteExperiencePage } from "./InstitutionalExperience";
-import {
-  AccessibilityStatementPage,
-  NondiscriminationNoticePage,
-  ParentStandardsPage,
-  PrivacyNoticePage,
-  WebsiteTermsPage,
-} from "./InstitutionalPages";
+
+import { NotFoundPage } from "./Pages";
 import { Footer, Header } from "./SiteChrome";
 import { publications } from "./siteData";
 import { useCurrentPath } from "./router";
 import { getSeoForPath } from "./seoRuntime";
+import { HomePage } from "./site/home";
+import { AiLabPage, AiSocietyPage, HealthPage, OurWorkPage, WorkforcePage } from "./site/work";
+import { AccessPage, PublicationPage, ResearchPage } from "./site/research";
+import { AboutPage, ContactPage, EventsPage, LeadershipPage, LegalPage, PartnerPage, SupportPage, legalPages } from "./site/about";
+
+// Retired routes answer with a permanent redirect at the edge; the app shows the destination if one is reached in the browser.
+export const retiredRoutes = { "/platforms/applied-learning": "/workforce", "/platforms/institute": "/publications", "/insights": "/publications" };
+
+const pages = {
+  "/": HomePage,
+  "/platforms": OurWorkPage,
+  "/platforms/health": HealthPage,
+  "/workforce": WorkforcePage,
+  "/ai-society": AiSocietyPage,
+  "/platforms/ai-lab": AiLabPage,
+  "/events": EventsPage,
+  "/about": AboutPage,
+  "/leadership": LeadershipPage,
+  "/partner": PartnerPage,
+  "/support": SupportPage,
+  "/contact": ContactPage,
+};
 
 function RouteView({ pathname }) {
-  if (pathname === "/") return <FoundationHome />;
-  if (pathname === "/workforce") return <WorkforcePage />;
-  if (approvedRoutes.includes(pathname)) return <ApprovedPage pathname={pathname} />;
-  const publication = pathname.startsWith("/publication/") ? publications.find((item) => item.path === pathname) : null;
-  const accessPublication = pathname.startsWith("/publication/") ? publications.find((item) => item.accessPath === pathname) : null;
-  if (accessPublication) return <PublicationAccessPage publication={accessPublication} />;
-  if (publication) return <PublicationDetailPage publication={publication} />;
-  if (pathname === "/") return <HomePage />;
-  if (pathname === "/ai-society") return <AiSocietyPage />;
-  if (pathname === "/platforms") return <WorkPage />;
-  if (pathname === "/platforms/institute") return <InstituteExperiencePage />;
-  if (pathname === "/platforms/health") return <HealthInitiativePage />;
-  if (pathname === "/platforms/ai-lab") return <AiLabExperiencePage />;
-  if (pathname === "/platforms/applied-learning") return <AppliedLearningPage />;
-  if (pathname === "/publications") return <ResearchPage />;
-  if (pathname === "/insights") return <InsightsPage />;
-  if (pathname === "/events") return <EventsExperiencePage />;
-  if (pathname === "/about") return <AboutExperiencePage />;
-  if (pathname === "/leadership") return <LeadershipPage />;
-  if (pathname === "/contact") return <ContactExperiencePage />;
-  if (pathname === "/partner") return <PartnerOpportunityPage />;
-  if (pathname === "/support") return <SupportOpportunityPage />;
-  if (pathname === "/standards") return <ParentStandardsPage />;
-  if (pathname === "/privacy") return <PrivacyNoticePage />;
-  if (pathname === "/accessibility") return <AccessibilityStatementPage />;
-  if (pathname === "/nondiscrimination") return <NondiscriminationNoticePage />;
-  if (pathname === "/terms") return <WebsiteTermsPage />;
+  const target = retiredRoutes[pathname] || pathname;
+  const Page = pages[target];
+  if (Page) return <Page />;
+  if (target === "/publications") return <ResearchPage publications={publications} />;
+  if (legalPages[target]) return <LegalPage {...legalPages[target]} />;
+  const access = publications.find((item) => item.accessPath === target);
+  if (access) return <AccessPage publication={access} />;
+  const publication = publications.find((item) => item.path === target);
+  if (publication) return <PublicationPage publication={publication} />;
   return <NotFoundPage />;
 }
 
@@ -134,12 +119,12 @@ export function App({ initialPath }) {
   }, [seo]);
 
   return (
-    <div className="site-frame approved-site">
+    <div className="site-frame approved-site ns-site">
       <Header pathname={pathname} />
       <main id="main-content" key={pathname} className="page-view" tabIndex={-1}>
         <RouteView pathname={pathname} />
       </main>
-      <ApprovedFooter />
+      <Footer />
     </div>
   );
 }

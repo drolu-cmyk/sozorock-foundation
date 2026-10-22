@@ -3,12 +3,14 @@
 > Healthier communities. Stronger systems. A say in what's next. The SozoRock Foundation, Inc. is a 501(c)(3) public charity (EIN 39-4736725) based in Albany, New York State. It works on three gaps: Access, Capacity and Trust, through one loop: listen, study, build and prove results in public.
 
 ## Our work
-- [Health Access](https://health.sozorockfoundation.org/): SozoRock Health. The Primary Care Access Program sponsors a year of direct primary care for up to 25 New Yorkers with a chronic condition and financial need, from January 2027. Clinical care stays with the licensed provider. Membership is not health insurance.
+- [Our Work overview](https://www.sozorockfoundation.org/platforms): three gaps (Access, Capacity, Trust), each program, its proof and who leads it.
+- [Health Access](https://www.sozorockfoundation.org/platforms/health): the Health Equity Initiative turns libraries, community centers and homes into trusted access points (Library, Community and Home Health Equity Hubs, in development with partners, and Health Access Day). SozoRock Health: https://health.sozorockfoundation.org/. The Primary Care Access Program sponsors a year of direct primary care for up to 25 New Yorkers with a chronic condition and financial need, from January 2027. Clinical care stays with the licensed provider. Membership is not health insurance.
 - [Workforce Capacity](https://www.sozorockfoundation.org/workforce): hands on learning in cloud computing (AWS), cloud security, identity and access management, governance, risk and compliance, and AI, with universities, employers and health systems. Includes a recurring graduate model with Capella University and work integrated learning with Athabasca University in Alberta, Canada.
 - [AI & Society](https://www.sozorockfoundation.org/ai-society): building public trust in AI through Who Decides? forums on AI in learning, work and health.
-- [SozoRock AI Lab](https://ai-lab.sozorockfoundation.org/): free, practical AI learning for any background, Tuesdays at 6:30 pm in Albany, New York State. Registration required.
+- [SozoRock AI Lab](https://www.sozorockfoundation.org/platforms/ai-lab): free, practical AI learning for any background, Tuesdays at 6:30 pm in Albany, New York State. Registration at https://ai-lab.sozorockfoundation.org/.
 
 ## Research
+- [All research](https://www.sozorockfoundation.org/publications): the SozoRock Global Institute research series, free to read.
 - [Health Systems Assurance Series, Volume 1 (2026)](https://www.sozorockfoundation.org/publication/hsa-v1-2026): what evidence should support trust in digital health systems.
 - [Rethinking Rural Governance Series, Volume 1 (2025)](https://www.sozorockfoundation.org/publication/rrg-v1-2025): from fragmented response to coordinated public action. Modernization and Resilience Program.
 - [Rural Equity Blueprint Series, Volume 1 (2025)](https://www.sozorockfoundation.org/publication/rebs-v1-2025): a practical framework for local health access.
@@ -21,4 +23,5 @@
 - [Leadership](https://www.sozorockfoundation.org/leadership)
 - [Standards](https://www.sozorockfoundation.org/standards)
 - [Partner with us](https://www.sozorockfoundation.org/partner)
+- [Support](https://www.sozorockfoundation.org/support): $108,000 funds the first Primary Care Access Program cohort; sponsorship levels and reporting.
 - [Contact](https://www.sozorockfoundation.org/contact)

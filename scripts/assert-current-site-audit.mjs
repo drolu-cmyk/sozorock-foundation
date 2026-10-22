@@ -15,7 +15,7 @@ if (Number(summary.gradientCount || 0) > 0) failures.push(`rendered gradients: $
 if ((summary.overflowRoutes || []).length) failures.push(`horizontal overflow: ${summary.overflowRoutes.join(", ")}`);
 if (Number(summary.pageErrorCount || 0) > 0) failures.push(`browser errors: ${summary.pageErrorCount}`);
 
-const expectedRoutes = 37;
+const expectedRoutes = 35;
 if (Number(summary.pages || 0) !== expectedRoutes) failures.push(`audited pages: ${summary.pages}; expected ${expectedRoutes}`);
 
 console.log(JSON.stringify(summary, null, 2));

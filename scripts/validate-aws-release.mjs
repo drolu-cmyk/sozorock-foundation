@@ -17,11 +17,17 @@ assert.deepEqual(workflowFiles, [
   "deploy-parent-cloudfront.yml",
   "publish-legacy-health-redirect.yml",
   "render-platform-films.yml",
+  "site-monitor.yml",
 ]);
 const filmWorkflow = (await readFile(new URL("render-platform-films.yml", workflowDirectory), "utf8")).replaceAll("\r\n", "\n");
 assert.match(filmWorkflow, /permissions:\n  contents: read\n/u);
 assert.doesNotMatch(filmWorkflow, /id-token:|secrets\.|configure-aws-credentials|aws s3|aws cloudformation/u);
-assert.doesNotMatch(workflowText, /^\s*schedule:/mu);
+// Only the read only live monitor may run on a schedule; it holds no credentials.
+const scheduledText = (await Promise.all(workflowFiles.filter((file) => file !== "site-monitor.yml").map((file) => readFile(new URL(file, workflowDirectory), "utf8")))).join("\n");
+assert.doesNotMatch(scheduledText, /^\s*schedule:/mu);
+const monitorWorkflow = await readFile(new URL("site-monitor.yml", workflowDirectory), "utf8");
+assert.match(monitorWorkflow, /permissions:\n  contents: read\n/u);
+assert.doesNotMatch(monitorWorkflow, /id-token:|secrets\.|configure-aws-credentials|uses:/u);
 assert.doesNotMatch(workflowText, /GitHubActionsSozorockAiLabDeployRole/u);
 assert.doesNotMatch(workflowText, /uses:\s+[^\s]+@v\d+(?:\s|$)/u);
 assert.match(workflowText, /actions\/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294/u);
@@ -66,14 +72,15 @@ assert.match(template, /CanonicalBridgeApiId/u);
 assert.match(workflow, /get-domain-name --domain-name "\$CANONICAL_HOST"/u);
 assert.match(workflow, /update-api-mapping/u);
 assert.match(await readFile(new URL("scripts/bootstrap-parent-aws.sh", root), "utf8"), /apigateway:TagResource/u);
-assert.match(workflow, /<title>What we do \| SozoRock Foundation<\/title>/u);
+assert.match(workflow, /Three gaps we work to close\./u);
+assert.match(workflow, /scripts\/indexnow\.mjs/u);
 assert.match(agentDeployScript, /ThrottlingBurstLimit/u);
 assert.match(agentDeployScript, /ThrottlingRateLimit/u);
 assert.match(agentDeployScript, /FoundationAgentsDeployCanaryInvoke/u);
 assert.match(agentDeployScript, /--principal "\$AWS_ROLE_TO_ASSUME"/u);
 assert.match(agentDeployScript, /canary_permission_added=0/u);
 
-const pages = await readFile(new URL("src/Pages.jsx", root), "utf8");
+const pages = await readFile(new URL("src/PublicationAccessPage.jsx", root), "utf8");
 assert.match(pages, /body\.accepted !== true \|\| body\.verificationSent !== true/u);
 
 await access(new URL("dist/client/index.html", root));

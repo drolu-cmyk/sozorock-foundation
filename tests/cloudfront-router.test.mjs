@@ -52,7 +52,10 @@ test("CloudFront protects private publication files and consolidates legacy rout
   for (const [legacyPath, destination] of [
     ["/about-us", "/about"],
     ["/programs", "/platforms"],
-    ["/work/global-institute", "/platforms/institute"],
+    ["/work/global-institute", "/publications"],
+    ["/platforms/institute", "/publications"],
+    ["/platforms/applied-learning", "/workforce"],
+    ["/insights", "/publications"],
   ]) {
     const legacy = request(legacyPath);
     assert.equal(legacy.statusCode, 301);

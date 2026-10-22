@@ -52,7 +52,7 @@ export function BriefingForm({ idPrefix = "briefing" }) {
     </select></label>
     <label className="ns-field full">City, state or region<input name="briefingLocation" type="text" autoComplete="address-level2" required minLength={2} /></label>
     <label className="ns-honeypot" aria-hidden="true">Website<input name="briefingWebsite" type="text" tabIndex={-1} autoComplete="off" /></label>
-    <label className="ns-check"><input name="briefingConsent" type="checkbox" value="yes" required /><span>Send me The SozoRock Briefing. I can unsubscribe at any time. See the <a href="/privacy">Privacy Policy</a>.</span></label>
+    <label className="ns-check"><input name="briefingConsent" type="checkbox" value="yes" required /><span>Send me The SozoRock Briefing. Unsubscribe at any time. See the <a href="/privacy">Privacy Policy</a>.</span></label>
     <div className="ns-form-actions">
       <button className="ns-btn ns-btn-primary" type="submit" disabled={status === "sending"}>{status === "sending" ? "Subscribing" : "Subscribe"}</button>
     </div>
@@ -64,8 +64,8 @@ export function BriefingSection() {
   return <section className="ns-briefing" id="briefing" aria-labelledby="briefing-title">
     <div className="ns-shell ns-briefing-inner">
       <div>
-        <h2 className="ns-h2" id="briefing-title">The SozoRock Briefing</h2>
-        <p className="ns-lede">Our research, data and events on health access, workforce capacity and trusted AI.</p>
+        <p className="ns-eyebrow">The SozoRock Briefing</p>
+        <h2 className="ns-stmt s44" id="briefing-title">Research, data and events, in your inbox.</h2>
       </div>
       <BriefingForm />
     </div>

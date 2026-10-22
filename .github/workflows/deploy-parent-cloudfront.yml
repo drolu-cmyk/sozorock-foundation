@@ -13,6 +13,7 @@ on:
       - scripts/bootstrap-parent-aws.sh
       - scripts/validate-aws-release.mjs
       - scripts/check-tracked-secrets.py
+      - scripts/indexnow.mjs
       - infra/cloudformation/parent-cloudfront.yml
       - .github/workflows/deploy-parent-cloudfront.yml
   workflow_dispatch:
@@ -228,7 +229,7 @@ jobs:
             test "$attempt" -lt 30
             sleep 10
           done
-          curl --proto '=https' --tlsv1.2 --fail --silent --show-error "https://${distribution_domain}/platforms" | grep -F '<title>What we do | SozoRock Foundation</title>' > /dev/null
+          curl --proto '=https' --tlsv1.2 --fail --silent --show-error "https://${distribution_domain}/platforms" | grep -F 'Three gaps we work to close.' > /dev/null
           api_status="$(curl --proto '=https' --tlsv1.2 --silent --show-error --output "$RUNNER_TEMP/api-preflight.json" --write-out '%{http_code}' \
             --request POST --header "Origin: https://${CANONICAL_HOST}" --header 'Content-Type: application/json' --data '{"email":"invalid"}' \
             "https://${distribution_domain}/api/contact")"
@@ -355,7 +356,7 @@ jobs:
           aws cloudfront wait distribution-deployed --id '${{ steps.target.outputs.distribution_id }}'
           target_ip="$(getent ahostsv4 '${{ steps.target.outputs.distribution_domain }}' | awk 'NR==1 {print $1}')"
           test -n "$target_ip"
-          curl --proto '=https' --tlsv1.2 --fail --silent --show-error --resolve "${CANONICAL_HOST}:443:${target_ip}" "https://${CANONICAL_HOST}/platforms" | grep -F '<title>What we do | SozoRock Foundation</title>' > /dev/null
+          curl --proto '=https' --tlsv1.2 --fail --silent --show-error --resolve "${CANONICAL_HOST}:443:${target_ip}" "https://${CANONICAL_HOST}/platforms" | grep -F 'Three gaps we work to close.' > /dev/null
           complete=1
           touch "$RUNNER_TEMP/foundation-aliases-moved"
 
@@ -368,7 +369,7 @@ jobs:
           set -euo pipefail
           target_ip="$(getent ahostsv4 "$DISTRIBUTION_DOMAIN" | awk 'NR==1 {print $1}')"
           test -n "$target_ip"
-          curl --proto '=https' --tlsv1.2 --fail --silent --show-error --resolve "${CANONICAL_HOST}:443:${target_ip}" "https://${CANONICAL_HOST}/platforms" | grep -F '<title>What we do | SozoRock Foundation</title>' > /dev/null
+          curl --proto '=https' --tlsv1.2 --fail --silent --show-error --resolve "${CANONICAL_HOST}:443:${target_ip}" "https://${CANONICAL_HOST}/platforms" | grep -F 'Three gaps we work to close.' > /dev/null
 
       - name: Atomically cut over DNS with automatic rollback
         id: dns
@@ -469,6 +470,11 @@ jobs:
           verified=1
           echo 'verified=true' >> "$GITHUB_OUTPUT"
           echo "mode=${receipt_mode}" >> "$GITHUB_OUTPUT"
+
+      - name: Tell search engines the site changed
+        if: steps.dns.outputs.verified == 'true'
+        continue-on-error: true
+        run: node scripts/indexnow.mjs
 
       - name: Publish production receipt
         if: always()

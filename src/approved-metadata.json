@@ -4,107 +4,95 @@
     "description": "Healthier communities, stronger systems and a say in what’s next. We expand primary care access, build health workforce capacity and shape trusted AI."
   },
   "/platforms": {
-    "title": "What we do | SozoRock Foundation",
-    "description": "Health systems, cybersecurity workforce development and AI & Society. Explore SozoRock’s programs, county evidence and research."
+    "title": "Our Work: Health Access, Workforce Capacity, AI & Society | SozoRock",
+    "description": "Three gaps we work to close: access to care, the capacity of the people who run health systems, and public trust in AI. See the programs and who leads them."
+  },
+  "/platforms/health": {
+    "title": "Health Access & Primary Care Access Program | SozoRock Foundation",
+    "description": "Libraries, community centers and homes as trusted access points, plus a sponsored year of primary care for up to 25 New Yorkers from January 2027."
   },
   "/workforce": {
     "title": "Workforce Capacity | Cloud, Security & AI Skills | SozoRock",
     "description": "Hands on learning in cloud computing, cloud security, identity and access, governance and AI, built with universities, employers and health systems."
   },
-  "/platforms/health": {
-    "title": "Health Access Initiative | The SozoRock Foundation",
-    "description": "How the Foundation supports health access: the Primary Care Access Program from January 2027, Health Equity Hubs in development, education and county evidence."
-  },
-  "/platforms/applied-learning": {
-    "title": "Cybersecurity Capstone & Workforce Development | SozoRock",
-    "description": "Recurring six-month cybersecurity capstones with instruction, hands-on projects, mentoring and evaluation. Explore SozoRock’s Capella University collaboration."
-  },
-  "/platforms/institute": {
-    "title": "SozoRock Global Institute | Health and Governance Research",
-    "description": "Rural health equity, public governance and health systems assurance."
+  "/ai-society": {
+    "title": "AI & Society | Building Public Trust in AI | SozoRock Foundation",
+    "description": "Who Decides? forums and roadshows give residents, educators, employers and policymakers a real say in how AI is used in learning, work and health."
   },
   "/platforms/ai-lab": {
-    "title": "SozoRock AI Lab | Applied AI and Cybersecurity Learning",
-    "description": "Applied AI systems. Cybersecurity. AI governance."
-  },
-  "/ai-society": {
-    "title": "AI & Society | Public Trust in AI | SozoRock Foundation",
-    "description": "AI & Society builds public trust in AI. Who Decides? forums bring people into decisions about AI in learning, work and health, with published responses."
+    "title": "SozoRock AI Lab | Free Practical AI Skills in Albany, NY",
+    "description": "Free, hands on AI learning for any background. Tuesdays at 6:30 pm in Albany, New York State. Register on the SozoRock AI Lab site."
   },
   "/publications": {
-    "title": "Publications | SozoRock Foundation",
-    "description": "Rural health. Public governance. Health systems assurance."
+    "title": "Research & Publications | SozoRock Global Institute",
+    "description": "Free, citable research on health systems assurance, rural governance and rural health equity from the SozoRock Global Institute."
   },
   "/publication/hsa-v1-2026": {
-    "title": "Health Systems Assurance | SozoRock Foundation",
-    "description": "What evidence supports trust in digital health systems?"
+    "title": "Health Systems Assurance Series, Volume 1 (2026) | SozoRock",
+    "description": "What evidence should support trust in digital health systems? Analytical tools for health system leaders, security and compliance teams. Free to read."
   },
   "/publication/hsa-v1-2026/access": {
-    "title": "Read Health Systems Assurance | SozoRock Foundation",
-    "description": "Free PDF. Verify your email to open the publication."
+    "title": "Get Health Systems Assurance | Free PDF | SozoRock Foundation",
+    "description": "Verify your email to receive free access to Health Systems Assurance, Volume 1."
   },
   "/publication/rrg-v1-2025": {
-    "title": "Rethinking Rural Governance | SozoRock Foundation",
-    "description": "Coordinating public decisions in rural communities."
+    "title": "Rethinking Rural Governance Series, Volume 1 (2025) | SozoRock",
+    "description": "From fragmented response to coordinated public action: a governance framework for county leaders and public agencies. DOI 10.65473/rrg-v1-2025."
   },
   "/publication/rrg-v1-2025/access": {
-    "title": "Read Rethinking Rural Governance | SozoRock Foundation",
-    "description": "Free PDF. Verify your email to open the publication."
+    "title": "Get Rethinking Rural Governance Series (RRG) | Free PDF | SozoRock",
+    "description": "Verify your email to receive free access to Rethinking Rural Governance, Volume 1."
   },
   "/publication/rebs-v1-2025": {
-    "title": "Rural Equity Blueprint Series | SozoRock Foundation",
-    "description": "Planning rural health access."
+    "title": "Rural Equity Blueprint Series, Volume 1 (2025) | SozoRock",
+    "description": "A practical framework for local health access, including Health Access Day and community hub models. DOI 10.65473/rebs-v1-2025."
   },
   "/publication/rebs-v1-2025/access": {
-    "title": "Read Rural Equity Blueprint Series | SozoRock Foundation",
-    "description": "Free PDF. Verify your email to open the publication."
-  },
-  "/insights": {
-    "title": "Insights | SozoRock Foundation",
-    "description": "Notes from SozoRock’s research and programs."
+    "title": "Get Rural Equity Blueprint Series (REBS) | Free PDF | SozoRock",
+    "description": "Verify your email to receive free access to the Rural Equity Blueprint Series, Volume 1."
   },
   "/events": {
-    "title": "Roundtables, Fireside and Briefings | SozoRock Foundation",
-    "description": "The 2025 Western New York roundtable and the planned Fireside and Working Roundtable on rural health, measured locally."
+    "title": "Events: Firesides, Roundtables & Who Decides? Forums | SozoRock",
+    "description": "Firesides, working roundtables and public forums on rural health and AI. Register interest; dates are announced as they are confirmed."
   },
   "/about": {
-    "title": "Our Mission and Programs | The SozoRock Foundation",
-    "description": "The SozoRock Foundation is a New York public charity connecting health access, public-interest research, county evidence and applied learning."
+    "title": "About The SozoRock Foundation | Access, Capacity & Trust",
+    "description": "A New York 501(c)(3) public charity connecting public interest research with programs in health access, workforce capacity and trusted AI."
   },
   "/leadership": {
-    "title": "Leadership | SozoRock Foundation",
-    "description": "The people responsible for SozoRock’s work."
-  },
-  "/support": {
-    "title": "Fund Health Access and Public Research | SozoRock Foundation",
-    "description": "Review the $108,000 primary care cohort budget, sponsorship levels, reporting and ways to support the Foundation’s research and applied learning."
+    "title": "Leadership | The SozoRock Foundation",
+    "description": "Meet the people responsible for SozoRock’s work in health partnerships, health education, global affairs, research and programs."
   },
   "/partner": {
-    "title": "Health Systems & Workforce Partnerships | SozoRock",
-    "description": "Discuss health equity hubs, cybersecurity capstones, applied AI learning or research partnerships with SozoRock."
+    "title": "Partner with Us | The SozoRock Foundation",
+    "description": "Universities, providers, libraries, employers, counties and technology partners: build a health access, workforce or AI project with us."
+  },
+  "/support": {
+    "title": "Support Primary Care Access & Public Research | SozoRock",
+    "description": "$108,000 funds a year of primary care for up to 25 New Yorkers. See sponsorship levels, reporting and other ways to support the work."
   },
   "/contact": {
-    "title": "Contact SozoRock | SozoRock Foundation",
-    "description": "Questions about our work, publications or website?"
+    "title": "Contact | The SozoRock Foundation",
+    "description": "Questions about our work, research or events? Email contact@sozorockfoundation.org or send us a message."
   },
   "/standards": {
-    "title": "Standards | SozoRock Foundation",
-    "description": "How we publish, disclose support and correct errors."
+    "title": "Standards: Independence, Evidence & Corrections | SozoRock",
+    "description": "How the Foundation publishes, discloses support, uses AI responsibly and corrects errors."
   },
   "/privacy": {
-    "title": "Privacy | SozoRock Foundation",
-    "description": "How we handle information submitted through this website."
+    "title": "Privacy Policy | The SozoRock Foundation",
+    "description": "How we handle information submitted through the SozoRock Foundation website and its forms."
   },
   "/terms": {
-    "title": "Website terms | SozoRock Foundation",
-    "description": "Conditions for using this website and its materials."
+    "title": "Terms of Use | The SozoRock Foundation",
+    "description": "Conditions for using the SozoRock Foundation website and its materials."
   },
   "/accessibility": {
-    "title": "Accessibility | SozoRock Foundation",
-    "description": "Request help accessing our website, publications or activities."
+    "title": "Accessibility | The SozoRock Foundation",
+    "description": "Our accessibility goal and how to request help accessing our website, publications or activities."
   },
   "/nondiscrimination": {
-    "title": "Nondiscrimination | SozoRock Foundation",
-    "description": "Equal access and respectful participation."
+    "title": "Nondiscrimination | The SozoRock Foundation",
+    "description": "Equal access and respectful participation in the Foundation’s programs, services and events."
   }
 }

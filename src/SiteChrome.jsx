@@ -8,7 +8,8 @@ export function Brand() {
 
 const primaryLinks = [["Our Work", "/platforms"], ["Research", "/publications"], ["Events", "/events"], ["About", "/about"]];
 const workRoutes = ["/platforms", "/workforce", "/ai-society"];
-const isCurrent = (pathname, href) => pathname === href || (href === "/platforms" && (workRoutes.includes(pathname) || pathname.startsWith("/platforms/"))) || (href === "/publications" && pathname.startsWith("/publication"));
+// Research covers publication records and access pages; About covers leadership and standards.
+const isCurrent = (pathname, href) => pathname === href || (href === "/platforms" && (workRoutes.includes(pathname) || pathname.startsWith("/platforms/"))) || (href === "/publications" && pathname.startsWith("/publication")) || (href === "/about" && ["/leadership", "/standards"].includes(pathname));
 
 export function Header({ pathname }) {
   const [open, setOpen] = useState(false);
@@ -70,7 +71,7 @@ export function Header({ pathname }) {
         </div>
         <div className="ns-nav-utility">
           <a href="#briefing">Subscribe</a>
-          <Link className="ns-btn ns-btn-outline" href="/support" aria-current={pathname === "/support" ? "page" : undefined}>Support</Link>
+          <Link className="ns-btn ns-btn-ice" href="/support" aria-current={pathname === "/support" ? "page" : undefined}>Support</Link>
         </div>
       </nav>
     </div>
@@ -78,7 +79,7 @@ export function Header({ pathname }) {
 }
 
 const footerColumns = [
-  ["Our Work", [["Health Access", "https://health.sozorockfoundation.org/"], ["Workforce Capacity", "/workforce"], ["AI & Society", "/ai-society"], ["AI Lab", "https://ai-lab.sozorockfoundation.org/"]]],
+  ["Our Work", [["Health Access", "/platforms/health"], ["Workforce Capacity", "/workforce"], ["AI & Society", "/ai-society"], ["AI Lab", "/platforms/ai-lab"]]],
   ["Research & Events", [["Research", "/publications"], ["Events", "/events"], ["The Briefing", "#briefing"]]],
   ["About", [["Our story", "/about"], ["Leadership", "/leadership"], ["Partner with us", "/partner"], ["Contact", "/contact"]]],
 ];
@@ -87,29 +88,29 @@ export function Footer() {
   const year = new Date().getFullYear();
   return <footer className="ns ns-site-footer">
     <BriefingSection />
-    <div className="ns-footer ns-dark">
-      <div className="ns-shell ns-footer-top">
-        <div>
-          <Brand />
-          <p className="ns-footer-mission">We build healthier communities and stronger systems through access, capacity and trust.</p>
-          <Link className="ns-btn ns-btn-light" href="/support">Support our work</Link>
+    <div className="ns-footer">
+      <div className="ns-shell">
+        <div className="ns-footer-top">
+          <div>
+            <Brand />
+            <p className="ns-footer-mission">We build healthier communities and stronger systems through access, capacity and trust.</p>
+            <Link className="ns-btn ns-btn-primary" href="/support">Support our work</Link>
+          </div>
+          {footerColumns.map(([title, links]) => <nav key={title} aria-label={title}>
+            <span className="ttl">{title}</span>
+            {links.map(([label, href]) => href.startsWith("#") ? <a key={label} href={href}>{label}</a> : <Link key={label} href={href}>{label}</Link>)}
+          </nav>)}
         </div>
-        {footerColumns.map(([title, links]) => <nav key={title} aria-label={title}>
-          <span className="ns-tag">{title}</span>
-          {links.map(([label, href]) => href.startsWith("#") ? <a key={label} href={href}>{label}</a> : <Link key={label} href={href}>{label}</Link>)}
-        </nav>)}
-      </div>
-    </div>
-    <div className="ns-legal">
-      <div className="ns-shell ns-legal-inner">
-        <nav aria-label="Legal and policy links">
-          <Link href="/privacy">Privacy Policy</Link>
-          <Link href="/terms">Terms of Use</Link>
-          <Link href="/accessibility">Accessibility</Link>
-          <Link href="/nondiscrimination">Nondiscrimination</Link>
-          <Link href="/standards">Standards</Link>
-        </nav>
-        <p>© {year} The SozoRock Foundation, Inc. · 501(c)(3) public charity · EIN 39-4736725</p>
+        <div className="ns-legal">
+          <nav aria-label="Legal and policy links">
+            <Link href="/privacy">Privacy Policy</Link>
+            <Link href="/terms">Terms of Use</Link>
+            <Link href="/accessibility">Accessibility</Link>
+            <Link href="/nondiscrimination">Nondiscrimination</Link>
+            <Link href="/standards">Standards</Link>
+          </nav>
+          <p>© {year} The SozoRock Foundation, Inc. · 501(c)(3) public charity · EIN 39-4736725</p>
+        </div>
       </div>
     </div>
   </footer>;
