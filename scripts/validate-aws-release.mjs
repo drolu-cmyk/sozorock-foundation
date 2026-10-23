@@ -29,6 +29,23 @@ const monitorWorkflow = await readFile(new URL("site-monitor.yml", workflowDirec
 assert.match(monitorWorkflow, /permissions:\n  contents: read\n/u);
 assert.doesNotMatch(monitorWorkflow, /id-token:|secrets\.|configure-aws-credentials|uses:/u);
 assert.match(monitorWorkflow, /accept-ch critical-ch server-timing nel report-to reporting-endpoints x-powered-by/u);
+// Every SozoRock hostname this site links to must be covered by the header privacy monitor.
+{
+  const { readdir } = await import("node:fs/promises");
+  const hosts = new Set();
+  async function scan(dir) {
+    for (const entry of await readdir(new URL(dir, root), { withFileTypes: true })) {
+      const rel = `${dir}${entry.name}${entry.isDirectory() ? "/" : ""}`;
+      if (entry.isDirectory()) await scan(rel);
+      else if (/\.(?:jsx?|mjs|json|ya?ml|html|txt|xml)$/u.test(entry.name)) {
+        for (const match of (await readFile(new URL(rel, root), "utf8")).matchAll(/https:\/\/([a-z0-9-]+)\.sozorockfoundation\.org/gu)) hosts.add(match[1]);
+      }
+    }
+  }
+  for (const dir of ["src/", "public/", "worker/", "infra/"]) await scan(dir);
+  const monitored = monitorWorkflow.match(/privacy_origins='([^']+)'/u)?.[1] ?? "";
+  for (const host of hosts) assert.ok(monitored.includes(`https://${host}.sozorockfoundation.org`), `site monitor must check ${host}.sozorockfoundation.org`);
+}
 assert.doesNotMatch(template, /Accept-CH|Critical-CH|Server-Timing|Reporting-Endpoints|Report-To|\bNEL\b/iu);
 assert.doesNotMatch(workflowText, /GitHubActionsSozorockAiLabDeployRole/u);
 assert.doesNotMatch(workflowText, /uses:\s+[^\s]+@v\d+(?:\s|$)/u);
