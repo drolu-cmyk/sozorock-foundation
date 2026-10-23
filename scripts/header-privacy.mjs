@@ -78,7 +78,11 @@ export async function requestHeaders(url, profile = 'browser') {
     const blocks = parseHeaderBlocks(stdout);
     if (!blocks.length) throw new Error('Missing HTTP response');
     return blocks;
-  } catch { throw new Error('Request failed or no valid HTTP response'); }
+  } catch (error) {
+    // Exit codes distinguish DNS/TLS/timeout failures without logging curl's
+    // output, which could contain a sensitive response header.
+    throw new Error(Number.isInteger(error.code) ? `Request failed (curl exit ${error.code})` : 'No valid HTTP response');
+  }
 }
 
 export async function checkChain(start, hosts, { request = requestHeaders, profile = 'browser', maxRedirects = 5 } = {}) {

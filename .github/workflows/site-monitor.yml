@@ -30,6 +30,7 @@ jobs:
       - name: Check production response privacy
         run: node scripts/header-privacy.mjs
       - name: Check pages, headers, redirects and certificate
+        if: ${{ !cancelled() }}
         shell: bash
         run: |
           set -euo pipefail
