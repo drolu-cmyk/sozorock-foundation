@@ -28,6 +28,8 @@ assert.doesNotMatch(scheduledText, /^\s*schedule:/mu);
 const monitorWorkflow = await readFile(new URL("site-monitor.yml", workflowDirectory), "utf8");
 assert.match(monitorWorkflow, /permissions:\n  contents: read\n/u);
 assert.doesNotMatch(monitorWorkflow, /id-token:|secrets\.|configure-aws-credentials|uses:/u);
+assert.match(monitorWorkflow, /accept-ch critical-ch server-timing nel report-to reporting-endpoints x-powered-by/u);
+assert.doesNotMatch(template, /Accept-CH|Critical-CH|Server-Timing|Reporting-Endpoints|Report-To|\bNEL\b/iu);
 assert.doesNotMatch(workflowText, /GitHubActionsSozorockAiLabDeployRole/u);
 assert.doesNotMatch(workflowText, /uses:\s+[^\s]+@v\d+(?:\s|$)/u);
 assert.match(workflowText, /actions\/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294/u);

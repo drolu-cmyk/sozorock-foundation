@@ -80,6 +80,8 @@ This repository is the production parent website for The SozoRock Foundation. Th
 
 ## Production runtime
 
+Header privacy applies to this site and every current or future subdomain: responses never carry personal data (names, emails, IP addresses, tokens) in any header or redirect URL, never request client hints (Accept-CH, Critical-CH), never send Server-Timing, NEL or Report-To, and load no third-party fonts or scripts. The live site monitor enforces this every six hours.
+
 Run the local server and open the preview in the available browser. Build app UI in `src/`. Preserve the Sites runtime contract in `.openai/hosting.json`, `worker/index.js`, `scripts/prepare-sites-build.mjs` and `tests/sites-worker.test.mjs`. Before handoff, run `npm run build` and `npm run test:sites`.
 
 Deploy through the existing AWS CloudFront workflow after `npm run test:aws` and production build browser QA. Preserve the two Crossref DOI landing URLs and records. Never deploy mail or DNS credentials in client files. Publication delivery must be verified before claiming the release complete. Do not redesign Health, Place Intelligence or other subdomains in this parent site assignment.
