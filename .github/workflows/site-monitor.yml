@@ -35,13 +35,17 @@ jobs:
           done
           if grep -qi '^server: *amazons3' <<<"$headers"; then echo 'origin server exposed'; exit 1; fi
           # Privacy: no site may ask browsers for extra client data, send reports to third parties,
-          # or carry personal data (emails, IP addresses) in any header.
-          for origin in https://www.sozorockfoundation.org https://health.sozorockfoundation.org https://ai-lab.sozorockfoundation.org https://cbcap.sozorockfoundation.org; do
-            got="$(curl --proto '=https' --tlsv1.2 -sI --max-time 20 -H 'Sec-CH-UA: "monitor"' "$origin/")" || { echo "$origin unreachable"; exit 1; }
-            for h in accept-ch critical-ch server-timing nel report-to reporting-endpoints x-powered-by; do
-              if grep -qi "^$h:" <<<"$got"; then echo "$origin sends $h"; exit 1; fi
+          # or carry personal data (emails, IPv4 or IPv6 addresses) in any header. Every origin is
+          # checked with real GET requests on a page, a missing page and the root redirect.
+          privacy_origins='https://www.sozorockfoundation.org https://health.sozorockfoundation.org https://ai-lab.sozorockfoundation.org https://cbcap.sozorockfoundation.org'
+          for origin in $privacy_origins; do
+            for target in "$origin/" "$origin/monitor-missing-page" "http://${origin#https://}/"; do
+              got="$(curl -s -D - -o /dev/null --max-time 20 -H 'Sec-CH-UA: "monitor"' "$target")" || { echo "$target unreachable"; exit 1; }
+              for h in accept-ch critical-ch server-timing nel report-to reporting-endpoints x-powered-by; do
+                if grep -qi "^$h:" <<<"$got"; then echo "$target sends $h"; exit 1; fi
+              done
+              if grep -Eiq '[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}|(^|[^0-9.])([0-9]{1,3}\.){3}[0-9]{1,3}([^0-9.]|$)|(^|[^0-9a-f:])([0-9a-f]{1,4}:){3,7}[0-9a-f]{1,4}([^0-9a-f:]|$)|[0-9a-f]{0,4}::[0-9a-f]{1,4}' <<<"$got"; then echo "$target header carries an email or IP address"; exit 1; fi
             done
-            if grep -Eiq '[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}|(^|[^0-9.])([0-9]{1,3}\.){3}[0-9]{1,3}([^0-9.]|$)' <<<"$got"; then echo "$origin header carries an email or IP address"; exit 1; fi
             echo "$origin headers private"
           done
           for pair in /platforms/applied-learning:/workforce /platforms/institute:/publications /insights:/publications; do
