@@ -122,7 +122,7 @@ export function OurWorkPage() {
           <span style={{ display: "flex", flexDirection: "column", justifyContent: "space-between", gap: 16 }}><span className="lab">Research</span><span className="ttl" style={{ fontSize: 20 }}>What evidence should support trust in digital health systems?</span><span className="ns-src">Health Systems Assurance Series · Volume 1 · 2026</span></span>
         </Go></li>
         <li><Tile href="/events" label="Event" title={upcoming[0].title} sub={`Fireside · ${upcoming[0].where} · Date to be announced`} /></li>
-        <li><Tile href={AI_LAB} label="SozoRock AI Lab" title="Practical AI skills for everyone" sub="Free · Tuesdays at 6:30 pm · Albany, New York State" /></li>
+        <li><Tile href={AI_LAB} label="SozoRock AI Lab" title="Ready for what AI does next" sub="Free Tuesday sessions · AI enablement for organizations" /></li>
       </ul>
     </Sec>
 
@@ -248,7 +248,7 @@ export function WorkforcePage() {
       <ul className="ns-grid g3">
         <li><Tile href="#partner" tone="white" label="Universities" title="Host a cohort" sub="Experiential learning for graduate and undergraduate students on real projects." /></li>
         <li><Tile href="#partner" tone="white" label="Health systems and employers" title="Share a project" sub="Cloud, security and AI work delivered, and a pipeline of job ready talent." /></li>
-        <li><Tile href={AI_LAB} tone="white" label="Communities" title="Learn AI for free" sub="Practical AI skills for any background through the SozoRock AI Lab." /></li>
+        <li><Tile href={`${AI_LAB}individuals/`} tone="white" label="Communities" title="Learn AI for free" sub="Hands on sessions every Tuesday, open to any background, through the SozoRock AI Lab." /></li>
       </ul>
     </Sec>
 
@@ -276,7 +276,7 @@ export function WorkforcePage() {
       </div>
     </Sec>
 
-    <Band top title="SozoRock AI Lab: practical AI skills for everyone." line="Free. Tuesdays at 6:30 pm, Albany, New York State." action={<Btn href={AI_LAB} tone="navy">Register for the AI Lab</Btn>} />
+    <Band top title="Ready for what AI does next." line="SozoRock AI Lab: free sessions every Tuesday and AI enablement for mission driven organizations." action={<Btn href={AI_LAB} tone="navy">Explore the AI Lab</Btn>} />
 
     <FormSection id="partner" eyebrow="Partner with us" title="Host a cohort, share a project or build your team." lede="Tell us what you would like to build. We will come back with a scope and timeline.">
       <PartnerForm />
@@ -335,20 +335,20 @@ export function AiLabPage() {
     <Hero
       id="lab-title"
       crumb={["Our Work", "/platforms"]}
-      title="Practical AI skills for everyone."
-      lede="Free, hands on and open to any background. Bring a laptop and a question; leave with something that works."
-      actions={<><Btn href={AI_LAB}>Register for the AI Lab</Btn><More href="/partner">Bring it to your team</More></>}
-      panelLabel="Tuesdays at 6:30 pm in the Beacon Bank community room, Albany, New York State."
+      title="Ready for what AI does next."
+      lede="Free weekly AI sessions for individuals. AI enablement for mission driven organizations. One platform neutral standard."
+      actions={<><Btn href={`${AI_LAB}individuals/`}>For individuals</Btn><More href={`${AI_LAB}organizations/`}>For organizations</More></>}
+      panelLabel="Free sessions every Tuesday at 6:30 pm in the Beacon Bank community room, Albany, New York State, since May 2026."
       panel={<div className="ns-panel-stat"><b>Tuesdays</b><b style={{ color: "var(--chart-2)" }}>6:30 pm</b><p style={{ color: "var(--ice-2)" }}>Beacon Bank community room, Albany, New York State</p></div>}
     />
     <Sec labelledBy="do-title">
-      <Head id="do-title" eyebrow="What you do" title="Learn by building, with people who started where you are." />
+      <Head id="do-title" eyebrow="Two programs" title="One standard for people and the organizations that serve them." />
       <ul className="ns-grid g3">
-        <li className="ns-tile"><span className="lab">Use</span><span><span className="ttl">AI at work and at home</span><span className="sub">Write, plan, research and analyze with today’s tools.</span></span></li>
-        <li className="ns-tile"><span className="lab">Build</span><span><span className="ttl">A small project of your own</span><span className="sub">One participant built and launched a business website.</span></span></li>
-        <li className="ns-tile"><span className="lab">Judge</span><span><span className="ttl">When to trust the answer</span><span className="sub">Privacy, security and human judgment, every session.</span></span></li>
+        <li className="ns-tile"><span className="lab">Individuals</span><span><span className="ttl">Free AI sessions, every Tuesday</span><span className="sub">Agents, voice, AI video and app building, for any background.</span></span></li>
+        <li className="ns-tile"><span className="lab">Organizations</span><span><span className="ttl">AI enablement for mission driven teams</span><span className="sub">Activation, train the trainer certification and AI governance.</span></span></li>
+        <li className="ns-tile"><span className="lab">Standard</span><span><span className="ttl">Platform neutral, human judgment first</span><span className="sub">ChatGPT, Claude, Copilot, Gemini, Grok and open models, with results published.</span></span></li>
       </ul>
     </Sec>
-    <Band tone="ice" title="Bring the AI Lab to your organization." line="Sessions on applied AI, identity and access, cloud security and governance. Scope and dates are agreed with you." action={<Btn href="/partner">Partner with us</Btn>} />
+    <Band tone="ice" title="Bring the AI Lab to your organization." line="A ninety day activation path, certified trainers and AI governance, as a sponsored cohort or a direct engagement." action={<Btn href={`${AI_LAB}organizations/#inquiry`}>Book a readiness call</Btn>} />
   </div>;
 }

@@ -141,7 +141,7 @@ export function HomePage() {
       </div>
     </Sec>
 
-    <Band top title="Practical AI skills for everyone." line="SozoRock AI Lab: free, hands on, any background. Tuesdays at 6:30 pm, Albany, New York State." action={<Btn href={AI_LAB} tone="navy">Register for the AI Lab</Btn>} />
+    <Band top title="Ready for what AI does next." line="SozoRock AI Lab: free AI sessions every Tuesday in Albany, New York State, and AI enablement for mission driven organizations." action={<Btn href={AI_LAB} tone="navy">Explore the AI Lab</Btn>} />
 
     <Sec className="pt0" id="events" labelledBy="events-title">
       <Head id="events-title" eyebrow="Events" title="Join the conversation." link={["All events", "/events"]} />

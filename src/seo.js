@@ -44,8 +44,8 @@ const routeSeo = {
     pageType: "WebPage",
   },
   "/platforms/ai-lab": {
-    title: "SozoRock AI Lab | Applied AI for Real Work",
-    description: "Task-based AI learning for real work, centered on human judgment, verification, responsible use and reviewed outputs.",
+    title: "SozoRock AI Lab | Free AI Training and AI Enablement",
+    description: "Free weekly AI sessions for individuals and platform neutral AI enablement, train the trainer programs and AI governance for mission driven organizations.",
     pageType: "WebPage",
   },
   "/publications": {
@@ -117,7 +117,7 @@ const routeKeywords = {
   "/platforms": ["SozoRock platforms", "Global Institute", "SozoRock Health", "SozoRock AI Lab", "county evidence", "public systems"],
   "/platforms/institute": ["public-interest research", "governance research", "health systems assurance", "public decisions", "rural institutions", "SozoRock Global Institute"],
   "/platforms/health": ["health access", "place intelligence", "community health evidence", "rural health", "SozoRock Health"],
-  "/platforms/ai-lab": ["applied artificial intelligence", "task-based AI learning", "AI verification", "human judgment", "SozoRock AI Lab"],
+  "/platforms/ai-lab": ["free AI classes", "AI enablement", "AI for nonprofits", "train the trainer", "AI governance", "AI agents", "SozoRock AI Lab"],
   "/publications": ["health systems publications", "governance research", "rural governance research", "health equity research", "public-interest reports"],
   "/insights": ["health access insights", "public systems", "county evidence", "applied AI insights"],
   "/events": ["public-interest briefings", "health-access roundtables", "community deliberation", "AI and society events", "SozoRock events"],
