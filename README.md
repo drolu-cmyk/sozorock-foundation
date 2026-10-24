@@ -1,13 +1,11 @@
 # The SozoRock Foundation
 
-The SozoRock Foundation, Inc. connects public research, health access and applied learning with practical community needs.
+The SozoRock Foundation, Inc. is a 501(c)(3) nonprofit working on access, capacity and trust: opening doors to primary care, building the people who run and protect health systems, and giving communities a voice on AI.
 
-## Our work
+- **SozoRock Health**: the Primary Care Access Program, the Health Equity Initiative and public evidence about access to care.
+- **Workforce Capacity**: hands on learning in cloud, security, governance and AI, including the SozoRock AI Lab.
+- **AI & Society**: research and public forums on how AI is used in learning, work and health.
 
-- **SozoRock Health** brings together the Primary Care Access Program, proposed Health Equity Hubs and public evidence about access to care.
-- **SozoRock Global Institute** publishes research and convenes discussions about public systems.
-- **SozoRock AI Lab** supports practical learning and the use of technology in everyday life.
-
-Visit [The SozoRock Foundation](https://www.sozorockfoundation.org/) to explore programs, read publications or discuss a partnership.
+Visit [The SozoRock Foundation](https://www.sozorockfoundation.org/) to explore our work, read our research or partner with us.
 
 Copyright © 2026 The SozoRock Foundation, Inc. All rights reserved.
