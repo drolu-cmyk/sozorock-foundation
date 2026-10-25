@@ -143,7 +143,7 @@ export function LeadershipPage() {
     <div className="ns-shell" style={{ paddingBottom: 112 }}>
       {leaders.map((leader, index) => <article key={leader.name} className="ns-profile">
         <img src={leader.image} alt={leader.name} width="720" height="840" loading={index > 1 ? "lazy" : "eager"} decoding="async" />
-        <div><h2 className="ns-stmt s40">{leader.name}</h2><p className="role">{leader.title}</p><p className="ns-body" style={{ marginTop: 18 }}>{leader.bio}</p></div>
+        <div><h2 className="ns-stmt s40">{leader.name}</h2><p className="role">{leader.title}</p><p className="ns-body" style={{ marginTop: 18 }}>{leader.bio}</p>{leader.links?.map(([text, href]) => <p key={href} style={{ marginTop: 18 }}><a className="ns-more" href={href} rel="me noopener" target="_blank">{text}<span aria-hidden="true">&nbsp;↗</span></a></p>)}</div>
       </article>)}
     </div>
     <Band title="Work with our team." line="Partner on a program or get in touch." action={<Btn href="/partner" tone="navy">Partner with us</Btn>} />

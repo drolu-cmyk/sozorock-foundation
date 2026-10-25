@@ -194,6 +194,18 @@ function breadcrumbsForPath(pathname, publication) {
   return { "@type": "BreadcrumbList", "@id": `${SITE_ORIGIN}${pathname}/#breadcrumb`, itemListElement: items };
 }
 
+const SCHOLAR_PROFILE = "https://scholar.google.com/citations?user=O1FiCLEAAAAJ";
+const OLU_PERSON = {
+  "@type": "Person",
+  "@id": `${SITE_ORIGIN}/leadership#oluwabiyi-adeyemo`,
+  name: "Dr. Oluwabiyi Adeyemo",
+  jobTitle: "Director of Strategic Initiatives",
+  url: `${SITE_ORIGIN}/leadership`,
+  image: `${SITE_ORIGIN}/leadership/dr-oluwabiyi-adeyemo-headshot.jpg`,
+  sameAs: [SCHOLAR_PROFILE],
+};
+const personFor = (name) => (/Adeyemo/u.test(name) ? { ...OLU_PERSON, worksFor: { "@id": ORGANIZATION_ID } } : { "@type": "Person", name });
+
 function publicationSchema(publication, canonicalUrl) {
   return {
     "@type": "Report",
@@ -202,7 +214,7 @@ function publicationSchema(publication, canonicalUrl) {
     alternateName: publication.subtitle,
     headline: publication.tagline,
     description: publication.description,
-    author: publication.author ? { "@type": "Person", name: publication.author } : undefined,
+    author: publication.author ? personFor(publication.author) : undefined,
     publisher: { "@id": ORGANIZATION_ID },
     datePublished: publication.dateMachine || publication.date,
     inLanguage: publication.languageCode || "en-US",
@@ -324,7 +336,7 @@ export function getSeoForPath(inputPathname = "/") {
           itemListElement: leaders.map((leader, index) => ({
             "@type": "ListItem",
             position: index + 1,
-            item: { "@type": "Person", name: leader.name, jobTitle: leader.title, worksFor: { "@id": ORGANIZATION_ID } },
+            item: /Adeyemo/u.test(leader.name) ? personFor(leader.name) : { "@type": "Person", name: leader.name, jobTitle: leader.title, worksFor: { "@id": ORGANIZATION_ID } },
           })),
         }
       : null,
