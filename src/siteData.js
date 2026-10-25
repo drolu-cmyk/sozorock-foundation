@@ -7,7 +7,7 @@ export const navigation = [
     items: [
       { label: "SozoRock Global Institute", href: "/platforms/institute", meta: "Research, publications and convening" },
       { label: "SozoRock Health", href: "/platforms/health", meta: "Systems for health access" },
-      { label: "SozoRock AI Lab", href: "/platforms/ai-lab", meta: "Applied AI for real work" },
+      { label: "SozoRock AI Lab", href: "/platforms/ai-lab", meta: "Free sessions and AI enablement" },
     ],
   },
   {
@@ -66,8 +66,8 @@ export const platforms = [
   {
     slug: "ai-lab",
     name: "SozoRock AI Lab",
-    line: "Applied AI for real work.",
-    detail: "No-cost practical learning built around a real task, a reviewed output and responsible use. A published participant project shows the method in practice.",
+    line: "Ready for what AI does next.",
+    detail: "Free weekly AI sessions for individuals and platform neutral AI enablement for mission driven organizations.",
     href: "/platforms/ai-lab",
     action: "Explore the AI Lab",
     tone: "royal",
@@ -183,14 +183,14 @@ export const campaigns = [
   {
     key: "ai-lab",
     label: "SozoRock AI Lab",
-    title: "Applied AI for real work.",
-    copy: "Task-based learning, reviewed output, responsible use and human judgment.",
-    detail: "Learn · Make · Check · Use",
+    title: "Ready for what AI does next.",
+    copy: "Free Tuesday sessions for individuals. AI enablement for mission driven organizations.",
+    detail: "Individuals · Organizations",
     href: "/platforms/ai-lab",
     action: "Explore the AI Lab",
     image: null,
     alt: "",
-    signal: "Learn. Make. Check. Use.",
+    signal: "Two programs. One standard.",
     kind: "type",
   },
 ];
@@ -212,8 +212,8 @@ export const insights = [
   },
   {
     type: "Applied learning",
-    title: "Human judgment stays in the work",
-    summary: "Learn what a tool can do, build something useful, verify it and put the reviewed result into practice.",
+    title: "From chatting with AI to handing it work",
+    summary: "Free Tuesday sessions on agents, voice, AI video and app building, and AI enablement for organizations.",
     href: "https://ai-lab.sozorockfoundation.org/",
     source: "SozoRock AI Lab",
   },

@@ -86,7 +86,7 @@ const overrides = {
   "/platforms/ai-lab": {
     title: "SozoRock AI Lab",
     description: "",
-    keywords: ["free AI classes Albany NY", "AI skills for beginners", "practical AI training", "community AI learning", "AI literacy", "AI upskilling", "Albany New York", "SozoRock AI Lab"],
+    keywords: ["free AI classes Albany NY", "AI enablement", "AI for nonprofits", "train the trainer", "AI governance", "AI literacy", "AI agents", "SozoRock AI Lab"],
   },
   "/events": {
     title: "Events",
