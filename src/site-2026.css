@@ -450,3 +450,4 @@
 .approved-site .ns .engagement-form label, .approved-site .ns .publication-access-form label { margin: 0; }
 @media (max-width: 640px) { .ns-panel:has(.ns-panel-words) { min-height: 0; } }
 .approved-site .ns .ns-band p { color: inherit; }
+.ns-grid > li > .ns-tile { height: 100%; }

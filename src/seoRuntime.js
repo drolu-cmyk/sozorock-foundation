@@ -62,7 +62,7 @@ const overrides = {
   },
   "/platforms/health": {
     title: "Primary Care Access Program, New York 2027 | SozoRock Health",
-    description: "SozoRock Health's Primary Care Access Program for up to 25 New Yorkers from January 2027, plus Health Equity Hubs in development and county evidence.",
+    description: "SozoRock Health's Primary Care Access Program for up to 25 New Yorkers from January 2027, plus Health Equity Hubs and free county data.",
     keywords: [
       "primary care access program",
       "health equity New York",
