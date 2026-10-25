@@ -11,7 +11,16 @@ test('legacy Health hosts redirect permanently to the current Health experience'
  }
 });
 test('legacy CB-CAP links preserve their product destination',()=>assert.equal(req('/cb-cap').headers.location.value,'https://cbcap.sozorockfoundation.org/'));
+test('legacy redirect does not reflect unknown or personal paths',()=>{
+ for(const path of ['//example.test/','/person@example.test','/%3Femail%3Dperson%40example.test']) {
+  assert.equal(req(path).statusCode,404);assert.equal(req(path).headers.location,undefined);
+ }
+ assert.equal(req('/explore/').headers.location.value,'https://health.sozorockfoundation.org/explore');
+});
 test('private query values and obsolete API operations are not forwarded',()=>{
+ for(const key of ['utm_source','utm_medium','utm_campaign','utm_content','utm_term']) {
+  assert.equal(req('/','www.sozorockhealth.com','GET',{[key]:{value:'person@example.test'}}).headers.location.value,'https://health.sozorockfoundation.org/');
+ }
  assert.equal(req('/','www.sozorockhealth.com','GET',{token:{value:'private'},utm_source:{value:'old site'}}).headers.location.value,'https://health.sozorockfoundation.org/?utm_source=old%20site');
  assert.equal(req('/api/contact').statusCode,410);assert.equal(req('/','www.sozorockhealth.com','POST').statusCode,410);
  assert.equal(req('/','example.cloudfront.net').statusCode,403);

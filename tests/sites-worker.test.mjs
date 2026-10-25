@@ -57,13 +57,39 @@ test("redirects legacy AWS clone routes to their canonical public routes", async
   }
 });
 
-test("removes trailing slashes without losing query parameters", async () => {
+test("removes trailing slashes while preserving public navigation markers", async () => {
   const response = await worker.fetch(new Request("https://example.test/publications/?ref=library", {
     headers: { accept: "text/html" },
   }), { ASSETS: { fetch: async () => { throw new Error("assets should not be called"); } } });
 
   assert.equal(response.status, 308);
   assert.equal(response.headers.get("location"), "/publications?ref=library");
+});
+
+test("redirect headers omit private and unknown query values on every redirect path", async () => {
+  for (const [input, expected] of [
+    ["https://sozorockfoundation.org/publications", "https://www.sozorockfoundation.org/publications"],
+    ["https://example.test/about-us", "/about"],
+    ["https://example.test/publications/", "/publications"],
+  ]) {
+    for (const query of ["email=person%40example.test&token=secret", "source=person%40example.test&ref=secret&unknown=value", "source=apex&source=secret"]) {
+      const response = await worker.fetch(new Request(`${input}?${query}`, { headers: { accept: "text/html" } }), {});
+      assert.equal(response.headers.get("location"), expected + (query.startsWith("source=apex") ? "?source=apex" : ""));
+    }
+  }
+});
+
+test("redirects reject unknown paths and protocol-relative destinations without reflection", async () => {
+  for (const host of ["sozorockfoundation.org", "www.sozorockfoundation.org"]) {
+    for (const path of ["//example.test/", "/person@example.test/", "/%3Femail%3Dperson%40example.test/"]) {
+      const response = await worker.fetch(new Request(`https://${host}${path}`, { headers: { accept: "text/html" } }), {});
+      assert.equal(response.status, 404);
+      assert.equal(response.headers.get("location"), null);
+    }
+  }
+  const apex = await worker.fetch(new Request("https://sozorockfoundation.org/person@example.test"), {});
+  assert.equal(apex.status, 404);
+  assert.equal(apex.headers.get("location"), null);
 });
 
 test("serves existing static assets without a fallback", async () => {
