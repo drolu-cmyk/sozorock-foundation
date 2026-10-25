@@ -165,7 +165,7 @@ export function PartnerPage() {
       <Head id="fit-title" eyebrow="Who we partner with" title="Find where you fit." />
       <ul className="ns-grid g3">
         <li><Tile href="/workforce" label="Capacity" title="Universities and employers" sub="Host a cohort or share a cloud, security or AI project." className="tall" /></li>
-        <li><Tile href="/platforms/health" label="Access" title="Licensed providers" sub="Reach more patients through the Primary Care Access Program, on your own platform." className="tall" /></li>
+        <li><Tile href="/platforms/health" label="Access" title="Licensed providers" sub="Reach people who face cost, distance or technology barriers to care." className="tall" /></li>
         <li><Tile href="/platforms/health" label="Access" title="Libraries and community groups" sub="A Library, Community or Home Health Equity Hub, or Health Access Day." className="tall" /></li>
         <li><Tile href="/platforms/health" label="Access" title="Counties and public agencies" sub="Free county data for health assessments, funding and workforce plans." className="tall" /></li>
         <li><Tile href="/ai-society" label="Trust" title="Event and forum hosts" sub="A Fireside, Working Roundtable or Who Decides? Forum." className="tall" /></li>

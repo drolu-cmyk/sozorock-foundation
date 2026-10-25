@@ -113,6 +113,7 @@ function routeHtml(route) {
       citation_author: seo.publication.citationAuthor || "Adeyemo, Oluwabiyi",
       citation_publication_date: String(seo.publication.dateMachine || seo.publication.date).replace(/-/gu, "/"),
       citation_technical_report_institution: seo.publication.publisher || "The SozoRock Foundation, Inc.",
+      citation_technical_report_number: seo.publication.reportNumber,
       citation_abstract_html_url: seo.canonicalUrl,
       citation_publisher: seo.publication.publisher || "The SozoRock Foundation, Inc.",
       citation_isbn: seo.publication.isbn,

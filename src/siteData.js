@@ -77,6 +77,7 @@ export const platforms = [
 export const publications = [
   {
     slug: "hsa-v1-2026",
+    reportNumber: "HSA Volume 1",
     path: "/publication/hsa-v1-2026",
     title: "Health Systems Assurance",
     subtitle: "From compliance to evidence-based digital assurance",
@@ -105,10 +106,11 @@ export const publications = [
     copyright: "© 2026 The SozoRock Foundation, Inc. All rights reserved. Third-party standards, trademarks, institutional names and copyrighted source materials remain the property of their respective owners.",
     doi: null,
     external: "https://health.sozorockfoundation.org/publications/health-systems-assurance-volume-1",
-    limits: "This volume is not legal advice, a certification or attestation scheme, a clinical standard or an audit. Its constructs are analytical tools and a research agenda, not validated standards.",
+    limits: "This volume is not legal advice, a certification or attestation scheme, a clinical standard or an audit. Its constructs are analytical tools offered for testing and a research agenda, not validated standards.",
   },
   {
     slug: "rrg-v1-2025",
+    reportNumber: "RRG Volume 1",
     doi: "10.65473/rrg-v1-2025",
     publisher: "The SozoRock Foundation, Inc.",
     dateMachine: "2025",
@@ -132,6 +134,7 @@ export const publications = [
   },
   {
     slug: "rebs-v1-2025",
+    reportNumber: "REBS Volume 1",
     doi: "10.65473/rebs-v1-2025",
     publisher: "The SozoRock Foundation, Inc.",
     dateMachine: "2025",
