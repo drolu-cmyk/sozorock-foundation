@@ -45,7 +45,7 @@ function Barriers() {
     <ul style={{ display: "grid", gap: 10 }}>
       {barriers.map(([barrier, response, detail]) => <li key={barrier} className="row"><span>{barrier}</span><span><b>{response}</b><small>{detail}</small></span></li>)}
     </ul>
-    <figcaption className="ns-src" style={{ marginTop: 10 }}>Library, Community and Home Health Equity Hubs are in development with local partners.</figcaption>
+    <figcaption className="ns-src" style={{ marginTop: 10 }}>Library hubs run by appointment and community hubs at scheduled events. The Home hub is in development.</figcaption>
   </figure>;
 }
 
@@ -68,8 +68,8 @@ export function OurWorkPage() {
         <div className="ns-stack">
           <p className="ns-eyebrow">Access</p>
           <h2 className="ns-stmt" id="access-title">Health Access</h2>
-          <p className="ns-body">We work with partners to turn libraries, community centers and homes into trusted access points, so cost, distance, technology and unclear information stop keeping people from care.</p>
-          <Bullets items={["SozoRock Health: county evidence, digital readiness and community partnerships", "Health Equity Initiative: Library, Community and Home Health Equity Hubs, and Health Access Day", "Primary Care Access Program, with Purcell Integrative Osteopathic Care"]} />
+          <p className="ns-body">We bring a private place, a device and secure Wi‑Fi to libraries, community centers and homes, so cost, distance, technology and unclear information stop keeping people from care.</p>
+          <Bullets items={["SozoRock Health: free county data and maps for every state", "Health Equity Initiative: Library, Community and Home Health Equity Hubs, and Health Access Day", "Primary Care Access Program, with Purcell Integrative Osteopathic Care"]} />
           <div className="ns-actions" style={{ marginTop: 8 }}><Btn href="/platforms/health">Explore Health Access</Btn><More href="/partner">Bring a hub to your community</More></div>
           <Leads keys={["nike", "jordan"]} />
         </div>
@@ -102,7 +102,7 @@ export function OurWorkPage() {
           <p className="ns-eyebrow">Trust</p>
           <h2 className="ns-stmt" id="trust-title">AI &amp; Society</h2>
           <p className="ns-body">Building public trust in AI by giving residents, educators, employers and policymakers a real say in how it is used.</p>
-          <Bullets items={["Who Decides? forums on AI in learning, work and health", "Roadshows that take the conversation to libraries, colleges and workplaces", "Published findings with institutional responses"]} />
+          <Bullets items={["Who Decides? forums on AI in learning, work and health", "Roadshows that take the conversation to colleges, workplaces and public spaces", "Published findings with institutional responses"]} />
           <div className="ns-actions" style={{ marginTop: 8 }}><Btn href="/ai-society">Explore AI &amp; Society</Btn><More href="/partner">Host a forum</More></div>
           <Leads keys={["olu"]} />
         </div>
@@ -149,7 +149,7 @@ export function HealthPage() {
       id="health-title"
       crumb={["Our Work", "/platforms"]}
       title="A clearer route to primary care."
-      lede="We work with partners to turn libraries, community centers and homes into trusted access points, so cost, distance, technology and unclear information stop keeping people from care."
+      lede="We bring a private place, a device and secure Wi‑Fi to libraries, community centers and homes, so cost, distance, technology and unclear information stop keeping people from care."
       actions={<><Btn href={HEALTH}>Visit SozoRock Health</Btn><More href="/support">Support the program</More></>}
       panel={<img className="fill" src="/media/health-access.webp" alt="" width="1672" height="941" decoding="async" fetchPriority="high" />}
     />
@@ -167,7 +167,7 @@ export function HealthPage() {
         <div className="ns-stack">
           <p className="ns-eyebrow">Health Equity Initiative</p>
           <h2 className="ns-stmt" id="barriers-title">Remove the barrier, and care becomes reachable.</h2>
-          <p className="ns-body">Libraries, community centers and homes are places people already trust. With local partners, we are turning them into access points for health information, digital skills and preparation for provider led care.</p>
+          <p className="ns-body">Libraries, community centers and homes are places people already trust. We use those spaces when they are available and reserved, for health information, help with technology and getting ready for a visit with a licensed provider.</p>
           <Bullets items={["Library Health Equity Hub", "Community Health Equity Hub", "Home Health Equity Hub", "Health Access Day"]} />
           <p className="ns-src">Local delivery depends on agreed responsibilities and available services. Clinical care remains with licensed providers.</p>
           <div className="ns-actions"><Btn href="/partner">Bring a hub to your community</Btn></div>
@@ -316,7 +316,7 @@ export function AiSocietyPage() {
       <Head id="formats-title" eyebrow="Formats" title="Come to one, or bring one to your community." link={["All events", "/events"]} />
       <ul className="ns-grid g3">
         <li><Tile href="#interest" label="Who Decides? Forum" title="AI, learning and work" sub="Albany, New York State · Date to be announced" /></li>
-        <li><Tile href="/partner" label="Roadshow" title="Who Decides? on the road" sub="Libraries, colleges and workplaces · Dates to be announced" /></li>
+        <li><Tile href="/partner" label="Roadshow" title="Who Decides? on the road" sub="Colleges, workplaces and public spaces · Dates to be announced" /></li>
         <li><Tile href="#interest" label="Fireside chat" title="AI in health and public services" sub="Date to be announced" /></li>
       </ul>
     </Sec>

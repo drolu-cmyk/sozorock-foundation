@@ -105,7 +105,7 @@ export const publications = [
     copyright: "© 2026 The SozoRock Foundation, Inc. All rights reserved. Third-party standards, trademarks, institutional names and copyrighted source materials remain the property of their respective owners.",
     doi: null,
     external: "https://health.sozorockfoundation.org/publications/health-systems-assurance-volume-1",
-    limits: "This volume is not legal advice, a certification or attestation scheme, a clinical standard or an audit. Its constructs are proposed analytical tools and a research agenda, not validated standards.",
+    limits: "This volume is not legal advice, a certification or attestation scheme, a clinical standard or an audit. Its constructs are analytical tools and a research agenda, not validated standards.",
   },
   {
     slug: "rrg-v1-2025",
@@ -127,7 +127,7 @@ export const publications = [
     author: "Dr. Oluwabiyi Adeyemo",
     date: "2025",
     citation: "Adeyemo, Oluwabiyi. 2025. Rethinking Rural Governance Series (RRG), Volume 1. The SozoRock Foundation, Inc. https://doi.org/10.65473/rrg-v1-2025",
-    limits: "Read this as a proposed governance framework. Its use of Delaware County as a reference case does not establish adoption, independent validation or outcomes in that county or elsewhere.",
+    limits: "Read this as a governance framework for discussion and testing. Its use of Delaware County as a reference case does not establish adoption, independent validation or outcomes in that county or elsewhere.",
     external: "https://health.sozorockfoundation.org/publications/rethinking-rural-governance-volume-1",
   },
   {
@@ -150,7 +150,7 @@ export const publications = [
     author: "Dr. Oluwabiyi Adeyemo",
     date: "2025",
     citation: "Adeyemo, Oluwabiyi. 2025. Rural Equity Blueprint Series (REBS), Volume 1. The SozoRock Foundation, Inc. https://doi.org/10.65473/rebs-v1-2025",
-    limits: "These are proposed access models, not evidence of operating services or measured health outcomes. Local implementation depends on partner agreements, capacity and licensed clinical responsibilities.",
+    limits: "These are access models for planning, not evidence of operating services or measured health outcomes. Local implementation depends on partner agreements, capacity and licensed clinical responsibilities.",
     external: "https://health.sozorockfoundation.org/publications/rural-equity-blueprint-volume-1",
   },
 ];

@@ -110,8 +110,10 @@ function routeHtml(route) {
     html = upsertMeta(html, "property", "article:section", seo.publication.theme);
     const citation = {
       citation_title: `${seo.publication.title}, ${seo.publication.volume}: ${seo.publication.subtitle || seo.publication.tagline}`,
-      citation_author: seo.publication.author,
-      citation_publication_date: seo.publication.dateMachine || seo.publication.date,
+      citation_author: seo.publication.citationAuthor || "Adeyemo, Oluwabiyi",
+      citation_publication_date: String(seo.publication.dateMachine || seo.publication.date).replace(/-/gu, "/"),
+      citation_technical_report_institution: seo.publication.publisher || "The SozoRock Foundation, Inc.",
+      citation_abstract_html_url: seo.canonicalUrl,
       citation_publisher: seo.publication.publisher || "The SozoRock Foundation, Inc.",
       citation_isbn: seo.publication.isbn,
       citation_language: seo.publication.languageCode || "en-US",

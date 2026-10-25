@@ -165,9 +165,9 @@ export function PartnerPage() {
       <Head id="fit-title" eyebrow="Who we partner with" title="Find where you fit." />
       <ul className="ns-grid g3">
         <li><Tile href="/workforce" label="Capacity" title="Universities and employers" sub="Host a cohort or share a cloud, security or AI project." className="tall" /></li>
-        <li><Tile href="/platforms/health" label="Access" title="Licensed providers" sub="The Primary Care Access Program and digital readiness on your platform." className="tall" /></li>
+        <li><Tile href="/platforms/health" label="Access" title="Licensed providers" sub="Reach more patients through the Primary Care Access Program, on your own platform." className="tall" /></li>
         <li><Tile href="/platforms/health" label="Access" title="Libraries and community groups" sub="A Library, Community or Home Health Equity Hub, or Health Access Day." className="tall" /></li>
-        <li><Tile href="/platforms/health" label="Access" title="Counties and public agencies" sub="County evidence for health assessments, funding and workforce plans." className="tall" /></li>
+        <li><Tile href="/platforms/health" label="Access" title="Counties and public agencies" sub="Free county data for health assessments, funding and workforce plans." className="tall" /></li>
         <li><Tile href="/ai-society" label="Trust" title="Event and forum hosts" sub="A Fireside, Working Roundtable or Who Decides? Forum." className="tall" /></li>
         <li><Tile href="#inquiry" label="Any program" title="Technology partners" sub="Devices, connectivity, cloud resources or expertise for a shared project." className="tall" /></li>
       </ul>
@@ -224,7 +224,7 @@ export function SupportPage() {
       <ul className="ns-grid g3">
         <li><Tile href="/workforce" label="Capacity" title="Workforce Capacity" sub="Mentored, hands on learning in cloud, security and AI." /></li>
         <li><Tile href="/ai-society" label="Trust" title="AI & Society" sub="Participant compensation, accessible facilitation and publication." /></li>
-        <li><Tile href="/publications" label="Research" title="A research volume" sub="Independent research and county evidence, free to read." /></li>
+        <li><Tile href="/publications" label="Research" title="A research volume" sub="Independent research and free county data." /></li>
       </ul>
     </Sec>
     <FormSection id="inquiry" eyebrow="Discuss support" title="Tell us how you would like to give." lede="This is an inquiry, not a payment form. The SozoRock Foundation, Inc. is a 501(c)(3) public charity, EIN 39-4736725. Contributions are tax deductible as allowed by law.">

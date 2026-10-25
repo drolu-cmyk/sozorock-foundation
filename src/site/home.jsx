@@ -100,7 +100,7 @@ export function HomePage() {
     </Sec>
 
     <Sec tone="navy" labelledBy="impact-title">
-      <Head id="impact-title" eyebrow="Our impact" title="Results people can see." link={["Partner with us", "/partner"]} />
+      <Head id="impact-title" eyebrow="Our impact" title="Where the work stands." link={["Partner with us", "/partner"]} />
       <ul className="ns-grid g3" style={{ gap: 24, marginTop: 48 }}>
         <li><Link className="ns-story" href="/workforce">
           <span className="viz"><Dots count={11} columns={6} size={16} color={(index) => (index < 6 ? "#ffffff" : "#6E9BDF")} /></span>
