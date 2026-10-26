@@ -284,9 +284,35 @@ async function handleContact(request, env) {
 }
 
 
+// Only fixed, public navigation markers may be reflected into response headers.
+// Filtering parameter names alone would still allow an email or token as a value.
+function publicRedirectQuery(url) {
+  const allowed = { source: ["apex", "legacy", "share"], ref: ["library"] };
+  const query = new URLSearchParams();
+  for (const [key, values] of Object.entries(allowed)) {
+    const value = url.searchParams.get(key);
+    if (values.includes(value)) query.set(key, value);
+  }
+  return query.toString();
+}
+
+function publicRedirectPath(pathname) {
+  const path = pathname === "/" ? "/" : pathname.replace(/\/+$/u, "");
+  return APP_ROUTES.has(path) || LEGACY_ROUTES.has(path) || PRIVATE_PUBLICATION_FILES.has(path)
+    || ["/robots.txt", "/sitemap.xml", "/favicon.ico", "/site.webmanifest", "/.well-known/security.txt"].includes(path)
+    ? path : null;
+}
+
+function rejectedRedirect() {
+  return new Response(null, { status: 404, headers: { "Cache-Control": "no-store", "X-Content-Type-Options": "nosniff" } });
+}
+
 function redirect(url, pathname, status = 308) {
+  if (!publicRedirectPath(pathname)) return rejectedRedirect();
   const destination = new URL(url);
   destination.pathname = pathname;
+  destination.search = publicRedirectQuery(destination);
+  destination.hash = "";
   return new Response(null, {
     status,
     headers: {
@@ -297,10 +323,15 @@ function redirect(url, pathname, status = 308) {
 }
 
 function redirectToCanonicalHost(url) {
+  const path = publicRedirectPath(url.pathname);
+  if (!path) return rejectedRedirect();
   const destination = new URL(url);
+  destination.pathname = path;
   destination.protocol = "https:";
   destination.hostname = CANONICAL_HOSTNAME;
   destination.port = "";
+  destination.search = publicRedirectQuery(destination);
+  destination.hash = "";
   return new Response(null, {
     status: 308,
     headers: {

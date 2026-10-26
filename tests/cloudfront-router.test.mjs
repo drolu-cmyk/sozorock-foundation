@@ -20,6 +20,33 @@ function request(uri, { host = "www.sozorockfoundation.org", querystring = {} } 
   return context.handler({ request: { uri, headers: { host: { value: host } }, querystring } });
 }
 
+test("all edge redirects exclude private values including duplicate public parameters", () => {
+  for (const [uri, host, expected] of [
+    ["/publications", "sozorockfoundation.org", "https://www.sozorockfoundation.org/publications"],
+    ["/about-us", "www.sozorockfoundation.org", "/about"],
+    ["/publications/", "www.sozorockfoundation.org", "/publications"],
+  ]) {
+    const querystring = {
+      email: { value: "person@example.test" }, token: { value: "secret" },
+      ref: { value: "person@example.test" },
+      source: { value: "apex", multiValue: [{ value: "apex" }, { value: "secret" }] },
+    };
+    const response = request(uri, { host, querystring });
+    assert.equal(response.headers.location.value, expected + "?source=apex");
+  }
+});
+
+test("edge redirects never reflect unrecognized paths or redirect to another origin", () => {
+  for (const host of ["sozorockfoundation.org", "www.sozorockfoundation.org"]) {
+    for (const uri of ["//example.test/", "/person@example.test/", "/%3Femail%3Dperson%40example.test/"]) {
+      const response = request(uri, { host });
+      assert.equal(response.statusCode, 404);
+      assert.equal(response.headers.location, undefined);
+    }
+  }
+  assert.equal(request("/person@example.test", { host: "sozorockfoundation.org" }).statusCode, 404);
+});
+
 test("CloudFront permanently canonicalizes the apex and preserves path/query", () => {
   const result = request("/platforms", {
     host: "sozorockfoundation.org",

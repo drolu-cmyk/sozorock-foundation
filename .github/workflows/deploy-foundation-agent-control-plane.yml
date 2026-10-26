@@ -12,7 +12,6 @@ on:
 
 permissions:
   contents: read
-  id-token: write
 
 concurrency:
   group: foundation-agent-control-plane
@@ -28,6 +27,9 @@ env:
 
 jobs:
   deploy:
+    permissions:
+      contents: read
+      id-token: write
     if: github.repository == 'drolu-cmyk/sozorock-foundation' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     timeout-minutes: 20

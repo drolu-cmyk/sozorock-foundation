@@ -97,25 +97,58 @@ Resources:
           var request = event.request;
           var uri = request.uri;
           var host = request.headers.host && request.headers.host.value;
-          var query = request.querystring;
+          var query = request.querystring || {};
+          // Reflect only fixed public navigation markers, never arbitrary values.
+          var allowed = { source: ['apex', 'legacy', 'share'], ref: ['library'] };
           var queryParts = [];
           var key;
 
-          for (key in query) {
-            if (Object.prototype.hasOwnProperty.call(query, key)) {
-              if (query[key].multiValue) {
-                for (var i = 0; i < query[key].multiValue.length; i += 1) {
-                  queryParts.push(encodeURIComponent(key) + '=' + encodeURIComponent(query[key].multiValue[i].value));
-                }
-              } else {
-                queryParts.push(encodeURIComponent(key) + '=' + encodeURIComponent(query[key].value));
+          for (key in allowed) {
+            if (Object.prototype.hasOwnProperty.call(allowed, key) && query[key]) {
+              var value = query[key].multiValue ? query[key].multiValue[0].value : query[key].value;
+              if (allowed[key].indexOf(value) !== -1) {
+                queryParts.push(key + '=' + encodeURIComponent(value));
               }
             }
           }
           var suffix = queryParts.length ? '?' + queryParts.join('&') : '';
 
+          var routes = {
+            '/ai-society': true,
+            '/': true,
+            '/platforms': true,
+            '/platforms/health': true,
+            '/platforms/ai-lab': true,
+            '/workforce': true,
+            '/publications': true,
+            '/events': true,
+            '/about': true,
+            '/leadership': true,
+            '/partner': true,
+            '/support': true,
+            '/contact': true,
+            '/standards': true,
+            '/privacy': true,
+            '/accessibility': true,
+            '/nondiscrimination': true,
+            '/terms': true,
+            '/publication/hsa-v1-2026': true,
+            '/publication/hsa-v1-2026/access': true,
+            '/publication/rrg-v1-2025': true,
+            '/publication/rrg-v1-2025/access': true,
+            '/publication/rebs-v1-2025': true,
+            '/publication/rebs-v1-2025/access': true
+          };
+          var normalized = uri === '/' ? '/' : uri.replace(/\/+$/, '');
+          var publicFiles = ['/robots.txt', '/sitemap.xml', '/favicon.ico', '/site.webmanifest', '/.well-known/security.txt', '/publications/hsa-volume-1-2026.pdf', '/publications/hsa-volume-1-2026.bib', '/publications/hsa-volume-1-2026.ris'];
+          var oldRoutes = ['/about-us', '/programs', '/work', '/work/global-institute', '/platforms/institute', '/platforms/applied-learning', '/insights', '/work/health', '/work/ai-lab'];
+          var publicPath = Object.prototype.hasOwnProperty.call(routes, normalized) || publicFiles.indexOf(normalized) !== -1 || oldRoutes.indexOf(normalized) !== -1;
+          if ((host === 'sozorockfoundation.org' || (uri.length > 1 && uri.charAt(uri.length - 1) === '/')) && !publicPath) {
+            return { statusCode: 404, statusDescription: 'Not Found', headers: { 'cache-control': { value: 'no-store' }, 'x-content-type-options': { value: 'nosniff' } } };
+          }
+
           if (host === 'sozorockfoundation.org') {
-            return response(308, 'https://www.sozorockfoundation.org' + uri + suffix, 'public, max-age=86400');
+            return response(308, 'https://www.sozorockfoundation.org' + normalized + suffix, 'public, max-age=86400');
           }
 
           // Validate the visitor's origin before the upstream service Origin
@@ -183,32 +216,6 @@ Resources:
           }
           if (uri.indexOf('/api/') === 0) return request;
 
-          var routes = {
-            '/ai-society': true,
-            '/': true,
-            '/platforms': true,
-            '/platforms/health': true,
-            '/platforms/ai-lab': true,
-            '/workforce': true,
-            '/publications': true,
-            '/events': true,
-            '/about': true,
-            '/leadership': true,
-            '/partner': true,
-            '/support': true,
-            '/contact': true,
-            '/standards': true,
-            '/privacy': true,
-            '/accessibility': true,
-            '/nondiscrimination': true,
-            '/terms': true,
-            '/publication/hsa-v1-2026': true,
-            '/publication/hsa-v1-2026/access': true,
-            '/publication/rrg-v1-2025': true,
-            '/publication/rrg-v1-2025/access': true,
-            '/publication/rebs-v1-2025': true,
-            '/publication/rebs-v1-2025/access': true
-          };
           if (uri === '/') request.uri = '/index.html';
           else if (routes[uri]) request.uri = uri + '.html';
           return request;
