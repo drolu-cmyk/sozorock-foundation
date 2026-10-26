@@ -65,7 +65,7 @@ function HeroFilm() {
     const v = ref.current; if (!v) return;
     let reduce = false;
     try { reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches; } catch { reduce = false; }
-    if (reduce) { setStill(true); v.removeAttribute("autoplay"); v.pause(); return; }
+    if (reduce) { setStill(true); return; }
     const p = v.play(); if (p && p.catch) p.catch(() => setStill(true));
   }, []);
   const watch = async () => {
@@ -76,7 +76,7 @@ function HeroFilm() {
     try { await v.play(); } catch { /* user can press play */ }
   };
   return <>
-    <video ref={ref} className="ns-film-video" muted playsInline autoPlay loop preload="metadata" poster="/media/foundation-film-poster.jpg"
+    <video ref={ref} className="ns-film-video" muted playsInline loop preload="metadata" poster="/media/foundation-film-poster.jpg"
       aria-label="The SozoRock Foundation in 60 seconds: access to care, capacity for health systems and public trust in AI, shown on a model of the United States">
       <source src="/media/foundation-film-720.mp4" type="video/mp4" media="(max-width: 900px)" />
       <source src="/media/foundation-film-1080.mp4" type="video/mp4" />
