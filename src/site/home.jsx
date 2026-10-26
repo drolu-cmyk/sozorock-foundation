@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from "react";
 import { Link } from "../router";
 import { AI_LAB, HEALTH, Band, Btn, Fig, Go, Head, Hero, Meter, More, Sec, Segs, Tile } from "./ui";
 
@@ -56,6 +57,34 @@ const loop = [
   ["Prove", "Results published in the open, then scaled."],
 ];
 
+/* Hero film: plays muted in the panel; "Watch with sound" opens it full screen from the start. */
+function HeroFilm() {
+  const ref = useRef(null);
+  const [still, setStill] = useState(false);
+  useEffect(() => {
+    const v = ref.current; if (!v) return;
+    let reduce = false;
+    try { reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches; } catch { reduce = false; }
+    if (reduce) { setStill(true); v.removeAttribute("autoplay"); v.pause(); return; }
+    const p = v.play(); if (p && p.catch) p.catch(() => setStill(true));
+  }, []);
+  const watch = async () => {
+    const v = ref.current; if (!v) return;
+    try { v.currentTime = 0; } catch { /* not seekable yet */ }
+    v.muted = false; v.loop = false; v.controls = true; setStill(false);
+    try { if (v.requestFullscreen) await v.requestFullscreen(); else if (v.webkitEnterFullscreen) v.webkitEnterFullscreen(); } catch { /* stays inline with controls */ }
+    try { await v.play(); } catch { /* user can press play */ }
+  };
+  return <>
+    <video ref={ref} className="ns-film-video" muted playsInline autoPlay loop preload="metadata" poster="/media/foundation-film-poster.jpg"
+      aria-label="The SozoRock Foundation in 60 seconds: access to care, capacity for health systems and public trust in AI, shown on a model of the United States">
+      <source src="/media/foundation-film-720.mp4" type="video/mp4" media="(max-width: 900px)" />
+      <source src="/media/foundation-film-1080.mp4" type="video/mp4" />
+    </video>
+    <button type="button" className="ns-film-play" onClick={watch}><span aria-hidden="true">▶</span>{still ? "Play the film" : "Watch with sound"}<span className="ns-film-len">1 min</span></button>
+  </>;
+}
+
 export function HomePage() {
   return <div className="ns ns-home">
     <Hero
@@ -63,7 +92,9 @@ export function HomePage() {
       title={<>Healthier communities. Stronger systems. <span style={{ color: "var(--cobalt)" }}>A say in what’s next.</span></>}
       lede="We open doors to primary care, build the people who run and protect health systems, and give communities a voice on AI."
       actions={<><Btn href="/platforms">Explore our work</Btn><More href="/partner">Partner with us</More></>}
-      panel={<div className="ns-panel-words"><span>Access.</span><span>Capacity.</span><span>Trust.</span></div>}
+      panel={<HeroFilm />}
+      panelClass="ns-film"
+      decorative={false}
     />
     <div className="ns-shell">
       <Link className="ns-upcoming" href="/events">
