@@ -22,7 +22,8 @@ test('all three publications retain permanent records and verified delivery mapp
     const accessHtml=readFileSync(`dist/client/publication/${slug}/access.html`,'utf8');
     assert.ok(html.includes(title));
     assert.match(html,new RegExp(`href="/publication/${slug}/access"`));
-    assert.match(accessHtml,new RegExp(`Get ${title.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')}`));
+    assert.ok(accessHtml.includes(`Get ${p.bibliographicTitle || p.title} | SozoRock`));
+    assert.ok(accessHtml.includes('id="access-title"'));
     if(p.doi) assert.ok(html.includes(`https://doi.org/${p.doi}`));
   }
 });

@@ -129,7 +129,7 @@ export function AccessPage({ publication }) {
       <section className="ns-hero" aria-labelledby="access-title" style={{ paddingBottom: 48 }}>
         <div>
           <Link className="ns-crumb" href={publication.path} style={{ display: "inline-flex", marginBottom: 20, fontSize: 15, fontWeight: 500, textDecoration: "none" }}>{info.series}</Link>
-          <h1 className="ns-h1" id="access-title">Read {publication.title}</h1>
+          <h1 className="ns-h1" id="access-title">Read {publication.bibliographicTitle || publication.title}</h1>
           <p className="ns-lede" style={{ marginTop: 24 }}>Free PDF. Verify your email to open the publication.</p>
         </div>
         <div className="ns-panel p-ice" style={{ display: "flex", alignItems: "center", justifyContent: "center" }}><img src={publication.cover} alt="" width="600" height="776" decoding="async" style={{ width: "34%", height: "auto", boxShadow: "0 16px 36px rgba(7,29,59,.24)" }} /></div>

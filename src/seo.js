@@ -239,7 +239,7 @@ export function getSeoForPath(inputPathname = "/") {
   const canonicalUrl = `${SITE_ORIGIN}${canonicalPath === "/" ? "" : canonicalPath}`;
   const base = publication
     ? {
-        title: `${publication.title}, ${publication.volume} | SozoRock`,
+        title: `${publication.bibliographicTitle || `${publication.title}, ${publication.volume}`} | SozoRock`,
         description: publication.metaDescription || publication.description,
         pageType: "WebPage",
         ogType: "article",
@@ -247,8 +247,8 @@ export function getSeoForPath(inputPathname = "/") {
       }
     : accessPublication
       ? {
-          title: `Get ${accessPublication.title} | SozoRock`,
-          description: `Get free verified access to ${accessPublication.title}, ${accessPublication.volume}.`,
+          title: `Get ${accessPublication.bibliographicTitle || accessPublication.title} | SozoRock`,
+          description: `Get free verified access to ${accessPublication.bibliographicTitle || accessPublication.title}.`,
           pageType: "WebPage",
           robots: "noindex, nofollow, noarchive",
         }
