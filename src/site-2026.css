@@ -390,6 +390,7 @@
 
 /* Phone */
 @media (max-width: 640px) {
+  .ns-h1.ns-pub-title { font-size: 31px; line-height: 1.1; }
   .ns { --gutter: 20px; }
   .ns-h1 { font-size: 40px; }
   .ns-lede { font-size: 17px; }
