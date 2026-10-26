@@ -74,6 +74,8 @@ function CopyCitation({ text }) {
 export function PublicationPage({ publication }) {
   const info = seriesInfo[publication.slug];
   const details = [["Series", info.series], ["Volume", `${publication.volume} · ${info.year}`], ["Author", publication.author], ["Publisher", publication.publisher || "The SozoRock Foundation, Inc."]];
+  details.splice(0, 0, ["Title", publication.bibliographicTitle || publication.title]);
+  if (publication.contributor) details.splice(4, 0, ["Contributor", publication.contributor]);
   if (info.program) details.push(["Program", info.program]);
   if (publication.isbn) details.push(["ISBN", publication.isbn]);
   if (publication.doi) details.push(["DOI", <a key="doi" href={`https://doi.org/${publication.doi}`} rel="noopener">https://doi.org/{publication.doi}</a>]);
@@ -88,7 +90,8 @@ export function PublicationPage({ publication }) {
           <p className="ns-gap-label">{publication.title}</p>
           <h1 className="ns-h1" id="pub-title" style={{ marginTop: 14 }}>{info.question}</h1>
           <p className="ns-src" style={{ marginTop: 20, fontSize: 15 }}>{publication.volume} · {info.year} · {publication.author}</p>
-          <p className="ns-lede" style={{ marginTop: 20 }}>{publication.description}</p>
+          <p className="ns-lede" style={{ marginTop: 20 }}>{publication.bibliographicTitle}</p>
+          <p className="ns-body" style={{ marginTop: 20 }}><strong>Abstract.</strong> {publication.abstract || publication.description}</p>
           <div className="ns-actions" style={{ marginTop: 36 }}><Btn href={publication.accessPath}>Read the free PDF</Btn><More href="#citation">Copy citation</More></div>
         </div>
       </section>
