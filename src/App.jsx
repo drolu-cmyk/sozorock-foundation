@@ -99,11 +99,14 @@ export function App({ initialPath }) {
 
     const citationMeta = {
       citation_title: seo.publication?.bibliographicTitle,
-      citation_author: seo.publication?.citationAuthor || "Oluwabiyi Adeyemo",
-      citation_publication_date: seo.publication?.dateMachine,
+      citation_author: seo.publication ? (seo.publication.citationAuthor || "Adeyemo, Oluwabiyi") : null,
+      citation_publication_date: seo.publication ? String(seo.publication.dateMachine || seo.publication.date).replace(/-/gu, "/") : null,
+      citation_technical_report_institution: seo.publication?.publisher || (seo.publication ? "The SozoRock Foundation, Inc." : null),
+      citation_technical_report_number: seo.publication?.reportNumber,
+      citation_abstract_html_url: seo.publication ? seo.canonicalUrl : null,
       citation_publisher: seo.publication?.publisher || (seo.publication ? "The SozoRock Foundation, Inc." : null),
       citation_isbn: seo.publication?.isbn,
-      citation_language: seo.publication?.languageCode,
+      citation_language: seo.publication ? (seo.publication.languageCode || "en-US") : null,
       citation_abstract: seo.publication?.abstract || seo.publication?.description,
       citation_doi: seo.publication?.doi,
     };
