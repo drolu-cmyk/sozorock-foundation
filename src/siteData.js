@@ -261,7 +261,7 @@ export const leaders = [
     title: "Director of Strategic Initiatives",
     image: "/leadership/dr-oluwabiyi-adeyemo.webp",
     bio: "Dr. Oluwabiyi Adeyemo leads research, policy, technology and program development. He is the author of the Foundation’s publications on health systems assurance, governance and rural equity, and connects that work with community access, applied learning and AI & Society.",
-    links: [["Google Scholar profile", "https://scholar.google.com/citations?user=O1FiCLEAAAAJ"]],
+    links: [["ORCID record", "https://orcid.org/0009-0008-5215-5609"], ["Google Scholar profile", "https://scholar.google.com/citations?user=O1FiCLEAAAAJ"]],
   },
 ];
 
