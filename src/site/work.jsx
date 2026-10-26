@@ -6,7 +6,7 @@ import { upcoming } from "./home";
 const people = {
   nike: { name: "Nike Oye", full: "Nike Oye, MBA", area: "Health partnerships and technical cooperation", short: "Health partnerships", img: "/leadership/nike-oye.webp" },
   jordan: { name: "Jordan Hare", full: "Jordan Hare, BSN, RN", area: "Health education and community learning", short: "Health education", img: "/leadership/jordan-hare.webp" },
-  anthony: { name: "Anthony Abraham", full: "Anthony Abraham, MSC", area: "Global affairs and institutional relations", short: "Global affairs", img: "/leadership/anthony-abraham.webp" },
+  anthony: { name: "Anthony Abraham", full: "Anthony Abraham, MSC", area: "Global affairs and institutional relations", short: "Global affairs", img: "/leadership/anthony-abraham-2026.webp" },
   olu: { name: "Dr. Oluwabiyi Adeyemo", full: "Dr. Oluwabiyi Adeyemo", area: "Research, technology and program development", short: "Research, technology and programs", img: "/leadership/dr-oluwabiyi-adeyemo.webp" },
 };
 
