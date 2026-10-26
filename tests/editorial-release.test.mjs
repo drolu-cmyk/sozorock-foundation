@@ -22,7 +22,8 @@ test('all three publications retain permanent records and verified delivery mapp
     const accessHtml=readFileSync(`dist/client/publication/${slug}/access.html`,'utf8');
     assert.ok(html.includes(title));
     assert.match(html,new RegExp(`href="/publication/${slug}/access"`));
-    assert.match(accessHtml,new RegExp(`Get ${title.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')}`));
+    assert.ok(accessHtml.includes(`Get ${p.bibliographicTitle || p.title} | SozoRock`));
+    assert.ok(accessHtml.includes('id="access-title"'));
     if(p.doi) assert.ok(html.includes(`https://doi.org/${p.doi}`));
   }
 });
@@ -68,6 +69,24 @@ test('research records and access keep citations, delivery essentials and separa
   for(const field of ['organization','sector','reason','updatesConsent']) assert.doesNotMatch(access,new RegExp('<input(?=[^>]*name="'+field+'")(?=[^>]*required)[^>]*>'));
   assert.doesNotMatch(access,/href="[^"<>]*\.pdf(?:["?])/i);
  }
+});
+test('a complete abstract and correct author metadata precede PDF access on every report',()=>{
+ for(const [slug] of publicationAccessMappings){
+  const report=publications.find(p=>p.slug===slug);
+  const html=page('publication/'+slug);
+  const title=html.indexOf(`id="pub-title"`);
+  const abstract=html.indexOf('class="ns-abstract"');
+  const access=html.indexOf('Continue to free PDF');
+  const cover=html.indexOf('class="ns-panel p-ice ns-publication-cover"');
+  assert.ok(title>=0 && title<abstract && abstract<access && access<cover,slug);
+  assert.ok(html.includes(report.bibliographicTitle),slug);
+  assert.ok(html.includes(report.abstract),slug);
+  assert.match(html,/<meta name="citation_author" content="Adeyemo, Oluwabiyi"/);
+  assert.doesNotMatch(html,/<meta name="citation_pdf_url"/);
+ }
+ const rebs=page('publication/rebs-v1-2025');
+ assert.match(rebs,/Contributor: Jordan Hare/);
+ assert.doesNotMatch(rebs,/<meta name="citation_author" content="Jordan Hare"/);
 });
 test('navigation, footer and forms retain accessible actions and legal identity',()=>{
  const html=page(''), chrome=readFileSync('src/SiteChrome.jsx','utf8');

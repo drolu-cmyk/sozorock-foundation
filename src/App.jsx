@@ -98,13 +98,13 @@ export function App({ initialPath }) {
     setMeta("article:section", seo.publication?.theme, "property");
 
     const citationMeta = {
-      citation_title: seo.publication ? `${seo.publication.title}, ${seo.publication.volume}: ${seo.publication.subtitle || seo.publication.tagline}` : null,
-      citation_author: seo.publication?.author,
+      citation_title: seo.publication?.bibliographicTitle,
+      citation_author: seo.publication?.citationAuthor || "Oluwabiyi Adeyemo",
       citation_publication_date: seo.publication?.dateMachine,
       citation_publisher: seo.publication?.publisher || (seo.publication ? "The SozoRock Foundation, Inc." : null),
       citation_isbn: seo.publication?.isbn,
       citation_language: seo.publication?.languageCode,
-      citation_abstract: seo.publication?.description,
+      citation_abstract: seo.publication?.abstract || seo.publication?.description,
       citation_doi: seo.publication?.doi,
     };
     Object.entries(citationMeta).forEach(([name, content]) => setMeta(name, content));

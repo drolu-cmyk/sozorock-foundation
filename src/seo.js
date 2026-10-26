@@ -210,11 +210,12 @@ function publicationSchema(publication, canonicalUrl) {
   return {
     "@type": "Report",
     "@id": `${canonicalUrl}/#report`,
-    name: `${publication.title}, ${publication.volume}`,
+    name: publication.bibliographicTitle || `${publication.title}, ${publication.volume}`,
     alternateName: publication.subtitle,
     headline: publication.tagline,
-    description: publication.description,
+    description: publication.abstract || publication.description,
     author: publication.author ? personFor(publication.author) : undefined,
+    contributor: publication.contributor ? { "@type": "Person", name: publication.contributor } : undefined,
     publisher: { "@id": ORGANIZATION_ID },
     datePublished: publication.dateMachine || publication.date,
     inLanguage: publication.languageCode || "en-US",
@@ -238,7 +239,7 @@ export function getSeoForPath(inputPathname = "/") {
   const canonicalUrl = `${SITE_ORIGIN}${canonicalPath === "/" ? "" : canonicalPath}`;
   const base = publication
     ? {
-        title: `${publication.title}, ${publication.volume} | SozoRock`,
+        title: `${publication.bibliographicTitle || `${publication.title}, ${publication.volume}`} | SozoRock`,
         description: publication.metaDescription || publication.description,
         pageType: "WebPage",
         ogType: "article",
@@ -246,8 +247,8 @@ export function getSeoForPath(inputPathname = "/") {
       }
     : accessPublication
       ? {
-          title: `Get ${accessPublication.title} | SozoRock`,
-          description: `Get free verified access to ${accessPublication.title}, ${accessPublication.volume}.`,
+          title: `Get ${accessPublication.bibliographicTitle || accessPublication.title} | SozoRock`,
+          description: `Get free verified access to ${accessPublication.bibliographicTitle || accessPublication.title}.`,
           pageType: "WebPage",
           robots: "noindex, nofollow, noarchive",
         }
