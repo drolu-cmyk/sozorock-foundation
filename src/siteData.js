@@ -239,7 +239,7 @@ export const leaders = [
   {
     name: "Anthony Abraham, MSC",
     title: "Director of Global Affairs",
-    image: "/leadership/anthony-abraham.webp",
+    image: "/leadership/anthony-abraham-2026.webp",
     bio: "Anthony Abraham leads global affairs and cross-border institutional relations. He focuses on cooperation among health, academic and development organizations without obscuring differences in mandate, jurisdiction or accountability.",
   },
   {

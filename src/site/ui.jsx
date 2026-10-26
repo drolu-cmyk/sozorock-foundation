@@ -21,7 +21,7 @@ export function More({ href, children }) {
   return <Go href={href} className="ns-more">{children}<span aria-hidden="true">&nbsp;{isExternal(href) ? "↗" : "→"}</span></Go>;
 }
 
-export function Hero({ id, crumb, title, lede, actions, panel, panelTone = "navy", panelLabel, decorative = true }) {
+export function Hero({ id, crumb, title, lede, actions, panel, panelTone = "navy", panelLabel, decorative = true, panelClass = "" }) {
   return <div className="ns-shell">
     <section className="ns-hero" aria-labelledby={id}>
       <div>
@@ -30,7 +30,7 @@ export function Hero({ id, crumb, title, lede, actions, panel, panelTone = "navy
         {lede && <p className="ns-lede">{lede}</p>}
         {actions && <div className="ns-actions">{actions}</div>}
       </div>
-      <div className={`ns-panel p-${panelTone} ${panelTone === "navy" || panelTone === "cobalt" || panelTone === "royal" ? "is-dark" : ""}`} role={panelLabel ? "img" : undefined} aria-label={panelLabel} aria-hidden={panelLabel || !decorative ? undefined : true}>{panel}</div>
+      <div className={`ns-panel p-${panelTone} ${panelTone === "navy" || panelTone === "cobalt" || panelTone === "royal" ? "is-dark" : ""} ${panelClass}`} role={panelLabel ? "img" : undefined} aria-label={panelLabel} aria-hidden={panelLabel || !decorative ? undefined : true}>{panel}</div>
     </section>
   </div>;
 }
