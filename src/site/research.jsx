@@ -73,26 +73,29 @@ function CopyCitation({ text }) {
 
 export function PublicationPage({ publication }) {
   const info = seriesInfo[publication.slug];
-  const details = [["Series", info.series], ["Volume", `${publication.volume} · ${info.year}`], ["Author", publication.author], ["Publisher", publication.publisher || "The SozoRock Foundation, Inc."]];
-  details.splice(0, 0, ["Title", publication.bibliographicTitle || publication.title]);
-  if (publication.contributor) details.splice(4, 0, ["Contributor", publication.contributor]);
+  const details = [["Title", publication.bibliographicTitle || publication.title], ["Series", info.series], ["Volume", `${publication.volume} · ${info.year}`], ["Author", publication.author]];
+  if (publication.contributor) details.push(["Contributor", publication.contributor]);
+  details.push(["Publisher", publication.publisher || "The SozoRock Foundation, Inc."]);
   if (info.program) details.push(["Program", info.program]);
   if (publication.isbn) details.push(["ISBN", publication.isbn]);
   if (publication.doi) details.push(["DOI", <a key="doi" href={`https://doi.org/${publication.doi}`} rel="noopener">https://doi.org/{publication.doi}</a>]);
   return <div className="ns ns-publication">
     <div className="ns-shell">
       <section className="ns-hero ns-hero-pub" aria-labelledby="pub-title">
-        <div className="ns-panel p-ice" style={{ aspectRatio: "4 / 5", display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <img src={publication.cover} alt={`${info.series}, ${publication.volume} cover`} width="600" height="776" decoding="async" fetchPriority="high" style={{ width: "62%", height: "auto", boxShadow: "0 24px 52px rgba(7,29,59,.28)" }} />
-        </div>
         <div>
           <Link className="ns-crumb" href="/publications" style={{ display: "inline-flex", marginBottom: 20, fontSize: 15, fontWeight: 500, textDecoration: "none" }}>Research</Link>
-          <p className="ns-gap-label">{publication.title}</p>
-          <h1 className="ns-h1" id="pub-title" style={{ marginTop: 14 }}>{info.question}</h1>
-          <p className="ns-src" style={{ marginTop: 20, fontSize: 15 }}>{publication.volume} · {info.year} · {publication.author}</p>
-          <p className="ns-lede" style={{ marginTop: 20 }}>{publication.bibliographicTitle}</p>
-          <p className="ns-body" style={{ marginTop: 20 }}><strong>Abstract.</strong> {publication.abstract || publication.description}</p>
-          <div className="ns-actions" style={{ marginTop: 36 }}><Btn href={publication.accessPath}>Read the free PDF</Btn><More href="#citation">Copy citation</More></div>
+          <p className="ns-gap-label">{info.series} · {publication.volume}</p>
+          <h1 className="ns-h1 ns-pub-title" id="pub-title" style={{ marginTop: 14 }}>{publication.bibliographicTitle || publication.title}</h1>
+          <p className="ns-src" style={{ marginTop: 16, fontSize: 15 }}>{info.year} · {publication.author}{publication.contributor ? ` · Contributor: ${publication.contributor}` : ""}</p>
+          <div className="ns-abstract">
+            <h2 className="ns-eyebrow">Abstract</h2>
+            <p className="ns-body">{publication.abstract || publication.description}</p>
+          </div>
+          <div className="ns-actions" style={{ marginTop: 32 }}><Btn href={publication.accessPath}>Continue to free PDF</Btn><More href="#citation">Copy citation</More></div>
+          <p className="ns-src" style={{ marginTop: 16 }}>Email verification is required to open the PDF.</p>
+        </div>
+        <div className="ns-panel p-ice ns-publication-cover" style={{ aspectRatio: "4 / 5", display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <img src={publication.cover} alt={`${info.series}, ${publication.volume} cover`} width="600" height="776" decoding="async" fetchPriority="high" style={{ width: "62%", height: "auto", boxShadow: "0 24px 52px rgba(7,29,59,.28)" }} />
         </div>
       </section>
     </div>
@@ -115,7 +118,7 @@ export function PublicationPage({ publication }) {
         </div>
       </div>
     </Sec>
-    <Band tone="ice" title="Read the full volume, free." line="Verify your email and we will send your access link." action={<Btn href={publication.accessPath}>Read the free PDF</Btn>} />
+    <Band tone="ice" title="Read the full volume, free." line="Verify your email and we will send your access link." action={<Btn href={publication.accessPath}>Continue to free PDF</Btn>} />
   </div>;
 }
 
