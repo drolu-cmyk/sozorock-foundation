@@ -195,6 +195,7 @@ function breadcrumbsForPath(pathname, publication) {
 }
 
 const SCHOLAR_PROFILE = "https://scholar.google.com/citations?user=O1FiCLEAAAAJ";
+const OLU_ORCID = "https://orcid.org/0009-0008-5215-5609";
 const OLU_PERSON = {
   "@type": "Person",
   "@id": `${SITE_ORIGIN}/leadership#oluwabiyi-adeyemo`,
@@ -202,7 +203,7 @@ const OLU_PERSON = {
   jobTitle: "Director of Strategic Initiatives",
   url: `${SITE_ORIGIN}/leadership`,
   image: `${SITE_ORIGIN}/leadership/dr-oluwabiyi-adeyemo-headshot.jpg`,
-  sameAs: [SCHOLAR_PROFILE],
+  sameAs: [OLU_ORCID, SCHOLAR_PROFILE],
 };
 const personFor = (name) => (/Adeyemo/u.test(name) ? { ...OLU_PERSON, worksFor: { "@id": ORGANIZATION_ID } } : { "@type": "Person", name });
 
