@@ -161,7 +161,7 @@ Resources:
             return response(308, uri.replace(/\/+$/, '') + suffix, 'public, max-age=3600');
           }
 
-          var accessSlugs = { 'hsa-v1-2026': 'health-systems-assurance-volume-1', 'rrg-v1-2025': 'rethinking-rural-governance-volume-1', 'rebs-v1-2025': 'rural-equity-blueprint-volume-1' };
+          var accessSlugs = { 'economic-outlook-october-2026': 'economic-outlook-october-2026', 'hsa-v1-2026': 'health-systems-assurance-volume-1', 'rrg-v1-2025': 'rethinking-rural-governance-volume-1', 'rebs-v1-2025': 'rural-equity-blueprint-volume-1' };
           var accessKey = uri.slice('/api/publications/access/'.length);
           if (uri.indexOf('/api/publications/access/') === 0 && accessSlugs[accessKey]) {
             request.uri = '/api/publications/access/' + accessSlugs[accessKey];
@@ -202,6 +202,8 @@ Resources:
             '/accessibility': true,
             '/nondiscrimination': true,
             '/terms': true,
+            '/publication/economic-outlook-october-2026': true,
+            '/publication/economic-outlook-october-2026/access': true,
             '/publication/hsa-v1-2026': true,
             '/publication/hsa-v1-2026/access': true,
             '/publication/rrg-v1-2025': true,

@@ -3,6 +3,8 @@ import { useEffect } from "react";
 import { NotFoundPage } from "./Pages";
 import { Footer, Header } from "./SiteChrome";
 import { publications } from "./siteData";
+import { economicOutlooks } from "./outlooks";
+import { OutlookPage, OutlookAccessPage } from "./site/outlook";
 import { useCurrentPath } from "./router";
 import { getSeoForPath } from "./seoRuntime";
 import { HomePage } from "./site/home";
@@ -34,6 +36,8 @@ function RouteView({ pathname }) {
   if (Page) return <Page />;
   if (target === "/publications") return <ResearchPage publications={publications} />;
   if (legalPages[target]) return <LegalPage {...legalPages[target]} />;
+  const outlook = economicOutlooks.find((item) => item.path === target || item.accessPath === target);
+  if (outlook) return target === outlook.path ? <OutlookPage outlook={outlook} /> : <OutlookAccessPage outlook={outlook} />;
   const access = publications.find((item) => item.accessPath === target);
   if (access) return <AccessPage publication={access} />;
   const publication = publications.find((item) => item.path === target);
@@ -104,7 +108,7 @@ export function App({ initialPath }) {
       citation_publisher: seo.publication?.publisher || (seo.publication ? "The SozoRock Foundation, Inc." : null),
       citation_isbn: seo.publication?.isbn,
       citation_language: seo.publication?.languageCode,
-      citation_abstract: seo.publication?.abstract || seo.publication?.description,
+      citation_abstract: seo.publication?.minimalMetadata ? null : seo.publication?.abstract || seo.publication?.description,
       citation_doi: seo.publication?.doi,
     };
     Object.entries(citationMeta).forEach(([name, content]) => setMeta(name, content));

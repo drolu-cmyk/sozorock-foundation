@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { economicOutlooks } from "../outlooks";
+import { OutlookFeature } from "./outlook";
 import { PublicationAccessPage } from "../PublicationAccessPage";
 import { Link } from "../router";
 import { Band, Btn, FormSection, Go, Head, Hero, More, Sec } from "./ui";
@@ -35,8 +37,8 @@ export function ResearchPage({ publications }) {
     <Hero
       id="research-title"
       title="Evidence leaders can act on."
-      lede="Research from the SozoRock Global Institute on health systems assurance, rural governance and rural health equity. Free to read."
-      actions={<><Btn href="/publication/hsa-v1-2026">Read the latest</Btn><More href="#briefing">Get the Briefing</More></>}
+      lede="National economic outlooks and research on health access, workforce capacity, governance, and accountable services. Free to read."
+      actions={<><Btn href={economicOutlooks[0].path}>Read the latest</Btn><More href="#briefing">Get the Briefing</More></>}
       panelTone="ice"
       panel={<div className="ns-panel-covers">
         <img src="/media/rebs-cover.webp" alt="" width="150" height="192" decoding="async" style={{ width: "24%" }} />
@@ -44,6 +46,7 @@ export function ResearchPage({ publications }) {
         <img src="/media/rrg-cover.webp" alt="" width="150" height="194" decoding="async" style={{ width: "24%" }} />
       </div>}
     />
+    <Sec labelledBy="latest-outlook"><div id="latest-outlook"><OutlookFeature outlook={economicOutlooks[0]} /></div></Sec>
     <Sec labelledBy="series-title">
       <Head id="series-title" eyebrow="The series" title="Three questions, each a series that grows volume by volume." />
       <div style={{ marginTop: 72 }}>

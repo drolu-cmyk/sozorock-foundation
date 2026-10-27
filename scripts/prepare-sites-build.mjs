@@ -30,6 +30,8 @@ const permanentRoutes = [
   "/accessibility",
   "/nondiscrimination",
   "/terms",
+  "/publication/economic-outlook-october-2026",
+  "/publication/economic-outlook-october-2026/access",
   "/publication/hsa-v1-2026",
   "/publication/hsa-v1-2026/access",
   "/publication/rrg-v1-2025",
@@ -118,7 +120,7 @@ function routeHtml(route) {
       citation_publisher: seo.publication.publisher || "The SozoRock Foundation, Inc.",
       citation_isbn: seo.publication.isbn,
       citation_language: seo.publication.languageCode || "en-US",
-      citation_abstract: seo.publication.abstract || seo.publication.description,
+      citation_abstract: seo.publication.minimalMetadata ? null : seo.publication.abstract || seo.publication.description,
       citation_doi: seo.publication.doi,
     };
     Object.entries(citation).forEach(([name, content]) => {

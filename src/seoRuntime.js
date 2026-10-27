@@ -184,7 +184,7 @@ export function getSeoForPath(inputPathname = "/") {
   const base = getBaseSeo(pathname);
   const approved = approvedMetadata[pathname];
   const config = approved && !pathname.startsWith("/publication/") ? { ...(overrides[pathname] || {}), ...approved, keywords: overrides[pathname]?.keywords || ["SozoRock Foundation", approved.title.split(" | ")[0]] } : overrides[pathname];
-  if (!config) return { ...base, imageAlt: SOCIAL_IMAGE_ALT, schema: normalizeGlobalSchema(base.schema) };
+  if (!config) return { ...base, imageAlt: base.publication ? base.imageAlt : SOCIAL_IMAGE_ALT, schema: normalizeGlobalSchema(base.schema) };
 
   return {
     ...base,

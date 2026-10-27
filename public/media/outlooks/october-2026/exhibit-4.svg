@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE svg
+  PUBLIC '-//W3C//DTD SVG 1.0//EN'
+  'http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd'>
+<svg width="410" height="202" preserveAspectRatio="xMinYMin meet" viewBox="0 0 410 202" xmlns="http://www.w3.org/2000/svg" version="1.0" fill-rule="evenodd" xmlns:xlink="http://www.w3.org/1999/xlink">
+	<title>...</title>
+	<desc>...</desc>
+	<clipPath id="clip">
+		<rect x="0" y="0" width="410" height="202"/>
+	</clipPath>
+	<g id="group" transform="scale(1,-1) translate(0,-202)" style="clip-path: url(#clip)">
+		<g transform="">
+			<text x="184" y="194" style="font-family: Medium; font-size: 8px;fill: rgb(2%,11%,23%); stroke:none;" transform="translate(0,388) scale(1,-1)">Employment change, %</text>
+			<text x="347.928" y="194" style="font-family: Medium; font-size: 8px;fill: rgb(2%,11%,23%); stroke:none;" transform="translate(0,388) scale(1,-1)">Annual openings</text>
+			<path d="M 214.333333,178 L 214.333333,50 Z" style="stroke: rgb(20%,28%,36%); stroke-linecap: butt; stroke-width: 0.6;"/>
+			<path d="M 230.133333,178 L 230.133333,50 Z" style="stroke: rgb(20%,28%,36%); stroke-linecap: butt; stroke-width: 0.8; stroke-dasharray: 2, 2;"/>
+			<text x="0" y="161.7" style="font-family: Sans; font-size: 9.3px;fill: rgb(2%,11%,23%); stroke:none;" transform="translate(0,323) scale(1,-1)">Information security analysts</text>
+			<rect x="214.33333333333334" y="152" width="110.6" height="17" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(2%,26%,67%); fill-rule: evenodd;"/>
+			<text x="329.93333333333334" y="157.8" style="font-family: Medium; font-size: 9.2px;fill: rgb(2%,11%,23%); stroke:none;" transform="translate(0,315) scale(1,-1)">+21</text>
+			<text x="381.79449999999997" y="157.5" style="font-family: Medium; font-size: 9.5px;fill: rgb(2%,11%,23%); stroke:none;" transform="translate(0,315) scale(1,-1)">14,100</text>
+			<text x="0" y="115.7" style="font-family: Sans; font-size: 9.3px;fill: rgb(2%,11%,23%); stroke:none;" transform="translate(0,231) scale(1,-1)">Computer network architects</text>
+			<rect x="214.33333333333334" y="106" width="42.133333333333354" height="17" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(2%,26%,67%); fill-rule: evenodd;"/>
+			<text x="261.4666666666667" y="111.8" style="font-family: Medium; font-size: 9.2px;fill: rgb(2%,11%,23%); stroke:none;" transform="translate(0,223) scale(1,-1)">+8</text>
+			<text x="383.438" y="111.5" style="font-family: Medium; font-size: 9.5px;fill: rgb(2%,11%,23%); stroke:none;" transform="translate(0,223) scale(1,-1)">9,600</text>
+			<text x="0" y="69.7" style="font-family: Sans; font-size: 9.3px;fill: rgb(2%,11%,23%); stroke:none;" transform="translate(0,139) scale(1,-1)">Network and systems administrators</text>
+			<rect x="193.26666666666668" y="60" width="21.066666666666663" height="17" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(4%,18%,43%); fill-rule: evenodd;"/>
+			<text x="178.0914666666667" y="65.8" style="font-family: Medium; font-size: 9.2px;fill: rgb(2%,11%,23%); stroke:none;" transform="translate(0,131) scale(1,-1)">-4</text>
+			<text x="380.056" y="65.5" style="font-family: Medium; font-size: 9.5px;fill: rgb(2%,11%,23%); stroke:none;" transform="translate(0,131) scale(1,-1)">13,400</text>
+			<text x="183.68" y="36" style="font-family: Sans; font-size: 8px;fill: rgb(20%,28%,36%); stroke:none;" transform="translate(0,72) scale(1,-1)">-5</text>
+			<text x="211.66933333333336" y="36" style="font-family: Sans; font-size: 8px;fill: rgb(20%,28%,36%); stroke:none;" transform="translate(0,72) scale(1,-1)">0</text>
+			<text x="262.772" y="36" style="font-family: Sans; font-size: 8px;fill: rgb(20%,28%,36%); stroke:none;" transform="translate(0,72) scale(1,-1)">10</text>
+			<text x="314.8226666666667" y="36" style="font-family: Sans; font-size: 8px;fill: rgb(20%,28%,36%); stroke:none;" transform="translate(0,72) scale(1,-1)">20</text>
+			<text x="341.524" y="36" style="font-family: Sans; font-size: 8px;fill: rgb(20%,28%,36%); stroke:none;" transform="translate(0,72) scale(1,-1)">25</text>
+			<path d="M 0,18 L 15,18 Z" style="stroke: rgb(20%,28%,36%); stroke-linecap: butt; stroke-width: 0.8; stroke-dasharray: 2, 2;"/>
+			<text x="21" y="16.5" style="font-family: Sans; font-size: 8.5px;fill: rgb(20%,28%,36%); stroke:none;" transform="translate(0,33) scale(1,-1)">All-occupation employment growth: 3%</text>
+		</g>
+	</g>
+</svg>

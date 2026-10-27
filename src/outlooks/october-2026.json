@@ -1,0 +1,251 @@
+{
+  "slug": "economic-outlook-october-2026",
+  "path": "/publication/economic-outlook-october-2026",
+  "accessPath": "/publication/economic-outlook-october-2026/access",
+  "kind": "economic-outlook",
+  "minimalMetadata": true,
+  "title": "Economic conditions outlook, October 2026",
+  "bibliographicTitle": "Economic conditions outlook, October 2026",
+  "author": "Dr Oluwabiyi Adeyemo",
+  "citationAuthor": "Adeyemo, Oluwabiyi",
+  "orcid": "https://orcid.org/0009-0008-5215-5609",
+  "role": "Director of Strategic Initiatives",
+  "publisher": "The SozoRock Foundation, Inc.",
+  "date": "October 2026",
+  "dateMachine": "2026-10-26",
+  "theme": "Economic outlook",
+  "pages": "9",
+  "cover": "/media/outlooks/october-2026/cover.webp",
+  "socialImage": "/media/outlooks/october-2026/social-landscape.png",
+  "imageAlt": "Workers at smaller firms contribute $2,847 more on average toward annual family health premiums. The SozoRock Foundation, October 2026.",
+  "description": "The US economy is expanding, but institutions face distinct pressures in health access, workforce capacity, and AI. Employer health contributions are rising, digital occupations have different growth prospects, and employee AI use is advancing faster than reports of clear organizational plans. This outlook examines the national data and the choices that will shape affordability, employment, and accountable services over the next year.",
+  "abstract": "The US economy is expanding, but institutions face distinct pressures in health access, workforce capacity, and AI. Employer health contributions are rising, digital occupations have different growth prospects, and employee AI use is advancing faster than reports of clear organizational plans. This outlook examines the national data and the choices that will shape affordability, employment, and accountable services over the next year.",
+  "metaDescription": "A national outlook on health affordability, digital work, and institutional choices. Read the analysis and download the free nine-page report by Dr Oluwabiyi Adeyemo.",
+  "metadataKeywords": [
+    "US economic outlook",
+    "health affordability",
+    "workforce capacity",
+    "Dr Oluwabiyi Adeyemo",
+    "The SozoRock Foundation"
+  ],
+  "citation": "Adeyemo, O. (2026). Economic conditions outlook, October 2026. The SozoRock Foundation, Inc.",
+  "article": {
+    "abstract": "The US economy is expanding, but institutions face distinct pressures in health access, workforce capacity, and AI. Employer health contributions are rising, digital occupations have different growth prospects, and employee AI use is advancing faster than reports of clear organizational plans. This outlook examines the national data and the choices that will shape affordability, employment, and accountable services over the next year.",
+    "intro": "Economic growth gives an incomplete account of the conditions facing households and institutions. Real GDP grew at a 2.2 percent annualized rate in the second quarter of 2026, while consumer spending and private fixed investment together grew 4.6 percent. Stronger domestic demand sits alongside difficult choices about who pays for care, which digital skills employers need, and how AI-supported decisions are governed.",
+    "intro_sources": [
+      "bea"
+    ],
+    "sections": [
+      {
+        "heading": "Health access depends on both coverage and household cost",
+        "paragraphs": [
+          "In the Federal Reserve's 2025 household survey, cost-related missed care affected 38 percent of adults with family income below $25,000, compared with 13 percent at $100,000 or more. Almost one-quarter of insured adults also reported skipping treatment because of cost. Coverage and affordability require separate attention.",
+          "KFF's 2026 employer survey puts average annual worker contributions for family coverage at $9,687 in smaller firms and $6,840 in larger ones. The difference reflects the division of the premium as well as its total price. For 2027 renewals, the question is whether benefit changes reduce the combined household bill while preserving access to essential providers."
+        ],
+        "sources": [
+          "fed",
+          "kff"
+        ],
+        "exhibit": 3
+      },
+      {
+        "heading": "Digital jobs require more selective workforce investment",
+        "paragraphs": [
+          "Bureau of Labor Statistics projections for 2025-35 put information security analyst employment growth at 21 percent, compared with an 8 percent increase for computer network architects and a 4 percent decline for network and computer systems administrators. These are long-term projections, not current vacancies.",
+          "Replacement demand changes the interpretation. Systems administration still has 13,400 projected annual openings. Training therefore needs to distinguish growth, replacement hiring, and changes in the tasks people perform. Over the next year, paid placements and retention will provide a more direct test of a program's value than enrollment alone."
+        ],
+        "sources": [
+          "bls-security",
+          "bls-network",
+          "bls-admin"
+        ],
+        "exhibit": 4
+      },
+      {
+        "heading": "AI use and institutional readiness are different measures",
+        "paragraphs": [
+          "Gallup's August 2026 data show 53 percent of US employees using AI at least a few times a year, while 26 percent report that their organization has communicated a clear integration plan. The figures come from different questions; their difference is not a count of users working without a plan.",
+          "A separate Pew Research Center survey found 52 percent of US adults more concerned than excited about AI. Expanding use therefore leaves institutions with work to do: define permitted tasks, assign responsibility for decisions, and provide a usable route to correct mistakes. Performance and accountability need to advance together."
+        ],
+        "sources": [
+          "gallup",
+          "pew"
+        ],
+        "exhibit": 5
+      }
+    ],
+    "outlook": "The next six to twelve months will test three institutional choices: how employers distribute higher benefit costs, whether training connects people to specific jobs, and whether AI-supported services become more accountable. Improvement would appear in lower cost-related missed care, sustained employment after training, and fewer unresolved service errors. Rising spending or adoption without those results would signal an unfinished transition.",
+    "methods": "This is original analysis of published statistics and surveys, not an original SozoRock survey. Data were checked on October 27, 2026. Sources describe different populations and periods; estimates are not pooled. The report distinguishes observed conditions, ten-year labor projections, and conditional scenarios for the coming year."
+  },
+  "sources": {
+    "bea": {
+      "title": "GDP (Third Estimate), Industries, Corporate Profits, State GDP, and State Personal Income, 2nd Quarter 2026; State PCE, 2025",
+      "organization": "US Bureau of Economic Analysis",
+      "date": "2026-09-30",
+      "label": "Bureau of Economic Analysis, GDP third estimate, September 30, 2026",
+      "url": "https://www.bea.gov/news/2026/gdp-third-estimate-industries-corporate-profits-state-gdp-and-state-personal-income-2nd"
+    },
+    "fed": {
+      "title": "Economic Well-Being of US Households in 2025: Economic Hardships",
+      "organization": "Board of Governors of the Federal Reserve System",
+      "date": "2026-05",
+      "label": "Federal Reserve Board, Economic Well-Being of US Households in 2025, May 2026",
+      "url": "https://www.federalreserve.gov/publications/2026-economic-well-being-of-us-households-in-2025-economic-hardships.htm"
+    },
+    "fed-method": {
+      "title": "Economic Well-Being of US Households in 2025: Description of the Survey",
+      "organization": "Board of Governors of the Federal Reserve System",
+      "date": "2026-05",
+      "label": "Federal Reserve Board, survey methods",
+      "url": "https://www.federalreserve.gov/publications/2026-economic-well-being-of-us-households-in-2025-description.htm"
+    },
+    "kff": {
+      "title": "2026 Employer Health Benefits Survey",
+      "organization": "KFF",
+      "date": "2026-10-22",
+      "label": "KFF, 2026 Employer Health Benefits Survey, Figures C and 6.3, October 22, 2026",
+      "url": "https://www.kff.org/health-costs/2026-employer-health-benefits-survey/"
+    },
+    "bls-security": {
+      "title": "Information Security Analysts: Occupational Outlook Handbook",
+      "organization": "US Bureau of Labor Statistics",
+      "date": "2026",
+      "label": "Bureau of Labor Statistics, Occupational Outlook Handbook: information security analysts",
+      "url": "https://www.bls.gov/ooh/computer-and-information-technology/information-security-analysts.htm"
+    },
+    "bls-network": {
+      "title": "Computer Network Architects: Occupational Outlook Handbook",
+      "organization": "US Bureau of Labor Statistics",
+      "date": "2026",
+      "label": "Bureau of Labor Statistics, Occupational Outlook Handbook: computer network architects",
+      "url": "https://www.bls.gov/ooh/computer-and-information-technology/computer-network-architects.htm"
+    },
+    "bls-admin": {
+      "title": "Network and Computer Systems Administrators: Occupational Outlook Handbook",
+      "organization": "US Bureau of Labor Statistics",
+      "date": "2026",
+      "label": "Bureau of Labor Statistics, Occupational Outlook Handbook: network and computer systems administrators",
+      "url": "https://www.bls.gov/ooh/computer-and-information-technology/network-and-computer-systems-administrators.htm"
+    },
+    "gallup": {
+      "title": "Global Indicator: Artificial Intelligence",
+      "organization": "Gallup",
+      "date": "2026",
+      "label": "Gallup, Global Indicator: Artificial Intelligence, data tables through August 2026",
+      "url": "https://www.gallup.com/699797/indicator-artificial-intelligence.aspx"
+    },
+    "pew": {
+      "title": "Young adults in the US are increasingly wary of AI, concerned it will take jobs",
+      "organization": "Pew Research Center",
+      "date": "2026-08-18",
+      "label": "Pew Research Center, Young adults in the US are increasingly wary of AI, August 18, 2026",
+      "url": "https://www.pewresearch.org/short-reads/2026/08/18/young-adults-in-the-us-are-increasingly-wary-of-ai-concerned-it-will-take-jobs/"
+    },
+    "pew-chart": {
+      "title": "Americans have grown more concerned about AI over time",
+      "organization": "Pew Research Center",
+      "date": "2026",
+      "label": "Pew Research Center, historical data table",
+      "url": "https://www.pewresearch.org/chart/americans-have-grown-more-concerned-about-ai-over-time/"
+    }
+  },
+  "exhibits": {
+    "3": {
+      "number": 3,
+      "headline": "Workers at smaller firms pay $2,847 more toward family premiums.",
+      "metric": "Average annual contribution for covered workers with family coverage, 2026, US dollars",
+      "chart": "premiums",
+      "data": [
+        {
+          "label": "Smaller firms",
+          "detail": "10-199 employees",
+          "worker": 9687,
+          "total": 27288
+        },
+        {
+          "label": "Larger firms",
+          "detail": "200+ employees",
+          "worker": 6840,
+          "total": 28592
+        }
+      ],
+      "note": "Employer contributions are calculated as total premium minus worker contribution. Estimates describe covered workers, not all employees. Survey: 1,937 nonfederal public and private employers with 10+ workers, fielded January-July 2026; overall response rate 11%.",
+      "sources": [
+        "kff"
+      ]
+    },
+    "4": {
+      "number": 4,
+      "headline": "Security has stronger projected growth; other roles still have openings.",
+      "metric": "US employment projections, 2025-35: total percentage change and average annual openings",
+      "chart": "workforce",
+      "data": [
+        {
+          "label": "Information security analysts",
+          "growth": 21,
+          "openings": 14100
+        },
+        {
+          "label": "Computer network architects",
+          "growth": 8,
+          "openings": 9600
+        },
+        {
+          "label": "Network and systems administrators",
+          "growth": -4,
+          "openings": 13400
+        }
+      ],
+      "note": "BLS ten-year projections, not current vacancies or a forecast for the next twelve months. Growth percentages are rounded. Annual openings include occupational transfers and labor-force exits. All occupations: 3% projected employment growth.",
+      "sources": [
+        "bls-security",
+        "bls-network",
+        "bls-admin"
+      ]
+    },
+    "5": {
+      "number": 5,
+      "headline": "Employee AI use has grown faster than reports of a clear AI plan.",
+      "metric": "US employees reporting each measure, %",
+      "chart": "ai",
+      "data": [
+        {
+          "date": "May 2025",
+          "use": 40,
+          "plan": 22
+        },
+        {
+          "date": "Aug 2025",
+          "use": 45,
+          "plan": 24
+        },
+        {
+          "date": "Nov 2025",
+          "use": 46,
+          "plan": 26
+        },
+        {
+          "date": "Feb 2026",
+          "use": 50,
+          "plan": 25
+        },
+        {
+          "date": "May 2026",
+          "use": 52,
+          "plan": 25
+        },
+        {
+          "date": "Aug 2026",
+          "use": 53,
+          "plan": 26
+        }
+      ],
+      "note": "Use means at least a few times a year. Plan means employees report their organization communicated a clear AI integration plan. Separate questions, not mutually exclusive groups. Weighted Gallup Panel surveys of US employees aged 18+; month labels follow the source's tables.",
+      "sources": [
+        "gallup"
+      ]
+    }
+  },
+  "assetBase": "/media/outlooks/october-2026",
+  "canonicalUrl": "https://www.sozorockfoundation.org/publication/economic-outlook-october-2026"
+}

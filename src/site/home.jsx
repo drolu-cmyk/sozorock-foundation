@@ -1,4 +1,6 @@
 import { useEffect, useRef, useState } from "react";
+import { economicOutlooks } from "../outlooks";
+import { OutlookFeature } from "./outlook";
 import { Link } from "../router";
 import { AI_LAB, HEALTH, Band, Btn, Fig, Go, Head, Hero, Meter, More, Sec, Segs, Tile } from "./ui";
 
@@ -151,6 +153,7 @@ export function HomePage() {
 
     <Sec labelledBy="research-title">
       <Head id="research-title" eyebrow="Research" title="Evidence leaders can act on." link={["See all research", "/publications"]} />
+      <OutlookFeature outlook={economicOutlooks[0]} compact />
       <Papers />
     </Sec>
 
