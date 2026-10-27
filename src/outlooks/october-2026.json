@@ -6,7 +6,7 @@
   "minimalMetadata": true,
   "title": "Economic conditions outlook, October 2026",
   "bibliographicTitle": "Economic conditions outlook, October 2026",
-  "author": "Dr Oluwabiyi Adeyemo",
+  "author": "Dr. Oluwabiyi Adeyemo",
   "citationAuthor": "Adeyemo, Oluwabiyi",
   "orcid": "https://orcid.org/0009-0008-5215-5609",
   "role": "Director of Strategic Initiatives",
@@ -18,29 +18,32 @@
   "cover": "/media/outlooks/october-2026/cover.webp",
   "socialImage": "/media/outlooks/october-2026/social-landscape.png",
   "imageAlt": "Workers at smaller firms contribute $2,847 more on average toward annual family health premiums. The SozoRock Foundation, October 2026.",
-  "description": "The US economy is expanding, but institutions face distinct pressures in health access, workforce capacity, and AI. Employer health contributions are rising, digital occupations have different growth prospects, and employee AI use is advancing faster than reports of clear organizational plans. This outlook examines the national data and the choices that will shape affordability, employment, and accountable services over the next year.",
-  "abstract": "The US economy is expanding, but institutions face distinct pressures in health access, workforce capacity, and AI. Employer health contributions are rising, digital occupations have different growth prospects, and employee AI use is advancing faster than reports of clear organizational plans. This outlook examines the national data and the choices that will shape affordability, employment, and accountable services over the next year.",
-  "metaDescription": "A national outlook on health affordability, digital work, and institutional choices. Read the analysis and download the free nine-page report by Dr Oluwabiyi Adeyemo.",
+  "description": "The US economy is still growing, but hiring has slowed and prices and borrowing costs are higher. Institutions face distinct pressures in health access, workforce capacity, and AI. Workers at smaller firms pay the most toward family coverage, digital occupations have different growth prospects, and employee AI use is advancing faster than reports of clear organizational plans. This outlook examines the national data and the choices that will shape affordability, employment, and accountable services over the next year.",
+  "abstract": "The US economy is still growing, but hiring has slowed and prices and borrowing costs are higher. Institutions face distinct pressures in health access, workforce capacity, and AI. Workers at smaller firms pay the most toward family coverage, digital occupations have different growth prospects, and employee AI use is advancing faster than reports of clear organizational plans. This outlook examines the national data and the choices that will shape affordability, employment, and accountable services over the next year.",
+  "metaDescription": "A national outlook on health affordability, digital work, and institutional choices. Read the analysis and download the free nine-page report by Dr. Oluwabiyi Adeyemo.",
   "metadataKeywords": [
     "US economic outlook",
     "health affordability",
     "workforce capacity",
-    "Dr Oluwabiyi Adeyemo",
+    "Dr. Oluwabiyi Adeyemo",
     "The SozoRock Foundation"
   ],
   "citation": "Adeyemo, O. (2026). Economic conditions outlook, October 2026. The SozoRock Foundation, Inc.",
   "article": {
-    "abstract": "The US economy is expanding, but institutions face distinct pressures in health access, workforce capacity, and AI. Employer health contributions are rising, digital occupations have different growth prospects, and employee AI use is advancing faster than reports of clear organizational plans. This outlook examines the national data and the choices that will shape affordability, employment, and accountable services over the next year.",
-    "intro": "Economic growth gives an incomplete account of the conditions facing households and institutions. Real GDP grew at a 2.2 percent annualized rate in the second quarter of 2026, while consumer spending and private fixed investment together grew 4.6 percent. Stronger domestic demand sits alongside difficult choices about who pays for care, which digital skills employers need, and how AI-supported decisions are governed.",
+    "abstract": "The US economy is still growing, but hiring has slowed and prices and borrowing costs are higher. Institutions face distinct pressures in health access, workforce capacity, and AI. Workers at smaller firms pay the most toward family coverage, digital occupations have different growth prospects, and employee AI use is advancing faster than reports of clear organizational plans. This outlook examines the national data and the choices that will shape affordability, employment, and accountable services over the next year.",
+    "intro": "Growth gives an incomplete account of the conditions facing households and institutions. Real GDP grew at a 2.2 percent annualized rate in the second quarter of 2026, and real final sales to private domestic purchasers, the combined measure of consumer spending and private fixed investment, grew 4.6 percent. Other indicators are less settled. Employers added 29,000 jobs in September and the unemployment rate rose to 4.2 percent. Consumer prices were 3.7 percent higher than a year earlier, or 2.6 percent excluding food and energy, and the Federal Reserve raised its policy rate range to 3.75 to 4.00 percent in September. Demand is holding while hiring slows and borrowing costs rise. That sharpens three choices: who pays for care, which digital skills employers need, and how AI-supported decisions are governed.",
     "intro_sources": [
-      "bea"
+      "bea",
+      "bls-jobs",
+      "bls-cpi",
+      "fomc"
     ],
     "sections": [
       {
         "heading": "Health access depends on both coverage and household cost",
         "paragraphs": [
           "In the Federal Reserve's 2025 household survey, cost-related missed care affected 38 percent of adults with family income below $25,000, compared with 13 percent at $100,000 or more. Almost one-quarter of insured adults also reported skipping treatment because of cost. Coverage and affordability require separate attention.",
-          "KFF's 2026 employer survey puts average annual worker contributions for family coverage at $9,687 in smaller firms and $6,840 in larger ones. The difference reflects the division of the premium as well as its total price. For 2027 renewals, the question is whether benefit changes reduce the combined household bill while preserving access to essential providers."
+          "KFF's 2026 employer survey puts average annual worker contributions for family coverage at $9,687 in smaller firms (10 to 199 employees) and $6,840 in larger firms (200 or more). The difference reflects how the premium is divided as well as its total price: larger firms carry higher total premiums but pay a greater share themselves. For 2027 renewals, the question is whether benefit changes reduce the combined household bill while preserving access to essential providers."
         ],
         "sources": [
           "fed",
@@ -75,7 +78,40 @@
       }
     ],
     "outlook": "The next six to twelve months will test three institutional choices: how employers distribute higher benefit costs, whether training connects people to specific jobs, and whether AI-supported services become more accountable. Improvement would appear in lower cost-related missed care, sustained employment after training, and fewer unresolved service errors. Rising spending or adoption without those results would signal an unfinished transition.",
-    "methods": "This is original analysis of published statistics and surveys, not an original SozoRock survey. Data were checked on October 27, 2026. Sources describe different populations and periods; estimates are not pooled. The report distinguishes observed conditions, ten-year labor projections, and conditional scenarios for the coming year."
+    "methods": "This is original analysis of published statistics and surveys, not an original SozoRock survey. Data were checked on October 27, 2026. Sources describe different populations and periods; estimates are not pooled. The report distinguishes observed conditions, ten-year labor projections, and conditional scenarios for the coming year.",
+    "watch_intro": "Release dates to watch, as published or expected by each source:",
+    "watch": [
+      {
+        "what": "Third-quarter GDP, advance estimate",
+        "when": "October 29, 2026",
+        "source": "bea"
+      },
+      {
+        "what": "Employment and unemployment",
+        "when": "Monthly, first Friday in most months",
+        "source": "bls-jobs"
+      },
+      {
+        "what": "Employee AI use and organizational plans",
+        "when": "Quarterly; next reading expected November 2026",
+        "source": "gallup"
+      },
+      {
+        "what": "Cost-related missed care",
+        "when": "Expected May 2027, covering 2026",
+        "source": "fed"
+      },
+      {
+        "what": "Employer premiums and worker contributions",
+        "when": "Expected October 2027",
+        "source": "kff"
+      },
+      {
+        "what": "Ten-year occupational projections",
+        "when": "Expected September 2027",
+        "source": "bls-security"
+      }
+    ]
   },
   "sources": {
     "bea": {
@@ -84,6 +120,27 @@
       "date": "2026-09-30",
       "label": "Bureau of Economic Analysis, GDP third estimate, September 30, 2026",
       "url": "https://www.bea.gov/news/2026/gdp-third-estimate-industries-corporate-profits-state-gdp-and-state-personal-income-2nd"
+    },
+    "bls-jobs": {
+      "title": "The Employment Situation, September 2026",
+      "organization": "US Bureau of Labor Statistics",
+      "date": "2026-10-02",
+      "label": "Bureau of Labor Statistics, The Employment Situation, September 2026, released October 2, 2026",
+      "url": "https://www.bls.gov/news.release/archives/empsit_10022026.htm"
+    },
+    "bls-cpi": {
+      "title": "Consumer Price Index, September 2026",
+      "organization": "US Bureau of Labor Statistics",
+      "date": "2026-10-14",
+      "label": "Bureau of Labor Statistics, Consumer Price Index, September 2026, released October 14, 2026",
+      "url": "https://www.bls.gov/cpi/"
+    },
+    "fomc": {
+      "title": "Federal Open Market Committee statement, September 16, 2026",
+      "organization": "Board of Governors of the Federal Reserve System",
+      "date": "2026-09-16",
+      "label": "Federal Reserve, FOMC statement, September 16, 2026",
+      "url": "https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm"
     },
     "fed": {
       "title": "Economic Well-Being of US Households in 2025: Economic Hardships",
@@ -172,7 +229,8 @@
       "note": "Employer contributions are calculated as total premium minus worker contribution. Estimates describe covered workers, not all employees. Survey: 1,937 nonfederal public and private employers with 10+ workers, fielded January-July 2026; overall response rate 11%.",
       "sources": [
         "kff"
-      ]
+      ],
+      "reportNumber": 3
     },
     "4": {
       "number": 4,
@@ -201,7 +259,8 @@
         "bls-security",
         "bls-network",
         "bls-admin"
-      ]
+      ],
+      "reportNumber": 4
     },
     "5": {
       "number": 5,
@@ -243,7 +302,8 @@
       "note": "Use means at least a few times a year. Plan means employees report their organization communicated a clear AI integration plan. Separate questions, not mutually exclusive groups. Weighted Gallup Panel surveys of US employees aged 18+; month labels follow the source's tables.",
       "sources": [
         "gallup"
-      ]
+      ],
+      "reportNumber": 5
     }
   },
   "assetBase": "/media/outlooks/october-2026",
