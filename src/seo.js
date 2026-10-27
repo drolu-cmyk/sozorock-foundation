@@ -1,3 +1,4 @@
+import { economicOutlooks } from "./outlooks.js";
 import { leaders, publications } from "./siteData.js";
 
 export const SITE_ORIGIN = "https://www.sozorockfoundation.org";
@@ -165,11 +166,11 @@ function cleanPath(pathname = "/") {
 }
 
 function publicationForPath(pathname) {
-  return publications.find((publication) => publication.path === pathname);
+  return [...publications, ...economicOutlooks].find((publication) => publication.path === pathname);
 }
 
 function accessPublicationForPath(pathname) {
-  return publications.find((publication) => publication.accessPath === pathname);
+  return [...publications, ...economicOutlooks].find((publication) => publication.accessPath === pathname);
 }
 
 function breadcrumbsForPath(pathname, publication) {
@@ -214,7 +215,7 @@ function publicationSchema(publication, canonicalUrl) {
     name: publication.bibliographicTitle || `${publication.title}, ${publication.volume}`,
     alternateName: publication.subtitle,
     headline: publication.tagline,
-    description: publication.abstract || publication.description,
+    description: publication.minimalMetadata ? publication.metaDescription : publication.abstract || publication.description,
     author: publication.author ? personFor(publication.author) : undefined,
     contributor: publication.contributor ? { "@type": "Person", name: publication.contributor } : undefined,
     publisher: { "@id": ORGANIZATION_ID },
@@ -224,7 +225,7 @@ function publicationSchema(publication, canonicalUrl) {
     url: canonicalUrl,
     mainEntityOfPage: { "@id": `${canonicalUrl}/#webpage` },
     image: `${SITE_ORIGIN}${publication.cover}`,
-    keywords: [publication.theme, "public-interest research", "systems intelligence"].filter(Boolean),
+    keywords: publication.metadataKeywords || [publication.theme, "public-interest research", "systems intelligence"].filter(Boolean),
     identifier: [
       publication.isbn ? { "@type": "PropertyValue", propertyID: "ISBN", value: publication.isbn } : null,
       publication.doi ? { "@type": "PropertyValue", propertyID: "DOI", value: publication.doi } : null,
@@ -263,7 +264,7 @@ export function getSeoForPath(inputPathname = "/") {
   const description = conciseDescription(base.description);
   const image = base.image || DEFAULT_SOCIAL_IMAGE;
   const keywords = publication
-    ? [publication.theme, publication.title, "public-interest research", "systems intelligence"].filter(Boolean)
+    ? publication.metadataKeywords || [publication.theme, publication.title, "public-interest research", "systems intelligence"].filter(Boolean)
     : routeKeywords[pathname] || ["SozoRock Foundation", "public-interest research"];
   const breadcrumb = breadcrumbsForPath(pathname, publication);
   const graph = [
@@ -356,7 +357,7 @@ export function getSeoForPath(inputPathname = "/") {
     image,
     imageWidth: 1200,
     imageHeight: 630,
-    imageAlt: publication ? `${publication.title}, ${publication.volume} publication preview` : "The SozoRock Foundation. Healthier communities. Stronger systems. A say in what’s next.",
+    imageAlt: publication ? publication.imageAlt || `${publication.title}${publication.volume ? `, ${publication.volume}` : ""} publication preview` : "The SozoRock Foundation. Healthier communities. Stronger systems. A say in what’s next.",
     schema: { "@context": "https://schema.org", "@graph": graph },
     publication,
   };

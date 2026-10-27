@@ -1,0 +1,52 @@
+@font-face{font-family:OutlookSerif;src:url('/fonts/outlook-source-serif-4.ttf') format('truetype');font-weight:400;font-style:normal;font-display:swap}
+.outlook-page h1,.outlook-page h2,.outlook-page .outlook-download h3{font-family:OutlookSerif,Georgia,serif;font-weight:400;letter-spacing:-.025em;line-height:1.12}
+.outlook-hero{display:grid;grid-template-columns:minmax(0,1.8fr) minmax(220px,1fr);gap:64px;align-items:start;padding-block:52px 60px}
+.outlook-breadcrumb{display:inline-block;margin-bottom:32px;font-size:15px;text-decoration:none}
+.outlook-page .outlook-label{font-size:13px;font-weight:500;line-height:1.5;color:var(--cobalt);margin:0 0 12px}
+.outlook-page h1{font-size:clamp(38px,4.2vw,60px);margin:0 0 24px;text-wrap:initial}
+.outlook-deck{font-size:20px;line-height:1.5;color:var(--text);margin:0 0 24px;max-width:720px}
+.outlook-byline{font-size:14px;line-height:1.6;margin:0 0 22px}
+.outlook-cover{padding:30px;background:var(--ice);margin-top:52px}
+.outlook-cover img{width:100%;height:auto;display:block;box-shadow:0 12px 28px rgb(7 29 59 / 13%)}
+.outlook-hero .outlook-source{margin-top:16px}
+.outlook-reading{width:min(760px,calc(100% - 48px));margin:0 auto;padding-bottom:72px;font-size:18px;line-height:1.65;color:var(--navy)}
+.outlook-reading p{margin:0 0 20px}
+.outlook-reading h2{font-size:32px;margin:48px 0 22px;text-wrap:initial}
+.outlook-reading h3{font-size:21px;line-height:1.35;font-weight:500;margin:12px 0}
+.outlook-reading a,.outlook-page .outlook-source a{text-underline-offset:3px}
+.outlook-share{display:flex;align-items:baseline;flex-wrap:wrap;gap:12px 24px;margin-bottom:36px;font-size:14px}
+.outlook-copy{display:inline-flex;align-items:baseline;gap:8px;flex-wrap:wrap;font-size:14px}
+.outlook-copy button{font:inherit;color:var(--cobalt);background:none;border:0;padding:0;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.outlook-copy [role=status]{font-size:13px;color:var(--text)}
+.outlook-page .outlook-source{font-size:13px;line-height:1.5;color:var(--text)}
+.outlook-exhibit{padding:28px 0 12px;margin:24px 0 40px}
+.outlook-exhibit figcaption>p:last-child{font-size:15px;line-height:1.5;margin:10px 0 18px}
+.outlook-chart{overflow:auto;margin-bottom:16px}
+.outlook-chart img{display:block;width:100%;min-width:560px;height:auto}
+.outlook-exhibit details{font-size:14px;line-height:1.5;margin-top:18px}
+.outlook-exhibit summary{cursor:pointer;color:var(--cobalt);font-weight:500}
+.outlook-table{overflow:auto;margin-top:16px}
+.outlook-table table{border-collapse:collapse;min-width:100%;font-size:14px;text-align:left}
+.outlook-table caption{text-align:left;margin-bottom:12px}
+.outlook-table th,.outlook-table td{padding:12px;background:var(--ice);vertical-align:top}
+.outlook-table tr:nth-child(even)>*{background:white}
+.outlook-download{display:grid;grid-template-columns:minmax(0,1fr) 140px;align-items:center;gap:32px;padding:32px;background:var(--ice);margin-top:32px}
+.outlook-download img{width:100%;height:auto;box-shadow:0 8px 18px rgb(7 29 59 / 12%)}
+.outlook-download h3{font-size:27px;margin:8px 0 18px}
+.outlook-download p{font-size:16px;line-height:1.5}
+.outlook-about{margin-top:48px;font-size:15px;line-height:1.6}
+.outlook-about h2{font-family:inherit;font-size:19px;font-weight:500;margin:0 0 18px}
+.outlook-about h3{font-size:16px;margin-top:24px}
+.outlook-citation-links{display:flex;flex-wrap:wrap;gap:16px 24px;font-size:14px}
+.outlook-access-heading{padding-block:52px 0;max-width:1000px}
+.outlook-access-heading>.outlook-label{margin-top:32px}
+.outlook-access-form{max-width:720px;margin-inline:auto}
+.outlook-feature{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(160px,.65fr);gap:56px;align-items:center;background:var(--ice);padding:44px;margin-bottom:40px}
+.outlook-feature .ns-stmt{margin-block:18px}
+.outlook-feature .ns-stmt a{text-decoration:none;color:inherit}
+.outlook-feature-cover{display:flex;justify-content:center}
+.outlook-feature-cover img{width:100%;max-width:230px;height:auto;box-shadow:0 12px 28px rgb(7 29 59 / 13%)}
+.outlook-feature.is-compact{margin-top:36px}
+@media(max-width:900px){.outlook-hero{gap:32px;grid-template-columns:minmax(0,1fr) 210px}.outlook-cover{padding:18px}.outlook-feature{padding:28px;gap:28px}.outlook-deck{font-size:18px}}
+@media(max-width:650px){.outlook-hero{display:block;padding-block:28px 36px}.outlook-page h1{font-size:38px}.outlook-cover{display:none}.outlook-breadcrumb{margin-bottom:24px}.outlook-reading{font-size:17px;width:calc(100% - 40px)}.outlook-reading h2{font-size:28px}.outlook-reading .outlook-source{font-size:14px}.outlook-download{padding:24px;grid-template-columns:1fr}.outlook-download img{display:none}.outlook-feature{grid-template-columns:1fr;padding:24px}.outlook-feature-cover{display:none}.outlook-share{gap:12px 20px}.outlook-access-heading{padding-top:28px}.outlook-exhibit{padding-top:16px}.outlook-chart img{min-width:540px}.outlook-hero .ns-actions{align-items:flex-start}.outlook-page .ns-btn{white-space:normal;text-align:center}}
+@media print{.outlook-share,.outlook-copy,.outlook-download,.outlook-hero .ns-actions{display:none}.outlook-reading{width:100%}.outlook-chart img{min-width:0}.outlook-exhibit{break-inside:avoid}}

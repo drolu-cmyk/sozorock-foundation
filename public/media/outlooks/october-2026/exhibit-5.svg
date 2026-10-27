@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE svg
+  PUBLIC '-//W3C//DTD SVG 1.0//EN'
+  'http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd'>
+<svg width="410" height="221" preserveAspectRatio="xMinYMin meet" viewBox="0 0 410 221" xmlns="http://www.w3.org/2000/svg" version="1.0" fill-rule="evenodd" xmlns:xlink="http://www.w3.org/1999/xlink">
+	<title>...</title>
+	<desc>...</desc>
+	<clipPath id="clip">
+		<rect x="0" y="0" width="410" height="221"/>
+	</clipPath>
+	<g id="group" transform="scale(1,-1) translate(0,-221)" style="clip-path: url(#clip)">
+		<g transform="">
+			<rect x="0" y="211" width="8" height="8" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(2%,26%,67%); fill-rule: evenodd;"/>
+			<text x="13" y="212.8" style="font-family: Sans; font-size: 8.2px;fill: rgb(2%,11%,23%); stroke:none;" transform="translate(0,425) scale(1,-1)">Uses AI at least occasionally</text>
+			<rect x="134.2712" y="211" width="8.0" height="8" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(4%,18%,43%); fill-rule: evenodd;"/>
+			<text x="147.2712" y="212.8" style="font-family: Sans; font-size: 8.2px;fill: rgb(2%,11%,23%); stroke:none;" transform="translate(0,425) scale(1,-1)">Reports a clear AI plan</text>
+			<path d="M 24,49 L 362,49 Z" style="stroke: rgb(80%,84%,89%); stroke-linecap: butt; stroke-width: 0.4;"/>
+			<text x="9.672" y="45.0" style="font-family: Sans; font-size: 8px;fill: rgb(20%,28%,36%); stroke:none;" transform="translate(0,90) scale(1,-1)">0</text>
+			<path d="M 24,95.333333 L 362,95.333333 Z" style="stroke: rgb(80%,84%,89%); stroke-linecap: butt; stroke-width: 0.4;"/>
+			<text x="5.311999999999999" y="91.33333333333333" style="font-family: Sans; font-size: 8px;fill: rgb(20%,28%,36%); stroke:none;" transform="translate(0,182) scale(1,-1)">20</text>
+			<path d="M 24,141.666667 L 362,141.666667 Z" style="stroke: rgb(80%,84%,89%); stroke-linecap: butt; stroke-width: 0.4;"/>
+			<text x="4.872" y="137.66666666666666" style="font-family: Sans; font-size: 8px;fill: rgb(20%,28%,36%); stroke:none;" transform="translate(0,275) scale(1,-1)">40</text>
+			<path d="M 24,188 L 362,188 Z" style="stroke: rgb(80%,84%,89%); stroke-linecap: butt; stroke-width: 0.4;"/>
+			<text x="4.879999999999999" y="184.0" style="font-family: Sans; font-size: 8px;fill: rgb(20%,28%,36%); stroke:none;" transform="translate(0,368) scale(1,-1)">60</text>
+			<polyline points="24 141.6667, 91.6 153.25, 159.2 155.5667, 226.8 164.8333, 294.4 169.4667, 362 171.7833" style="stroke: rgb(2%,26%,67%); stroke-linecap: butt; stroke-width: 1.6; fill: None; fill-rule: evenodd;"/>
+			<circle cx="24.0" cy="141.66666666666666" r="2.5" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(2%,26%,67%); fill-rule: evenodd;"/>
+			<text x="18.302999999999997" y="148.66666666666666" style="font-family: Medium; font-size: 9px;fill: rgb(2%,26%,67%); stroke:none;" transform="translate(0,297) scale(1,-1)">40</text>
+			<circle cx="91.6" cy="153.25" r="2.5" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(2%,26%,67%); fill-rule: evenodd;"/>
+			<text x="86.317" y="160.25" style="font-family: Medium; font-size: 9px;fill: rgb(2%,26%,67%); stroke:none;" transform="translate(0,320) scale(1,-1)">45</text>
+			<circle cx="159.2" cy="155.56666666666666" r="2.5" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(2%,26%,67%); fill-rule: evenodd;"/>
+			<text x="153.8045" y="162.56666666666666" style="font-family: Medium; font-size: 9px;fill: rgb(2%,26%,67%); stroke:none;" transform="translate(0,325) scale(1,-1)">46</text>
+			<circle cx="226.8" cy="164.83333333333334" r="2.5" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(2%,26%,67%); fill-rule: evenodd;"/>
+			<text x="221.22" y="171.83333333333334" style="font-family: Medium; font-size: 9px;fill: rgb(2%,26%,67%); stroke:none;" transform="translate(0,343) scale(1,-1)">50</text>
+			<circle cx="294.4" cy="169.46666666666667" r="2.5" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(2%,26%,67%); fill-rule: evenodd;"/>
+			<text x="289.36449999999996" y="176.46666666666667" style="font-family: Medium; font-size: 9px;fill: rgb(2%,26%,67%); stroke:none;" transform="translate(0,352) scale(1,-1)">52</text>
+			<circle cx="362.0" cy="171.78333333333333" r="2.5" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(2%,26%,67%); fill-rule: evenodd;"/>
+			<text x="356.834" y="178.78333333333333" style="font-family: Medium; font-size: 9px;fill: rgb(2%,26%,67%); stroke:none;" transform="translate(0,357) scale(1,-1)">53</text>
+			<polyline points="24 99.96667, 91.6 104.6, 159.2 109.2333, 226.8 106.9167, 294.4 106.9167, 362 109.2333" style="stroke: rgb(4%,18%,43%); stroke-linecap: butt; stroke-width: 1.6; fill: None; fill-rule: evenodd;"/>
+			<circle cx="24.0" cy="99.96666666666667" r="2.5" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(4%,18%,43%); fill-rule: evenodd;"/>
+			<text x="19.095" y="83.96666666666667" style="font-family: Medium; font-size: 9px;fill: rgb(4%,18%,43%); stroke:none;" transform="translate(0,167) scale(1,-1)">22</text>
+			<circle cx="91.6" cy="104.6" r="2.5" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(4%,18%,43%); fill-rule: evenodd;"/>
+			<text x="86.44749999999999" y="88.6" style="font-family: Medium; font-size: 9px;fill: rgb(4%,18%,43%); stroke:none;" transform="translate(0,177) scale(1,-1)">24</text>
+			<circle cx="159.2" cy="109.23333333333333" r="2.5" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(4%,18%,43%); fill-rule: evenodd;"/>
+			<text x="154.052" y="93.23333333333333" style="font-family: Medium; font-size: 9px;fill: rgb(4%,18%,43%); stroke:none;" transform="translate(0,186) scale(1,-1)">26</text>
+			<circle cx="226.8" cy="106.91666666666667" r="2.5" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(4%,18%,43%); fill-rule: evenodd;"/>
+			<text x="221.7645" y="90.91666666666667" style="font-family: Medium; font-size: 9px;fill: rgb(4%,18%,43%); stroke:none;" transform="translate(0,181) scale(1,-1)">25</text>
+			<circle cx="294.4" cy="106.91666666666667" r="2.5" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(4%,18%,43%); fill-rule: evenodd;"/>
+			<text x="289.36449999999996" y="90.91666666666667" style="font-family: Medium; font-size: 9px;fill: rgb(4%,18%,43%); stroke:none;" transform="translate(0,181) scale(1,-1)">25</text>
+			<circle cx="362.0" cy="109.23333333333333" r="2.5" style="stroke: none; stroke-linecap: butt; stroke-width: 1; fill: rgb(4%,18%,43%); fill-rule: evenodd;"/>
+			<text x="356.852" y="93.23333333333333" style="font-family: Medium; font-size: 9px;fill: rgb(4%,18%,43%); stroke:none;" transform="translate(0,186) scale(1,-1)">26</text>
+			<text x="15.8577" y="24.7" style="font-family: Sans; font-size: 8.3px;fill: rgb(20%,28%,36%); stroke:none;" transform="translate(0,49) scale(1,-1)">May</text>
+			<text x="14.3305" y="12.7" style="font-family: Sans; font-size: 8.3px;fill: rgb(20%,28%,36%); stroke:none;" transform="translate(0,25) scale(1,-1)">2025</text>
+			<text x="83.61954999999999" y="24.7" style="font-family: Sans; font-size: 8.3px;fill: rgb(20%,28%,36%); stroke:none;" transform="translate(0,49) scale(1,-1)">Aug</text>
+			<text x="81.9305" y="12.7" style="font-family: Sans; font-size: 8.3px;fill: rgb(20%,28%,36%); stroke:none;" transform="translate(0,25) scale(1,-1)">2025</text>
+			<text x="151.55155" y="24.7" style="font-family: Sans; font-size: 8.3px;fill: rgb(20%,28%,36%); stroke:none;" transform="translate(0,49) scale(1,-1)">Nov</text>
+			<text x="149.5305" y="12.7" style="font-family: Sans; font-size: 8.3px;fill: rgb(20%,28%,36%); stroke:none;" transform="translate(0,25) scale(1,-1)">2025</text>
+			<text x="219.4462" y="24.7" style="font-family: Sans; font-size: 8.3px;fill: rgb(20%,28%,36%); stroke:none;" transform="translate(0,49) scale(1,-1)">Feb</text>
+			<text x="217.02675000000002" y="12.7" style="font-family: Sans; font-size: 8.3px;fill: rgb(20%,28%,36%); stroke:none;" transform="translate(0,25) scale(1,-1)">2026</text>
+			<text x="286.2577" y="24.7" style="font-family: Sans; font-size: 8.3px;fill: rgb(20%,28%,36%); stroke:none;" transform="translate(0,49) scale(1,-1)">May</text>
+			<text x="284.62674999999996" y="12.7" style="font-family: Sans; font-size: 8.3px;fill: rgb(20%,28%,36%); stroke:none;" transform="translate(0,25) scale(1,-1)">2026</text>
+			<text x="354.01955" y="24.7" style="font-family: Sans; font-size: 8.3px;fill: rgb(20%,28%,36%); stroke:none;" transform="translate(0,49) scale(1,-1)">Aug</text>
+			<text x="352.22675" y="12.7" style="font-family: Sans; font-size: 8.3px;fill: rgb(20%,28%,36%); stroke:none;" transform="translate(0,25) scale(1,-1)">2026</text>
+		</g>
+	</g>
+</svg>
