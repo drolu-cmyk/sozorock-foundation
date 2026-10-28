@@ -11,6 +11,7 @@
 
 ## Research
 - [All research](https://www.sozorockfoundation.org/publications): the SozoRock Global Institute research series, free to read.
+- [SozoRock Outlook: Access, Capacity and Trust, October 2026](https://www.sozorockfoundation.org/publication/economic-outlook-october-2026): national outlook by Dr. Oluwabiyi Adeyemo. Workers at firms with 10 to 199 employees pay $9,687 a year toward family health coverage, $2,847 more than workers at larger firms (KFF, 2026). Information security analyst jobs are projected to grow 21 percent from 2025 to 2035 (BLS). 53 percent of US employees use AI at work at least a few times a year; 26 percent report a clear organizational plan (Gallup, August 2026). Free nine-page report with email verification.
 - [Health Systems Assurance Series, Volume 1 (2026)](https://www.sozorockfoundation.org/publication/hsa-v1-2026): what evidence should support trust in digital health systems.
 - [Rethinking Rural Governance Series, Volume 1 (2025)](https://www.sozorockfoundation.org/publication/rrg-v1-2025): from fragmented response to coordinated public action. Modernization and Resilience Program.
 - [Rural Equity Blueprint Series, Volume 1 (2025)](https://www.sozorockfoundation.org/publication/rebs-v1-2025): a practical framework for local health access.
