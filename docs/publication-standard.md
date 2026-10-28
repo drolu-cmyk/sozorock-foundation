@@ -43,6 +43,8 @@ PDF document properties contain only Title, Author, and Creator. The title is th
 
 ## Publication and distribution
 
+Article pages carry a tool row under the byline: a Share button that opens a menu (LinkedIn, X, Facebook, Email, Copy link) and Print. On wide screens the same tools follow the reader in a rail beside the text once the byline has scrolled away. The byline links to the author's Foundation profile; ORCID stays in citation metadata and appears in the report as plain text, never as a link. Charts embed their font subsets so they render in the report typeface everywhere.
+
 Give every edition one permanent Foundation article URL. Make the abstract and article publicly readable before the free PDF download. Use the established email-verification service for the PDF. Keep marketing consent separate and optional. Include readable citations and author attribution, a canonical URL, a search sitemap entry, and accurate social previews. Do not promise indexing or citations.
 
 Link previews use a title card: series label, title, edition month, author, and the cover's geometric field. Posts open with the edition and then the findings, for example "The latest SozoRock Outlook is out. In this edition: ...", followed by the article link.

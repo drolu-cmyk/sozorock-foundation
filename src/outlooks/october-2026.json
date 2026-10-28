@@ -309,5 +309,10 @@
   "assetBase": "/media/outlooks/october-2026",
   "canonicalUrl": "https://www.sozorockfoundation.org/publication/economic-outlook-october-2026",
   "displayTitle": "Access, Capacity and Trust",
-  "series": "SozoRock Outlook"
+  "series": "SozoRock Outlook",
+  "keyFinding": {
+    "value": "$2,847",
+    "text": "More a year that workers at smaller firms pay toward family health premiums than workers at larger firms.",
+    "source": "KFF, 2026 Employer Health Benefits Survey"
+  }
 }
