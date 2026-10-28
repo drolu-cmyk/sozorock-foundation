@@ -214,17 +214,22 @@ function publicationSchema(publication, canonicalUrl) {
     "@id": `${canonicalUrl}/#report`,
     name: publication.bibliographicTitle || `${publication.title}, ${publication.volume}`,
     alternateName: publication.subtitle,
-    headline: publication.tagline,
+    headline: publication.tagline || publication.displayTitle,
     description: publication.minimalMetadata ? publication.metaDescription : publication.abstract || publication.description,
     author: publication.author ? personFor(publication.author) : undefined,
     contributor: publication.contributor ? { "@type": "Person", name: publication.contributor } : undefined,
     publisher: { "@id": ORGANIZATION_ID },
     datePublished: publication.dateMachine || publication.date,
+    dateModified: publication.dateModified,
+    abstract: publication.kind === "economic-outlook" ? publication.abstract : undefined,
+    isAccessibleForFree: true,
+    isPartOf: publication.series ? { "@type": "CreativeWorkSeries", name: publication.series, publisher: { "@id": ORGANIZATION_ID } } : undefined,
+    genre: publication.theme,
     inLanguage: publication.languageCode || "en-US",
     pagination: publication.pages,
     url: canonicalUrl,
     mainEntityOfPage: { "@id": `${canonicalUrl}/#webpage` },
-    image: `${SITE_ORIGIN}${publication.cover}`,
+    image: publication.socialImage ? [`${SITE_ORIGIN}${publication.socialImage}`, `${SITE_ORIGIN}${publication.cover}`] : `${SITE_ORIGIN}${publication.cover}`,
     keywords: publication.metadataKeywords || [publication.theme, "public-interest research", "systems intelligence"].filter(Boolean),
     identifier: [
       publication.isbn ? { "@type": "PropertyValue", propertyID: "ISBN", value: publication.isbn } : null,
@@ -241,7 +246,7 @@ export function getSeoForPath(inputPathname = "/") {
   const canonicalUrl = `${SITE_ORIGIN}${canonicalPath === "/" ? "" : canonicalPath}`;
   const base = publication
     ? {
-        title: `${publication.bibliographicTitle || `${publication.title}, ${publication.volume}`} | SozoRock`,
+        title: (() => { const name = publication.bibliographicTitle || `${publication.title}, ${publication.volume}`; return /SozoRock/u.test(name) ? name : `${name} | SozoRock`; })(),
         description: publication.metaDescription || publication.description,
         pageType: "WebPage",
         ogType: "article",

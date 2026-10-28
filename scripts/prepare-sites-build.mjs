@@ -110,6 +110,8 @@ function routeHtml(route) {
   if (seo.publication) {
     html = upsertMeta(html, "property", "article:published_time", seo.publication.dateMachine || seo.publication.date);
     html = upsertMeta(html, "property", "article:section", seo.publication.theme);
+    if (seo.publication.dateModified) html = upsertMeta(html, "property", "article:modified_time", seo.publication.dateModified);
+    if (/Adeyemo/u.test(seo.publication.author || "")) html = upsertMeta(html, "property", "article:author", "https://www.sozorockfoundation.org/leadership");
     const citation = {
       citation_title: seo.publication.bibliographicTitle || `${seo.publication.title}, ${seo.publication.volume}: ${seo.publication.subtitle || seo.publication.tagline}`,
       citation_author: seo.publication.citationAuthor || "Adeyemo, Oluwabiyi",
