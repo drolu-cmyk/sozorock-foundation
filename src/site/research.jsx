@@ -16,7 +16,7 @@ export const seriesInfo = {
   },
   "rrg-v1-2025": {
     series: "Rethinking Rural Governance Series", year: "2025", program: "Modernization and Resilience Program", tone: "alt",
-    question: "From fragmented response to coordinated public action.",
+    question: "How can rural institutions move from fragmented response to coordinated public action?",
     who: "County leaders, public agencies, regional planners.",
     informs: "Institutional roles, local capacity and coordination across public services.",
     why: "Rural institutions carry more responsibility with fewer people and tools.",
@@ -24,7 +24,7 @@ export const seriesInfo = {
   },
   "rebs-v1-2025": {
     series: "Rural Equity Blueprint Series", year: "2025", program: null, tone: "",
-    question: "A practical framework for local health access.",
+    question: "What makes health access work when care is nearby but still out of reach?",
     who: "Providers, libraries, community groups, funders.",
     informs: "Where health literacy, technology, workforce and local capacity meet access.",
     why: "Care can exist nearby and still be out of reach.",
@@ -37,18 +37,14 @@ export function ResearchPage({ publications }) {
     <Hero
       id="research-title"
       title="Evidence leaders can act on."
-      lede="National economic outlooks and research on health access, workforce capacity, governance, and accountable services. Free to read."
-      actions={<><Btn href={economicOutlooks[0].path}>Read the latest</Btn><More href="#briefing">Get the Briefing</More></>}
+      lede="The SozoRock Outlook and three research series on health access, workforce capacity, governance and accountable services. Free to read."
+      actions={<><Btn href={economicOutlooks[0].path}>Read the latest outlook</Btn><More href="#briefing">Get the Briefing</More></>}
       panelTone="ice"
-      panel={<div className="ns-panel-covers">
-        <img src="/media/rebs-cover.webp" alt="" width="150" height="192" decoding="async" style={{ width: "24%" }} />
-        <img src="/media/hsa-cover.webp" alt="" width="190" height="246" decoding="async" fetchPriority="high" style={{ width: "31%" }} />
-        <img src="/media/rrg-cover.webp" alt="" width="150" height="194" decoding="async" style={{ width: "24%" }} />
-      </div>}
+      panel={<div className="ns-panel-covers"><Link href={economicOutlooks[0].path} aria-label={`${economicOutlooks[0].title}, report cover`} style={{ width: "46%", display: "block" }}><img src={economicOutlooks[0].cover} alt="" width="612" height="792" decoding="async" fetchPriority="high" style={{ width: "100%", height: "auto", boxShadow: "0 18px 40px rgba(7,29,59,.2)" }} /></Link></div>}
     />
-    <Sec labelledBy="latest-outlook"><div id="latest-outlook"><OutlookFeature outlook={economicOutlooks[0]} /></div></Sec>
+    <Sec labelledBy="latest-outlook"><div id="latest-outlook"><OutlookFeature outlook={economicOutlooks[0]} cover={false} primary={false} /></div></Sec>
     <Sec labelledBy="series-title">
-      <Head id="series-title" eyebrow="The series" title="Three questions, each a series that grows volume by volume." />
+      <Head id="series-title" eyebrow="The series" title="Three questions. Each series answers one, volume by volume." />
       <div style={{ marginTop: 72 }}>
         {publications.map((publication, index) => {
           const info = seriesInfo[publication.slug];
@@ -57,7 +53,7 @@ export function ResearchPage({ publications }) {
             <p><span className="ns-gap-label">{info.series}</span><br /><span className="ns-src">{publication.volume} · {info.year}{info.program ? ` · ${info.program}` : ` · ${publication.author}`}</span></p>
             <h2 className="ns-stmt s40"><Link href={publication.path} style={{ color: "inherit", textDecoration: "none" }}>{info.question}</Link></h2>
             <div className="facts"><div><b>Who it is for</b><p>{info.who}</p></div><div><b>What it informs</b><p>{info.informs}</p></div></div>
-            <div className="ns-actions"><Btn href={publication.path}>Read {publication.volume}</Btn>{publication.doi ? <span className="ns-src">DOI {publication.doi}</span> : <span className="ns-src">ISBN {publication.isbn}</span>}</div>
+            <div className="ns-actions"><More href={publication.path}>Read {publication.volume}</More>{publication.doi ? <span className="ns-src">DOI {publication.doi}</span> : <span className="ns-src">ISBN {publication.isbn}</span>}</div>
           </div>;
           return <article key={publication.slug} className="ns-series">{index % 2 ? <>{text}{cover}</> : <>{cover}{text}</>}</article>;
         })}
