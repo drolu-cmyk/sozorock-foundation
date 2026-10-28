@@ -36,7 +36,7 @@ export function ResearchPage({ publications }) {
   return <div className="ns ns-research">
     <Hero
       id="research-title"
-      title="Evidence leaders can act on."
+      title="Findings institutions can use."
       lede="The SozoRock Outlook and three research series on health access, workforce capacity, governance and accountable services. Free to read."
       actions={<><Btn href={economicOutlooks[0].path}>Read the latest outlook</Btn><More href="#briefing">Get the Briefing</More></>}
       panelTone="ice"
