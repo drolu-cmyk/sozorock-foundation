@@ -92,6 +92,9 @@ function HeroFilm() {
 function LabFilm() {
   const ref = useRef(null);
   const [playing, setPlaying] = useState(false);
+  const [ready, setReady] = useState(false);
+  // Native controls are the no-script fallback; the play control takes over once hydrated.
+  useEffect(() => { const v = ref.current; if (v) v.controls = false; setReady(true); }, []);
   const play = async () => {
     const v = ref.current; if (!v) return;
     v.controls = true; setPlaying(true);
@@ -100,14 +103,14 @@ function LabFilm() {
   };
   return <figure className="ns-labfilm">
     <div className="ns-labfilm-frame">
-      <video ref={ref} preload="none" playsInline poster="/media/ai-lab/ai-lab-film-poster.webp" tabIndex={-1}
+      <video ref={ref} controls preload="none" playsInline poster="/media/ai-lab/ai-lab-film-poster.webp" tabIndex={-1}
         onEnded={() => { const v = ref.current; setPlaying(false); if (v) { v.controls = false; v.load(); } }}
         aria-label="Film: Eric, 85, and Edward at a Tuesday class of the SozoRock AI Lab in Albany, New York State">
         <source src="/media/ai-lab/ai-lab-film-720.mp4" type="video/mp4" media="(max-width: 900px)" />
         <source src="/media/ai-lab/ai-lab-film-1080.mp4" type="video/mp4" />
         <track kind="captions" srcLang="en" label="English" src="/media/ai-lab/ai-lab-film.vtt" />
       </video>
-      {!playing && <button type="button" className="ns-labfilm-play" onClick={play} aria-label="Watch the film, 1 minute 42 seconds">
+      {ready && !playing && <button type="button" className="ns-labfilm-play" onClick={play} aria-label="Watch the film, 1 minute 42 seconds">
         <span className="ns-labfilm-icon" aria-hidden="true" /><span className="ns-labfilm-txt" aria-hidden="true">Watch the film</span><span className="ns-labfilm-len" aria-hidden="true">1:42</span>
       </button>}
     </div>
