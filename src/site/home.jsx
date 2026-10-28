@@ -103,7 +103,7 @@ function LabFilm() {
   };
   return <figure className="ns-labfilm">
     <div className="ns-labfilm-frame">
-      <video ref={ref} controls preload="none" playsInline poster="/media/ai-lab/ai-lab-film-poster.webp" tabIndex={-1}
+      <video ref={ref} controls preload="none" playsInline poster="/media/ai-lab/ai-lab-film-poster.webp" tabIndex={ready && !playing ? -1 : undefined}
         onEnded={() => { const v = ref.current; setPlaying(false); if (v) { v.controls = false; v.load(); } }}
         aria-label="Film: Eric, 85, and Edward at a Tuesday class of the SozoRock AI Lab in Albany, New York State">
         <source src="/media/ai-lab/ai-lab-film-720.mp4" type="video/mp4" media="(max-width: 900px)" />
