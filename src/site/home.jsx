@@ -208,7 +208,7 @@ export function HomePage() {
         <div>
           <p className="ns-eyebrow">SozoRock AI Lab</p>
           <h2 className="ns-stmt" id="lab-title">Eric is 85. Last week he knew nothing about AI.</h2>
-          <p className="ns-body" style={{ marginTop: 20 }}>At his second class he used it to compare contractor estimates. Free classes every Tuesday at 6:30 pm in the Beacon Bank community room, Albany, New York State.</p>
+          <p className="ns-body" style={{ marginTop: 20 }}>At his second class he used it to compare contractor estimates. The Lab runs free AI sessions every Tuesday in Albany, New York State, at 6:30 pm in the Beacon Bank community room.</p>
           <div className="ns-actions" style={{ marginTop: 36 }}><Btn href={AI_LAB}>Explore the AI Lab</Btn><More href={`${AI_LAB}individuals/#apply`}>Reserve a free seat</More></div>
         </div>
         <LabFilm />
