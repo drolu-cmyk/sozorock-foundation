@@ -16,8 +16,8 @@
   "theme": "Economic outlook",
   "pages": "9",
   "cover": "/media/outlooks/october-2026/cover.webp",
-  "socialImage": "/media/outlooks/october-2026/social-title-card.png",
-  "imageAlt": "SozoRock Outlook: Access, Capacity and Trust, October 2026, by Dr. Oluwabiyi Adeyemo. The SozoRock Foundation.",
+  "socialImage": "/media/outlooks/october-2026/social-card-oct-2026.png",
+  "imageAlt": "SozoRock Outlook: Access, Capacity and Trust, October 2026. The SozoRock Foundation.",
   "description": "The US economy is still growing, but hiring has slowed and prices and borrowing costs are higher. Institutions face distinct pressures in health access, workforce capacity, and AI. Workers at smaller firms pay the most toward family coverage, digital occupations have different growth prospects, and employee AI use is advancing faster than reports of clear organizational plans. This outlook examines the national data and the choices that will shape affordability, employment, and accountable services over the next year.",
   "abstract": "The US economy is still growing, but hiring has slowed and prices and borrowing costs are higher. Institutions face distinct pressures in health access, workforce capacity, and AI. Workers at smaller firms pay the most toward family coverage, digital occupations have different growth prospects, and employee AI use is advancing faster than reports of clear organizational plans. This outlook examines the national data and the choices that will shape affordability, employment, and accountable services over the next year.",
   "metaDescription": "Who pays for family health coverage, where digital jobs are growing, and why AI use is outpacing plans. A free outlook by Dr. Oluwabiyi Adeyemo.",
@@ -312,8 +312,9 @@
   "series": "SozoRock Outlook",
   "keyFinding": {
     "value": "$2,847",
-    "text": "More a year that workers at smaller firms pay toward family health premiums than workers at larger firms.",
+    "text": "The extra amount workers at smaller firms pay each year toward family health premiums, compared with workers at larger firms.",
     "source": "KFF, 2026 Employer Health Benefits Survey"
   },
-  "promo": "In this edition: who pays for family health coverage, where digital jobs are growing, and why AI use at work is outpacing clear plans."
+  "promo": "In this edition: who pays for family health coverage, where digital jobs are growing, and why AI use at work is outpacing clear plans.",
+  "coverVector": "/media/outlooks/october-2026/cover.svg"
 }

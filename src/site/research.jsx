@@ -40,7 +40,7 @@ export function ResearchPage({ publications }) {
       lede="The SozoRock Outlook and three research series on health access, workforce capacity, governance and accountable services. Free to read."
       actions={<><Btn href={economicOutlooks[0].path}>Read the latest outlook</Btn><More href="#briefing">Get the Briefing</More></>}
       panelTone="ice"
-      panel={<div className="ns-panel-covers"><Link href={economicOutlooks[0].path} aria-label={`${economicOutlooks[0].title}, report cover`} style={{ width: "46%", display: "block" }}><img src={economicOutlooks[0].cover} alt="" width="612" height="792" decoding="async" fetchPriority="high" style={{ width: "100%", height: "auto", boxShadow: "0 18px 40px rgba(7,29,59,.2)" }} /></Link></div>}
+      panel={<div className="ns-panel-covers"><Link href={economicOutlooks[0].path} aria-label={`${economicOutlooks[0].title}, report cover`} style={{ width: "46%", display: "block" }}><img src={economicOutlooks[0].coverVector || economicOutlooks[0].cover} alt="" width="612" height="792" decoding="async" fetchPriority="high" style={{ width: "100%", height: "auto", boxShadow: "0 18px 40px rgba(7,29,59,.2)" }} /></Link></div>}
     />
     <Sec labelledBy="latest-outlook"><div id="latest-outlook"><OutlookFeature outlook={economicOutlooks[0]} cover={false} primary={false} /></div></Sec>
     <Sec labelledBy="series-title">
