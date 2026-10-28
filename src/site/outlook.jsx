@@ -47,7 +47,7 @@ function Exhibit({ outlook, number, label }) {
 
 export function OutlookFeature({ outlook, compact = false }) {
   return <article className={`outlook-feature ${compact ? "is-compact" : ""}`}>
-    <div><p className="ns-eyebrow">Economic outlook · {outlook.date}</p><h2 className="ns-stmt s40"><Link href={outlook.path}>{outlook.title}</Link></h2><p className="ns-body">Higher health costs and changing digital jobs complicate a growing economy. The choices institutions make will shape access, employment, and accountable services.</p><div className="ns-actions"><Btn href={outlook.path}>Read the outlook</Btn><span className="ns-src">By {outlook.author} · 9-page download</span></div></div>
+    <div><p className="ns-eyebrow">{outlook.series} · {outlook.date}</p><h2 className="ns-stmt s40"><Link href={outlook.path}>{outlook.displayTitle}</Link></h2><p className="ns-body">Higher health costs and changing digital jobs complicate a growing economy. The choices institutions make will shape access, employment, and accountable services.</p><div className="ns-actions"><Btn href={outlook.path}>Read the outlook</Btn><span className="ns-src">By {outlook.author} · 9-page download</span></div></div>
     <Link className="outlook-feature-cover" href={outlook.path}><img src={outlook.cover} alt={`${outlook.title} cover`} width="612" height="792" loading="lazy" decoding="async" /></Link>
   </article>;
 }
@@ -57,7 +57,7 @@ export function OutlookPage({ outlook }) {
   const url = encodeURIComponent(outlook.canonicalUrl);
   return <article className="ns outlook-page">
     <header className="outlook-hero ns-shell">
-      <div><Link className="outlook-breadcrumb" href="/publications">Research</Link><p className="outlook-label">Economic outlook · {outlook.date}</p><h1>{outlook.title}</h1><p className="outlook-deck">{outlook.abstract}</p><p className="outlook-byline">By <a href={outlook.orcid}>{outlook.author}</a> · Analysis · 5-minute read</p><div className="ns-actions"><Btn href={outlook.accessPath}>Download the nine-page report</Btn><a className="outlook-textlink" href="#outlook-analysis">Read the analysis</a></div><p className="outlook-source">Free PDF with email verification.</p></div>
+      <div><Link className="outlook-breadcrumb" href="/publications">Research</Link><p className="outlook-label">{outlook.series} · {outlook.date}</p><h1>{outlook.displayTitle}</h1><p className="outlook-deck">{outlook.abstract}</p><p className="outlook-byline">By <a href={outlook.orcid}>{outlook.author}</a> · Analysis · 5-minute read</p><div className="ns-actions"><Btn href={outlook.accessPath}>Download the nine-page report</Btn><a className="outlook-textlink" href="#outlook-analysis">Read the analysis</a></div><p className="outlook-source">Free PDF with email verification.</p></div>
       <div className="outlook-cover"><img src={outlook.cover} alt={`${outlook.title}, nine-page report cover`} width="612" height="792" fetchPriority="high" decoding="async" /></div>
     </header>
     <div className="outlook-reading" id="outlook-analysis">

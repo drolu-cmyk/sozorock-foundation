@@ -4,8 +4,8 @@
   "accessPath": "/publication/economic-outlook-october-2026/access",
   "kind": "economic-outlook",
   "minimalMetadata": true,
-  "title": "Economic conditions outlook, October 2026",
-  "bibliographicTitle": "Economic conditions outlook, October 2026",
+  "title": "SozoRock Outlook: Access, Capacity and Trust, October 2026",
+  "bibliographicTitle": "SozoRock Outlook: Access, Capacity and Trust, October 2026",
   "author": "Dr. Oluwabiyi Adeyemo",
   "citationAuthor": "Adeyemo, Oluwabiyi",
   "orcid": "https://orcid.org/0009-0008-5215-5609",
@@ -17,7 +17,7 @@
   "pages": "9",
   "cover": "/media/outlooks/october-2026/cover.webp",
   "socialImage": "/media/outlooks/october-2026/social-landscape.png",
-  "imageAlt": "Workers at smaller firms contribute $2,847 more on average toward annual family health premiums. The SozoRock Foundation, October 2026.",
+  "imageAlt": "SozoRock Outlook: Access, Capacity and Trust, October 2026, by Dr. Oluwabiyi Adeyemo. The SozoRock Foundation.",
   "description": "The US economy is still growing, but hiring has slowed and prices and borrowing costs are higher. Institutions face distinct pressures in health access, workforce capacity, and AI. Workers at smaller firms pay the most toward family coverage, digital occupations have different growth prospects, and employee AI use is advancing faster than reports of clear organizational plans. This outlook examines the national data and the choices that will shape affordability, employment, and accountable services over the next year.",
   "abstract": "The US economy is still growing, but hiring has slowed and prices and borrowing costs are higher. Institutions face distinct pressures in health access, workforce capacity, and AI. Workers at smaller firms pay the most toward family coverage, digital occupations have different growth prospects, and employee AI use is advancing faster than reports of clear organizational plans. This outlook examines the national data and the choices that will shape affordability, employment, and accountable services over the next year.",
   "metaDescription": "A national outlook on health affordability, digital work, and institutional choices. Read the analysis and download the free nine-page report by Dr. Oluwabiyi Adeyemo.",
@@ -28,10 +28,10 @@
     "Dr. Oluwabiyi Adeyemo",
     "The SozoRock Foundation"
   ],
-  "citation": "Adeyemo, O. (2026). Economic conditions outlook, October 2026. The SozoRock Foundation, Inc.",
+  "citation": "Adeyemo, O. (2026). SozoRock Outlook: Access, Capacity and Trust, October 2026. The SozoRock Foundation, Inc.",
   "article": {
     "abstract": "The US economy is still growing, but hiring has slowed and prices and borrowing costs are higher. Institutions face distinct pressures in health access, workforce capacity, and AI. Workers at smaller firms pay the most toward family coverage, digital occupations have different growth prospects, and employee AI use is advancing faster than reports of clear organizational plans. This outlook examines the national data and the choices that will shape affordability, employment, and accountable services over the next year.",
-    "intro": "Growth gives an incomplete account of the conditions facing households and institutions. Real GDP grew at a 2.2 percent annualized rate in the second quarter of 2026, and real final sales to private domestic purchasers, the combined measure of consumer spending and private fixed investment, grew 4.6 percent. Other indicators are less settled. Employers added 29,000 jobs in September and the unemployment rate rose to 4.2 percent. Consumer prices were 3.7 percent higher than a year earlier, or 2.6 percent excluding food and energy, and the Federal Reserve raised its policy rate range to 3.75 to 4.00 percent in September. Demand is holding while hiring slows and borrowing costs rise. That sharpens three choices: who pays for care, which digital skills employers need, and how AI-supported decisions are governed.",
+    "intro": "Growth gives an incomplete account of the conditions facing households and institutions. Real GDP grew at a 2.2 percent annualized rate in the second quarter of 2026, and real final sales to private domestic purchasers, the combined measure of consumer spending and private fixed investment, grew 4.6 percent. Other indicators are less settled. Employers added 29,000 jobs in September, and the unemployment rate was little changed at 4.2 percent. Consumer prices were 3.7 percent higher than a year earlier, or 2.6 percent excluding food and energy, and the Federal Reserve raised its policy rate range to 3.75 to 4 percent in September. Demand is holding while hiring slows and borrowing costs rise. That sharpens three choices: who pays for care, which digital skills employers need, and how AI-supported decisions are governed.",
     "intro_sources": [
       "bea",
       "bls-jobs",
@@ -133,14 +133,14 @@
       "organization": "US Bureau of Labor Statistics",
       "date": "2026-10-14",
       "label": "Bureau of Labor Statistics, Consumer Price Index, September 2026, released October 14, 2026",
-      "url": "https://www.bls.gov/cpi/"
+      "url": "https://www.bls.gov/news.release/archives/cpi_10142026.htm"
     },
     "fomc": {
-      "title": "Federal Open Market Committee statement, September 16, 2026",
+      "title": "Federal Reserve issues FOMC statement, September 16, 2026",
       "organization": "Board of Governors of the Federal Reserve System",
       "date": "2026-09-16",
       "label": "Federal Reserve, FOMC statement, September 16, 2026",
-      "url": "https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm"
+      "url": "https://www.federalreserve.gov/newsevents/pressreleases/monetary20260916a.htm"
     },
     "fed": {
       "title": "Economic Well-Being of US Households in 2025: Economic Hardships",
@@ -307,5 +307,7 @@
     }
   },
   "assetBase": "/media/outlooks/october-2026",
-  "canonicalUrl": "https://www.sozorockfoundation.org/publication/economic-outlook-october-2026"
+  "canonicalUrl": "https://www.sozorockfoundation.org/publication/economic-outlook-october-2026",
+  "displayTitle": "Access, Capacity and Trust",
+  "series": "SozoRock Outlook"
 }
