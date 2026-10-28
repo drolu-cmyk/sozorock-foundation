@@ -6,8 +6,8 @@ import { AI_LAB, HEALTH, Band, Btn, Fig, Go, Head, Hero, Meter, More, Sec, Segs,
 
 export const papers = [
   { series: "Health Systems Assurance Series", meta: "Volume 1 · 2026", line: "What evidence should support trust in digital health systems?", href: "/publication/hsa-v1-2026", img: "/media/hsa-cover.webp", width: 1600, height: 2071 },
-  { series: "Rethinking Rural Governance Series", meta: "Volume 1 · 2025 · Modernization and Resilience Program", line: "From fragmented response to coordinated public action.", href: "/publication/rrg-v1-2025", img: "/media/rrg-cover.webp", width: 1100, height: 1424, alt: true },
-  { series: "Rural Equity Blueprint Series", meta: "Volume 1 · 2025", line: "A practical framework for local health access.", href: "/publication/rebs-v1-2025", img: "/media/rebs-cover.webp", width: 1100, height: 1407 },
+  { series: "Rethinking Rural Governance Series", meta: "Volume 1 · 2025 · Modernization and Resilience Program", line: "How can rural institutions move from fragmented response to coordinated public action?", href: "/publication/rrg-v1-2025", img: "/media/rrg-cover.webp", width: 1100, height: 1424, alt: true },
+  { series: "Rural Equity Blueprint Series", meta: "Volume 1 · 2025", line: "What makes health access work when care is nearby but still out of reach?", href: "/publication/rebs-v1-2025", img: "/media/rebs-cover.webp", width: 1100, height: 1407 },
 ];
 
 export const upcoming = [

@@ -81,3 +81,9 @@
 @media(max-width:650px){.outlook-watch{padding:20px}.outlook-watch li{grid-template-columns:1fr}.outlook-hero{display:block;padding-block:28px 36px}.outlook-page h1{font-size:38px}.outlook-cover{display:none}.outlook-breadcrumb{margin-bottom:24px}.outlook-reading{font-size:17px;width:calc(100% - 40px)}.outlook-reading h2{font-size:28px}.outlook-reading .outlook-source{font-size:14px}.outlook-download{padding:24px;grid-template-columns:1fr}.outlook-download img{display:none}.outlook-feature{grid-template-columns:1fr;padding:24px}.outlook-feature-cover{display:none}.outlook-share{gap:12px 20px}.outlook-access-heading{padding-top:28px}.outlook-exhibit{padding-top:16px}.outlook-chart img{min-width:540px}.outlook-hero .ns-actions{align-items:flex-start}.outlook-page .ns-btn{white-space:normal;text-align:center}}
 @media print{.outlook-tools,.outlook-rail,.outlook-copy,.outlook-download,.outlook-hero .ns-actions{display:none}.outlook-reading{width:100%}.outlook-chart img{min-width:0}.outlook-exhibit{break-inside:avoid}}
 .outlook-feature .ns-actions{margin-top:24px;align-items:baseline;gap:12px 28px;flex-wrap:wrap}
+.outlook-feature-stat.is-inline{flex-direction:row;align-items:center;gap:20px;margin-top:24px}
+.outlook-feature-stat.is-inline .outlook-stat-value{font-size:clamp(44px,5vw,64px)}
+.outlook-feature-stat.is-inline .outlook-stat-text{max-width:380px}
+.outlook-feature-by{margin-top:14px}
+.outlook-feature-cover img{max-width:270px}
+@media(max-width:650px){.outlook-feature-stat.is-inline{flex-direction:column;align-items:flex-start;gap:8px}}
