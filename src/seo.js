@@ -335,6 +335,20 @@ export function getSeoForPath(inputPathname = "/") {
       mainEntity: publication ? { "@id": `${canonicalUrl}/#report` } : undefined,
     },
     breadcrumb,
+    pathname === "/"
+      ? {
+          "@type": "VideoObject",
+          "@id": `${SITE_ORIGIN}/#ai-lab-film`,
+          name: "Eric is 85. Last week he knew nothing about AI.",
+          description: "Eric, 85, a retired immigration lawyer, and Edward, a small business owner, on what they learned at the free weekly classes of the SozoRock AI Lab in Albany, New York State.",
+          thumbnailUrl: [`${SITE_ORIGIN}/media/ai-lab/ai-lab-film-poster.jpg`],
+          uploadDate: "2026-10-28",
+          duration: "PT1M42S",
+          contentUrl: `${SITE_ORIGIN}/media/ai-lab/ai-lab-film-1080.mp4`,
+          inLanguage: "en-US",
+          publisher: { "@id": ORGANIZATION_ID },
+        }
+      : null,
     publication ? publicationSchema(publication, canonicalUrl) : null,
     pathname === "/leadership"
       ? {

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://www.sozorockfoundation.org/</loc><lastmod>2026-10-22</lastmod><priority>1.0</priority></url>
+<urlset xmlns:video="http://www.google.com/schemas/sitemap-video/1.1" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://www.sozorockfoundation.org/</loc><lastmod>2026-10-28</lastmod><priority>1.0</priority><video:video><video:thumbnail_loc>https://www.sozorockfoundation.org/media/ai-lab/ai-lab-film-poster.jpg</video:thumbnail_loc><video:title>Eric is 85. Last week he knew nothing about AI.</video:title><video:description>Eric, 85, a retired immigration lawyer, and Edward, a small business owner, on what they learned at the free weekly classes of the SozoRock AI Lab in Albany, New York State.</video:description><video:content_loc>https://www.sozorockfoundation.org/media/ai-lab/ai-lab-film-1080.mp4</video:content_loc><video:duration>102</video:duration><video:publication_date>2026-10-28</video:publication_date></video:video></url>
   <url><loc>https://www.sozorockfoundation.org/platforms</loc><lastmod>2026-10-22</lastmod><priority>0.9</priority></url>
   <url><loc>https://www.sozorockfoundation.org/platforms/health</loc><lastmod>2026-10-22</lastmod><priority>0.9</priority></url>
   <url><loc>https://www.sozorockfoundation.org/workforce</loc><lastmod>2026-10-22</lastmod><priority>0.9</priority></url>
