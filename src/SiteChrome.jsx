@@ -2,8 +2,11 @@ import { useEffect, useRef, useState } from "react";
 import { Link } from "./router";
 import { BriefingSection } from "./BriefingForm";
 
-export function Brand() {
-  return <Link href="/" className="ns-brand foundation-wordmark" aria-label="The SozoRock Foundation home"><span>The</span><strong>SozoRock.</strong><span>Foundation</span></Link>;
+export function Brand({ showIcon = false }) {
+  return <Link href="/" className={`ns-brand foundation-wordmark${showIcon ? " ns-brand-with-icon" : ""}`} aria-label="The SozoRock Foundation home">
+    {showIcon && <img className="ns-brand-icon" src="/favicon.svg" alt="" width="44" height="44" />}
+    <span className="ns-brand-type"><span>The</span><strong>SozoRock.</strong><span>Foundation</span></span>
+  </Link>;
 }
 
 const primaryLinks = [["Our Work", "/platforms"], ["Research", "/publications"], ["Events", "/events"], ["About", "/about"]];
@@ -63,7 +66,7 @@ export function Header({ pathname }) {
   return <header className="ns ns-header">
     <a className="skip-link" href="#main-content">Skip to main content</a>
     <div className="ns-shell ns-header-inner">
-      <Brand />
+      <Brand showIcon />
       <button ref={toggle} className="ns-menu-toggle" type="button" aria-expanded={open} aria-controls="foundation-navigation" onClick={() => setOpen((value) => !value)}>{open ? "Close" : "Menu"}</button>
       <nav ref={navigation} id="foundation-navigation" className={`ns-nav ${open ? "is-open" : ""}`} aria-label="Primary navigation" onClick={(event) => { if (event.target.closest("a")) setOpen(false); }}>
         <div className="ns-nav-main">
