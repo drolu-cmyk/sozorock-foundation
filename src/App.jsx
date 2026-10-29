@@ -7,6 +7,7 @@ import { economicOutlooks } from "./outlooks";
 import { OutlookPage, OutlookAccessPage } from "./site/outlook";
 import { useCurrentPath } from "./router";
 import { getSeoForPath } from "./seoRuntime";
+import { getCitationMetadata } from "./citationMetadata";
 import { HomePage } from "./site/home";
 import { AiLabPage, AiSocietyPage, HealthPage, OurWorkPage, WorkforcePage } from "./site/work";
 import { AccessPage, PublicationPage, ResearchPage } from "./site/research";
@@ -100,17 +101,10 @@ export function App({ initialPath }) {
     setMeta("twitter:image:alt", seo.imageAlt);
     setMeta("article:published_time", seo.publication?.dateMachine || seo.publication?.date, "property");
     setMeta("article:section", seo.publication?.theme, "property");
+    setMeta("article:modified_time", seo.publication?.dateModified, "property");
+    setMeta("article:author", /Adeyemo/u.test(seo.publication?.author || "") ? "https://www.sozorockfoundation.org/leadership" : null, "property");
 
-    const citationMeta = {
-      citation_title: seo.publication?.bibliographicTitle,
-      citation_author: seo.publication?.citationAuthor || "Oluwabiyi Adeyemo",
-      citation_publication_date: seo.publication?.dateMachine,
-      citation_publisher: seo.publication?.publisher || (seo.publication ? "The SozoRock Foundation, Inc." : null),
-      citation_isbn: seo.publication?.isbn,
-      citation_language: seo.publication?.languageCode,
-      citation_abstract: seo.publication?.minimalMetadata ? null : seo.publication?.abstract || seo.publication?.description,
-      citation_doi: seo.publication?.doi,
-    };
+    const citationMeta = getCitationMetadata(seo);
     Object.entries(citationMeta).forEach(([name, content]) => setMeta(name, content));
 
     const schemaId = "site-schema";
