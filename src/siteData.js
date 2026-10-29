@@ -77,7 +77,6 @@ export const platforms = [
 export const publications = [
   {
     slug: "hsa-v1-2026",
-    reportNumber: "HSA Volume 1",
     path: "/publication/hsa-v1-2026",
     title: "Health Systems Assurance",
     bibliographicTitle: "Health Systems Assurance, Volume 1: From compliance to evidence-based digital assurance",
@@ -113,7 +112,7 @@ export const publications = [
   },
   {
     slug: "rrg-v1-2025",
-    reportNumber: "RRG Volume 1",
+    reportNumber: "RRG-V1-2025",
     doi: "10.65473/rrg-v1-2025",
     publisher: "The SozoRock Foundation, Inc.",
     dateMachine: "2025-11",
@@ -140,7 +139,6 @@ export const publications = [
   },
   {
     slug: "rebs-v1-2025",
-    reportNumber: "REBS Volume 1",
     doi: "10.65473/rebs-v1-2025",
     publisher: "The SozoRock Foundation, Inc.",
     dateMachine: "2025-10",

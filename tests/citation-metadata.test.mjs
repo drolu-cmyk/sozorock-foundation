@@ -7,17 +7,17 @@ const records = [
   {
     slug: "hsa-v1-2026", date: "2026", datePublished: "2026-08",
     title: "Health Systems Assurance, Volume 1: From compliance to evidence-based digital assurance",
-    report: "HSA Volume 1", isbn: "979-8-9936477-3-9",
+    isbn: "979-8-9936477-3-9",
   },
   {
     slug: "rrg-v1-2025", date: "2025", datePublished: "2025-11",
     title: "Rethinking Rural Governance: Volume 1 – Delaware County, New York — From Compliance to Systems Intelligence",
-    report: "RRG Volume 1", doi: "10.65473/rrg-v1-2025",
+    report: "RRG-V1-2025", doi: "10.65473/rrg-v1-2025",
   },
   {
     slug: "rebs-v1-2025", date: "2025", datePublished: "2025-10",
     title: "Access Day: Building a Framework for Rural Health Equity in New York State",
-    report: "REBS Volume 1", isbn: "979-8-9936477-0-8", doi: "10.65473/rebs-v1-2025",
+    isbn: "979-8-9936477-0-8", doi: "10.65473/rebs-v1-2025",
   },
   {
     slug: "economic-outlook-october-2026", date: "2026/10/27", datePublished: "2026-10-27",
