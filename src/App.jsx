@@ -3,8 +3,11 @@ import { useEffect } from "react";
 import { NotFoundPage } from "./Pages";
 import { Footer, Header } from "./SiteChrome";
 import { publications } from "./siteData";
+import { economicOutlooks } from "./outlooks";
+import { OutlookPage, OutlookAccessPage } from "./site/outlook";
 import { useCurrentPath } from "./router";
 import { getSeoForPath } from "./seoRuntime";
+import { getCitationMetadata } from "./citationMetadata";
 import { HomePage } from "./site/home";
 import { AiLabPage, AiSocietyPage, HealthPage, OurWorkPage, WorkforcePage } from "./site/work";
 import { AccessPage, PublicationPage, ResearchPage } from "./site/research";
@@ -34,6 +37,8 @@ function RouteView({ pathname }) {
   if (Page) return <Page />;
   if (target === "/publications") return <ResearchPage publications={publications} />;
   if (legalPages[target]) return <LegalPage {...legalPages[target]} />;
+  const outlook = economicOutlooks.find((item) => item.path === target || item.accessPath === target);
+  if (outlook) return target === outlook.path ? <OutlookPage outlook={outlook} /> : <OutlookAccessPage outlook={outlook} />;
   const access = publications.find((item) => item.accessPath === target);
   if (access) return <AccessPage publication={access} />;
   const publication = publications.find((item) => item.path === target);
@@ -96,20 +101,10 @@ export function App({ initialPath }) {
     setMeta("twitter:image:alt", seo.imageAlt);
     setMeta("article:published_time", seo.publication?.dateMachine || seo.publication?.date, "property");
     setMeta("article:section", seo.publication?.theme, "property");
+    setMeta("article:modified_time", seo.publication?.dateModified, "property");
+    setMeta("article:author", /Adeyemo/u.test(seo.publication?.author || "") ? "https://www.sozorockfoundation.org/leadership" : null, "property");
 
-    const citationMeta = {
-      citation_title: seo.publication?.bibliographicTitle,
-      citation_author: seo.publication ? (seo.publication.citationAuthor || "Adeyemo, Oluwabiyi") : null,
-      citation_publication_date: seo.publication ? String(seo.publication.dateMachine || seo.publication.date).replace(/-/gu, "/") : null,
-      citation_technical_report_institution: seo.publication?.publisher || (seo.publication ? "The SozoRock Foundation, Inc." : null),
-      citation_technical_report_number: seo.publication?.reportNumber,
-      citation_abstract_html_url: seo.publication ? seo.canonicalUrl : null,
-      citation_publisher: seo.publication?.publisher || (seo.publication ? "The SozoRock Foundation, Inc." : null),
-      citation_isbn: seo.publication?.isbn,
-      citation_language: seo.publication ? (seo.publication.languageCode || "en-US") : null,
-      citation_abstract: seo.publication?.abstract || seo.publication?.description,
-      citation_doi: seo.publication?.doi,
-    };
+    const citationMeta = getCitationMetadata(seo);
     Object.entries(citationMeta).forEach(([name, content]) => setMeta(name, content));
 
     const schemaId = "site-schema";

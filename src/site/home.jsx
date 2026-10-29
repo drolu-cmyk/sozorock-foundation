@@ -1,11 +1,13 @@
 import { useEffect, useRef, useState } from "react";
+import { economicOutlooks } from "../outlooks";
+import { OutlookFeature } from "./outlook";
 import { Link } from "../router";
-import { AI_LAB, HEALTH, Band, Btn, Fig, Go, Head, Hero, Meter, More, Sec, Segs, Tile } from "./ui";
+import { AI_LAB, HEALTH, Btn, Fig, Go, Head, Hero, Meter, More, Sec, Segs, Tile } from "./ui";
 
 export const papers = [
   { series: "Health Systems Assurance Series", meta: "Volume 1 · 2026", line: "What evidence should support trust in digital health systems?", href: "/publication/hsa-v1-2026", img: "/media/hsa-cover.webp", width: 1600, height: 2071 },
-  { series: "Rethinking Rural Governance Series", meta: "Volume 1 · 2025 · Modernization and Resilience Program", line: "From fragmented response to coordinated public action.", href: "/publication/rrg-v1-2025", img: "/media/rrg-cover.webp", width: 1100, height: 1424, alt: true },
-  { series: "Rural Equity Blueprint Series", meta: "Volume 1 · 2025", line: "A practical framework for local health access.", href: "/publication/rebs-v1-2025", img: "/media/rebs-cover.webp", width: 1100, height: 1407 },
+  { series: "Rethinking Rural Governance Series", meta: "Volume 1 · 2025 · Modernization and Resilience Program", line: "How can rural institutions move from fragmented response to coordinated public action?", href: "/publication/rrg-v1-2025", img: "/media/rrg-cover.webp", width: 1100, height: 1424, alt: true },
+  { series: "Rural Equity Blueprint Series", meta: "Volume 1 · 2025", line: "What makes health access work when care is nearby but still out of reach?", href: "/publication/rebs-v1-2025", img: "/media/rebs-cover.webp", width: 1100, height: 1407 },
 ];
 
 export const upcoming = [
@@ -85,6 +87,37 @@ function HeroFilm() {
   </>;
 }
 
+
+/* AI Lab film: poster first, plays inline with sound only when the visitor asks. */
+function LabFilm() {
+  const ref = useRef(null);
+  const [playing, setPlaying] = useState(false);
+  const [ready, setReady] = useState(false);
+  // Native controls are the no-script fallback; the play control takes over once hydrated.
+  useEffect(() => { const v = ref.current; if (v) v.controls = false; setReady(true); }, []);
+  const play = async () => {
+    const v = ref.current; if (!v) return;
+    v.controls = true; setPlaying(true);
+    try { await v.play(); } catch { /* controls stay available */ }
+    v.focus();
+  };
+  return <figure className="ns-labfilm">
+    <div className="ns-labfilm-frame">
+      <video ref={ref} controls preload="none" playsInline poster="/media/ai-lab/ai-lab-film-poster.webp" tabIndex={ready && !playing ? -1 : undefined}
+        onEnded={() => { const v = ref.current; setPlaying(false); if (v) { v.controls = false; v.load(); } }}
+        aria-label="Film: Eric, 85, and Edward at a Tuesday class of the SozoRock AI Lab in Albany, New York State">
+        <source src="/media/ai-lab/ai-lab-film-720.mp4" type="video/mp4" media="(max-width: 900px)" />
+        <source src="/media/ai-lab/ai-lab-film-1080.mp4" type="video/mp4" />
+        <track kind="captions" srcLang="en" label="English" src="/media/ai-lab/ai-lab-film.vtt" />
+      </video>
+      {ready && !playing && <button type="button" className="ns-labfilm-play" onClick={play} aria-label="Watch the film, 1 minute 42 seconds">
+        <span className="ns-labfilm-icon" aria-hidden="true" /><span className="ns-labfilm-txt" aria-hidden="true">Watch the film</span><span className="ns-labfilm-len" aria-hidden="true">1:42</span>
+      </button>}
+    </div>
+    <figcaption className="ns-src">Filmed at a Tuesday class, October 2026. Shared with the participants’ permission.</figcaption>
+  </figure>;
+}
+
 export function HomePage() {
   return <div className="ns ns-home">
     <Hero
@@ -151,6 +184,7 @@ export function HomePage() {
 
     <Sec labelledBy="research-title">
       <Head id="research-title" eyebrow="Research" title="Evidence leaders can act on." link={["See all research", "/publications"]} />
+      <OutlookFeature outlook={economicOutlooks[0]} compact />
       <Papers />
     </Sec>
 
@@ -172,7 +206,17 @@ export function HomePage() {
       </div>
     </Sec>
 
-    <Band top title="Ready for what AI does next." line="SozoRock AI Lab: free AI sessions every Tuesday in Albany, New York State, and AI enablement for mission driven organizations." action={<Btn href={AI_LAB} tone="navy">Explore the AI Lab</Btn>} />
+    <Sec tone="ice" labelledBy="lab-title">
+      <div className="ns-two ns-lab">
+        <div>
+          <p className="ns-eyebrow">SozoRock AI Lab</p>
+          <h2 className="ns-stmt" id="lab-title">Eric is 85. Last week he knew nothing about AI.</h2>
+          <p className="ns-body" style={{ marginTop: 20 }}>At his second class he used it to compare contractor estimates. The Lab runs free AI sessions every Tuesday in Albany, New York State, at 6:30 pm in the Beacon Bank community room.</p>
+          <div className="ns-actions" style={{ marginTop: 36 }}><Btn href={AI_LAB}>Explore the AI Lab</Btn><More href={`${AI_LAB}individuals/#apply`}>Reserve a free seat</More></div>
+        </div>
+        <LabFilm />
+      </div>
+    </Sec>
 
     <Sec className="pt0" id="events" labelledBy="events-title">
       <Head id="events-title" eyebrow="Events" title="Join the conversation." link={["All events", "/events"]} />

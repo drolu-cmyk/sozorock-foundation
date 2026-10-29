@@ -6,6 +6,7 @@ import { createElement } from "react";
 import { renderToString } from "react-dom/server";
 import { fileURLToPath } from "node:url";
 import { getSeoForPath } from "../src/seoRuntime.js";
+import { getCitationMetadata } from "../src/citationMetadata.js";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const dist = path.join(root, "dist");
@@ -30,6 +31,8 @@ const permanentRoutes = [
   "/accessibility",
   "/nondiscrimination",
   "/terms",
+  "/publication/economic-outlook-october-2026",
+  "/publication/economic-outlook-october-2026/access",
   "/publication/hsa-v1-2026",
   "/publication/hsa-v1-2026/access",
   "/publication/rrg-v1-2025",
@@ -108,19 +111,9 @@ function routeHtml(route) {
   if (seo.publication) {
     html = upsertMeta(html, "property", "article:published_time", seo.publication.dateMachine || seo.publication.date);
     html = upsertMeta(html, "property", "article:section", seo.publication.theme);
-    const citation = {
-      citation_title: seo.publication.bibliographicTitle || `${seo.publication.title}, ${seo.publication.volume}: ${seo.publication.subtitle || seo.publication.tagline}`,
-      citation_author: seo.publication.citationAuthor || "Adeyemo, Oluwabiyi",
-      citation_publication_date: String(seo.publication.dateMachine || seo.publication.date).replace(/-/gu, "/"),
-      citation_technical_report_institution: seo.publication.publisher || "The SozoRock Foundation, Inc.",
-      citation_technical_report_number: seo.publication.reportNumber,
-      citation_abstract_html_url: seo.canonicalUrl,
-      citation_publisher: seo.publication.publisher || "The SozoRock Foundation, Inc.",
-      citation_isbn: seo.publication.isbn,
-      citation_language: seo.publication.languageCode || "en-US",
-      citation_abstract: seo.publication.abstract || seo.publication.description,
-      citation_doi: seo.publication.doi,
-    };
+    if (seo.publication.dateModified) html = upsertMeta(html, "property", "article:modified_time", seo.publication.dateModified);
+    if (/Adeyemo/u.test(seo.publication.author || "")) html = upsertMeta(html, "property", "article:author", "https://www.sozorockfoundation.org/leadership");
+    const citation = getCitationMetadata(seo);
     Object.entries(citation).forEach(([name, content]) => {
       if (content) html = upsertMeta(html, "name", name, content);
     });

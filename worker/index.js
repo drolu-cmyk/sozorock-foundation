@@ -3,6 +3,7 @@ const APEX_HOSTNAME = "sozorockfoundation.org";
 const CANONICAL_HOSTNAME = "www.sozorockfoundation.org";
 const MAX_REQUEST_BYTES = 16_384;
 const ACCESS_ROUTES = new Map([
+  ["economic-outlook-october-2026", "economic-outlook-october-2026"],
   ["rrg-v1-2025", "rethinking-rural-governance-volume-1"],
   ["rebs-v1-2025", "rural-equity-blueprint-volume-1"],
   ["hsa-v1-2026", "health-systems-assurance-volume-1"],
@@ -31,6 +32,8 @@ export const APP_ROUTES = new Set([
   "/accessibility",
   "/nondiscrimination",
   "/terms",
+  "/publication/economic-outlook-october-2026",
+  "/publication/economic-outlook-october-2026/access",
   "/publication/hsa-v1-2026",
   "/publication/hsa-v1-2026/access",
   "/publication/rrg-v1-2025",
