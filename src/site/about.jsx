@@ -194,6 +194,12 @@ export function SupportPage() {
       panelLabel="$108,000 funds the first cohort: a year of primary care for up to 25 New Yorkers, from January 2027."
       panel={<div className="ns-panel-stat"><b>$108,000</b><p>funds the first cohort: a year of primary care for up to 25 New Yorkers, from January 2027.</p></div>}
     />
+    <Sec tone="ice" id="give" labelledBy="roundup-title">
+      <div className="ns-two top">
+        <div><p className="ns-eyebrow">Give through RoundUp</p><h2 className="ns-stmt" id="roundup-title">Make everyday purchases count.</h2></div>
+        <div><p className="ns-body">Set up recurring donations to The SozoRock Foundation by rounding up your everyday purchases through RoundUp.</p><div className="ns-actions" style={{ marginTop: 28 }}><Btn href="https://www.roundup.org/nonprofits/the-sozorock-foundation-ny-albany-p9q164l">Give through RoundUp</Btn></div></div>
+      </div>
+    </Sec>
     <Sec labelledBy="gift-title">
       <div className="ns-two top">
         <div>
