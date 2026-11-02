@@ -342,7 +342,7 @@ export function getSeoForPath(inputPathname = "/") {
           name: "Eric is 85. Last week he knew nothing about AI.",
           description: "Eric, 85, a retired immigration lawyer, and Edward, a small business owner, on what they learned at the free weekly classes of the SozoRock AI Lab in Albany, New York State.",
           thumbnailUrl: [`${SITE_ORIGIN}/media/ai-lab/ai-lab-film-poster.jpg`],
-          uploadDate: "2026-10-28",
+          uploadDate: "2026-10-28T20:07:20Z",
           duration: "PT1M42S",
           contentUrl: `${SITE_ORIGIN}/media/ai-lab/ai-lab-film-1080.mp4`,
           inLanguage: "en-US",
