@@ -77,7 +77,6 @@ export const platforms = [
 export const publications = [
   {
     slug: "hsa-v1-2026",
-    reportNumber: "HSA Volume 1",
     path: "/publication/hsa-v1-2026",
     title: "Health Systems Assurance",
     bibliographicTitle: "Health Systems Assurance, Volume 1: From compliance to evidence-based digital assurance",
@@ -91,6 +90,7 @@ export const publications = [
     cover: "/media/hsa-cover.webp",
     socialImage: "/media/hsa-social-card.png",
     author: "Dr. Oluwabiyi Adeyemo",
+    citationAuthor: "Adeyemo, Oluwabiyi",
     date: "August 2026",
     dateMachine: "2026-08",
     publisher: "The SozoRock Foundation, Inc.",
@@ -112,7 +112,7 @@ export const publications = [
   },
   {
     slug: "rrg-v1-2025",
-    reportNumber: "RRG Volume 1",
+    reportNumber: "RRG-V1-2025",
     doi: "10.65473/rrg-v1-2025",
     publisher: "The SozoRock Foundation, Inc.",
     dateMachine: "2025-11",
@@ -131,6 +131,7 @@ export const publications = [
     cover: "/media/rrg-cover.webp",
     socialImage: "/media/rrg-social-card.png",
     author: "Dr. Oluwabiyi Adeyemo",
+    citationAuthor: "Adeyemo, Oluwabiyi",
     date: "2025",
     citation: "Adeyemo, Oluwabiyi. 2025. Rethinking Rural Governance: Volume 1 – Delaware County, New York — From Compliance to Systems Intelligence. The SozoRock Foundation, Inc. https://doi.org/10.65473/rrg-v1-2025",
     limits: "Read this as a governance framework for discussion and testing. Its use of Delaware County as a reference case does not establish adoption, independent validation or outcomes in that county or elsewhere.",
@@ -138,7 +139,6 @@ export const publications = [
   },
   {
     slug: "rebs-v1-2025",
-    reportNumber: "REBS Volume 1",
     doi: "10.65473/rebs-v1-2025",
     publisher: "The SozoRock Foundation, Inc.",
     dateMachine: "2025-10",
@@ -159,6 +159,7 @@ export const publications = [
     cover: "/media/rebs-cover.webp",
     socialImage: "/media/rebs-social-card.png",
     author: "Dr. Oluwabiyi Adeyemo",
+    citationAuthor: "Adeyemo, Oluwabiyi",
     date: "2025",
     citation: "Adeyemo, Oluwabiyi. 2025. Access Day: Building a Framework for Rural Health Equity in New York State. Rural Equity Blueprint Series, Volume 1. The SozoRock Foundation, Inc. https://doi.org/10.65473/rebs-v1-2025",
     limits: "These are access models for planning, not evidence of operating services or measured health outcomes. Local implementation depends on partner agreements, capacity and licensed clinical responsibilities.",
