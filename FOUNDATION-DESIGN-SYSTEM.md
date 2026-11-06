@@ -14,7 +14,6 @@ This section supersedes the older tables below wherever they differ. It is imple
 
 ## Earlier system (reference only)
 
-VERIFIED: implemented in src/foundation-system.css, extending the existing shared stylesheet. Production-build QA is recorded separately. This file describes the implementation awaiting release.
 
 ## Typography
 
@@ -68,7 +67,3 @@ Actual HSA cover aspect ratio is 600:780. Publication list covers use 220px colu
 ## Assets and identity
 
 The real publication covers and approved leadership portraits are retained. Parent social artwork: /media/foundation-editorial-social.png, 1731 x 909 pixels. Publication-specific social cards remain 1200 x 630. Existing SR ICO/PNG/Apple-touch assets are retained as the coherent hostname favicon system; manifest colors are updated. No separate Google favicon is claimed for a path.
-
-## Release boundary
-
-The visual implementation has passed local design and route checks. Google SMTP authentication, actual inbox delivery, SPF/DKIM/DMARC message alignment, verified publication download and final production acceptance remain mandatory before marking Prompt 2 complete. Existing Crossref DOI records and landing URLs remain unchanged.

@@ -62,7 +62,7 @@ const overrides = {
   },
   "/platforms/health": {
     title: "Primary Care Access Program, New York 2027 | SozoRock Health",
-    description: "SozoRock Health's Primary Care Access Program for up to 25 New Yorkers from January 2027, plus Health Equity Hubs in development and county evidence.",
+    description: "SozoRock Health's Primary Care Access Program for up to 25 New Yorkers from January 2027, plus Health Equity Hubs and free county data.",
     keywords: [
       "primary care access program",
       "health equity New York",
@@ -184,7 +184,7 @@ export function getSeoForPath(inputPathname = "/") {
   const base = getBaseSeo(pathname);
   const approved = approvedMetadata[pathname];
   const config = approved && !pathname.startsWith("/publication/") ? { ...(overrides[pathname] || {}), ...approved, keywords: overrides[pathname]?.keywords || ["SozoRock Foundation", approved.title.split(" | ")[0]] } : overrides[pathname];
-  if (!config) return { ...base, imageAlt: SOCIAL_IMAGE_ALT, schema: normalizeGlobalSchema(base.schema) };
+  if (!config) return { ...base, imageAlt: base.publication ? base.imageAlt : SOCIAL_IMAGE_ALT, schema: normalizeGlobalSchema(base.schema) };
 
   return {
     ...base,

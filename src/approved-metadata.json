@@ -1,7 +1,7 @@
 {
   "/": {
     "title": "The SozoRock Foundation | Health Access, Workforce Capacity & Trusted AI",
-    "description": "Healthier communities, stronger systems and a say in what’s next. We expand primary care access, build health workforce capacity and shape trusted AI."
+    "description": "Healthier communities, stronger systems and a say in what\u2019s next. We expand primary care access, build health workforce capacity and shape trusted AI."
   },
   "/platforms": {
     "title": "Our Work: Health Access, Workforce Capacity, AI & Society | SozoRock",
@@ -25,7 +25,7 @@
   },
   "/publications": {
     "title": "Research & Publications | SozoRock Global Institute",
-    "description": "Free, citable research on health systems assurance, rural governance and rural health equity from the SozoRock Global Institute."
+    "description": "Economic outlooks and research on health access, workforce capacity, governance, and accountable services, with free verified publication access."
   },
   "/publication/hsa-v1-2026": {
     "title": "Health Systems Assurance Series, Volume 1 (2026) | SozoRock",
@@ -61,7 +61,7 @@
   },
   "/leadership": {
     "title": "Leadership | The SozoRock Foundation",
-    "description": "Meet the people responsible for SozoRock’s work in health partnerships, health education, global affairs, research and programs."
+    "description": "Meet the people responsible for SozoRock\u2019s work in health partnerships, health education, global affairs, research and programs."
   },
   "/partner": {
     "title": "Partner with Us | The SozoRock Foundation",
@@ -93,6 +93,14 @@
   },
   "/nondiscrimination": {
     "title": "Nondiscrimination | The SozoRock Foundation",
-    "description": "Equal access and respectful participation in the Foundation’s programs, services and events."
+    "description": "Equal access and respectful participation in the Foundation\u2019s programs, services and events."
+  },
+  "/publication/economic-outlook-october-2026": {
+    "title": "SozoRock Outlook: Access, Capacity and Trust, October 2026",
+    "description": "Who pays for family health coverage, where digital jobs are growing, and why AI use is outpacing plans. A free outlook by Dr. Oluwabiyi Adeyemo."
+  },
+  "/publication/economic-outlook-october-2026/access": {
+    "title": "Get the SozoRock Outlook, October 2026 | SozoRock",
+    "description": "Get free verified access to the nine-page economic outlook."
   }
 }

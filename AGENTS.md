@@ -45,8 +45,6 @@ This repository is the production parent website for The SozoRock Foundation. Th
 - Always write Purcell Integrative Osteopathic Care in full; do not abbreviate the practice name.
 - Clinical care remains with the licensed provider. Membership is not health insurance.
 - Why the first cohort is small: to show where the pathway works, where it fails and what should change before expansion.
-- First-cohort budget: $108,000, about $4,320 per participant for a full year. This covers the membership, telehealth, transportation help, health access education, coordination and reporting.
-- Sponsorship levels: Community $5,000, Access $10,000, Principal $25,000, Lead $50,000. Other amounts are welcome.
 - Funds are confirmed before anyone enrolls. Sponsors receive reports at months 3, 6, 9 and 12. Renewal is optional for sponsors. Sponsors do not select participants or influence clinical care.
 - The Fireside and the Working Roundtable are a planned series. Upcoming events may show a working title, format and region with “Date to be announced” and a Register interest action. Do not publish dates, participants or partner organizations until confirmed, and do not name prospective partners such as companies being pitched.
 - The health access story may use the verified 2025 Western New York preplanning roundtable and REBS evidence. The reported figure of more than 12,000 residents per primary care clinician must remain visibly attributed as participant reported context. Do not publish wait time, travel duration or similar figures until their exact source is verified.
@@ -84,4 +82,4 @@ Header privacy applies to this site and every current or future subdomain: respo
 
 Run the local server and open the preview in the available browser. Build app UI in `src/`. Preserve the Sites runtime contract in `.openai/hosting.json`, `worker/index.js`, `scripts/prepare-sites-build.mjs` and `tests/sites-worker.test.mjs`. Before handoff, run `npm run build` and `npm run test:sites`.
 
-Deploy through the existing AWS CloudFront workflow after `npm run test:aws` and production build browser QA. Preserve the two Crossref DOI landing URLs and records. Never deploy mail or DNS credentials in client files. Publication delivery must be verified before claiming the release complete. Do not redesign Health, Place Intelligence or other subdomains in this parent site assignment.
+Deploy through the established production workflow after `npm run test:aws` and production build browser QA. Preserve the two Crossref DOI landing URLs and records. Never deploy mail or DNS credentials in client files. Publication delivery must be verified before claiming the release complete. Do not redesign Health, Place Intelligence or other subdomains in this parent site assignment.

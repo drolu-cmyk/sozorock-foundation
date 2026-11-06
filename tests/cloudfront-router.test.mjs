@@ -111,6 +111,15 @@ test("CloudFront maps the public publication slug to the established Health API 
   assert.equal(request("/api/contact").uri, "/api/contact");
 });
 
+test("the merged edge router preserves economic outlook pages and their access endpoint", () => {
+  for (const path of ["/publication/economic-outlook-october-2026", "/publication/economic-outlook-october-2026/access"]) {
+    assert.equal(request(path).uri, `${path}.html`);
+    assert.equal(request(`${path}/`).headers.location.value, path);
+    assert.equal(request(path, { host: "sozorockfoundation.org" }).headers.location.value, `https://www.sozorockfoundation.org${path}`);
+  }
+  assert.equal(request("/api/publications/access/economic-outlook-october-2026").uri, "/api/publications/access/economic-outlook-october-2026");
+});
+
 test("CloudFront answers the switched off website guide at the edge", () => {
   for (const path of ["/api/navigator", "/api/navigator/private"]) {
     const response = request(path);

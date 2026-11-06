@@ -132,6 +132,8 @@ Resources:
             '/accessibility': true,
             '/nondiscrimination': true,
             '/terms': true,
+            '/publication/economic-outlook-october-2026': true,
+            '/publication/economic-outlook-october-2026/access': true,
             '/publication/hsa-v1-2026': true,
             '/publication/hsa-v1-2026/access': true,
             '/publication/rrg-v1-2025': true,
@@ -141,20 +143,60 @@ Resources:
           };
           var normalized = uri === '/' ? '/' : uri.replace(/\/+$/, '');
             var publicFiles = [
-              '/robots.txt', '/sitemap.xml', '/favicon.ico', '/favicon.svg', '/apple-touch-icon.png',
-              '/icon-192.png', '/icon-512.png', '/site.webmanifest', '/llms.txt',
-              '/assets/instrument-sans-latin-ext-wght-normal-B5bTHO_g.woff2',
-              '/assets/instrument-sans-latin-wght-normal-BbzFLZTg.woff2',
-              '/assets/index-DglJS65l.css', '/assets/index-BKWOrf4r.js',
-              '/b4f26f7199275450b01cabfe27e47f02.txt', '/.well-known/security.txt',
-              '/licenses/instrument-sans-OFL.txt',
-              '/leadership/anthony-abraham.webp', '/leadership/dr-oluwabiyi-adeyemo-headshot.jpg',
-              '/leadership/dr-oluwabiyi-adeyemo.webp', '/leadership/jordan-hare.webp', '/leadership/nike-oye.webp',
-              '/media/foundation-access-capacity-trust-2026.png', '/media/foundation-workforce-capacity-2026.png',
-              '/media/health-access.webp', '/media/hsa-cover.webp', '/media/hsa-social-card.png',
-              '/media/rebs-cover.webp', '/media/rebs-social-card.png', '/media/rrg-cover.webp',
-              '/media/rrg-social-card.png', '/media/sozorock-logo.png', '/media/sozorock-social-card.png',
-              '/publications/hsa-volume-1-2026.pdf', '/publications/hsa-volume-1-2026.bib', '/publications/hsa-volume-1-2026.ris'
+              "/.well-known/security.txt",
+              "/apple-touch-icon.png",
+              "/assets/index-BmYOnznI.js",
+              "/assets/index-C4gXYc7a.css",
+              "/assets/instrument-sans-latin-ext-wght-normal-B5bTHO_g.woff2",
+              "/assets/instrument-sans-latin-wght-normal-BbzFLZTg.woff2",
+              "/b4f26f7199275450b01cabfe27e47f02.txt",
+              "/favicon.ico",
+              "/favicon.svg",
+              "/fonts/outlook-source-serif-4.ttf",
+              "/fonts/outlook-source-serif-license.txt",
+              "/icon-192.png",
+              "/icon-512.png",
+              "/leadership/anthony-abraham-2026.webp",
+              "/leadership/dr-oluwabiyi-adeyemo-headshot.jpg",
+              "/leadership/dr-oluwabiyi-adeyemo.webp",
+              "/leadership/jordan-hare.webp",
+              "/leadership/nike-oye.webp",
+              "/licenses/instrument-sans-OFL.txt",
+              "/llms.txt",
+              "/media/ai-lab/ai-lab-film-1080.mp4",
+              "/media/ai-lab/ai-lab-film-720.mp4",
+              "/media/ai-lab/ai-lab-film-poster.jpg",
+              "/media/ai-lab/ai-lab-film-poster.webp",
+              "/media/ai-lab/ai-lab-film.vtt",
+              "/media/foundation-access-capacity-trust-2026.png",
+              "/media/foundation-film-1080.mp4",
+              "/media/foundation-film-720.mp4",
+              "/media/foundation-film-poster.jpg",
+              "/media/foundation-workforce-capacity-2026.png",
+              "/media/health-access.webp",
+              "/media/hsa-cover.webp",
+              "/media/hsa-social-card.png",
+              "/media/outlooks/october-2026/citation.bib",
+              "/media/outlooks/october-2026/citation.ris",
+              "/media/outlooks/october-2026/cover.svg",
+              "/media/outlooks/october-2026/cover.webp",
+              "/media/outlooks/october-2026/exhibit-3.svg",
+              "/media/outlooks/october-2026/exhibit-4.svg",
+              "/media/outlooks/october-2026/exhibit-5.svg",
+              "/media/outlooks/october-2026/social-card-oct-2026-v3.png",
+              "/media/outlooks/october-2026/social-portrait.png",
+              "/media/rebs-cover.webp",
+              "/media/rebs-social-card.png",
+              "/media/rrg-cover.webp",
+              "/media/rrg-social-card.png",
+              "/media/sozorock-logo.png",
+              "/media/sozorock-social-card.png",
+              "/publications/hsa-volume-1-2026.bib",
+              "/publications/hsa-volume-1-2026.pdf",
+              "/publications/hsa-volume-1-2026.ris",
+              "/robots.txt",
+              "/site.webmanifest",
+              "/sitemap.xml",
             ];
           var oldRoutes = ['/about-us', '/programs', '/work', '/work/global-institute', '/platforms/institute', '/platforms/applied-learning', '/insights', '/work/health', '/work/ai-lab'];
           var publicPath = Object.prototype.hasOwnProperty.call(routes, normalized) || publicFiles.indexOf(normalized) !== -1 || oldRoutes.indexOf(normalized) !== -1;
@@ -209,7 +251,7 @@ Resources:
             return response(308, uri.replace(/\/+$/, '') + suffix, 'public, max-age=3600');
           }
 
-          var accessSlugs = { 'hsa-v1-2026': 'health-systems-assurance-volume-1', 'rrg-v1-2025': 'rethinking-rural-governance-volume-1', 'rebs-v1-2025': 'rural-equity-blueprint-volume-1' };
+          var accessSlugs = { 'economic-outlook-october-2026': 'economic-outlook-october-2026', 'hsa-v1-2026': 'health-systems-assurance-volume-1', 'rrg-v1-2025': 'rethinking-rural-governance-volume-1', 'rebs-v1-2025': 'rural-equity-blueprint-volume-1' };
           var accessKey = uri.slice('/api/publications/access/'.length);
           if (uri.indexOf('/api/publications/access/') === 0 && accessSlugs[accessKey]) {
             request.uri = '/api/publications/access/' + accessSlugs[accessKey];

@@ -143,7 +143,7 @@ export function LeadershipPage() {
     <div className="ns-shell" style={{ paddingBottom: 112 }}>
       {leaders.map((leader, index) => <article key={leader.name} className="ns-profile">
         <img src={leader.image} alt={leader.name} width="720" height="840" loading={index > 1 ? "lazy" : "eager"} decoding="async" />
-        <div><h2 className="ns-stmt s40">{leader.name}</h2><p className="role">{leader.title}</p><p className="ns-body" style={{ marginTop: 18 }}>{leader.bio}</p></div>
+        <div><h2 className="ns-stmt s40">{leader.name}</h2><p className="role">{leader.title}</p><p className="ns-body" style={{ marginTop: 18 }}>{leader.bio}</p>{leader.links?.map(([text, href]) => <p key={href} style={{ marginTop: 18 }}><a className="ns-more" href={href} rel="me noopener" target="_blank">{text}<span aria-hidden="true">&nbsp;↗</span></a></p>)}</div>
       </article>)}
     </div>
     <Band title="Work with our team." line="Partner on a program or get in touch." action={<Btn href="/partner" tone="navy">Partner with us</Btn>} />
@@ -165,9 +165,9 @@ export function PartnerPage() {
       <Head id="fit-title" eyebrow="Who we partner with" title="Find where you fit." />
       <ul className="ns-grid g3">
         <li><Tile href="/workforce" label="Capacity" title="Universities and employers" sub="Host a cohort or share a cloud, security or AI project." className="tall" /></li>
-        <li><Tile href="/platforms/health" label="Access" title="Licensed providers" sub="The Primary Care Access Program and digital readiness on your platform." className="tall" /></li>
+        <li><Tile href="/platforms/health" label="Access" title="Licensed providers" sub="Reach people who face cost, distance or technology barriers to care." className="tall" /></li>
         <li><Tile href="/platforms/health" label="Access" title="Libraries and community groups" sub="A Library, Community or Home Health Equity Hub, or Health Access Day." className="tall" /></li>
-        <li><Tile href="/platforms/health" label="Access" title="Counties and public agencies" sub="County evidence for health assessments, funding and workforce plans." className="tall" /></li>
+        <li><Tile href="/platforms/health" label="Access" title="Counties and public agencies" sub="Free county data for health assessments, funding and workforce plans." className="tall" /></li>
         <li><Tile href="/ai-society" label="Trust" title="Event and forum hosts" sub="A Fireside, Working Roundtable or Who Decides? Forum." className="tall" /></li>
         <li><Tile href="#inquiry" label="Any program" title="Technology partners" sub="Devices, connectivity, cloud resources or expertise for a shared project." className="tall" /></li>
       </ul>
@@ -194,6 +194,12 @@ export function SupportPage() {
       panelLabel="$108,000 funds the first cohort: a year of primary care for up to 25 New Yorkers, from January 2027."
       panel={<div className="ns-panel-stat"><b>$108,000</b><p>funds the first cohort: a year of primary care for up to 25 New Yorkers, from January 2027.</p></div>}
     />
+    <Sec tone="ice" id="give" labelledBy="roundup-title">
+      <div className="ns-two top">
+        <div><p className="ns-eyebrow">Give through RoundUp</p><h2 className="ns-stmt" id="roundup-title">Make everyday purchases count.</h2></div>
+        <div><p className="ns-body">Set up recurring donations to The SozoRock Foundation by rounding up your everyday purchases through RoundUp.</p><div className="ns-actions" style={{ marginTop: 28 }}><Btn href="https://www.roundup.org/nonprofits/the-sozorock-foundation-ny-albany-p9q164l">Give through RoundUp</Btn></div></div>
+      </div>
+    </Sec>
     <Sec labelledBy="gift-title">
       <div className="ns-two top">
         <div>
@@ -224,7 +230,7 @@ export function SupportPage() {
       <ul className="ns-grid g3">
         <li><Tile href="/workforce" label="Capacity" title="Workforce Capacity" sub="Mentored, hands on learning in cloud, security and AI." /></li>
         <li><Tile href="/ai-society" label="Trust" title="AI & Society" sub="Participant compensation, accessible facilitation and publication." /></li>
-        <li><Tile href="/publications" label="Research" title="A research volume" sub="Independent research and county evidence, free to read." /></li>
+        <li><Tile href="/publications" label="Research" title="A research volume" sub="Independent research and free county data." /></li>
       </ul>
     </Sec>
     <FormSection id="inquiry" eyebrow="Discuss support" title="Tell us how you would like to give." lede="This is an inquiry, not a payment form. The SozoRock Foundation, Inc. is a 501(c)(3) public charity, EIN 39-4736725. Contributions are tax deductible as allowed by law.">

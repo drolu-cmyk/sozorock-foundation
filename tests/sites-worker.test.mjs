@@ -421,6 +421,19 @@ test("ships crawl controls, sitemap, favicon, and social images", async () => {
   ]) await access(new URL(file, import.meta.url));
 });
 
+test("publishes the AI Lab film's release time consistently in video metadata and sitemap", async () => {
+  const html = await readFile(new URL("../dist/client/index.html", import.meta.url), "utf8");
+  const schemaText = html.match(/<script id="site-schema" type="application\/ld\+json">([^<]+)<\/script>/u)?.[1];
+  assert.ok(schemaText, "homepage JSON-LD exists");
+  const schema = JSON.parse(schemaText);
+  const video = schema["@graph"].find((item) => item["@type"] === "VideoObject");
+  assert.ok(video, "homepage VideoObject exists");
+  assert.equal(video.uploadDate, "2026-10-28T20:07:20Z");
+  const sitemap = await readFile(new URL("../dist/client/sitemap.xml", import.meta.url), "utf8");
+  const publicationDate = sitemap.match(/<video:publication_date>([^<]+)<\/video:publication_date>/u)?.[1];
+  assert.equal(publicationDate, video.uploadDate, "video sitemap and structured data agree");
+});
+
 test("keeps Partner and Support as real, consent-based service submissions", async () => {
   const source = await readFile(new URL("../src/components.jsx", import.meta.url), "utf8");
   assert.match(source, /fetch\("\/api\/contact"/u);

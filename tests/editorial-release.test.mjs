@@ -22,7 +22,8 @@ test('all three publications retain permanent records and verified delivery mapp
     const accessHtml=readFileSync(`dist/client/publication/${slug}/access.html`,'utf8');
     assert.ok(html.includes(title));
     assert.match(html,new RegExp(`href="/publication/${slug}/access"`));
-    assert.match(accessHtml,new RegExp(`Get ${title.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')}`));
+    assert.ok(accessHtml.includes(`Get ${p.bibliographicTitle || p.title} | SozoRock`));
+    assert.ok(accessHtml.includes('id="access-title"'));
     if(p.doi) assert.ok(html.includes(`https://doi.org/${p.doi}`));
   }
 });
@@ -31,7 +32,7 @@ const page = route => readFileSync(`dist/client/${route || 'index'}.html`,'utf8'
 const visible = html => html.replace(/<script[\s\S]*?<\/script>/g,'').replace(/<[^>]+>/g,' ').replace(/\s+/g,' ');
 test('approved pages retain the core programs and claim boundaries',()=>{
   const home=visible(page(''));
-  for(const term of ['Healthier communities. Stronger systems.','A say in what’s next.','Demand for care, skills and trusted AI is outpacing supply.','How we work','Health Access','Workforce Capacity','AI &amp; Society','Results people can see.','Up to 25 people gain a year of primary care from January 2027.','Evidence leaders can act on.','Health Systems Assurance Series','Rethinking Rural Governance Series','Rural Equity Blueprint Series','Modernization and Resilience Program','free AI sessions every Tuesday in Albany, New York State','Join the conversation.','Date to be announced','Western New York preplanning roundtable','The SozoRock Briefing']) assert.ok(home.includes(term),term);
+  for(const term of ['Healthier communities. Stronger systems.','A say in what’s next.','Demand for care, skills and trusted AI is outpacing supply.','How we work','Health Access','Workforce Capacity','AI &amp; Society','Where the work stands.','Up to 25 people gain a year of primary care from January 2027.','Evidence leaders can act on.','Health Systems Assurance Series','Rethinking Rural Governance Series','Rural Equity Blueprint Series','Modernization and Resilience Program','free AI sessions every Tuesday in Albany, New York State','Join the conversation.','Date to be announced','Western New York preplanning roundtable','The SozoRock Briefing']) assert.ok(home.includes(term),term);
   assert.doesNotMatch(home,/Proposed|\u2014|\u2013/);
   const workforce=visible(page('workforce'));
   for(const term of ['Stronger systems start with skilled people.','cloud, security, governance and AI','Capella University','Athabasca University','6 learners','5 learners','1 learner','Capella University, which retains academic oversight and grading','Dr. Oluwabiyi Adeyemo','Explore the AI Lab']) assert.ok(workforce.includes(term),term);
@@ -68,6 +69,24 @@ test('research records and access keep citations, delivery essentials and separa
   for(const field of ['organization','sector','reason','updatesConsent']) assert.doesNotMatch(access,new RegExp('<input(?=[^>]*name="'+field+'")(?=[^>]*required)[^>]*>'));
   assert.doesNotMatch(access,/href="[^"<>]*\.pdf(?:["?])/i);
  }
+});
+test('a complete abstract and correct author metadata precede PDF access on every report',()=>{
+ for(const [slug] of publicationAccessMappings){
+  const report=publications.find(p=>p.slug===slug);
+  const html=page('publication/'+slug);
+  const title=html.indexOf(`id="pub-title"`);
+  const abstract=html.indexOf('class="ns-abstract"');
+  const access=html.indexOf('Continue to free PDF');
+  const cover=html.indexOf('class="ns-panel p-ice ns-publication-cover"');
+  assert.ok(title>=0 && title<abstract && abstract<access && access<cover,slug);
+  assert.ok(html.includes(report.bibliographicTitle),slug);
+  assert.ok(html.includes(report.abstract),slug);
+  assert.match(html,/<meta name="citation_author" content="Adeyemo, Oluwabiyi"/);
+  assert.doesNotMatch(html,/<meta name="citation_pdf_url"/);
+ }
+ const rebs=page('publication/rebs-v1-2025');
+ assert.match(rebs,/Contributor: Jordan Hare/);
+ assert.doesNotMatch(rebs,/<meta name="citation_author" content="Jordan Hare"/);
 });
 test('navigation, footer and forms retain accessible actions and legal identity',()=>{
  const html=page(''), chrome=readFileSync('src/SiteChrome.jsx','utf8');

@@ -1,3 +1,4 @@
+import { economicOutlooks } from "./outlooks.js";
 import { leaders, publications } from "./siteData.js";
 
 export const SITE_ORIGIN = "https://www.sozorockfoundation.org";
@@ -165,11 +166,11 @@ function cleanPath(pathname = "/") {
 }
 
 function publicationForPath(pathname) {
-  return publications.find((publication) => publication.path === pathname);
+  return [...publications, ...economicOutlooks].find((publication) => publication.path === pathname);
 }
 
 function accessPublicationForPath(pathname) {
-  return publications.find((publication) => publication.accessPath === pathname);
+  return [...publications, ...economicOutlooks].find((publication) => publication.accessPath === pathname);
 }
 
 function breadcrumbsForPath(pathname, publication) {
@@ -194,23 +195,42 @@ function breadcrumbsForPath(pathname, publication) {
   return { "@type": "BreadcrumbList", "@id": `${SITE_ORIGIN}${pathname}/#breadcrumb`, itemListElement: items };
 }
 
+const SCHOLAR_PROFILE = "https://scholar.google.com/citations?user=O1FiCLEAAAAJ";
+const OLU_ORCID = "https://orcid.org/0009-0008-5215-5609";
+const OLU_PERSON = {
+  "@type": "Person",
+  "@id": `${SITE_ORIGIN}/leadership#oluwabiyi-adeyemo`,
+  name: "Dr. Oluwabiyi Adeyemo",
+  jobTitle: "Director of Strategic Initiatives",
+  url: `${SITE_ORIGIN}/leadership`,
+  image: `${SITE_ORIGIN}/leadership/dr-oluwabiyi-adeyemo-headshot.jpg`,
+  sameAs: [OLU_ORCID, SCHOLAR_PROFILE],
+};
+const personFor = (name) => (/Adeyemo/u.test(name) ? { ...OLU_PERSON, worksFor: { "@id": ORGANIZATION_ID } } : { "@type": "Person", name });
+
 function publicationSchema(publication, canonicalUrl) {
   return {
     "@type": "Report",
     "@id": `${canonicalUrl}/#report`,
-    name: `${publication.title}, ${publication.volume}`,
+    name: publication.bibliographicTitle || `${publication.title}, ${publication.volume}`,
     alternateName: publication.subtitle,
-    headline: publication.tagline,
-    description: publication.description,
-    author: publication.author ? { "@type": "Person", name: publication.author } : undefined,
+    headline: publication.tagline || publication.displayTitle,
+    description: publication.minimalMetadata ? publication.metaDescription : publication.abstract || publication.description,
+    author: publication.author ? personFor(publication.author) : undefined,
+    contributor: publication.contributor ? { "@type": "Person", name: publication.contributor } : undefined,
     publisher: { "@id": ORGANIZATION_ID },
     datePublished: publication.dateMachine || publication.date,
+    dateModified: publication.dateModified,
+    abstract: publication.kind === "economic-outlook" ? publication.abstract : undefined,
+    isAccessibleForFree: true,
+    isPartOf: publication.series ? { "@type": "CreativeWorkSeries", name: publication.series, publisher: { "@id": ORGANIZATION_ID } } : undefined,
+    genre: publication.theme,
     inLanguage: publication.languageCode || "en-US",
     pagination: publication.pages,
     url: canonicalUrl,
     mainEntityOfPage: { "@id": `${canonicalUrl}/#webpage` },
-    image: `${SITE_ORIGIN}${publication.cover}`,
-    keywords: [publication.theme, "public-interest research", "systems intelligence"].filter(Boolean),
+    image: publication.socialImage ? [`${SITE_ORIGIN}${publication.socialImage}`, `${SITE_ORIGIN}${publication.cover}`] : `${SITE_ORIGIN}${publication.cover}`,
+    keywords: publication.metadataKeywords || [publication.theme, "public-interest research", "systems intelligence"].filter(Boolean),
     identifier: [
       publication.isbn ? { "@type": "PropertyValue", propertyID: "ISBN", value: publication.isbn } : null,
       publication.doi ? { "@type": "PropertyValue", propertyID: "DOI", value: publication.doi } : null,
@@ -226,7 +246,7 @@ export function getSeoForPath(inputPathname = "/") {
   const canonicalUrl = `${SITE_ORIGIN}${canonicalPath === "/" ? "" : canonicalPath}`;
   const base = publication
     ? {
-        title: `${publication.title}, ${publication.volume} | SozoRock`,
+        title: (() => { const name = publication.bibliographicTitle || `${publication.title}, ${publication.volume}`; return /SozoRock/u.test(name) ? name : `${name} | SozoRock`; })(),
         description: publication.metaDescription || publication.description,
         pageType: "WebPage",
         ogType: "article",
@@ -234,8 +254,8 @@ export function getSeoForPath(inputPathname = "/") {
       }
     : accessPublication
       ? {
-          title: `Get ${accessPublication.title} | SozoRock`,
-          description: `Get free verified access to ${accessPublication.title}, ${accessPublication.volume}.`,
+          title: `Get ${accessPublication.bibliographicTitle || accessPublication.title} | SozoRock`,
+          description: `Get free verified access to ${accessPublication.bibliographicTitle || accessPublication.title}.`,
           pageType: "WebPage",
           robots: "noindex, nofollow, noarchive",
         }
@@ -249,7 +269,7 @@ export function getSeoForPath(inputPathname = "/") {
   const description = conciseDescription(base.description);
   const image = base.image || DEFAULT_SOCIAL_IMAGE;
   const keywords = publication
-    ? [publication.theme, publication.title, "public-interest research", "systems intelligence"].filter(Boolean)
+    ? publication.metadataKeywords || [publication.theme, publication.title, "public-interest research", "systems intelligence"].filter(Boolean)
     : routeKeywords[pathname] || ["SozoRock Foundation", "public-interest research"];
   const breadcrumb = breadcrumbsForPath(pathname, publication);
   const graph = [
@@ -315,6 +335,20 @@ export function getSeoForPath(inputPathname = "/") {
       mainEntity: publication ? { "@id": `${canonicalUrl}/#report` } : undefined,
     },
     breadcrumb,
+    pathname === "/"
+      ? {
+          "@type": "VideoObject",
+          "@id": `${SITE_ORIGIN}/#ai-lab-film`,
+          name: "Eric is 85. Last week he knew nothing about AI.",
+          description: "Eric, 85, a retired immigration lawyer, and Edward, a small business owner, on what they learned at the free weekly classes of the SozoRock AI Lab in Albany, New York State.",
+          thumbnailUrl: [`${SITE_ORIGIN}/media/ai-lab/ai-lab-film-poster.jpg`],
+          uploadDate: "2026-10-28T20:07:20Z",
+          duration: "PT1M42S",
+          contentUrl: `${SITE_ORIGIN}/media/ai-lab/ai-lab-film-1080.mp4`,
+          inLanguage: "en-US",
+          publisher: { "@id": ORGANIZATION_ID },
+        }
+      : null,
     publication ? publicationSchema(publication, canonicalUrl) : null,
     pathname === "/leadership"
       ? {
@@ -324,7 +358,7 @@ export function getSeoForPath(inputPathname = "/") {
           itemListElement: leaders.map((leader, index) => ({
             "@type": "ListItem",
             position: index + 1,
-            item: { "@type": "Person", name: leader.name, jobTitle: leader.title, worksFor: { "@id": ORGANIZATION_ID } },
+            item: /Adeyemo/u.test(leader.name) ? personFor(leader.name) : { "@type": "Person", name: leader.name, jobTitle: leader.title, worksFor: { "@id": ORGANIZATION_ID } },
           })),
         }
       : null,
@@ -342,7 +376,7 @@ export function getSeoForPath(inputPathname = "/") {
     image,
     imageWidth: 1200,
     imageHeight: 630,
-    imageAlt: publication ? `${publication.title}, ${publication.volume} publication preview` : "The SozoRock Foundation. Healthier communities. Stronger systems. A say in what’s next.",
+    imageAlt: publication ? publication.imageAlt || `${publication.title}${publication.volume ? `, ${publication.volume}` : ""} publication preview` : "The SozoRock Foundation. Healthier communities. Stronger systems. A say in what’s next.",
     schema: { "@context": "https://schema.org", "@graph": graph },
     publication,
   };
