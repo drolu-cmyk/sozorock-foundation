@@ -97,25 +97,115 @@ Resources:
           var request = event.request;
           var uri = request.uri;
           var host = request.headers.host && request.headers.host.value;
-          var query = request.querystring;
+          var query = request.querystring || {};
+          // Reflect only fixed public navigation markers, never arbitrary values.
+          var allowed = { source: ['apex', 'legacy', 'share'], ref: ['library'] };
           var queryParts = [];
           var key;
 
-          for (key in query) {
-            if (Object.prototype.hasOwnProperty.call(query, key)) {
-              if (query[key].multiValue) {
-                for (var i = 0; i < query[key].multiValue.length; i += 1) {
-                  queryParts.push(encodeURIComponent(key) + '=' + encodeURIComponent(query[key].multiValue[i].value));
-                }
-              } else {
-                queryParts.push(encodeURIComponent(key) + '=' + encodeURIComponent(query[key].value));
+          for (key in allowed) {
+            if (Object.prototype.hasOwnProperty.call(allowed, key) && query[key]) {
+              var value = query[key].multiValue ? query[key].multiValue[0].value : query[key].value;
+              if (allowed[key].indexOf(value) !== -1) {
+                queryParts.push(key + '=' + encodeURIComponent(value));
               }
             }
           }
           var suffix = queryParts.length ? '?' + queryParts.join('&') : '';
 
+          var routes = {
+            '/ai-society': true,
+            '/': true,
+            '/platforms': true,
+            '/platforms/health': true,
+            '/platforms/ai-lab': true,
+            '/workforce': true,
+            '/publications': true,
+            '/events': true,
+            '/about': true,
+            '/leadership': true,
+            '/partner': true,
+            '/support': true,
+            '/contact': true,
+            '/standards': true,
+            '/privacy': true,
+            '/accessibility': true,
+            '/nondiscrimination': true,
+            '/terms': true,
+            '/publication/economic-outlook-october-2026': true,
+            '/publication/economic-outlook-october-2026/access': true,
+            '/publication/hsa-v1-2026': true,
+            '/publication/hsa-v1-2026/access': true,
+            '/publication/rrg-v1-2025': true,
+            '/publication/rrg-v1-2025/access': true,
+            '/publication/rebs-v1-2025': true,
+            '/publication/rebs-v1-2025/access': true
+          };
+          var normalized = uri === '/' ? '/' : uri.replace(/\/+$/, '');
+            var publicFiles = [
+              "/.well-known/security.txt",
+              "/apple-touch-icon.png",
+              "/assets/index-BmYOnznI.js",
+              "/assets/index-C4gXYc7a.css",
+              "/assets/instrument-sans-latin-ext-wght-normal-B5bTHO_g.woff2",
+              "/assets/instrument-sans-latin-wght-normal-BbzFLZTg.woff2",
+              "/b4f26f7199275450b01cabfe27e47f02.txt",
+              "/favicon.ico",
+              "/favicon.svg",
+              "/fonts/outlook-source-serif-4.ttf",
+              "/fonts/outlook-source-serif-license.txt",
+              "/icon-192.png",
+              "/icon-512.png",
+              "/leadership/anthony-abraham-2026.webp",
+              "/leadership/dr-oluwabiyi-adeyemo-headshot.jpg",
+              "/leadership/dr-oluwabiyi-adeyemo.webp",
+              "/leadership/jordan-hare.webp",
+              "/leadership/nike-oye.webp",
+              "/licenses/instrument-sans-OFL.txt",
+              "/llms.txt",
+              "/media/ai-lab/ai-lab-film-1080.mp4",
+              "/media/ai-lab/ai-lab-film-720.mp4",
+              "/media/ai-lab/ai-lab-film-poster.jpg",
+              "/media/ai-lab/ai-lab-film-poster.webp",
+              "/media/ai-lab/ai-lab-film.vtt",
+              "/media/foundation-access-capacity-trust-2026.png",
+              "/media/foundation-film-1080.mp4",
+              "/media/foundation-film-720.mp4",
+              "/media/foundation-film-poster.jpg",
+              "/media/foundation-workforce-capacity-2026.png",
+              "/media/health-access.webp",
+              "/media/hsa-cover.webp",
+              "/media/hsa-social-card.png",
+              "/media/outlooks/october-2026/citation.bib",
+              "/media/outlooks/october-2026/citation.ris",
+              "/media/outlooks/october-2026/cover.svg",
+              "/media/outlooks/october-2026/cover.webp",
+              "/media/outlooks/october-2026/exhibit-3.svg",
+              "/media/outlooks/october-2026/exhibit-4.svg",
+              "/media/outlooks/october-2026/exhibit-5.svg",
+              "/media/outlooks/october-2026/social-card-oct-2026-v3.png",
+              "/media/outlooks/october-2026/social-portrait.png",
+              "/media/rebs-cover.webp",
+              "/media/rebs-social-card.png",
+              "/media/rrg-cover.webp",
+              "/media/rrg-social-card.png",
+              "/media/sozorock-logo.png",
+              "/media/sozorock-social-card.png",
+              "/publications/hsa-volume-1-2026.bib",
+              "/publications/hsa-volume-1-2026.pdf",
+              "/publications/hsa-volume-1-2026.ris",
+              "/robots.txt",
+              "/site.webmanifest",
+              "/sitemap.xml",
+            ];
+          var oldRoutes = ['/about-us', '/programs', '/work', '/work/global-institute', '/platforms/institute', '/platforms/applied-learning', '/insights', '/work/health', '/work/ai-lab'];
+          var publicPath = Object.prototype.hasOwnProperty.call(routes, normalized) || publicFiles.indexOf(normalized) !== -1 || oldRoutes.indexOf(normalized) !== -1;
+          if ((host === 'sozorockfoundation.org' || (uri.length > 1 && uri.charAt(uri.length - 1) === '/')) && !publicPath) {
+            return { statusCode: 404, statusDescription: 'Not Found', headers: { 'cache-control': { value: 'no-store' }, 'x-content-type-options': { value: 'nosniff' } } };
+          }
+
           if (host === 'sozorockfoundation.org') {
-            return response(308, 'https://www.sozorockfoundation.org' + uri + suffix, 'public, max-age=86400');
+            return response(308, 'https://www.sozorockfoundation.org' + normalized + suffix, 'public, max-age=86400');
           }
 
           // Validate the visitor's origin before the upstream service Origin
@@ -183,34 +273,6 @@ Resources:
           }
           if (uri.indexOf('/api/') === 0) return request;
 
-          var routes = {
-            '/ai-society': true,
-            '/': true,
-            '/platforms': true,
-            '/platforms/health': true,
-            '/platforms/ai-lab': true,
-            '/workforce': true,
-            '/publications': true,
-            '/events': true,
-            '/about': true,
-            '/leadership': true,
-            '/partner': true,
-            '/support': true,
-            '/contact': true,
-            '/standards': true,
-            '/privacy': true,
-            '/accessibility': true,
-            '/nondiscrimination': true,
-            '/terms': true,
-            '/publication/economic-outlook-october-2026': true,
-            '/publication/economic-outlook-october-2026/access': true,
-            '/publication/hsa-v1-2026': true,
-            '/publication/hsa-v1-2026/access': true,
-            '/publication/rrg-v1-2025': true,
-            '/publication/rrg-v1-2025/access': true,
-            '/publication/rebs-v1-2025': true,
-            '/publication/rebs-v1-2025/access': true
-          };
           if (uri === '/') request.uri = '/index.html';
           else if (routes[uri]) request.uri = uri + '.html';
           return request;

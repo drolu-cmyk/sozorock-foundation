@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 import vm from "node:vm";
+import { publicAssets } from "./public-assets.mjs";
 
 const template = (await readFile(new URL("../infra/cloudformation/parent-cloudfront.yml", import.meta.url), "utf8")).replaceAll("\r\n", "\n");
 const marker = "      FunctionCode: |\n";
@@ -20,6 +21,33 @@ function request(uri, { host = "www.sozorockfoundation.org", querystring = {} } 
   return context.handler({ request: { uri, headers: { host: { value: host } }, querystring } });
 }
 
+test("all edge redirects exclude private values including duplicate public parameters", () => {
+  for (const [uri, host, expected] of [
+    ["/publications", "sozorockfoundation.org", "https://www.sozorockfoundation.org/publications"],
+    ["/about-us", "www.sozorockfoundation.org", "/about"],
+    ["/publications/", "www.sozorockfoundation.org", "/publications"],
+  ]) {
+    const querystring = {
+      email: { value: "person@example.test" }, token: { value: "secret" },
+      ref: { value: "person@example.test" },
+      source: { value: "apex", multiValue: [{ value: "apex" }, { value: "secret" }] },
+    };
+    const response = request(uri, { host, querystring });
+    assert.equal(response.headers.location.value, expected + "?source=apex");
+  }
+});
+
+test("edge redirects never reflect unrecognized paths or redirect to another origin", () => {
+  for (const host of ["sozorockfoundation.org", "www.sozorockfoundation.org"]) {
+    for (const uri of ["//example.test/", "/person@example.test/", "/%3Femail%3Dperson%40example.test/"]) {
+      const response = request(uri, { host });
+      assert.equal(response.statusCode, 404);
+      assert.equal(response.headers.location, undefined);
+    }
+  }
+  assert.equal(request("/person@example.test", { host: "sozorockfoundation.org" }).statusCode, 404);
+});
+
 test("CloudFront permanently canonicalizes the apex and preserves path/query", () => {
   const result = request("/platforms", {
     host: "sozorockfoundation.org",
@@ -27,6 +55,18 @@ test("CloudFront permanently canonicalizes the apex and preserves path/query", (
   });
   assert.equal(result.statusCode, 308);
   assert.equal(result.headers.location.value, "https://www.sozorockfoundation.org/platforms?source=apex");
+});
+
+test("CloudFront canonicalizes every shipped public asset without reflecting private paths", async () => {
+  const assets = [...await publicAssets(), ...await publicAssets(new URL("../dist/client/assets/", import.meta.url), "/assets")];
+  for (const path of assets) {
+    const result = request(path, { host: "sozorockfoundation.org", querystring: { email: { value: "person@example.test" } } });
+    assert.equal(result.statusCode, 308, path);
+    assert.equal(result.headers.location.value, `https://www.sozorockfoundation.org${path}`, path);
+  }
+  const privatePath = request("/media/person@example.test", { host: "sozorockfoundation.org" });
+  assert.equal(privatePath.statusCode, 404);
+  assert.equal(privatePath.headers.location, undefined);
 });
 
 test("CloudFront rewrites every clean production route to its prebuilt HTML", async () => {
@@ -69,6 +109,15 @@ test("CloudFront maps the public publication slug to the established Health API 
     "/api/publications/access/health-systems-assurance-volume-1",
   );
   assert.equal(request("/api/contact").uri, "/api/contact");
+});
+
+test("the merged edge router preserves economic outlook pages and their access endpoint", () => {
+  for (const path of ["/publication/economic-outlook-october-2026", "/publication/economic-outlook-october-2026/access"]) {
+    assert.equal(request(path).uri, `${path}.html`);
+    assert.equal(request(`${path}/`).headers.location.value, path);
+    assert.equal(request(path, { host: "sozorockfoundation.org" }).headers.location.value, `https://www.sozorockfoundation.org${path}`);
+  }
+  assert.equal(request("/api/publications/access/economic-outlook-october-2026").uri, "/api/publications/access/economic-outlook-october-2026");
 });
 
 test("CloudFront answers the switched off website guide at the edge", () => {

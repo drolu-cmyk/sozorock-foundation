@@ -20,13 +20,15 @@ permissions:
 
 jobs:
   audit:
+    permissions:
+      contents: read
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
       - name: Check out exact revision
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - name: Set up Node
-        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: "24"
           cache: npm
@@ -59,7 +61,7 @@ jobs:
         run: node scripts/assert-current-site-audit.mjs
       - name: Upload current audit evidence
         if: always()
-        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: sozorock-current-site-audit
           path: audit-output/

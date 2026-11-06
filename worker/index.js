@@ -287,9 +287,87 @@ async function handleContact(request, env) {
 }
 
 
+// Only fixed, public navigation markers may be reflected into response headers.
+// Filtering parameter names alone would still allow an email or token as a value.
+function publicRedirectQuery(url) {
+  const allowed = { source: ["apex", "legacy", "share"], ref: ["library"] };
+  const query = new URLSearchParams();
+  for (const [key, values] of Object.entries(allowed)) {
+    const value = url.searchParams.get(key);
+    if (values.includes(value)) query.set(key, value);
+  }
+  return query.toString();
+}
+
+function publicRedirectPath(pathname) {
+  const path = pathname === "/" ? "/" : pathname.replace(/\/+$/u, "");
+  return APP_ROUTES.has(path) || LEGACY_ROUTES.has(path) || PRIVATE_PUBLICATION_FILES.has(path)
+    || [
+      "/.well-known/security.txt",
+      "/apple-touch-icon.png",
+      "/assets/index-BmYOnznI.js",
+      "/assets/index-C4gXYc7a.css",
+      "/assets/instrument-sans-latin-ext-wght-normal-B5bTHO_g.woff2",
+      "/assets/instrument-sans-latin-wght-normal-BbzFLZTg.woff2",
+      "/b4f26f7199275450b01cabfe27e47f02.txt",
+      "/favicon.ico",
+      "/favicon.svg",
+      "/fonts/outlook-source-serif-4.ttf",
+      "/fonts/outlook-source-serif-license.txt",
+      "/icon-192.png",
+      "/icon-512.png",
+      "/leadership/anthony-abraham-2026.webp",
+      "/leadership/dr-oluwabiyi-adeyemo-headshot.jpg",
+      "/leadership/dr-oluwabiyi-adeyemo.webp",
+      "/leadership/jordan-hare.webp",
+      "/leadership/nike-oye.webp",
+      "/licenses/instrument-sans-OFL.txt",
+      "/llms.txt",
+      "/media/ai-lab/ai-lab-film-1080.mp4",
+      "/media/ai-lab/ai-lab-film-720.mp4",
+      "/media/ai-lab/ai-lab-film-poster.jpg",
+      "/media/ai-lab/ai-lab-film-poster.webp",
+      "/media/ai-lab/ai-lab-film.vtt",
+      "/media/foundation-access-capacity-trust-2026.png",
+      "/media/foundation-film-1080.mp4",
+      "/media/foundation-film-720.mp4",
+      "/media/foundation-film-poster.jpg",
+      "/media/foundation-workforce-capacity-2026.png",
+      "/media/health-access.webp",
+      "/media/hsa-cover.webp",
+      "/media/hsa-social-card.png",
+      "/media/outlooks/october-2026/citation.bib",
+      "/media/outlooks/october-2026/citation.ris",
+      "/media/outlooks/october-2026/cover.svg",
+      "/media/outlooks/october-2026/cover.webp",
+      "/media/outlooks/october-2026/exhibit-3.svg",
+      "/media/outlooks/october-2026/exhibit-4.svg",
+      "/media/outlooks/october-2026/exhibit-5.svg",
+      "/media/outlooks/october-2026/social-card-oct-2026-v3.png",
+      "/media/outlooks/october-2026/social-portrait.png",
+      "/media/rebs-cover.webp",
+      "/media/rebs-social-card.png",
+      "/media/rrg-cover.webp",
+      "/media/rrg-social-card.png",
+      "/media/sozorock-logo.png",
+      "/media/sozorock-social-card.png",
+      "/robots.txt",
+      "/site.webmanifest",
+      "/sitemap.xml",
+    ].includes(path)
+    ? path : null;
+}
+
+function rejectedRedirect() {
+  return new Response(null, { status: 404, headers: { "Cache-Control": "no-store", "X-Content-Type-Options": "nosniff" } });
+}
+
 function redirect(url, pathname, status = 308) {
+  if (!publicRedirectPath(pathname)) return rejectedRedirect();
   const destination = new URL(url);
   destination.pathname = pathname;
+  destination.search = publicRedirectQuery(destination);
+  destination.hash = "";
   return new Response(null, {
     status,
     headers: {
@@ -300,10 +378,15 @@ function redirect(url, pathname, status = 308) {
 }
 
 function redirectToCanonicalHost(url) {
+  const path = publicRedirectPath(url.pathname);
+  if (!path) return rejectedRedirect();
   const destination = new URL(url);
+  destination.pathname = path;
   destination.protocol = "https:";
   destination.hostname = CANONICAL_HOSTNAME;
   destination.port = "";
+  destination.search = publicRedirectQuery(destination);
+  destination.hash = "";
   return new Response(null, {
     status: 308,
     headers: {
