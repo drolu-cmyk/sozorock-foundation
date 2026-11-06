@@ -10,7 +10,18 @@ function handler(event) {
   }
   var uri = request.uri || '/';
   uri = uri === '/' ? '/' : uri.replace(/\/+$/, '');
-  var publicPaths = ['/', '/about', '/about/', '/work', '/explore', '/publications', '/cb-cap', '/cb-cap/', '/cbcap', '/cbcap/'];
+  // Fixed public destinations from the current Health sitemap and publication links.
+  var publicPaths = [
+    '/', '/about', '/work', '/explore', '/publications', '/cb-cap', '/cbcap',
+    '/contact', '/interest', '/primary-care-access', '/evidence', '/privacy',
+    '/terms', '/accessibility', '/nondiscrimination', '/es',
+    '/es/primary-care-access', '/es/privacy', '/es/terms', '/es/accessibility',
+    '/es/nondiscrimination',
+    '/publications/rural-equity-blueprint-volume-1',
+    '/publications/rethinking-rural-governance-volume-1',
+    '/publications/health-systems-assurance-volume-1',
+    '/publications/health-systems-assurance-volume-1/access'
+  ];
   if (publicPaths.indexOf(uri) === -1) {
     return { statusCode: 404, statusDescription: 'Not Found', headers: { 'cache-control': { value: 'no-store' }, 'x-content-type-options': { value: 'nosniff' } } };
   }

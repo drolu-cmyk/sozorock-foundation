@@ -140,7 +140,22 @@ Resources:
             '/publication/rebs-v1-2025/access': true
           };
           var normalized = uri === '/' ? '/' : uri.replace(/\/+$/, '');
-          var publicFiles = ['/robots.txt', '/sitemap.xml', '/favicon.ico', '/site.webmanifest', '/.well-known/security.txt', '/publications/hsa-volume-1-2026.pdf', '/publications/hsa-volume-1-2026.bib', '/publications/hsa-volume-1-2026.ris'];
+            var publicFiles = [
+              '/robots.txt', '/sitemap.xml', '/favicon.ico', '/favicon.svg', '/apple-touch-icon.png',
+              '/icon-192.png', '/icon-512.png', '/site.webmanifest', '/llms.txt',
+              '/assets/instrument-sans-latin-ext-wght-normal-B5bTHO_g.woff2',
+              '/assets/instrument-sans-latin-wght-normal-BbzFLZTg.woff2',
+              '/assets/index-DglJS65l.css', '/assets/index-BKWOrf4r.js',
+              '/b4f26f7199275450b01cabfe27e47f02.txt', '/.well-known/security.txt',
+              '/licenses/instrument-sans-OFL.txt',
+              '/leadership/anthony-abraham.webp', '/leadership/dr-oluwabiyi-adeyemo-headshot.jpg',
+              '/leadership/dr-oluwabiyi-adeyemo.webp', '/leadership/jordan-hare.webp', '/leadership/nike-oye.webp',
+              '/media/foundation-access-capacity-trust-2026.png', '/media/foundation-workforce-capacity-2026.png',
+              '/media/health-access.webp', '/media/hsa-cover.webp', '/media/hsa-social-card.png',
+              '/media/rebs-cover.webp', '/media/rebs-social-card.png', '/media/rrg-cover.webp',
+              '/media/rrg-social-card.png', '/media/sozorock-logo.png', '/media/sozorock-social-card.png',
+              '/publications/hsa-volume-1-2026.pdf', '/publications/hsa-volume-1-2026.bib', '/publications/hsa-volume-1-2026.ris'
+            ];
           var oldRoutes = ['/about-us', '/programs', '/work', '/work/global-institute', '/platforms/institute', '/platforms/applied-learning', '/insights', '/work/health', '/work/ai-lab'];
           var publicPath = Object.prototype.hasOwnProperty.call(routes, normalized) || publicFiles.indexOf(normalized) !== -1 || oldRoutes.indexOf(normalized) !== -1;
           if ((host === 'sozorockfoundation.org' || (uri.length > 1 && uri.charAt(uri.length - 1) === '/')) && !publicPath) {

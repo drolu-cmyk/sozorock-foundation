@@ -299,7 +299,21 @@ function publicRedirectQuery(url) {
 function publicRedirectPath(pathname) {
   const path = pathname === "/" ? "/" : pathname.replace(/\/+$/u, "");
   return APP_ROUTES.has(path) || LEGACY_ROUTES.has(path) || PRIVATE_PUBLICATION_FILES.has(path)
-    || ["/robots.txt", "/sitemap.xml", "/favicon.ico", "/site.webmanifest", "/.well-known/security.txt"].includes(path)
+    || [
+      "/robots.txt", "/sitemap.xml", "/favicon.ico", "/favicon.svg", "/apple-touch-icon.png",
+      "/icon-192.png", "/icon-512.png", "/site.webmanifest", "/llms.txt",
+      "/assets/instrument-sans-latin-ext-wght-normal-B5bTHO_g.woff2",
+      "/assets/instrument-sans-latin-wght-normal-BbzFLZTg.woff2",
+      "/assets/index-DglJS65l.css", "/assets/index-BKWOrf4r.js",
+      "/b4f26f7199275450b01cabfe27e47f02.txt", "/.well-known/security.txt",
+      "/licenses/instrument-sans-OFL.txt",
+      "/leadership/anthony-abraham.webp", "/leadership/dr-oluwabiyi-adeyemo-headshot.jpg",
+      "/leadership/dr-oluwabiyi-adeyemo.webp", "/leadership/jordan-hare.webp", "/leadership/nike-oye.webp",
+      "/media/foundation-access-capacity-trust-2026.png", "/media/foundation-workforce-capacity-2026.png",
+      "/media/health-access.webp", "/media/hsa-cover.webp", "/media/hsa-social-card.png",
+      "/media/rebs-cover.webp", "/media/rebs-social-card.png", "/media/rrg-cover.webp",
+      "/media/rrg-social-card.png", "/media/sozorock-logo.png", "/media/sozorock-social-card.png"
+    ].includes(path)
     ? path : null;
 }
 

@@ -11,6 +11,14 @@ test('legacy Health hosts redirect permanently to the current Health experience'
  }
 });
 test('legacy CB-CAP links preserve their product destination',()=>assert.equal(req('/cb-cap').headers.location.value,'https://cbcap.sozorockfoundation.org/'));
+test('maintained Health destinations remain available on both legacy hosts',()=>{
+ const routes=['/contact','/interest','/primary-care-access','/evidence','/privacy','/terms','/accessibility','/nondiscrimination','/es','/es/primary-care-access','/es/privacy','/es/terms','/es/accessibility','/es/nondiscrimination','/publications/rural-equity-blueprint-volume-1','/publications/rethinking-rural-governance-volume-1','/publications/health-systems-assurance-volume-1','/publications/health-systems-assurance-volume-1/access'];
+ for(const host of ['www.sozorockhealth.com','sozorockhealth.com']) for(const path of routes) for(const suffix of ['','/']) {
+  const result=req(path+suffix,host,'GET',{token:{value:'private'}});
+  assert.equal(result.statusCode,301,path);assert.equal(result.headers.location.value,'https://health.sozorockfoundation.org'+path,path);
+ }
+ assert.equal(req('/publications/person@example.test').statusCode,404);
+});
 test('legacy redirect does not reflect unknown or personal paths',()=>{
  for(const path of ['//example.test/','/person@example.test','/%3Femail%3Dperson%40example.test']) {
   assert.equal(req(path).statusCode,404);assert.equal(req(path).headers.location,undefined);

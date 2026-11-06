@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 import vm from "node:vm";
+import { publicAssets } from "./public-assets.mjs";
 
 const template = (await readFile(new URL("../infra/cloudformation/parent-cloudfront.yml", import.meta.url), "utf8")).replaceAll("\r\n", "\n");
 const marker = "      FunctionCode: |\n";
@@ -54,6 +55,18 @@ test("CloudFront permanently canonicalizes the apex and preserves path/query", (
   });
   assert.equal(result.statusCode, 308);
   assert.equal(result.headers.location.value, "https://www.sozorockfoundation.org/platforms?source=apex");
+});
+
+test("CloudFront canonicalizes every shipped public asset without reflecting private paths", async () => {
+  const assets = [...await publicAssets(), ...await publicAssets(new URL("../dist/client/assets/", import.meta.url), "/assets")];
+  for (const path of assets) {
+    const result = request(path, { host: "sozorockfoundation.org", querystring: { email: { value: "person@example.test" } } });
+    assert.equal(result.statusCode, 308, path);
+    assert.equal(result.headers.location.value, `https://www.sozorockfoundation.org${path}`, path);
+  }
+  const privatePath = request("/media/person@example.test", { host: "sozorockfoundation.org" });
+  assert.equal(privatePath.statusCode, 404);
+  assert.equal(privatePath.headers.location, undefined);
 });
 
 test("CloudFront rewrites every clean production route to its prebuilt HTML", async () => {

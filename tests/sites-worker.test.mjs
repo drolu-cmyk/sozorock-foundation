@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { access, readFile } from "node:fs/promises";
 import test from "node:test";
 import worker, { APP_ROUTES, LEGACY_ROUTES } from "../worker/index.js";
+import { publicAssets } from "./public-assets.mjs";
 
 test("redirects the apex domain to the canonical www host", async () => {
   const response = await worker.fetch(new Request("https://sozorockfoundation.org/publications?source=apex", {
@@ -10,6 +11,18 @@ test("redirects the apex domain to the canonical www host", async () => {
 
   assert.equal(response.status, 308);
   assert.equal(response.headers.get("location"), "https://www.sozorockfoundation.org/publications?source=apex");
+});
+
+test("canonicalizes every shipped public asset without reflecting private values", async () => {
+  const assets = [...await publicAssets(), ...await publicAssets(new URL("../dist/client/assets/", import.meta.url), "/assets")];
+  for (const path of assets) {
+    const response = await worker.fetch(new Request(`https://sozorockfoundation.org${path}?email=person%40example.test`), {});
+    assert.equal(response.status, 308, path);
+    assert.equal(response.headers.get("location"), `https://www.sozorockfoundation.org${path}`, path);
+  }
+  const privatePath = await worker.fetch(new Request("https://sozorockfoundation.org/media/person@example.test"), {});
+  assert.equal(privatePath.status, 404);
+  assert.equal(privatePath.headers.get("location"), null);
 });
 
 test("serves every permanent route from its prebuilt route-specific HTML", async () => {
