@@ -11,7 +11,7 @@
   "dependencies": {
     "@aws/bedrock-token-generator": "^1.1.0",
     "@aws-sdk/client-sts": "^3.1111.0",
-    "@openai/agents": "^0.17.0",
+    "@openai/agents": "^0.21.0",
     "openai": "^7.5.0",
     "zod": "^4.1.5"
   }
