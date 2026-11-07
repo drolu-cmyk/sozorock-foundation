@@ -8,6 +8,12 @@ on:
   schedule:
     - cron: "17 */6 * * *"
   workflow_dispatch:
+  pull_request:
+    paths:
+      - .github/workflows/site-monitor.yml
+      - scripts/header-privacy.mjs
+      - infra/production-sites.json
+      - tests/header-privacy.test.mjs
 
 permissions:
   contents: read
@@ -17,7 +23,14 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
+      - name: Check out monitor source without credentials
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+      - name: Check production response privacy
+        run: node scripts/header-privacy.mjs
       - name: Check pages, headers, redirects and certificate
+        if: ${{ !cancelled() }}
         shell: bash
         run: |
           set -euo pipefail
@@ -34,20 +47,6 @@ jobs:
             if grep -qi "^$h:" <<<"$headers"; then echo "exposed $h"; exit 1; fi
           done
           if grep -qi '^server: *amazons3' <<<"$headers"; then echo 'origin server exposed'; exit 1; fi
-          # Privacy: no site may ask browsers for extra client data, send reports to third parties,
-          # or carry personal data (emails, IPv4 or IPv6 addresses) in any header. Every origin is
-          # checked with real GET requests on a page, a missing page and the root redirect.
-          privacy_origins='https://www.sozorockfoundation.org https://health.sozorockfoundation.org https://ai-lab.sozorockfoundation.org https://cbcap.sozorockfoundation.org'
-          for origin in $privacy_origins; do
-            for target in "$origin/" "$origin/monitor-missing-page" "http://${origin#https://}/"; do
-              got="$(curl -s -D - -o /dev/null --max-time 20 -H 'Sec-CH-UA: "monitor"' "$target")" || { echo "$target unreachable"; exit 1; }
-              for h in accept-ch critical-ch server-timing nel report-to reporting-endpoints x-powered-by; do
-                if grep -qi "^$h:" <<<"$got"; then echo "$target sends $h"; exit 1; fi
-              done
-              if grep -Eiq '[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}|(^|[^0-9.])([0-9]{1,3}\.){3}[0-9]{1,3}([^0-9.]|$)|(^|[^0-9a-f:])([0-9a-f]{1,4}:){3,7}[0-9a-f]{1,4}([^0-9a-f:]|$)|[0-9a-f]{0,4}::[0-9a-f]{1,4}' <<<"$got"; then echo "$target header carries an email or IP address"; exit 1; fi
-            done
-            echo "$origin headers private"
-          done
           for pair in /platforms/applied-learning:/workforce /platforms/institute:/publications /insights:/publications; do
             from="${pair%%:*}"; to="${pair##*:}"
             loc="$(curl --proto '=https' --tlsv1.2 -sI --max-time 20 "$site$from" | awk 'tolower($1)=="location:"{print $2}' | tr -d '\r')"

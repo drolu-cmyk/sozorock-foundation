@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import assert from "node:assert/strict";
 import { access, readFile, readdir } from "node:fs/promises";
+import { forbiddenHeaders, validateInventory, validateConfiguredHosts } from "./header-privacy.mjs";
 
 const root = new URL("../", import.meta.url);
 const template = await readFile(new URL("infra/cloudformation/parent-cloudfront.yml", root), "utf8");
@@ -27,25 +28,13 @@ const scheduledText = (await Promise.all(workflowFiles.filter((file) => file !==
 assert.doesNotMatch(scheduledText, /^\s*schedule:/mu);
 const monitorWorkflow = await readFile(new URL("site-monitor.yml", workflowDirectory), "utf8");
 assert.match(monitorWorkflow, /permissions:\n  contents: read\n/u);
-assert.doesNotMatch(monitorWorkflow, /id-token:|secrets\.|configure-aws-credentials|uses:/u);
-assert.match(monitorWorkflow, /accept-ch critical-ch server-timing nel report-to reporting-endpoints x-powered-by/u);
-// Every SozoRock hostname this site links to must be covered by the header privacy monitor.
-{
-  const { readdir } = await import("node:fs/promises");
-  const hosts = new Set();
-  async function scan(dir) {
-    for (const entry of await readdir(new URL(dir, root), { withFileTypes: true })) {
-      const rel = `${dir}${entry.name}${entry.isDirectory() ? "/" : ""}`;
-      if (entry.isDirectory()) await scan(rel);
-      else if (/\.(?:jsx?|mjs|json|ya?ml|html|txt|xml)$/u.test(entry.name)) {
-        for (const match of (await readFile(new URL(rel, root), "utf8")).matchAll(/https:\/\/([a-z0-9-]+)\.sozorockfoundation\.org/gu)) hosts.add(match[1]);
-      }
-    }
-  }
-  for (const dir of ["src/", "public/", "worker/", "infra/"]) await scan(dir);
-  const monitored = monitorWorkflow.match(/privacy_origins='([^']+)'/u)?.[1] ?? "";
-  for (const host of hosts) assert.ok(monitored.includes(`https://${host}.sozorockfoundation.org`), `site monitor must check ${host}.sozorockfoundation.org`);
-}
+assert.doesNotMatch(monitorWorkflow, /id-token:|secrets\.|configure-aws-credentials/u);
+assert.deepEqual([...monitorWorkflow.matchAll(/uses: ([^\s]+)/gu)].map((match) => match[1]), ["actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd"]);
+assert.match(monitorWorkflow, /persist-credentials: false/u);
+assert.match(monitorWorkflow, /node scripts\/header-privacy\.mjs/u);
+for (const header of ["accept-ch", "critical-ch", "server-timing", "nel", "report-to", "reporting-endpoints", "x-powered-by"]) assert.ok(forbiddenHeaders.has(header));
+const { sites: productionSites } = JSON.parse(await readFile(new URL("infra/production-sites.json", root), "utf8"));
+await validateConfiguredHosts(root, validateInventory(productionSites));
 assert.doesNotMatch(template, /Accept-CH|Critical-CH|Server-Timing|Reporting-Endpoints|Report-To|\bNEL\b/iu);
 assert.doesNotMatch(workflowText, /GitHubActionsSozorockAiLabDeployRole/u);
 assert.doesNotMatch(workflowText, /uses:\s+[^\s]+@v\d+(?:\s|$)/u);
