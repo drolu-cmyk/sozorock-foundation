@@ -71,6 +71,9 @@
 .ns-header .skip-link:focus { top: 8px; }
 .ns-header-inner { display: flex; align-items: center; justify-content: space-between; min-height: 84px; gap: 32px; }
 .ns-brand { display: inline-flex; flex-direction: column; line-height: 1; text-decoration: none; }
+.ns-brand-type { display: flex; flex-direction: column; }
+.ns-brand-with-icon { flex-direction: row; align-items: center; gap: 10px; }
+.ns-brand-icon { display: block; width: 44px; height: 44px; flex: none; }
 .ns a.ns-brand { color: var(--navy); }
 .ns-brand span { font-size: 11px; font-weight: 600; }
 .ns-brand strong { font-size: 20px; font-weight: 700; letter-spacing: -0.02em; }
